@@ -27,6 +27,12 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// API Routes
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/assessments", require("./routes/assessments"));
+app.use("/api/subscriptions", require("./routes/subscriptions"));
+app.use("/api/admin", require("./routes/admin"));
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
