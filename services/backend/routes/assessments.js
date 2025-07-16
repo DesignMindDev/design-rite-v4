@@ -1,4 +1,5 @@
-﻿const express = require("express")
+// Enhanced with NDAA-compliant BOM - Updated 07/16/2025 11:49:15
+const express = require("express")
 const { createClient } = require("@supabase/supabase-js")
 const OpenAI = require("openai")
 const router = express.Router()
@@ -56,12 +57,12 @@ router.post("/create", verifyToken, async (req, res) => {
       })
     }
 
-    console.log(`🔍 Generating AI assessment for: ${companyName} (${facilityType})`)
+    console.log(`?? Generating AI assessment for: ${companyName} (${facilityType})`)
 
     // For demo/testing - use a simpler prompt if no user data
     const userSubscriptionTier = "professional" // Default for testing
 
-    // 🧠 Enhanced AI Security Expert Prompt with NDAA-Compliant BOM
+    // ?? Enhanced AI Security Expert Prompt with NDAA-Compliant BOM
     const assessmentPrompt = `You are a world-class security consultant with 20+ years of experience designing NDAA-compliant security systems for Fortune 500 companies.
 
 CLIENT INFORMATION:
@@ -410,7 +411,7 @@ CRITICAL INSTRUCTIONS:
    - Fire/smoke detectors: Per NFPA 72 code (roughly 1 per 900 sq ft)
 2. Use current 2024 market pricing
 3. All unit prices should be realistic (no zeros except where noted)
-4. Extended price MUST equal quantity × unit price
+4. Extended price MUST equal quantity � unit price
 5. Never use banned manufacturers (Hikvision, Dahua, etc.)
 6. Lead score 1-100 based on budget match, urgency, and facility size
 7. Provide specific model numbers that actually exist
@@ -500,7 +501,7 @@ The response must be valid JSON that can be parsed. Be specific and professional
       }
     }
 
-    console.log(`✅ Assessment with BOM generated successfully for ${companyName} - Lead Score: ${leadScore}`)
+    console.log(`? Assessment with BOM generated successfully for ${companyName} - Lead Score: ${leadScore}`)
 
     // Return the assessment
     res.status(201).json({
