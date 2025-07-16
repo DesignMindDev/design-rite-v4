@@ -4,10 +4,12 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
+    // Get the backend URL from environment variables
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
 
     console.log("Forwarding assessment request to backend:", backendUrl)
 
+    // Forward the request to the backend service
     const response = await fetch(`${backendUrl}/api/assessments/create`, {
       method: "POST",
       headers: {
@@ -22,10 +24,11 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await response.json()
+    console.log("Assessment created successfully:", result.assessment?.id)
 
     return NextResponse.json(result)
   } catch (error) {
-    console.error("Assessment API error:", error)
-    return NextResponse.json({ error: "Failed to process assessment" }, { status: 500 })
+    console.error("Assessment creation error:", error)
+    return NextResponse.json({ error: "Failed to create assessment" }, { status: 500 })
   }
 }
