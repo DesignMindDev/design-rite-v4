@@ -1,7 +1,7 @@
 "use client"
 
-import AssessmentPage from "../services/frontend/app/assessment/page"
+import  from "../services/frontend/components/ui/button"
 
 export default function SyntheticV0PageForDeployment() {
-  return <AssessmentPage />
+  return < />
 }

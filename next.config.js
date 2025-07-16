@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -7,35 +9,16 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ["images.unsplash.com", "placeholder.svg"],
     unoptimized: true,
   },
   env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
   },
-  async headers() {
+  async rewrites() {
     return [
       {
-        source: "/(.*)",
-        headers: [
-          {
-            key: "X-Frame-Options",
-            value: "DENY",
-          },
-          {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
-          },
-          {
-            key: "Referrer-Policy",
-            value: "strict-origin-when-cross-origin",
-          },
-          {
-            key: "Strict-Transport-Security",
-            value: "max-age=31536000; includeSubDomains",
-          },
-        ],
+        source: "/api/:path*",
+        destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/:path*`,
       },
     ]
   },
