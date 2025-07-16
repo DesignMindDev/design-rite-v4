@@ -411,7 +411,7 @@ CRITICAL INSTRUCTIONS:
    - Fire/smoke detectors: Per NFPA 72 code (roughly 1 per 900 sq ft)
 2. Use current 2024 market pricing
 3. All unit prices should be realistic (no zeros except where noted)
-4. Extended price MUST equal quantity × unit price
+4. Extended price MUST equal quantity ï¿½ unit price
 5. Never use banned manufacturers (Hikvision, Dahua, etc.)
 6. Lead score 1-100 based on budget match, urgency, and facility size
 7. Provide specific model numbers that actually exist
