@@ -6,7 +6,11 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "audit": "npm audit --production",
+    "audit-fix": "npm audit fix --only=prod",
+    "deps-check": "npm outdated",
+    "deps-update": "npm update --save-exact"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "latest",
