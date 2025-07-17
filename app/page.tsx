@@ -1,7 +1,7 @@
 "use client"
 
-import  from "../services/frontend/components/ui/button"
+import config from "../tailwind.config"
 
 export default function SyntheticV0PageForDeployment() {
-  return < />
+  return <config />
 }
