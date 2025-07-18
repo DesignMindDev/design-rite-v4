@@ -2,5 +2,37 @@
   "buildCommand": "pnpm build",
   "installCommand": "pnpm install",
   "devCommand": "pnpm dev",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://design-rite-backend.onrender.com",
+    "NEXT_PUBLIC_SUPABASE_URL": "https://ickwrbdpuorzqpzqbqpf.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  },
+  "redirects": [
+    {
+      "source": "/api/auth/(.*)",
+      "destination": "https://design-rite-backend.onrender.com/api/auth/$1",
+      "permanent": false
+    },
+    {
+      "source": "/api/assessments/(.*)", 
+      "destination": "https://design-rite-backend.onrender.com/api/assessments/$1",
+      "permanent": false
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    }
+  ]
 }
