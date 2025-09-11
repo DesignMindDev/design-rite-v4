@@ -136,13 +136,22 @@ export default function UnifiedNavigation({ activeSection }: NavigationProps) {
                     <div className="text-xs text-gray-400 leading-tight">In-house team solutions</div>
                   </div>
                 </Link>
--3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                <Link href="/education" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
                   <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                     🎓
                   </div>
                   <div>
-                    <div className="font-semibold text-sm text-white mb-1">Education & Healthcare</div>
-                    <div className="text-xs text-gray-400 leading-tight">Specialized compliance tools</div>
+                    <div className="font-semibold text-sm text-white mb-1">Education</div>
+                    <div className="text-xs text-gray-400 leading-tight">FERPA compliant school security</div>
+                  </div>
+                </Link>
+                <Link href="/healthcare" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    🏥
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Healthcare</div>
+                    <div className="text-xs text-gray-400 leading-tight">HIPAA compliant medical security</div>
                   </div>
                 </Link>
                 <Link href="/consultants" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
@@ -272,7 +281,8 @@ export default function UnifiedNavigation({ activeSection }: NavigationProps) {
             <div className="px-6 py-4 space-y-4">
               <Link href="/integrators" className="block text-white/80 hover:text-white py-2">Security Integrators</Link>
               <Link href="/enterprise" className="block text-white/80 hover:text-white py-2">Enterprise Security</Link>
-              <Link href="/education" className="block text-white/80 hover:text-white py-2">Education & Healthcare</Link>
+              <Link href="/education" className="block text-white/80 hover:text-white py-2">Education</Link>
+              <Link href="/healthcare" className="block text-white/80 hover:text-white py-2">Healthcare</Link>
               <Link href="/consultants" className="block text-white/80 hover:text-white py-2">Security Consultants</Link>
               <Link href="/about" className="block text-white/80 hover:text-white py-2">About</Link>
               <Link href="/contact" className="block text-white/80 hover:text-white py-2">Contact</Link>
