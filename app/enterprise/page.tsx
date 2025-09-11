@@ -525,3 +525,34 @@ export default function EnterpriseSecurityPage() {
             </div>
             <div>
               <h3 className="text-white font-bold mb-4">Solutions</h3
+              <ul className="space-y-2">
+                <li><Link href="/integrators" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Security Integrators</Link></li>
+                <li><Link href="/enterprise" className="text-purple-600 font-medium text-sm transition-colors">Enterprise Security</Link></li>
+                <li><Link href="/education" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Education & Healthcare</Link></li>
+                <li><Link href="/consultants" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Consultants</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-white font-bold mb-4">Company</h3>
+              <ul className="space-y-2">
+                <li><Link href="/about" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">About Us</Link></li>
+                <li><Link href="/careers" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Careers</Link></li>
+                <li><Link href="/contact" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Contact</Link></li>
+                <li><Link href="/support" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Enterprise Support</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-600/30 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
+            <div>© 2025 Design-Rite. All rights reserved.</div>
+            <div className="flex gap-6 mt-4 md:mt-0">
+              <Link href="/privacy" className="hover:text-purple-600 transition-colors">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-purple-600 transition-colors">Terms of Service</Link>
+              <Link href="/security" className="hover:text-purple-600 transition-colors">Security</Link>
+              <Link href="/soc2" className="hover:text-purple-600 transition-colors">SOC 2 Compliance</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  )
+}
