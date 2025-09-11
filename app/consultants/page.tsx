@@ -2,407 +2,259 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import UnifiedNavigation from '@/components/UnifiedNavigation'
 
-export default function SecurityConsultantsPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+export default function ConsultantsPage() {
+  const router = useRouter()
+
+  const redirectToApp = () => {
+    router.push('/app')
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
-      {/* Top Banner */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
-        <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
-          <span className="text-base">🎓</span>
-          <span className="flex-1 text-center">Design-Rite's Revolutionary AI is launching Q4 2025 - Join the waitlist for early access to security design mastery</span>
-          <Link className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30" href="/subscribe">Join Waitlist</Link>
-          <button className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">×</button>
-        </div>
-      </div>
-
-      {/* Secondary Header */}
-      <div className="bg-black/90 border-b border-purple-600/10 py-2 text-xs">
-        <div className="max-w-6xl mx-auto px-8 flex justify-end items-center gap-8">
-          <Link className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2" href="/login">
-            <span>👤</span> Login
-          </Link>
-          <Link className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2" href="/pricing">
-            <span>💰</span> Plans & Pricing
-          </Link>
-          <Link className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2" href="/help">
-            <span>❓</span> Help Center
-          </Link>
-          <Link className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2" href="/contact">
-            <span>📧</span> Contact Us
-          </Link>
-        </div>
-      </div>
-
-      {/* Main Header with Dropdowns */}
-      <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b border-purple-600/20 py-4">
-        <nav className="max-w-6xl mx-auto px-8 flex justify-between items-center">
-          <Link className="flex items-center gap-3 text-white font-black text-2xl" href="/">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">DR</div>
-            Design-Rite
-          </Link>
-
-          {/* Desktop Navigation with Dropdowns */}
-          <ul className="hidden lg:flex items-center gap-10">
-            {/* Platform Dropdown */}
-            <li className="relative group">
-              <a className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full" href="#platform">Platform</a>
-              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
-                <Link className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2" href="/app">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0 transition-all group-hover:bg-purple-600/30 group-hover:scale-110">🔍</div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">AI Assessment</div>
-                    <div className="text-xs text-gray-400 leading-tight">Intelligent security analysis</div>
-                  </div>
-                </Link>
-                <Link className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2" href="/proposal">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0 transition-all group-hover:bg-purple-600/30 group-hover:scale-110">📋</div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Proposal Generator</div>
-                    <div className="text-xs text-gray-400 leading-tight">Professional BOMs & pricing</div>
-                  </div>
-                </Link>
-                <Link className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2" href="/white-label">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0 transition-all group-hover:bg-purple-600/30 group-hover:scale-110">🏢</div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">White-Label Solutions</div>
-                    <div className="text-xs text-gray-400 leading-tight">Branded platforms for partners</div>
-                  </div>
-                </Link>
-                <Link className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1" href="/api">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0 transition-all group-hover:bg-purple-600/30 group-hover:scale-110">⚡</div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">API Access</div>
-                    <div className="text-xs text-gray-400 leading-tight">Integrate with your systems</div>
-                  </div>
-                </Link>
-              </div>
-            </li>
-
-            {/* Solutions Dropdown */}
-            <li className="relative group">
-              <a className="text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-full after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700" href="#solutions">Solutions</a>
-              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
-                <Link className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2" href="/integrators">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🔧</div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Security Integrators</div>
-                    <div className="text-xs text-gray-400 leading-tight">Design & proposal automation</div>
-                  </div>
-                </Link>
-                <Link className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2" href="/enterprise">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🏢</div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Enterprise Security</div>
-                    <div className="text-xs text-gray-400 leading-tight">In-house team solutions</div>
-                  </div>
-                </Link>
-                <Link className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2" href="/education">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🎓</div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Education & Healthcare</div>
-                    <div className="text-xs text-gray-400 leading-tight">Specialized compliance tools</div>
-                  </div>
-                </Link>
-                <Link className="flex items-center gap-4 p-3 rounded-lg text-purple-600 bg-purple-600/10 transition-all hover:translate-x-1" href="/consultants">
-                  <div className="w-10 h-10 bg-purple-600/30 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">💼</div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Security Consultants</div>
-                    <div className="text-xs text-gray-400 leading-tight">Expert-level assessments</div>
-                  </div>
-                </Link>
-              </div>
-            </li>
-
-            {/* Partners Dropdown */}
-            <li className="relative group">
-              <a className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full" href="#partners">Partners</a>
-              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
-                <Link className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2" href="/white-label-program">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🏷️</div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">White-Label Program</div>
-                    <div className="text-xs text-gray-400 leading-tight">Brand our platform as your own</div>
-                  </div>
-                </Link>
-                <Link className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2" href="/integration">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🔗</div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Technology Partners</div>
-                    <div className="text-xs text-gray-400 leading-tight">Integration ecosystem</div>
-                  </div>
-                </Link>
-                <Link className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1" href="/referral">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">💰</div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Referral Program</div>
-                    <div className="text-xs text-gray-400 leading-tight">Earn commission for referrals</div>
-                  </div>
-                </Link>
-              </div>
-            </li>
-
-            {/* About Dropdown */}
-            <li className="relative group">
-              <a className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full" href="#about">About</a>
-              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
-                <Link className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2" href="/about">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🏢</div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Company</div>
-                    <div className="text-xs text-gray-400 leading-tight">Our mission and vision</div>
-                  </div>
-                </Link>
-                <Link className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2" href="/team">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">👥</div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Team</div>
-                    <div className="text-xs text-gray-400 leading-tight">Meet the founders</div>
-                  </div>
-                </Link>
-                <Link className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2" href="/careers">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">💼</div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Careers</div>
-                    <div className="text-xs text-gray-400 leading-tight">Join our growing team</div>
-                  </div>
-                </Link>
-                <Link className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1" href="/academy">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🎓</div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Design-Rite Academy</div>
-                    <div className="text-xs text-gray-400 leading-tight">Security design education</div>
-                  </div>
-                </Link>
-              </div>
-            </li>
-          </ul>
-
-          {/* Desktop Action Buttons */}
-          <div className="hidden lg:flex items-center gap-4">
-            <Link className="bg-purple-600/20 text-purple-600 border border-purple-600/30 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-purple-600/30 hover:border-purple-600 transition-all" href="/subscribe">Subscribe</Link>
-            <div className="flex items-center gap-4">
-              <Link className="bg-purple-600/10 text-purple-600 border border-purple-600/30 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-purple-600/20 hover:border-purple-600 transition-all" href="/demo">Watch Demo</Link>
-              <Link href="/app" className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:shadow-lg hover:shadow-purple-600/30 transition-all">Try It Free</Link>
-            </div>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button className="lg:hidden text-white text-2xl p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>☰</button>
-        </nav>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
-            <div className="px-8 py-4 space-y-4">
-              <Link href="/platform" className="block text-white/80 hover:text-white py-2">Platform</Link>
-              <Link href="/solutions" className="block text-purple-600 font-medium py-2">Solutions</Link>
-              <Link href="/partners" className="block text-white/80 hover:text-white py-2">Partners</Link>
-              <Link href="/about" className="block text-white/80 hover:text-white py-2">About</Link>
-              <Link href="/contact" className="block text-white/80 hover:text-white py-2">Contact</Link>
-              <div className="pt-4 space-y-3">
-                <Link href="/subscribe" className="block bg-purple-600/20 text-purple-600 px-4 py-2 rounded-lg text-center">Subscribe</Link>
-                <Link href="/app" className="block bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-2 rounded-lg text-center">Try Platform</Link>
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
+      <UnifiedNavigation activeSection="solutions" />
 
       {/* Main Content */}
-      <main className="pt-32 pb-16">
+      <main className="py-20 px-6">
         {/* Hero Section */}
-        <section className="text-center mb-20 max-w-4xl mx-auto px-8 relative">
-          <div className="absolute inset-0 bg-gradient-radial from-purple-600/10 via-transparent to-transparent"></div>
-          <div className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-bold text-base tracking-widest uppercase mb-4 relative z-10">
+        <section className="text-center mb-20 max-w-4xl mx-auto">
+          <div className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-bold text-base tracking-widest uppercase mb-4">
             Security Consultants
           </div>
-          <h1 className="text-5xl lg:text-6xl font-black leading-tight mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent relative z-10">
-            Expert-Level Security Assessments
+          <h1 className="text-5xl lg:text-6xl font-black leading-tight mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            Expert-Level Assessments Powered by AI
           </h1>
-          <p className="text-xl text-gray-400 leading-relaxed mb-10 relative z-10">
-            Advanced AI tools designed for security consultants who demand precision, depth, 
-            and professional-grade analysis for complex security projects.
+          <p className="text-xl text-gray-400 leading-relaxed">
+            Leverage AI to enhance your consulting expertise. Deliver comprehensive assessments, 
+            detailed risk analyses, and strategic security recommendations faster than ever before.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
-            <Link href="/app" className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-purple-600/40 transition-all">
-              Start Expert Assessment
-            </Link>
-            <Link href="/contact" className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all">
-              Discuss Custom Solution
-            </Link>
-          </div>
         </section>
 
-        {/* Key Features */}
-        <section className="max-w-6xl mx-auto px-8 mb-24">
-          <h2 className="text-4xl lg:text-5xl font-black mb-4 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent text-center">
-            Built for Security Experts
-          </h2>
-          <p className="text-xl text-gray-400 mb-16 max-w-2xl mx-auto text-center">
-            Advanced features and capabilities designed specifically for experienced security professionals and consultants.
-          </p>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Key Benefits */}
+        <section className="max-w-6xl mx-auto mb-20">
+          <div className="grid lg:grid-cols-3 gap-8">
             <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="w-15 h-15 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-2xl mb-6">
-                🧠
-              </div>
-              <h3 className="text-xl font-bold text-white mb-4">Advanced Threat Modeling</h3>
-              <p className="text-gray-400 mb-6 leading-relaxed">
-                Sophisticated AI analysis that considers complex threat scenarios, attack vectors, and security vulnerabilities across multi-layered environments.
-              </p>
-              <Link className="text-purple-600 font-semibold text-sm hover:text-purple-700 transition-colors" href="/threat-modeling">
-                Learn More →
-              </Link>
+              <div className="text-4xl mb-4">🧠</div>
+              <h3 className="text-xl font-bold mb-4">Enhanced Expertise</h3>
+              <p className="text-gray-400">AI amplifies your professional knowledge with comprehensive threat databases, latest compliance standards, and industry best practices.</p>
             </div>
-
             <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="w-15 h-15 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-2xl mb-6">
-                📊
-              </div>
-              <h3 className="text-xl font-bold text-white mb-4">Risk Assessment Matrix</h3>
-              <p className="text-gray-400 mb-6 leading-relaxed">
-                Comprehensive risk scoring with customizable matrices, probability calculations, and impact assessments for informed decision-making.
-              </p>
-              <Link className="text-purple-600 font-semibold text-sm hover:text-purple-700 transition-colors" href="/risk-assessment">
-                Learn More →
-              </Link>
+              <div className="text-4xl mb-4">📊</div>
+              <h3 className="text-xl font-bold mb-4">Comprehensive Reports</h3>
+              <p className="text-gray-400">Generate executive-level security assessments with detailed risk matrices, compliance gaps, and strategic recommendations.</p>
             </div>
-
             <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="w-15 h-15 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-2xl mb-6">
-                🔍
-              </div>
-              <h3 className="text-xl font-bold text-white mb-4">Vulnerability Analysis</h3>
-              <p className="text-gray-400 mb-6 leading-relaxed">
-                Deep-dive security gap analysis with remediation prioritization, compliance mapping, and detailed technical recommendations.
-              </p>
-              <Link className="text-purple-600 font-semibold text-sm hover:text-purple-700 transition-colors" href="/vulnerability-analysis">
-                Learn More →
-              </Link>
-            </div>
-
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="w-15 h-15 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-2xl mb-6">
-                📋
-              </div>
-              <h3 className="text-xl font-bold text-white mb-4">Executive Reporting</h3>
-              <p className="text-gray-400 mb-6 leading-relaxed">
-                Professional executive summaries with ROI analysis, strategic recommendations, and board-ready presentation materials.
-              </p>
-              <Link className="text-purple-600 font-semibold text-sm hover:text-purple-700 transition-colors" href="/executive-reporting">
-                Learn More →
-              </Link>
-            </div>
-
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="w-15 h-15 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-2xl mb-6">
-                🛡️
-              </div>
-              <h3 className="text-xl font-bold text-white mb-4">Compliance Frameworks</h3>
-              <p className="text-gray-400 mb-6 leading-relaxed">
-                Advanced compliance mapping for complex frameworks including SOC 2, ISO 27001, NIST, and industry-specific regulations.
-              </p>
-              <Link className="text-purple-600 font-semibold text-sm hover:text-purple-700 transition-colors" href="/compliance">
-                Learn More →
-              </Link>
-            </div>
-
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="w-15 h-15 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-2xl mb-6">
-                ⚡
-              </div>
-              <h3 className="text-xl font-bold text-white mb-4">Custom Integrations</h3>
-              <p className="text-gray-400 mb-6 leading-relaxed">
-                API access and custom integrations with existing security tools, SIEM platforms, and enterprise management systems.
-              </p>
-              <Link className="text-purple-600 font-semibold text-sm hover:text-purple-700 transition-colors" href="/api">
-                Learn More →
-              </Link>
+              <div className="text-4xl mb-4">⚡</div>
+              <h3 className="text-xl font-bold mb-4">Accelerated Delivery</h3>
+              <p className="text-gray-400">Complete thorough assessments in hours instead of weeks. Take on more clients while maintaining the highest quality standards.</p>
             </div>
           </div>
         </section>
 
-        {/* Professional Workflow */}
-        <section className="max-w-6xl mx-auto px-8 mb-24">
-          <h2 className="text-4xl font-bold text-center mb-16">Professional Consulting Workflow</h2>
-          <div className="grid lg:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6">1</div>
-              <h3 className="text-xl font-bold mb-4">Discovery & Planning</h3>
-              <p className="text-gray-400">Comprehensive client requirements gathering with advanced questionnaires and site assessment protocols.</p>
+        {/* Consultant-Specific Features */}
+        <section className="max-w-6xl mx-auto mb-20">
+          <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">Built for Security Consulting Excellence</h2>
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div className="space-y-8">
+              <div className="flex gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-xl flex-shrink-0">🔍</div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Advanced Risk Assessment</h3>
+                  <p className="text-gray-400">Multi-layered threat analysis incorporating physical, cyber, and operational security vectors with quantified risk scoring.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-xl flex-shrink-0">📋</div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Executive Reporting</h3>
+                  <p className="text-gray-400">Board-ready reports with executive summaries, ROI justifications, and strategic security roadmaps tailored for C-suite audiences.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-xl flex-shrink-0">🏛️</div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Regulatory Compliance</h3>
+                  <p className="text-gray-400">Comprehensive compliance analysis for CJIS, SOX, FERPA, HIPAA, and industry-specific regulations with gap assessments.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-xl flex-shrink-0">📈</div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Strategic Planning</h3>
+                  <p className="text-gray-400">Long-term security strategies with phased implementation plans, budget forecasting, and performance metrics.</p>
+                </div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6">2</div>
-              <h3 className="text-xl font-bold mb-4">AI-Powered Analysis</h3>
-              <p className="text-gray-400">Expert-level threat modeling and vulnerability assessment using advanced AI algorithms and security frameworks.</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6">3</div>
-              <h3 className="text-xl font-bold mb-4">Strategic Design</h3>
-              <p className="text-gray-400">Multi-layered security architecture with detailed technical specifications and implementation roadmaps.</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex-center text-2xl font-black mx-auto mb-6">4</div>
-              <h3 className="text-xl font-bold mb-4">Executive Delivery</h3>
-              <p className="text-gray-400">Professional reports with executive summaries, ROI analysis, and strategic security recommendations.</p>
+            <div className="bg-gray-800/80 backdrop-blur-xl border border-purple-600/30 rounded-2xl p-8">
+              <h3 className="text-xl font-bold mb-4">Sample: Corporate Campus Assessment</h3>
+              <div className="space-y-4 text-sm">
+                <div className="bg-red-600/20 p-3 rounded-lg border border-red-600/30">
+                  <div className="font-semibold text-red-300">Critical Vulnerabilities</div>
+                  <div className="text-gray-300">12 high-risk areas identified</div>
+                </div>
+                <div className="bg-yellow-600/20 p-3 rounded-lg border border-yellow-600/30">
+                  <div className="font-semibold text-yellow-300">Compliance Gaps</div>
+                  <div className="text-gray-300">CJIS Level 3 requirements not met</div>
+                </div>
+                <div className="bg-green-600/20 p-3 rounded-lg border border-green-600/30">
+                  <div className="font-semibold text-green-300">Strategic Recommendations</div>
+                  <div className="text-gray-300">3-phase security enhancement plan</div>
+                </div>
+                <div className="bg-blue-600/20 p-3 rounded-lg border border-blue-600/30">
+                  <div className="font-semibold text-blue-300">ROI Analysis</div>
+                  <div className="text-gray-300">18-month payback period</div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Use Cases */}
-        <section className="max-w-6xl mx-auto px-8 mb-24">
-          <h2 className="text-4xl font-bold text-center mb-16">Consultant Use Cases</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:border-purple-600/50 hover:bg-white/15 transition-all">
-              <div className="text-4xl mb-4">🏢</div>
-              <h3 className="text-xl font-bold mb-4">Enterprise Security Audits</h3>
-              <p className="text-gray-400">Comprehensive security assessments for large organizations with complex infrastructure and compliance requirements.</p>
+        {/* Consultant Use Cases */}
+        <section className="max-w-6xl mx-auto mb-20">
+          <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">Consultant-Specific Applications</h2>
+          <div className="grid lg:grid-cols-2 gap-8">
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <h3 className="text-xl font-bold mb-4">🏢 Enterprise Security Audits</h3>
+              <p className="text-gray-400 mb-4">
+                Comprehensive security posture assessments for large corporations including multi-site analysis, 
+                policy reviews, and strategic security planning.
+              </p>
+              <ul className="space-y-2 text-gray-300">
+                <li>• Executive-level risk assessments</li>
+                <li>• Compliance gap analysis</li>
+                <li>• Security ROI justifications</li>
+                <li>• Strategic roadmap development</li>
+              </ul>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:border-purple-600/50 hover:bg-white/15 transition-all">
-              <div className="text-4xl mb-4">🏛️</div>
-              <h3 className="text-xl font-bold mb-4">Government & Defense</h3>
-              <p className="text-gray-400">High-security assessments for government facilities, defense contractors, and critical infrastructure projects.</p>
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <h3 className="text-xl font-bold mb-4">⚖️ Legal & Insurance Support</h3>
+              <p className="text-gray-400 mb-4">
+                Expert witness services, litigation support, and insurance claim analysis with 
+                detailed forensic security assessments and professional testimony preparation.
+              </p>
+              <ul className="space-y-2 text-gray-300">
+                <li>• Forensic security analysis</li>
+                <li>• Expert witness reports</li>
+                <li>• Insurance claim support</li>
+                <li>• Litigation documentation</li>
+              </ul>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:border-purple-600/50 hover:bg-white/15 transition-all">
-              <div className="text-4xl mb-4">🏭</div>
-              <h3 className="text-xl font-bold mb-4">Critical Infrastructure</h3>
-              <p className="text-gray-400">Specialized security designs for utilities, transportation, and other critical infrastructure facilities.</p>
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <h3 className="text-xl font-bold mb-4">🏛️ Government & Critical Infrastructure</h3>
+              <p className="text-gray-400 mb-4">
+                Specialized assessments for government facilities, critical infrastructure, 
+                and high-security environments with advanced threat modeling and countermeasures.
+              </p>
+              <ul className="space-y-2 text-gray-300">
+                <li>• CJIS compliance validation</li>
+                <li>• Critical infrastructure protection</li>
+                <li>• Threat modeling & analysis</li>
+                <li>• Security clearance documentation</li>
+              </ul>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:border-purple-600/50 hover:bg-white/15 transition-all">
-              <div className="text-4xl mb-4">🏦</div>
-              <h3 className="text-xl font-bold mb-4">Financial Services</h3>
-              <p className="text-gray-400">High-security assessments for banks, data centers, and financial institutions with strict regulatory requirements.</p>
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <h3 className="text-xl font-bold mb-4">📚 Training & Education</h3>
+              <p className="text-gray-400 mb-4">
+                Educational institution security assessments, security awareness training development, 
+                and specialized programs for educational environments.
+              </p>
+              <ul className="space-y-2 text-gray-300">
+                <li>• Campus security assessments</li>
+                <li>• FERPA compliance reviews</li>
+                <li>• Emergency response planning</li>
+                <li>• Security training curricula</li>
+              </ul>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:border-purple-600/50 hover:bg-white/15 transition-all">
-              <div className="text-4xl mb-4">🎯</div>
-              <h3 className="text-xl font-bold mb-4">Risk Assessments</h3>
-              <p className="text-gray-400">Detailed risk analysis and mitigation strategies for organizations facing specific security challenges.</p>
+          </div>
+        </section>
+
+        {/* Professional Value Proposition */}
+        <section className="max-w-4xl mx-auto mb-20">
+          <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-3xl p-12 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+            <h2 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">Why Top Consultants Choose Design-Rite</h2>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <h3 className="text-xl font-bold mb-4 flex items-center gap-3">
+                  🎓 Professional Credibility
+                </h3>
+                <p className="text-gray-400 mb-4">
+                  AI-powered assessments backed by industry expertise enhance your professional reputation 
+                  and provide unmatched depth of analysis that clients expect from top-tier consultants.
+                </p>
+                <ul className="text-gray-300 space-y-2">
+                  <li>• Industry-leading methodologies</li>
+                  <li>• Comprehensive documentation</li>
+                  <li>• Professional presentation quality</li>
+                  <li>• Defensible recommendations</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold mb-4 flex items-center gap-3">
+                  📈 Business Growth
+                </h3>
+                <p className="text-gray-400 mb-4">
+                  Deliver more comprehensive assessments in less time, allowing you to take on more clients 
+                  while maintaining the highest standards of professional excellence.
+                </p>
+                <ul className="text-gray-300 space-y-2">
+                  <li>• 5x faster assessment delivery</li>
+                  <li>• Higher client satisfaction rates</li>
+                  <li>• Premium pricing justification</li>
+                  <li>• Expanded service capabilities</li>
+                </ul>
+              </div>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:border-purple-600/50 hover:bg-white/15 transition-all">
-              <div className="text-4xl mb-4">📈</div>
-              <h3 className="text-xl font-bold mb-4">Strategic Planning</h3>
-              <p className="text-gray-400">Long-term security strategy development with budget planning and phased implementation roadmaps.</p>
+          </div>
+        </section>
+
+        {/* Testimonials */}
+        <section className="max-w-6xl mx-auto mb-20">
+          <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">Trusted by Security Professionals</h2>
+          <div className="grid lg:grid-cols-2 gap-8">
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="text-4xl mb-4">"</div>
+              <p className="text-gray-300 mb-6 leading-relaxed">
+                "Design-Rite's AI platform has elevated the quality of my security assessments significantly. 
+                My clients are impressed with the depth of analysis and professional presentation. 
+                It's like having a team of experts at my fingertips."
+              </p>
+              <div className="font-semibold text-purple-300">Senior Security Consultant</div>
+              <div className="text-gray-400 text-sm">20+ years experience, Fortune 500 clients</div>
+            </div>
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="text-4xl mb-4">"</div>
+              <p className="text-gray-300 mb-6 leading-relaxed">
+                "The compliance analysis features have been invaluable for my government contracting work. 
+                Design-Rite ensures I never miss a regulatory requirement and helps me deliver 
+                assessments that exceed client expectations."
+              </p>
+              <div className="font-semibold text-purple-300">Government Security Specialist</div>
+              <div className="text-gray-400 text-sm">CJIS certified, federal contracting</div>
             </div>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="max-w-4xl mx-auto px-8">
-          <div className="bg-gradient-to-r from-purple-600/10 to-purple-700/10 backdrop-blur-sm rounded-3xl p-12 border border-purple-600/30 text-center">
-            <h2 className="text-4xl font-bold mb-6">Ready to Enhance Your Practice?</h2>
+        <section className="max-w-4xl mx-auto text-center">
+          <div className="bg-gradient-to-r from-purple-600/10 to-purple-700/10 backdrop-blur-xl border border-purple-600/20 rounded-3xl p-12">
+            <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">Elevate Your Consulting Practice</h2>
             <p className="text-xl text-gray-400 mb-10">
-              Join leading security consultants who are using AI to deliver more comprehensive, 
-              accurate, and profitable consulting services.
+              Join the select group of security consultants leveraging AI to deliver unparalleled 
+              expertise and accelerated results for their most demanding clients.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/app" className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl hover:shadow-purple-600/40 transition-all">
-                Start Expert Trial
-              </Link>
-              <Link href="/contact" className="bg-white/10 border-2 border-white/30 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white/20 hover:border-white/50 transition-all">
+              <button 
+                onClick={redirectToApp} 
+                className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-purple-600/40 transition-all"
+              >
+                Start Professional Trial
+              </button>
+              <Link 
+                href="/contact" 
+                className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all"
+              >
                 Schedule Consultation
               </Link>
             </div>
@@ -411,12 +263,14 @@ export default function SecurityConsultantsPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
+      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12">
         <div className="max-w-6xl mx-auto px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-8">
             <div>
               <div className="flex items-center gap-3 text-white font-black text-2xl mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">DR</div>
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
+                  DR
+                </div>
                 Design-Rite
               </div>
               <p className="text-gray-400 leading-relaxed mb-6">
@@ -427,7 +281,7 @@ export default function SecurityConsultantsPage() {
             <div>
               <h3 className="text-white font-bold mb-4">Platform</h3>
               <ul className="space-y-2">
-                <li><Link href="/app" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">AI Assessment</Link></li>
+                <li><button className="text-gray-400 hover:text-purple-600 text-sm transition-colors">AI Assessment</button></li>
                 <li><Link href="/proposals" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Proposal Generator</Link></li>
                 <li><Link href="/white-label" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">White-Label</Link></li>
                 <li><Link href="/api" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">API Access</Link></li>
@@ -455,9 +309,9 @@ export default function SecurityConsultantsPage() {
           <div className="border-t border-gray-600/30 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
             <div>© 2025 Design-Rite. All rights reserved.</div>
             <div className="flex gap-4 mt-4 md:mt-0">
-              <a href="mailto:hello@design-rite.com" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">📧</a>
-              <Link className="text-gray-400 hover:text-purple-600 text-xl transition-colors" href="/linkedin">💼</Link>
-              <Link className="text-gray-400 hover:text-purple-600 text-xl transition-colors" href="/twitter">🐦</Link>
+              <Link href="mailto:hello@design-rite.com" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">📧</Link>
+              <Link href="/linkedin" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">💼</Link>
+              <Link href="/twitter" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">🐦</Link>
             </div>
           </div>
         </div>
