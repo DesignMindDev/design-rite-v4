@@ -1,5 +1,4 @@
-﻿// File: app/integrators/page.tsx
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -8,29 +7,45 @@ export default function SecurityIntegratorsPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const redirectToApp = () => {
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      window.location.href = '/login-trial.html'
-    } else {
-      window.location.href = '/login-trial.html'
-    }
+    window.location.href = '/login-trial.html'
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800">
-      {/* Top Contact Bar */}
-      <div className="bg-black/20 backdrop-blur-sm border-b border-white/10 py-2">
-        <div className="max-w-6xl mx-auto px-8 flex justify-between items-center text-sm">
-          <div className="text-white/80">
-            🚀 <strong>Ready to transform your design process?</strong> Start your free trial today!
-          </div>
-          <div className="flex gap-6">
-            <Link href="/support" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
-              <span>❓</span> Help Center
-            </Link>
-            <Link href="/contact" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
-              <span>📧</span> Contact Us
-            </Link>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
+      {/* Top Announcement Bar */}
+      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
+        <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
+          <span className="text-base">🔧</span>
+          <span className="flex-1 text-center">
+            Transform your design process with AI - Complete assessments in minutes, not days
+          </span>
+          <Link 
+            href="/contact"
+            className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30"
+          >
+            Get Started
+          </Link>
+          <button className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">
+            ×
+          </button>
+        </div>
+      </div>
+
+      {/* Utility Bar */}
+      <div className="bg-black/90 border-b border-purple-600/10 py-2 text-xs">
+        <div className="max-w-6xl mx-auto px-8 flex justify-end items-center gap-8">
+          <Link href="/login" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>👤</span> Login
+          </Link>
+          <Link href="/pricing" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>💰</span> Plans & Pricing
+          </Link>
+          <Link href="/help" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>❓</span> Help Center
+          </Link>
+          <Link href="/contact" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>📧</span> Contact Us
+          </Link>
         </div>
       </div>
 
@@ -47,12 +62,12 @@ export default function SecurityIntegratorsPage() {
           {/* Desktop Navigation */}
           <ul className="hidden lg:flex items-center gap-10">
             <li className="relative group">
-              <Link href="#platform" className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+              <Link href="/#platform" className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
                 Platform
               </Link>
             </li>
             <li className="relative group">
-              <Link href="#solutions" className="text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-full after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700">
+              <Link href="/#solutions" className="text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-full after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700">
                 Solutions
               </Link>
               <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
@@ -118,7 +133,7 @@ export default function SecurityIntegratorsPage() {
             </Link>
             <button 
               onClick={redirectToApp}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition-all btn-hover-lift"
+              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition-all"
             >
               Try Platform
             </button>
@@ -139,8 +154,8 @@ export default function SecurityIntegratorsPage() {
             <div className="px-6 py-4 space-y-4">
               <Link href="/integrators" className="block text-purple-600 font-medium py-2">Security Integrators</Link>
               <Link href="/enterprise" className="block text-white/80 hover:text-white py-2">Enterprise Security</Link>
-              <Link href="/education" className="block text-white/80 hover:text-white py-2">Education & Healthcare</Link>
-              <Link href="/consultants" className="block text-white/80 hover:text-white py-2">Security Consultants</Link>
+              <Link href="/education" className="block text-white/80 hover:text-white py-2">Education</Link>
+              <Link href="/consultants" className="block text-white/80 hover:text-white py-2">Consultants</Link>
               <div className="pt-4 border-t border-white/10">
                 <Link href="/login" className="block text-white/80 hover:text-white py-2">Sign In</Link>
                 <button onClick={redirectToApp} className="block w-full text-left bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">
@@ -169,13 +184,13 @@ export default function SecurityIntegratorsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
               onClick={redirectToApp}
-              className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all btn-hover-lift text-lg"
+              className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg"
             >
               🚀 Start Free Trial
             </button>
             <Link 
               href="/contact" 
-              className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg"
+              className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block"
             >
               📞 Schedule Demo
             </Link>
@@ -184,7 +199,7 @@ export default function SecurityIntegratorsPage() {
 
         {/* Features Grid */}
         <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 max-w-6xl mx-auto">
-          <div className="glass rounded-2xl p-8 text-center hover:-translate-y-2 transition-all">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
             <div className="text-4xl mb-4">🔍</div>
             <h3 className="text-xl font-bold text-white mb-4">AI Site Assessment</h3>
             <p className="text-gray-300">
@@ -193,7 +208,7 @@ export default function SecurityIntegratorsPage() {
             </p>
           </div>
 
-          <div className="glass rounded-2xl p-8 text-center hover:-translate-y-2 transition-all">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
             <div className="text-4xl mb-4">📋</div>
             <h3 className="text-xl font-bold text-white mb-4">Automated Proposals</h3>
             <p className="text-gray-300">
@@ -202,7 +217,7 @@ export default function SecurityIntegratorsPage() {
             </p>
           </div>
 
-          <div className="glass rounded-2xl p-8 text-center hover:-translate-y-2 transition-all">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
             <div className="text-4xl mb-4">💰</div>
             <h3 className="text-xl font-bold text-white mb-4">Custom Pricing</h3>
             <p className="text-gray-300">
@@ -211,7 +226,7 @@ export default function SecurityIntegratorsPage() {
             </p>
           </div>
 
-          <div className="glass rounded-2xl p-8 text-center hover:-translate-y-2 transition-all">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
             <div className="text-4xl mb-4">🏷️</div>
             <h3 className="text-xl font-bold text-white mb-4">White-Label Ready</h3>
             <p className="text-gray-300">
@@ -220,7 +235,7 @@ export default function SecurityIntegratorsPage() {
             </p>
           </div>
 
-          <div className="glass rounded-2xl p-8 text-center hover:-translate-y-2 transition-all">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
             <div className="text-4xl mb-4">📊</div>
             <h3 className="text-xl font-bold text-white mb-4">Project Management</h3>
             <p className="text-gray-300">
@@ -229,7 +244,7 @@ export default function SecurityIntegratorsPage() {
             </p>
           </div>
 
-          <div className="glass rounded-2xl p-8 text-center hover:-translate-y-2 transition-all">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
             <div className="text-4xl mb-4">⚡</div>
             <h3 className="text-xl font-bold text-white mb-4">10x Faster</h3>
             <p className="text-gray-300">
@@ -275,7 +290,7 @@ export default function SecurityIntegratorsPage() {
             </p>
             <button 
               onClick={redirectToApp}
-              className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl font-bold transition-all btn-hover-lift"
+              className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl font-bold transition-all"
             >
               Start Saving Today
             </button>
@@ -288,7 +303,7 @@ export default function SecurityIntegratorsPage() {
             What Security Integrators Are Saying
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="glass rounded-2xl p-8">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
               <div className="text-yellow-400 text-2xl mb-4">⭐⭐⭐⭐⭐</div>
               <p className="text-gray-300 mb-4">
                 "Design-Rite cut our assessment time from 2 days to 30 minutes. 
@@ -297,7 +312,7 @@ export default function SecurityIntegratorsPage() {
               <div className="text-white font-bold">- Mike Rodriguez, SecureMax Solutions</div>
             </div>
 
-            <div className="glass rounded-2xl p-8">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
               <div className="text-yellow-400 text-2xl mb-4">⭐⭐⭐⭐⭐</div>
               <p className="text-gray-300 mb-4">
                 "The AI recommendations are spot-on and the automated proposals look incredibly professional. 
@@ -306,7 +321,7 @@ export default function SecurityIntegratorsPage() {
               <div className="text-white font-bold">- Sarah Chen, Guardian Tech Systems</div>
             </div>
 
-            <div className="glass rounded-2xl p-8">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
               <div className="text-yellow-400 text-2xl mb-4">⭐⭐⭐⭐⭐</div>
               <p className="text-gray-300 mb-4">
                 "White-labeling was seamless. Our clients think we built this amazing tool in-house. 
@@ -328,13 +343,13 @@ export default function SecurityIntegratorsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
               onClick={redirectToApp}
-              className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all btn-hover-lift text-lg"
+              className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg"
             >
               🚀 Start Free Trial - No Credit Card Required
             </button>
             <Link 
               href="/contact" 
-              className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg"
+              className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block"
             >
               📞 Talk to Our Team
             </Link>
@@ -344,54 +359,13 @@ export default function SecurityIntegratorsPage() {
 
       {/* Footer */}
       <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
-        <div className="max-w-6xl mx-auto px-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <Link href="/" className="flex items-center gap-3 text-white font-black text-xl mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-sm">
-                  DR
-                </div>
-                Design-Rite
-              </Link>
-              <p className="text-gray-400 text-sm">
-                Professional assessments, automated proposals, and comprehensive documentation for the modern security industry.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-white font-bold mb-4">Platform</h3>
-              <ul className="space-y-2">
-                <li><button className="text-gray-400 hover:text-purple-600 text-sm transition-colors">AI Assessment</button></li>
-                <li><Link href="/proposals" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Proposal Generator</Link></li>
-                <li><Link href="/white-label" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">White-Label</Link></li>
-                <li><Link href="/api" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">API Access</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-white font-bold mb-4">Solutions</h3>
-              <ul className="space-y-2">
-                <li><Link href="/integrators" className="text-purple-600 font-medium text-sm transition-colors">Security Integrators</Link></li>
-                <li><Link href="/enterprise" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Enterprise</Link></li>
-                <li><Link href="/education" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Education & Healthcare</Link></li>
-                <li><Link href="/consultants" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Consultants</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-white font-bold mb-4">Company</h3>
-              <ul className="space-y-2">
-                <li><Link href="/about" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">About Us</Link></li>
-                <li><Link href="/careers" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Careers</Link></li>
-                <li><Link href="/contact" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Contact</Link></li>
-                <li><Link href="/support" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Support</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-600/30 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
-            <div>© 2025 Design-Rite. All rights reserved.</div>
-            <div className="flex gap-6 mt-4 md:mt-0">
-              <Link href="/privacy" className="hover:text-purple-600 transition-colors">Privacy Policy</Link>
-              <Link href="/terms" className="hover:text-purple-600 transition-colors">Terms of Service</Link>
-              <Link href="/security" className="hover:text-purple-600 transition-colors">Security</Link>
-            </div>
+        <div className="max-w-6xl mx-auto px-8 text-center">
+          <p className="text-white/70">© 2025 Design-Rite. All rights reserved.</p>
+          <div className="flex justify-center gap-6 mt-4">
+            <Link href="/" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Home</Link>
+            <Link href="/about" className="text-white/70 hover:text-purple-600 text-sm transition-colors">About</Link>
+            <Link href="/careers" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Careers</Link>
+            <Link href="/contact" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Contact</Link>
           </div>
         </div>
       </footer>
