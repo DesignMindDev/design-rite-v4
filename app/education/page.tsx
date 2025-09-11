@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-export default function EducationPage() {
+export default function EducationHealthcarePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const router = useRouter()
 
@@ -96,17 +96,8 @@ export default function EducationPage() {
                     🎓
                   </div>
                   <div>
-                    <div className="font-semibold text-sm text-purple-300 mb-1">Education</div>
-                    <div className="text-xs text-purple-400 leading-tight">FERPA compliant school security</div>
-                  </div>
-                </Link>
-                <Link href="/healthcare" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                    🏥
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Healthcare</div>
-                    <div className="text-xs text-gray-400 leading-tight">HIPAA compliant medical security</div>
+                    <div className="font-semibold text-sm text-purple-300 mb-1">Education & Healthcare</div>
+                    <div className="text-xs text-purple-400 leading-tight">Specialized compliance tools</div>
                   </div>
                 </Link>
                 <Link href="/consultants" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
@@ -157,8 +148,7 @@ export default function EducationPage() {
             <div className="px-6 py-4 space-y-4">
               <Link href="/integrators" className="block text-white/80 hover:text-white py-2">Security Integrators</Link>
               <Link href="/enterprise" className="block text-white/80 hover:text-white py-2">Enterprise Security</Link>
-              <Link href="/education" className="block text-purple-600 font-medium py-2">Education</Link>
-              <Link href="/healthcare" className="block text-white/80 hover:text-white py-2">Healthcare</Link>
+              <Link href="/education" className="block text-purple-600 font-medium py-2">Education & Healthcare</Link>
               <Link href="/consultants" className="block text-white/80 hover:text-white py-2">Security Consultants</Link>
               <div className="pt-4 border-t border-white/10">
                 <Link href="/login" className="block text-white/80 hover:text-white py-2">Sign In</Link>
@@ -176,70 +166,150 @@ export default function EducationPage() {
         {/* Hero Section */}
         <section className="text-center mb-20 max-w-4xl mx-auto">
           <div className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-bold text-base tracking-widest uppercase mb-4">
-            Educational Institution Security
+            Education & Healthcare Security
           </div>
           <h1 className="text-5xl lg:text-6xl font-black leading-tight mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-            Protecting Students with Smart Security
+            Specialized Security for Critical Environments
           </h1>
           <p className="text-xl text-gray-400 leading-relaxed">
-            FERPA-compliant security solutions designed specifically for K-12 schools, universities, and educational facilities. 
-            Create safe learning environments with AI-powered design that understands educational needs.
+            FERPA and HIPAA-compliant security solutions designed for educational institutions and healthcare facilities. 
+            Protect students, patients, and sensitive data with specialized AI-powered design.
           </p>
         </section>
 
-        {/* Educational Challenges */}
+        {/* Split: Education & Healthcare */}
         <section className="max-w-6xl mx-auto mb-20">
-          <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">Unique Educational Security Challenges</h2>
-          <div className="grid lg:grid-cols-3 gap-8">
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="text-4xl mb-4">👥</div>
-              <h3 className="text-xl font-bold mb-4">Open Campus Environment</h3>
-              <p className="text-gray-400">Balance accessibility for learning with controlled access for safety. Manage visitor flow while maintaining welcoming educational atmosphere.</p>
+          <div className="grid lg:grid-cols-2 gap-12">
+            {/* Education Section */}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-3xl p-12 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="text-5xl mb-6 text-center">🎓</div>
+              <h2 className="text-3xl font-bold text-center mb-8">Educational Institutions</h2>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-xl font-bold mb-3">Student Safety First</h3>
+                  <p className="text-gray-400">Comprehensive security solutions for K-12 schools, universities, and educational facilities with specialized protocols for student protection and emergency response.</p>
+                </div>
+                
+                <div>
+                  <h3 className="text-xl font-bold mb-3">FERPA Compliance</h3>
+                  <p className="text-gray-400">Automated compliance validation ensures all security measures meet Family Educational Rights and Privacy Act requirements for student data protection.</p>
+                </div>
+                
+                <div>
+                  <h3 className="text-xl font-bold mb-3">Budget-Conscious Solutions</h3>
+                  <p className="text-gray-400">Cost-effective recommendations optimized for educational budgets, with grant application support documentation and phased implementation plans.</p>
+                </div>
+              </div>
+              
+              <div className="mt-8 p-6 bg-blue-600/20 rounded-xl border border-blue-600/30">
+                <h4 className="font-bold mb-3">Key Features for Schools:</h4>
+                <ul className="space-y-2 text-gray-300">
+                  <li>• Visitor management integration</li>
+                  <li>• Emergency lockdown protocols</li>
+                  <li>• Campus-wide communication systems</li>
+                  <li>• Student privacy protection</li>
+                  <li>• Grant funding documentation</li>
+                </ul>
+              </div>
             </div>
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="text-4xl mb-4">📚</div>
-              <h3 className="text-xl font-bold mb-4">Student Privacy Protection</h3>
-              <p className="text-gray-400">FERPA compliance requirements for student data protection while ensuring comprehensive security coverage of educational activities.</p>
-            </div>
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="text-4xl mb-4">💰</div>
-              <h3 className="text-xl font-bold mb-4">Budget Constraints</h3>
-              <p className="text-gray-400">Maximize security effectiveness within limited educational budgets. Grant funding support and phased implementation planning.</p>
+
+            {/* Healthcare Section */}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-3xl p-12 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="text-5xl mb-6 text-center">🏥</div>
+              <h2 className="text-3xl font-bold text-center mb-8">Healthcare Facilities</h2>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-xl font-bold mb-3">Patient Privacy Protection</h3>
+                  <p className="text-gray-400">HIPAA-compliant security designs that protect patient information while maintaining operational efficiency and emergency access requirements.</p>
+                </div>
+                
+                <div>
+                  <h3 className="text-xl font-bold mb-3">Medical Equipment Security</h3>
+                  <p className="text-gray-400">Specialized protection for valuable medical equipment, pharmaceutical storage, and controlled substance areas with appropriate access controls.</p>
+                </div>
+                
+                <div>
+                  <h3 className="text-xl font-bold mb-3">Emergency Department Protocols</h3>
+                  <p className="text-gray-400">Unique security requirements for high-stress environments with rapid patient turnover and potential violence prevention.</p>
+                </div>
+              </div>
+              
+              <div className="mt-8 p-6 bg-green-600/20 rounded-xl border border-green-600/30">
+                <h4 className="font-bold mb-3">Key Features for Healthcare:</h4>
+                <ul className="space-y-2 text-gray-300">
+                  <li>• HIPAA compliance validation</li>
+                  <li>• Pharmaceutical security zones</li>
+                  <li>• Patient flow monitoring</li>
+                  <li>• Staff duress systems</li>
+                  <li>• Medical equipment tracking</li>
+                </ul>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* FERPA Compliance Focus */}
-        <section className="max-w-4xl mx-auto mb-20">
-          <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-3xl p-12 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-            <h2 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">FERPA Compliance Built-In</h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-xl font-bold mb-4 flex items-center gap-3">
-                  📋 Automated Compliance
-                </h3>
-                <p className="text-gray-400 mb-4">
-                  Our AI automatically validates that all security measures comply with Family Educational Rights and Privacy Act requirements.
-                </p>
-                <ul className="text-gray-300 space-y-2">
-                  <li>• Student privacy protection protocols</li>
-                  <li>• Educational record safeguarding</li>
-                  <li>• Access control documentation</li>
-                  <li>• Compliance audit trails</li>
+        {/* Compliance Standards */}
+        <section className="max-w-6xl mx-auto mb-20">
+          <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">Regulatory Compliance Built-In</h2>
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="bg-blue-600/20 rounded-2xl p-8 text-center border border-blue-600/30 hover:-translate-y-1 transition-all">
+              <div className="text-4xl mb-4">📚</div>
+              <h3 className="text-xl font-bold mb-4">FERPA Compliance</h3>
+              <p className="text-gray-400">Automated validation of Family Educational Rights and Privacy Act requirements for educational institutions.</p>
+            </div>
+            <div className="bg-green-600/20 rounded-2xl p-8 text-center border border-green-600/30 hover:-translate-y-1 transition-all">
+              <div className="text-4xl mb-4">🏥</div>
+              <h3 className="text-xl font-bold mb-4">HIPAA Compliance</h3>
+              <p className="text-gray-400">Health Insurance Portability and Accountability Act compliance for healthcare facility security requirements.</p>
+            </div>
+            <div className="bg-purple-600/20 rounded-2xl p-8 text-center border border-purple-600/30 hover:-translate-y-1 transition-all">
+              <div className="text-4xl mb-4">🏛️</div>
+              <h3 className="text-xl font-bold mb-4">Local Codes</h3>
+              <p className="text-gray-400">Integration with local building codes, fire safety requirements, and emergency response protocols.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Use Cases */}
+        <section className="max-w-6xl mx-auto mb-20">
+          <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">Common Implementation Scenarios</h2>
+          <div className="grid lg:grid-cols-2 gap-8">
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-3">
+                🏫 K-12 School District
+              </h3>
+              <p className="text-gray-400 mb-4">
+                Comprehensive security upgrade for a 15-school district including elementary, middle, and high schools. 
+                Standardized security protocols with age-appropriate considerations.
+              </p>
+              <div className="bg-blue-600/20 p-4 rounded-lg border border-blue-600/30">
+                <div className="text-sm font-semibold text-blue-300 mb-2">Implementation Highlights:</div>
+                <ul className="text-gray-300 text-sm space-y-1">
+                  <li>• Visitor management at all entry points</li>
+                  <li>• Campus-wide emergency communication</li>
+                  <li>• Playground and athletic facility monitoring</li>
+                  <li>• Bus loading zone security</li>
                 </ul>
               </div>
-              <div>
-                <h3 className="text-xl font-bold mb-4 flex items-center gap-3">
-                  💰 Grant Application Support
-                </h3>
-                <p className="text-gray-400 mb-4">
-                  Comprehensive documentation packages designed to support federal and state grant applications for educational security improvements.
-                </p>
-                <ul className="text-gray-300 space-y-2">
-                  <li>• Federal grant documentation</li>
-                  <li>• State funding applications</li>
-                  <li>• Cost-benefit analysis reports</li>
-                  <li>• Implementation timelines</li>
+            </div>
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-3">
+                🏥 Regional Medical Center
+              </h3>
+              <p className="text-gray-400 mb-4">
+                Multi-building hospital campus with emergency department, surgical suites, and outpatient facilities. 
+                Balanced security with patient care accessibility.
+              </p>
+              <div className="bg-green-600/20 p-4 rounded-lg border border-green-600/30">
+                <div className="text-sm font-semibold text-green-300 mb-2">Implementation Highlights:</div>
+                <ul className="text-gray-300 text-sm space-y-1">
+                  <li>• Emergency department violence prevention</li>
+                  <li>• Pharmaceutical storage security</li>
+                  <li>• Patient room privacy protection</li>
+                  <li>• Medical equipment asset tracking</li>
                 </ul>
               </div>
             </div>
@@ -249,23 +319,23 @@ export default function EducationPage() {
         {/* CTA Section */}
         <section className="max-w-4xl mx-auto text-center">
           <div className="bg-gradient-to-r from-purple-600/10 to-purple-700/10 backdrop-blur-xl border border-purple-600/20 rounded-3xl p-12">
-            <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">Protect Your Educational Community</h2>
+            <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">Protect Your Students and Patients</h2>
             <p className="text-xl text-gray-400 mb-10">
-              Create safer learning environments with security solutions designed specifically for educational institutions. 
-              Start with a FERPA-compliant assessment today.
+              Specialized security solutions that understand the unique requirements of educational and healthcare environments. 
+              Start with a compliant assessment today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 
                 onClick={redirectToApp} 
                 className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-purple-600/40 transition-all"
               >
-                Start Educational Assessment
+                Start Compliant Assessment
               </button>
               <Link 
                 href="/contact" 
                 className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all"
               >
-                Speak with Education Specialist
+                Speak with Specialist
               </Link>
             </div>
           </div>
@@ -302,8 +372,8 @@ export default function EducationPage() {
               <ul className="space-y-2">
                 <li><Link href="/integrators" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Security Integrators</Link></li>
                 <li><Link href="/enterprise" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Enterprise</Link></li>
-                <li><Link href="/education" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Education</Link></li>
-                <li><Link href="/healthcare" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Healthcare</Link></li>
+                <li><Link href="/education" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Education & Healthcare</Link></li>
+                <li><Link href="/consultants" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Consultants</Link></li>
               </ul>
             </div>
             <div>
