@@ -294,9 +294,11 @@ export default function EnterpriseSecurityPage() {
               className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl font-bold transition-all"
             >
               Calculate Your Enterprise Savings
-            </button>
-          </div>
-        </section>
+            </Link>
+            <Link 
+              href="/contact" 
+              className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block"
+            >
 
         {/* CTA Section */}
         <section className="text-center max-w-4xl mx-auto">
@@ -307,12 +309,12 @@ export default function EnterpriseSecurityPage() {
             Join enterprise security teams who have transformed their operations with Design-Rite.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
-              onClick={redirectToApp}
-              className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg"
-            >
-              🚀 Start Enterprise Trial
-            </button>
+            <Link 
+  href="/enterprise-roi"
+  className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl font-bold transition-all inline-block"
+>
+  Calculate Your Enterprise Savings
+</Link>
             <Link 
               href="/contact" 
               className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block"
