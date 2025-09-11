@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import UnifiedNavigation from '@/components/UnifiedNavigation'
+import UnifiedNavigation from '../components/UnifiedNavigation'
 
 export default function EnterprisePage() {
   const router = useRouter()
