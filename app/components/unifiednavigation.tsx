@@ -136,7 +136,7 @@ export default function UnifiedNavigation({ activeSection }: NavigationProps) {
                     <div className="text-xs text-gray-400 leading-tight">In-house team solutions</div>
                   </div>
                 </Link>
-                <Link href="/education" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
                   <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                     🎓
                   </div>
