@@ -268,6 +268,158 @@ export default function DesignRiteLandingPage() {
         </div>
       </section>
 
+      {/* Features Section */}
+      <section className="py-24 bg-black/50">
+        <div className="max-w-6xl mx-auto px-8 text-center">
+          <h2 className="text-4xl lg:text-5xl font-black mb-4 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">
+            Intelligent Security Design Platform
+          </h2>
+          <p className="text-xl text-gray-400 mb-16 max-w-2xl mx-auto">
+            Powered by advanced AI algorithms trained on thousands of security installations, 
+            our platform delivers professional-grade assessments and proposals.
+          </p>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: "🧠",
+                title: "AI-Powered Analysis",
+                description: "Our advanced AI analyzes your facility requirements and generates comprehensive security assessments with detailed device specifications and placement recommendations.",
+                link: "/ai-analysis"
+              },
+              {
+                icon: "📋",
+                title: "Professional Proposals",
+                description: "Generate client-ready proposals with detailed BOMs, pricing, compliance documentation, and implementation timelines in minutes.",
+                link: "/proposals"
+              },
+              {
+                icon: "🏢",
+                title: "White-Label Solutions",
+                description: "Brand our platform as your own. Complete customization with your logo, colors, and pricing to seamlessly integrate with your business.",
+                link: "/white-label"
+              },
+              {
+                icon: "📊",
+                title: "Compliance Analytics",
+                description: "Ensure full compliance with industry standards including CJIS, FERPA, HIPAA, and local building codes with automated verification.",
+                link: "/compliance"
+              },
+              {
+                icon: "⚡",
+                title: "API Integration",
+                description: "Seamlessly integrate our AI capabilities into your existing workflows with our comprehensive REST API and webhooks.",
+                link: "/api"
+              },
+              {
+                icon: "📈",
+                title: "Project Management",
+                description: "Track project progress, manage client communications, and maintain detailed documentation throughout the entire installation lifecycle.",
+                link: "/projects"
+              }
+            ].map((feature, index) => (
+              <div key={index} className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 text-left hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+                <div className="w-15 h-15 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-2xl mb-6">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4">{feature.title}</h3>
+                <p className="text-gray-400 mb-6 leading-relaxed">{feature.description}</p>
+                <Link href={feature.link} className="text-purple-600 font-semibold text-sm hover:text-purple-700 transition-colors">
+                  Learn More →
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 bg-gradient-to-r from-purple-600/10 to-purple-700/10">
+        <div className="max-w-4xl mx-auto px-8 text-center">
+          <h2 className="text-4xl lg:text-5xl font-black text-white mb-4">
+            Ready to Transform Your Design Process?
+          </h2>
+          <p className="text-xl text-gray-400 mb-10">
+            Join hundreds of security integrators who are already on our waitlist for early access 
+            to the most advanced AI-powered security design platform launching Q4 2025.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button 
+              onClick={redirectToWaitlist}
+              className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-purple-600/40 transition-all"
+            >
+              Join Waitlist - Free Early Access
+            </button>
+            <Link 
+              href="/contact"
+              className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all"
+            >
+              Contact Sales
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12">
+        <div className="max-w-6xl mx-auto px-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-8">
+            <div>
+              <div className="flex items-center gap-3 text-white font-black text-2xl mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
+                  DR
+                </div>
+                Design-Rite
+              </div>
+              <p className="text-gray-400 leading-relaxed mb-6">
+                Transforming security system design with AI-powered intelligence. 
+                Professional assessments, automated proposals, and comprehensive 
+                documentation for the modern security industry.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="text-white font-bold mb-4">Platform</h3>
+              <ul className="space-y-2">
+                <li><button onClick={redirectToWaitlist} className="text-gray-400 hover:text-purple-600 text-sm transition-colors">AI Assessment</button></li>
+                <li><Link href="/proposals" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Proposal Generator</Link></li>
+                <li><Link href="/white-label" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">White-Label</Link></li>
+                <li><Link href="/api" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">API Access</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-white font-bold mb-4">Solutions</h3>
+              <ul className="space-y-2">
+                <li><Link href="/integrators" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Security Integrators</Link></li>
+                <li><Link href="/enterprise" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Enterprise</Link></li>
+                <li><Link href="/education" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Education</Link></li>
+                <li><Link href="/healthcare" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Healthcare</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-white font-bold mb-4">Company</h3>
+              <ul className="space-y-2">
+                <li><Link href="/about" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">About Us</Link></li>
+                <li><Link href="/careers" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Careers</Link></li>
+                <li><Link href="/contact" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Contact</Link></li>
+                <li><Link href="/support" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Support</Link></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-600/30 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
+            <div>© 2025 Design-Rite. All rights reserved.</div>
+            <div className="flex gap-4 mt-4 md:mt-0">
+              <a href="mailto:hello@design-rite.com" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">📧</a>
+              <Link href="/linkedin" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">💼</Link>
+              <Link href="/twitter" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">🐦</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
+
       {/* Working Chat Widget */}
       <div className="fixed bottom-5 right-5 z-[999999]">
         <button
