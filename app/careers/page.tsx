@@ -87,7 +87,7 @@ Best regards,
                     <div className="text-xs text-gray-400">Intelligent security analysis</div>
                   </div>
                 </button>
-                <Link href="/proposal" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                <Link href="/professional-proposals" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
                   <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">📋</div>
                   <div>
                     <div className="font-semibold text-sm text-white mb-1">Proposal Generator</div>
@@ -273,6 +273,38 @@ Best regards,
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="text-3xl mb-4">🚀</div>
+              <h3 className="text-xl font-bold text-white mb-4">Cutting-Edge Technology</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Work with the latest AI/ML technologies, building systems that transform how security professionals work.
+              </p>
+            </div>
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="text-3xl mb-4">🌱</div>
+              <h3 className="text-xl font-bold text-white mb-4">Growth Opportunities</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Join a rapidly growing startup where your impact is visible and your career growth is accelerated.
+              </p>
+            </div>
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="text-3xl mb-4">🏠</div>
+              <h3 className="text-xl font-bold text-white mb-4">Remote-First Culture</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Work from anywhere while collaborating with a distributed team of talented professionals.
+              </p>
+            </div>
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="text-3xl mb-4">🎯</div>
+              <h3 className="text-xl font-bold text-white mb-4">Meaningful Impact</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Your work directly helps security professionals deliver better solutions and protect more people.
+              </p>
+            </div>
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
               <div className="text-3xl mb-4">💰</div>
               <h3 className="text-xl font-bold text-white mb-4">Competitive Benefits</h3>
               <p className="text-gray-400 leading-relaxed">
@@ -445,97 +477,25 @@ Best regards,
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-16 bg-black/50">
-        <div className="max-w-6xl mx-auto px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-black mb-4 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">
-              Benefits & Perks
-            </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              We believe in taking care of our team so they can do their best work.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6 text-center">
-              <div className="text-3xl mb-4">💰</div>
-              <h3 className="text-lg font-bold text-white mb-2">Competitive Equity</h3>
-              <p className="text-gray-400 text-sm">Meaningful equity stakes in a high-growth AI startup</p>
-            </div>
-
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6 text-center">
-              <div className="text-3xl mb-4">🏥</div>
-              <h3 className="text-lg font-bold text-white mb-2">Health Benefits</h3>
-              <p className="text-gray-400 text-sm">Comprehensive medical, dental, and vision coverage</p>
-            </div>
-
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6 text-center">
-              <div className="text-3xl mb-4">🏖️</div>
-              <h3 className="text-lg font-bold text-white mb-2">Unlimited PTO</h3>
-              <p className="text-gray-400 text-sm">Take the time you need to recharge and stay productive</p>
-            </div>
-
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6 text-center">
-              <div className="text-3xl mb-4">💻</div>
-              <h3 className="text-lg font-bold text-white mb-2">Tech Stipend</h3>
-              <p className="text-gray-400 text-sm">$2,000 annual budget for equipment and software</p>
-            </div>
-
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6 text-center">
-              <div className="text-3xl mb-4">📚</div>
-              <h3 className="text-lg font-bold text-white mb-2">Learning Budget</h3>
-              <p className="text-gray-400 text-sm">$1,500 annually for courses, conferences, and books</p>
-            </div>
-
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6 text-center">
-              <div className="text-3xl mb-4">🌍</div>
-              <h3 className="text-lg font-bold text-white mb-2">Remote-First</h3>
-              <p className="text-gray-400 text-sm">Work from anywhere with flexible hours and collaboration</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Application Process Section */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-8">
-          <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-12">
-            <h2 className="text-4xl font-black mb-8 text-center bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">
-              Ready to Join Us?
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8 mb-10">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">1</div>
-                <h3 className="text-white font-semibold mb-2">Apply</h3>
-                <p className="text-gray-400 text-sm">Send us your resume and a note about why you're excited about Design-Rite</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">2</div>
-                <h3 className="text-white font-semibold mb-2">Interview</h3>
-                <p className="text-gray-400 text-sm">Casual conversation about your experience and our mission</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">3</div>
-                <h3 className="text-white font-semibold mb-2">Welcome</h3>
-                <p className="text-gray-400 text-sm">Join our team and start building the future of security design</p>
-              </div>
-            </div>
-
-            <div className="text-center">
-              <p className="text-lg text-gray-300 mb-8">
-                Don't see a position that matches your skills? We're always looking for exceptional talent.
-              </p>
-              <button 
-                onClick={() => applyForPosition('General Application')}
-                className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-purple-600/40 transition-all mr-4"
-              >
-                Send General Application
-              </button>
-              <Link href="/contact" className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all inline-block">
-                Contact HR Team
-              </Link>
-            </div>
+      {/* Call to Action Section */}
+      <section className="py-24 bg-gradient-to-r from-purple-600/10 to-purple-700/10">
+        <div className="max-w-4xl mx-auto px-8 text-center">
+          <h2 className="text-4xl lg:text-5xl font-black text-white mb-4">
+            Ready to Join Us?
+          </h2>
+          <p className="text-xl text-gray-400 mb-10">
+            Don't see a position that matches your skills? We're always looking for exceptional talent.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button 
+              onClick={() => applyForPosition('General Application')}
+              className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-purple-600/40 transition-all"
+            >
+              Send General Application
+            </button>
+            <Link href="/contact" className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all">
+              Contact HR Team
+            </Link>
           </div>
         </div>
       </section>
@@ -607,36 +567,4 @@ Best regards,
       </div>
     </div>
   )
-}-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="text-3xl mb-4">🚀</div>
-              <h3 className="text-xl font-bold text-white mb-4">Cutting-Edge Technology</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Work with the latest AI/ML technologies, building systems that transform how security professionals work.
-              </p>
-            </div>
-
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="text-3xl mb-4">🌱</div>
-              <h3 className="text-xl font-bold text-white mb-4">Growth Opportunities</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Join a rapidly growing startup where your impact is visible and your career growth is accelerated.
-              </p>
-            </div>
-
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="text-3xl mb-4">🏠</div>
-              <h3 className="text-xl font-bold text-white mb-4">Remote-First Culture</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Work from anywhere while collaborating with a distributed team of talented professionals.
-              </p>
-            </div>
-
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="text-3xl mb-4">🎯</div>
-              <h3 className="text-xl font-bold text-white mb-4">Meaningful Impact</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Your work directly helps security professionals deliver better solutions and protect more people.
-              </p>
-            </div>
-
-            <div className="bg
+}
