@@ -309,16 +309,16 @@ export default function AIAssessmentPage() {
         </div>
       </div>
 
-      <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
-        <label className="block text-sm font-semibold text-purple-200 mb-4">
+      <div className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700">
+        <label className="block text-sm font-semibold text-gray-300 mb-4">
           Compliance Requirements
         </label>
         <div className="grid md:grid-cols-3 gap-3">
           {['CJIS', 'HIPAA', 'SOX', 'FERPA', 'GDPR', 'PCI DSS', 'None Required'].map(compliance => (
-            <label key={compliance} className="flex items-center space-x-2 p-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 cursor-pointer transition-all">
+            <label key={compliance} className="flex items-center space-x-2 p-3 bg-gray-800/50 border border-gray-600 rounded-lg hover:bg-gray-700/50 cursor-pointer transition-all">
               <input 
                 type="checkbox" 
-                className="text-purple-500 focus:ring-purple-400 focus:ring-2 rounded"
+                className="text-purple-500 focus:ring-purple-500 focus:ring-2 rounded"
                 onChange={(e) => {
                   const reqs = e.target.checked 
                     ? [...sessionData.compliance, compliance]
@@ -327,7 +327,7 @@ export default function AIAssessmentPage() {
                 }}
                 checked={sessionData.compliance.includes(compliance)}
               />
-              <span className="text-purple-100 text-sm font-medium">{compliance}</span>
+              <span className="text-gray-300 text-sm font-medium">{compliance}</span>
             </label>
           ))}
         </div>
@@ -336,7 +336,7 @@ export default function AIAssessmentPage() {
       <div className="text-center">
         <button 
           onClick={() => setCurrentStep('ai-results')}
-          className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-green-600 hover:to-blue-600 transition-all inline-flex items-center gap-2 text-lg"
+          className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all inline-flex items-center gap-2 text-lg"
         >
           Generate AI Assessment <Zap className="w-5 h-5" />
         </button>
