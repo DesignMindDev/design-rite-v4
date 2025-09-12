@@ -100,15 +100,19 @@ export default function AIAssessmentPage() {
     generateAIInsight(value, key);
   };
 
+  const redirectToApp = () => {
+    window.location.href = '/app'
+  }
+
   const WelcomeStep = () => (
     <div className="text-center space-y-6 max-w-3xl mx-auto">
-      <div className="mx-auto w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
-        <Shield className="w-10 h-10 text-white" />
+      <div className="mx-auto w-20 h-20 bg-gradient-to-br from-purple-400 to-purple-300 rounded-full flex items-center justify-center">
+        <Shield className="w-10 h-10 text-purple-800" />
       </div>
       <h1 className="text-4xl lg:text-5xl font-bold text-white">
         AI Security Consultant Demo
       </h1>
-      <p className="text-xl text-purple-100 leading-relaxed">
+      <p className="text-xl text-white/80 leading-relaxed">
         Experience how our AI gathers information and provides instant insights. 
         In just 5 minutes, you'll see a complete security assessment with professional recommendations.
       </p>
@@ -117,22 +121,22 @@ export default function AIAssessmentPage() {
         <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20">
           <div className="text-2xl mb-2">🧠</div>
           <h3 className="font-semibold text-white mb-1">Smart Questions</h3>
-          <p className="text-sm text-purple-100">Questions adapt based on your answers</p>
+          <p className="text-sm text-white/70">Questions adapt based on your answers</p>
         </div>
         <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20">
           <div className="text-2xl mb-2">⚡</div>
           <h3 className="font-semibold text-white mb-1">Instant Insights</h3>
-          <p className="text-sm text-purple-100">AI provides recommendations in real-time</p>
+          <p className="text-sm text-white/70">AI provides recommendations in real-time</p>
         </div>
         <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20">
           <div className="text-2xl mb-2">📋</div>
           <h3 className="font-semibold text-white mb-1">Professional Output</h3>
-          <p className="text-sm text-purple-100">Complete assessment with specifications</p>
+          <p className="text-sm text-white/70">Complete assessment with specifications</p>
         </div>
       </div>
 
-      <div className="bg-blue-500/20 backdrop-blur-sm p-6 rounded-xl border border-blue-400/30">
-        <p className="text-purple-100">
+      <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
+        <p className="text-white/80">
           <strong className="text-white">What makes this different:</strong> Our AI doesn't just collect data - it analyzes and provides 
           insights in real-time, adapting questions based on your responses using multiple AI providers.
         </p>
@@ -140,7 +144,7 @@ export default function AIAssessmentPage() {
       
       <button 
         onClick={() => setCurrentStep('facility-info')}
-        className="bg-white text-purple-600 px-8 py-4 rounded-xl font-semibold hover:bg-purple-50 transition-all inline-flex items-center gap-2 text-lg"
+        className="bg-white text-purple-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all inline-flex items-center gap-2 text-lg"
       >
         Start AI Assessment <ChevronRight className="w-5 h-5" />
       </button>
@@ -154,7 +158,7 @@ export default function AIAssessmentPage() {
           <Building2 className="w-8 h-8 text-purple-300" />
           <h2 className="text-3xl font-bold text-white">Facility Information</h2>
         </div>
-        <p className="text-purple-200">Tell us about your facility so our AI can provide targeted recommendations</p>
+        <p className="text-white/70">Tell us about your facility so our AI can provide targeted recommendations</p>
       </div>
       
       <div className="grid lg:grid-cols-2 gap-8">
@@ -253,7 +257,7 @@ export default function AIAssessmentPage() {
         <div className="text-center">
           <button 
             onClick={() => setCurrentStep('security-details')}
-            className="bg-white text-purple-600 px-8 py-4 rounded-xl font-semibold hover:bg-purple-50 transition-all inline-flex items-center gap-2"
+            className="bg-white text-purple-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all inline-flex items-center gap-2"
           >
             Continue to Security Details <ChevronRight className="w-5 h-5" />
           </button>
@@ -269,7 +273,7 @@ export default function AIAssessmentPage() {
           <Shield className="w-8 h-8 text-purple-300" />
           <h2 className="text-3xl font-bold text-white">Security Requirements</h2>
         </div>
-        <p className="text-purple-200">Help us understand your budget, timeline, and compliance needs</p>
+        <p className="text-white/70">Help us understand your budget, timeline, and compliance needs</p>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
@@ -309,16 +313,16 @@ export default function AIAssessmentPage() {
         </div>
       </div>
 
-      <div className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700">
-        <label className="block text-sm font-semibold text-gray-300 mb-4">
+      <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
+        <label className="block text-sm font-semibold text-purple-200 mb-4">
           Compliance Requirements
         </label>
         <div className="grid md:grid-cols-3 gap-3">
           {['CJIS', 'HIPAA', 'SOX', 'FERPA', 'GDPR', 'PCI DSS', 'None Required'].map(compliance => (
-            <label key={compliance} className="flex items-center space-x-2 p-3 bg-gray-800/50 border border-gray-600 rounded-lg hover:bg-gray-700/50 cursor-pointer transition-all">
+            <label key={compliance} className="flex items-center space-x-2 p-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 cursor-pointer transition-all">
               <input 
                 type="checkbox" 
-                className="text-purple-500 focus:ring-purple-500 focus:ring-2 rounded"
+                className="text-purple-500 focus:ring-purple-400 focus:ring-2 rounded"
                 onChange={(e) => {
                   const reqs = e.target.checked 
                     ? [...sessionData.compliance, compliance]
@@ -327,7 +331,7 @@ export default function AIAssessmentPage() {
                 }}
                 checked={sessionData.compliance.includes(compliance)}
               />
-              <span className="text-gray-300 text-sm font-medium">{compliance}</span>
+              <span className="text-purple-100 text-sm font-medium">{compliance}</span>
             </label>
           ))}
         </div>
@@ -336,7 +340,7 @@ export default function AIAssessmentPage() {
       <div className="text-center">
         <button 
           onClick={() => setCurrentStep('ai-results')}
-          className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all inline-flex items-center gap-2 text-lg"
+          className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-green-600 hover:to-blue-600 transition-all inline-flex items-center gap-2 text-lg"
         >
           Generate AI Assessment <Zap className="w-5 h-5" />
         </button>
@@ -351,7 +355,7 @@ export default function AIAssessmentPage() {
           <CheckCircle className="w-8 h-8 text-white" />
         </div>
         <h2 className="text-3xl font-bold text-white">AI Assessment Complete</h2>
-        <p className="text-purple-200">Based on your responses, here's what our AI recommends</p>
+        <p className="text-white/70">Based on your responses, here's what our AI recommends</p>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
@@ -446,13 +450,13 @@ export default function AIAssessmentPage() {
       <div className="text-center space-y-6">
         <h3 className="text-2xl font-bold text-white">Ready to see the full platform?</h3>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/waitlist" className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-blue-600 transition-all">
+          <Link href="/waitlist" className="bg-white text-purple-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all">
             Join Waitlist - Q4 2025 Launch
           </Link>
           <Link href="/contact" className="border-2 border-white/30 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all">
             Schedule Demo
           </Link>
-          <Link href="/" className="border border-white/20 text-purple-200 px-6 py-4 rounded-xl font-semibold hover:bg-white/5 transition-all">
+          <Link href="/" className="border border-white/20 text-white/80 px-6 py-4 rounded-xl font-semibold hover:bg-white/5 transition-all">
             Back to Home
           </Link>
         </div>
@@ -461,10 +465,10 @@ export default function AIAssessmentPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-blue-900">
-      {/* Header */}
-      <header className="bg-black/20 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50">
-        <nav className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 text-white">
+      {/* Header - matches integrators page exactly */}
+      <header className="bg-black/10 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 py-5">
+        <nav className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-3 text-white font-bold text-2xl">
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-purple-600 font-black text-sm">
               DR
@@ -472,31 +476,31 @@ export default function AIAssessmentPage() {
             Design-Rite
           </Link>
 
-          <div className="hidden lg:flex items-center gap-6">
-            <Link href="/solutions" className="text-purple-200 hover:text-white transition-colors">
-              Solutions
+          <ul className="hidden lg:flex items-center gap-8">
+            <li><Link href="/platform" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Platform</Link></li>
+            <li><Link href="/solutions" className="text-white bg-white/10 px-4 py-2 rounded-lg font-medium">Solutions</Link></li>
+            <li><Link href="/partners" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Partners</Link></li>
+            <li><Link href="/about" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">About</Link></li>
+            <li><Link href="/contact" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Contact</Link></li>
+          </ul>
+
+          <div className="hidden lg:flex items-center gap-3">
+            <Link href="/login" className="text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
+              Sign In
             </Link>
-            <Link href="/pricing" className="text-purple-200 hover:text-white transition-colors">
-              Pricing  
-            </Link>
-            <Link href="/about" className="text-purple-200 hover:text-white transition-colors">
-              About
-            </Link>
-            <Link href="/contact" className="border border-white/30 text-white px-4 py-2 rounded-lg hover:bg-white/10 transition-all">
-              Contact
-            </Link>
+            <button onClick={redirectToApp} className="bg-white text-purple-600 px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all">
+              Try Platform
+            </button>
           </div>
 
-          <button className="lg:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            ☰
-          </button>
+          <button className="lg:hidden text-white text-2xl" onClick={() => setIsMenuOpen(!isMenuOpen)}>☰</button>
         </nav>
       </header>
 
       {/* Main Content */}
-      <main className="py-12 px-6">
+      <main className="py-20 px-6">
         {/* Progress Indicator */}
-        <div className="max-w-4xl mx-auto mb-12">
+        <div className="max-w-4xl mx-auto mb-20">
           <div className="flex items-center justify-between mb-6">
             {[
               { key: 'welcome', label: 'Welcome', icon: '🚀' },
@@ -509,15 +513,15 @@ export default function AIAssessmentPage() {
                   step.key === currentStep 
                     ? 'text-white' 
                     : ['welcome', 'facility-info', 'security-details'].indexOf(currentStep) > idx
-                    ? 'text-green-400'
-                    : 'text-purple-400'
+                    ? 'text-purple-300'
+                    : 'text-white/40'
                 }`}>
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${
                     step.key === currentStep
                       ? 'bg-white text-purple-600'
                       : ['welcome', 'facility-info', 'security-details'].indexOf(currentStep) > idx
-                      ? 'bg-green-500 text-white'
-                      : 'bg-white/20 text-purple-300'
+                      ? 'bg-purple-300 text-purple-800'
+                      : 'bg-white/20 text-white/60'
                   }`}>
                     {step.icon}
                   </div>
@@ -525,13 +529,13 @@ export default function AIAssessmentPage() {
                     <div className="font-medium">{step.label}</div>
                   </div>
                 </div>
-                {idx < 3 && <ChevronRight className="w-5 h-5 text-purple-400 mx-2 hidden sm:block" />}
+                {idx < 3 && <ChevronRight className="w-5 h-5 text-white/40 mx-2 hidden sm:block" />}
               </div>
             ))}
           </div>
           <div className="w-full bg-white/20 rounded-full h-2">
             <div 
-              className="bg-gradient-to-r from-purple-400 to-blue-400 h-2 rounded-full transition-all duration-700"
+              className="bg-gradient-to-r from-purple-300 to-white h-2 rounded-full transition-all duration-700"
               style={{
                 width: currentStep === 'welcome' ? '0%' : 
                        currentStep === 'facility-info' ? '25%' :
@@ -560,7 +564,7 @@ export default function AIAssessmentPage() {
                   setCurrentStep(steps[currentIndex - 1]);
                 }
               }}
-              className="flex items-center gap-2 text-purple-200 hover:text-white transition-colors"
+              className="flex items-center gap-2 text-white/70 hover:text-white transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
