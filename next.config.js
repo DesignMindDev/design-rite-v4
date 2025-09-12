@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    eslint: {
+  eslint: {
     ignoreDuringBuilds: true,
   },
   typescript: {
@@ -12,6 +12,65 @@ const nextConfig = {
   },
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
+  },
+  async redirects() {
+    return [
+      // Redirect old HTML files to new routes
+      {
+        source: '/index.html',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/solutions-page.html',
+        destination: '/solutions',
+        permanent: true,
+      },
+      {
+        source: '/contact_page.html',
+        destination: '/contact',
+        permanent: true,
+      },
+      {
+        source: '/app.html',
+        destination: '/app',
+        permanent: true,
+      },
+      // Add convenient redirects for new pages
+      {
+        source: '/demo',
+        destination: '/watch-demo',
+        permanent: false,
+      },
+      {
+        source: '/ai-analyst',
+        destination: '/ai-powered-analyst',
+        permanent: false,
+      },
+      {
+        source: '/compliance',
+        destination: '/compliance-analyst',
+        permanent: false,
+      },
+      {
+        source: '/projects',
+        destination: '/project-management',
+        permanent: false,
+      },
+    ]
+  },
+  // Don't interfere with Next.js routes - let them work normally
+  async rewrites() {
+    return {
+      // Only apply rewrites after checking all Next.js routes
+      afterFiles: [
+        // If someone visits root and no Next.js route matches, serve the static HTML
+        {
+          source: '/',
+          destination: '/index-16.html',
+        },
+      ],
+    }
   },
   async headers() {
     return [
