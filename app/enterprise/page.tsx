@@ -289,11 +289,8 @@ export default function EnterpriseSecurityPage() {
             <p className="text-gray-300 mb-6">
               Based on 50+ facility locations with standardized security processes
             </p>
-            <button 
-              onClick={redirectToApp}
-              className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl font-bold transition-all"
-            >
-              Calculate Your Enterprise Savings
+          
+                        Calculate Your Enterprise Savings
             </Link>
             <Link 
               href="/contact" 
