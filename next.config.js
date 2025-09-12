@@ -57,6 +57,11 @@ const nextConfig = {
         destination: '/project-management',
         permanent: false,
       },
+      {
+        source: '/proposals',
+        destination: '/professional-proposals', 
+        permanent: false,
+      },
     ]
   },
   // Don't interfere with Next.js routes - let them work normally
