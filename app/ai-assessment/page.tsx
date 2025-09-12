@@ -23,76 +23,152 @@ export default function AIAssessmentPage() {
   const [aiInsights, setAiInsights] = useState([]);
   const [isGeneratingInsight, setIsGeneratingInsight] = useState(false);
 
-  // Simulate AI insight generation
-  const generateAIInsight = (userInput, context) => {
+  // Real AI insight generation using API
+  const generateAIInsight = async (userInput, context) => {
     setIsGeneratingInsight(true);
-    setTimeout(() => {
-      let insight = '';
-      let recommendation = '';
+    
+    try {
+      const response = await fetch('/api/ai-assessment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionData: { 
+            value: userInput,
+            ...sessionData 
+          },
+          requestType: 'real-time-insight',
+          context: context
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
       
-      if (context === 'facilityType') {
-        const insights = {
-          'office': {
-            insight: "Corporate offices need balanced security for employee safety and asset protection",
-            recommendation: "Focus on access control and visitor management systems"
-          },
-          'retail': {
-            insight: "Retail environments require loss prevention with customer experience balance", 
-            recommendation: "AI-powered theft detection and customer analytics are essential"
-          },
-          'warehouse': {
-            insight: "Warehouses need perimeter security and cargo protection systems",
-            recommendation: "Consider truck dock monitoring and inventory tracking integration"
-          },
-          'healthcare': {
-            insight: "Healthcare facilities require HIPAA compliance and advanced access control",
-            recommendation: "Biometric access and zone-based security with 24/7 monitoring"
-          },
-          'education': {
-            insight: "Educational institutions need comprehensive safety and emergency response",
-            recommendation: "Multi-zone lockdown capabilities and visitor screening systems"
-          },
-          'manufacturing': {
-            insight: "Manufacturing plants need industrial-grade security with safety integration",
-            recommendation: "Explosion-proof cameras and safety system integration required"
-          }
-        };
-        
-        const selected = insights[userInput];
-        if (selected) {
-          insight = selected.insight;
-          recommendation = selected.recommendation;
-        }
-      } else if (context === 'budget') {
-        const budgetValue = parseInt(userInput);
-        if (budgetValue <= 50000) {
-          insight = "Your budget suggests a phased implementation approach would be most effective";
-          recommendation = "Priority 1: Secure main entrances and critical areas first";
-        } else if (budgetValue <= 100000) {
-          insight = "Your budget allows for a comprehensive system with advanced features";
-          recommendation = "Include AI analytics and integrated access control";
-        } else {
-          insight = "Premium budget enables enterprise-grade solutions with redundancy";
-          recommendation = "Full integration with business systems and advanced analytics";
-        }
-      } else if (context === 'securityConcerns' && Array.isArray(userInput) && userInput.length > 0) {
-        if (userInput.includes('Asset Protection')) {
-          insight = "Asset protection focus impacts camera placement and analytics strategy";
-          recommendation = "4K cameras with AI-powered theft detection in high-value areas";
-        } else if (userInput.includes('Employee Safety')) {
-          insight = "Employee safety requires comprehensive monitoring and emergency response";
-          recommendation = "Panic buttons, two-way communication, and rapid response protocols";
-        } else if (userInput.includes('Compliance Requirements')) {
-          insight = "Compliance requirements will drive system design and documentation needs";
-          recommendation = "Ensure all equipment meets regulatory standards and audit trails";
+      if (data.success && data.insight) {
+        setAiInsights(prev => [...prev, { 
+          insight: data.insight.insight,
+          recommendation: data.insight.recommendation,
+          context, 
+          timestamp: Date.now(),
+          priority: data.insight.priority,
+          provider: data.provider || 'AI'
+        }]);
+      } else {
+        // Fallback to local insights if API doesn't return data
+        const fallbackInsight = generateLocalInsight(userInput, context);
+        if (fallbackInsight) {
+          setAiInsights(prev => [...prev, { 
+            ...fallbackInsight, 
+            context, 
+            timestamp: Date.now(),
+            provider: 'Local'
+          }]);
         }
       }
+    } catch (error) {
+      console.error('AI API Error:', error);
       
-      if (insight) {
-        setAiInsights(prev => [...prev, { insight, recommendation, context, timestamp: Date.now() }]);
+      // Fallback to local insights on error
+      const fallbackInsight = generateLocalInsight(userInput, context);
+      if (fallbackInsight) {
+        setAiInsights(prev => [...prev, { 
+          ...fallbackInsight, 
+          context, 
+          timestamp: Date.now(),
+          provider: 'Local',
+          note: 'Generated locally due to API unavailability'
+        }]);
       }
+    } finally {
       setIsGeneratingInsight(false);
-    }, 1200);
+    }
+  };
+
+  // Fallback local insight generation
+  const generateLocalInsight = (userInput, context) => {
+    const localInsights = {
+      'facilityType': {
+        'office': {
+          insight: "Corporate offices need balanced security for employee safety and asset protection",
+          recommendation: "Focus on access control and visitor management systems"
+        },
+        'retail': {
+          insight: "Retail environments require loss prevention with customer experience balance", 
+          recommendation: "AI-powered theft detection and customer analytics are essential"
+        },
+        'warehouse': {
+          insight: "Warehouses need perimeter security and cargo protection systems",
+          recommendation: "Consider truck dock monitoring and inventory tracking integration"
+        },
+        'healthcare': {
+          insight: "Healthcare facilities require HIPAA compliance and advanced access control",
+          recommendation: "Biometric access and zone-based security with 24/7 monitoring"
+        },
+        'education': {
+          insight: "Educational institutions need comprehensive safety and emergency response",
+          recommendation: "Multi-zone lockdown capabilities and visitor screening systems"
+        },
+        'manufacturing': {
+          insight: "Manufacturing plants need industrial-grade security with safety integration",
+          recommendation: "Explosion-proof cameras and safety system integration required"
+        }
+      },
+      'budget': {
+        'low': {
+          insight: "Your budget suggests a phased implementation approach would be most effective",
+          recommendation: "Priority 1: Secure main entrances and critical areas first"
+        },
+        'medium': {
+          insight: "Your budget allows for a comprehensive system with advanced features",
+          recommendation: "Include AI analytics and integrated access control"
+        },
+        'high': {
+          insight: "Premium budget enables enterprise-grade solutions with redundancy",
+          recommendation: "Full integration with business systems and advanced analytics"
+        }
+      }
+    };
+
+    if (context === 'facilityType') {
+      return localInsights.facilityType[userInput];
+    } else if (context === 'budget') {
+      const budgetValue = parseInt(userInput);
+      const budgetCategory = budgetValue <= 50000 ? 'low' : budgetValue <= 100000 ? 'medium' : 'high';
+      return localInsights.budget[budgetCategory];
+    }
+
+    return null;
+  };
+
+  // Generate full AI assessment
+  const generateFullAssessment = async () => {
+    try {
+      const response = await fetch('/api/ai-assessment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionData: sessionData,
+          requestType: 'full-assessment'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Assessment API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Full assessment error:', error);
+      return null;
+    }
   };
 
   const updateSessionData = (key, value) => {
@@ -236,8 +312,16 @@ export default function AIAssessmentPage() {
             
             {aiInsights.map((insight, idx) => (
               <div key={insight.timestamp} className="bg-white/10 p-4 rounded-lg border-l-4 border-purple-400 animate-fadeIn">
-                <p className="text-white font-medium text-sm mb-2">{insight.insight}</p>
+                <div className="flex items-center gap-2 mb-2">
+                  <p className="text-white font-medium text-sm">{insight.insight}</p>
+                  <span className="text-xs text-purple-300 bg-purple-800/30 px-2 py-1 rounded">
+                    {insight.provider}
+                  </span>
+                </div>
                 <p className="text-purple-200 text-xs">{insight.recommendation}</p>
+                {insight.note && (
+                  <p className="text-yellow-300 text-xs mt-1 italic">{insight.note}</p>
+                )}
               </div>
             ))}
             
@@ -406,7 +490,12 @@ export default function AIAssessmentPage() {
           <div className="space-y-4 max-h-80 overflow-y-auto">
             {aiInsights.map((insight, idx) => (
               <div key={insight.timestamp} className="bg-white/10 p-4 rounded-lg border-l-4 border-purple-400">
-                <p className="text-white font-medium text-sm mb-2">{insight.insight}</p>
+                <div className="flex items-center gap-2 mb-2">
+                  <p className="text-white font-medium text-sm">{insight.insight}</p>
+                  <span className="text-xs text-purple-300 bg-purple-800/30 px-2 py-1 rounded">
+                    {insight.provider}
+                  </span>
+                </div>
                 <p className="text-purple-200 text-xs mb-2">{insight.recommendation}</p>
                 <div className="text-xs text-purple-300 opacity-75">
                   Context: {insight.context}
@@ -465,23 +554,23 @@ export default function AIAssessmentPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
       {/* Header - matches integrators page exactly */}
-      <header className="bg-black/10 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 py-5">
-        <nav className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-3 text-white font-bold text-2xl">
-            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-purple-600 font-black text-sm">
+      <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b border-purple-600/20 py-4">
+        <nav className="max-w-6xl mx-auto px-8 flex justify-between items-center">
+          <Link href="/" className="flex items-center gap-3 text-white font-black text-2xl">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
               DR
             </div>
             Design-Rite
           </Link>
 
-          <ul className="hidden lg:flex items-center gap-8">
-            <li><Link href="/platform" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Platform</Link></li>
-            <li><Link href="/solutions" className="text-white bg-white/10 px-4 py-2 rounded-lg font-medium">Solutions</Link></li>
-            <li><Link href="/partners" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Partners</Link></li>
-            <li><Link href="/about" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">About</Link></li>
-            <li><Link href="/contact" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Contact</Link></li>
+          <ul className="hidden lg:flex items-center gap-10">
+            <li><Link href="/platform" className="text-gray-300 hover:text-purple-600 font-medium transition-all">Platform</Link></li>
+            <li><Link href="/solutions" className="text-purple-600 font-medium">Solutions</Link></li>
+            <li><Link href="/partners" className="text-gray-300 hover:text-purple-600 font-medium transition-all">Partners</Link></li>
+            <li><Link href="/about" className="text-gray-300 hover:text-purple-600 font-medium transition-all">About</Link></li>
+            <li><Link href="/contact" className="text-gray-300 hover:text-purple-600 font-medium transition-all">Contact</Link></li>
           </ul>
 
           <div className="hidden lg:flex items-center gap-3">
@@ -498,7 +587,7 @@ export default function AIAssessmentPage() {
       </header>
 
       {/* Main Content */}
-      <main className="py-20 px-6">
+      <main className="py-20 px-8">
         {/* Progress Indicator */}
         <div className="max-w-4xl mx-auto mb-20">
           <div className="flex items-center justify-between mb-6">
@@ -518,10 +607,10 @@ export default function AIAssessmentPage() {
                 }`}>
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${
                     step.key === currentStep
-                      ? 'bg-white text-purple-600'
+                      ? 'bg-purple-600 text-white'
                       : ['welcome', 'facility-info', 'security-details'].indexOf(currentStep) > idx
-                      ? 'bg-purple-300 text-purple-800'
-                      : 'bg-white/20 text-white/60'
+                      ? 'bg-purple-600/30 text-purple-300'
+                      : 'bg-white/10 text-white/60'
                   }`}>
                     {step.icon}
                   </div>
@@ -533,9 +622,9 @@ export default function AIAssessmentPage() {
               </div>
             ))}
           </div>
-          <div className="w-full bg-white/20 rounded-full h-2">
+          <div className="w-full bg-white/10 rounded-full h-2">
             <div 
-              className="bg-gradient-to-r from-purple-300 to-white h-2 rounded-full transition-all duration-700"
+              className="bg-gradient-to-r from-purple-600 to-purple-700 h-2 rounded-full transition-all duration-700"
               style={{
                 width: currentStep === 'welcome' ? '0%' : 
                        currentStep === 'facility-info' ? '25%' :
