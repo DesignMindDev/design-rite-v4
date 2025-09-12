@@ -1,0 +1,398 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+
+export default function PricingPage() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [billingPeriod, setBillingPeriod] = useState('monthly') // 'monthly' or 'annual'
+
+  const redirectToApp = () => {
+    window.location.href = '/login-trial.html'
+  }
+
+  const plans = {
+    starter: {
+      name: 'Starter',
+      description: 'Perfect for small integrators getting started',
+      monthlyPrice: 49,
+      annualPrice: 490, // 2 months free
+      features: [
+        'Up to 25 assessments per month',
+        'AI-powered site analysis',
+        'Basic proposal generation',
+        'Standard equipment database',
+        'Email support',
+        'Mobile app access',
+        '30-day free trial'
+      ],
+      cta: 'Start Free Trial',
+      popular: false
+    },
+    professional: {
+      name: 'Professional',
+      description: 'For established integrators scaling their business',
+      monthlyPrice: 149,
+      annualPrice: 1490, // 2 months free
+      features: [
+        'Unlimited assessments',
+        'Advanced AI recommendations',
+        'Custom proposal templates',
+        'White-label branding',
+        'Premium equipment database',
+        'Priority phone & email support',
+        'Client portal access',
+        'Project management tools',
+        'Custom pricing rules'
+      ],
+      cta: 'Start Free Trial',
+      popular: true
+    },
+    enterprise: {
+      name: 'Enterprise',
+      description: 'For large organizations with multiple facilities',
+      monthlyPrice: 299,
+      annualPrice: 2990, // 2 months free
+      features: [
+        'Everything in Professional',
+        'Multi-site management',
+        'Vendor comparison tools',
+        'Custom compliance reporting',
+        'API access & integrations',
+        'Dedicated account manager',
+        'Advanced analytics dashboard',
+        'Custom training & onboarding',
+        'SLA guarantee'
+      ],
+      cta: 'Contact Sales',
+      popular: false
+    }
+  }
+
+  const getPrice = (plan) => {
+    return billingPeriod === 'monthly' ? plan.monthlyPrice : Math.floor(plan.annualPrice / 12)
+  }
+
+  const getSavings = (plan) => {
+    const monthlyCost = plan.monthlyPrice * 12
+    const annualCost = plan.annualPrice
+    return monthlyCost - annualCost
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
+      {/* Top Announcement Bar */}
+      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
+        <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
+          <span className="text-base">💰</span>
+          <span className="flex-1 text-center">
+            Save 20% on annual plans - Transform your security design process today
+          </span>
+          <button 
+            onClick={redirectToApp}
+            className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30"
+          >
+            Try Free
+          </button>
+          <button className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">
+            ×
+          </button>
+        </div>
+      </div>
+
+      {/* Utility Bar */}
+      <div className="bg-black/90 border-b border-purple-600/10 py-2 text-xs">
+        <div className="max-w-6xl mx-auto px-8 flex justify-end items-center gap-8">
+          <Link href="/login" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>👤</span> Login
+          </Link>
+          <Link href="/pricing" className="text-purple-600 font-medium flex items-center gap-2">
+            <span>💰</span> Plans & Pricing
+          </Link>
+          <Link href="/help" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>❓</span> Help Center
+          </Link>
+          <Link href="/contact" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>📧</span> Contact Us
+          </Link>
+        </div>
+      </div>
+
+      {/* Main Navigation Header */}
+      <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b border-purple-600/20 py-4">
+        <nav className="max-w-6xl mx-auto px-8 flex justify-between items-center">
+          <Link href="/" className="flex items-center gap-3 text-white font-black text-2xl">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
+              DR
+            </div>
+            Design-Rite
+          </Link>
+
+          {/* Desktop Navigation */}
+          <ul className="hidden lg:flex items-center gap-10">
+            <li>
+              <Link href="/#platform" className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm">
+                Platform
+              </Link>
+            </li>
+            <li>
+              <Link href="/#solutions" className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm">
+                Solutions
+              </Link>
+            </li>
+            <li>
+              <Link href="/pricing" className="text-purple-600 font-medium transition-all text-sm">
+                Pricing
+              </Link>
+            </li>
+            <li>
+              <Link href="/about" className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm">
+                About
+              </Link>
+            </li>
+            <li>
+              <Link href="/contact" className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm">
+                Contact
+              </Link>
+            </li>
+          </ul>
+
+          {/* CTA Buttons */}
+          <div className="hidden lg:flex items-center gap-4">
+            <Link href="/login" className="text-gray-300 hover:text-white transition-colors">
+              Sign In
+            </Link>
+            <button 
+              onClick={redirectToApp}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition-all"
+            >
+              Try Platform
+            </button>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button 
+            className="lg:hidden text-white text-2xl p-2"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            ☰
+          </button>
+        </nav>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
+            <div className="px-6 py-4 space-y-4">
+              <Link href="/pricing" className="block text-purple-600 font-medium py-2">Pricing</Link>
+              <Link href="/integrators" className="block text-white/80 hover:text-white py-2">Security Integrators</Link>
+              <Link href="/enterprise" className="block text-white/80 hover:text-white py-2">Enterprise Security</Link>
+              <Link href="/education" className="block text-white/80 hover:text-white py-2">Education</Link>
+              <div className="pt-4 border-t border-white/10">
+                <Link href="/login" className="block text-white/80 hover:text-white py-2">Sign In</Link>
+                <button onClick={redirectToApp} className="block w-full text-left bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">
+                  Try Platform
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Main Content */}
+      <main className="py-20 px-6">
+        {/* Hero Section */}
+        <section className="text-center mb-16 max-w-4xl mx-auto">
+          <div className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-bold text-base tracking-widest uppercase mb-4">
+            Pricing Plans
+          </div>
+          <h1 className="text-5xl lg:text-6xl font-black leading-tight mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            Choose Your Plan
+          </h1>
+          <p className="text-xl text-gray-400 leading-relaxed mb-8">
+            Start with a free trial. Scale as you grow. No hidden fees, cancel anytime.
+          </p>
+
+          {/* Billing Toggle */}
+          <div className="flex items-center justify-center mb-8">
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-1 border border-white/20">
+              <button
+                onClick={() => setBillingPeriod('monthly')}
+                className={`px-6 py-2 rounded-md font-semibold transition-all ${
+                  billingPeriod === 'monthly' 
+                    ? 'bg-purple-600 text-white' 
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setBillingPeriod('annual')}
+                className={`px-6 py-2 rounded-md font-semibold transition-all ${
+                  billingPeriod === 'annual' 
+                    ? 'bg-purple-600 text-white' 
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                Annual
+                <span className="ml-2 text-xs bg-green-500 text-white px-2 py-1 rounded-full">Save 20%</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Cards */}
+        <section className="max-w-7xl mx-auto mb-20">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Object.values(plans).map((plan, index) => (
+              <div 
+                key={plan.name}
+                className={`bg-white/10 backdrop-blur-sm rounded-3xl p-8 border transition-all hover:-translate-y-2 relative ${
+                  plan.popular 
+                    ? 'border-purple-500 ring-2 ring-purple-500/20' 
+                    : 'border-white/20 hover:border-purple-500/30'
+                }`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-2 rounded-full text-sm font-bold">
+                      Most Popular
+                    </span>
+                  </div>
+                )}
+
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+                  <p className="text-gray-400 mb-6">{plan.description}</p>
+                  
+                  <div className="mb-4">
+                    <span className="text-5xl font-black text-white">${getPrice(plan)}</span>
+                    <span className="text-gray-400 ml-2">/{billingPeriod === 'monthly' ? 'month' : 'month'}</span>
+                  </div>
+
+                  {billingPeriod === 'annual' && (
+                    <div className="text-green-400 text-sm font-semibold">
+                      Save ${getSavings(plan)} per year
+                    </div>
+                  )}
+                </div>
+
+                <ul className="space-y-4 mb-8">
+                  {plan.features.map((feature, featureIndex) => (
+                    <li key={featureIndex} className="flex items-start gap-3 text-gray-300">
+                      <span className="text-green-500 font-bold text-lg flex-shrink-0 mt-0.5">✓</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="text-center">
+                  {plan.name === 'Enterprise' ? (
+                    <Link 
+                      href="/contact"
+                      className={`block w-full py-4 px-6 rounded-xl font-bold transition-all text-lg ${
+                        plan.popular 
+                          ? 'bg-white text-purple-600 hover:bg-gray-100'
+                          : 'bg-purple-600 text-white hover:bg-purple-700'
+                      }`}
+                    >
+                      {plan.cta}
+                    </Link>
+                  ) : (
+                    <button 
+                      onClick={redirectToApp}
+                      className={`w-full py-4 px-6 rounded-xl font-bold transition-all text-lg ${
+                        plan.popular 
+                          ? 'bg-white text-purple-600 hover:bg-gray-100'
+                          : 'bg-purple-600 text-white hover:bg-purple-700'
+                      }`}
+                    >
+                      {plan.cta}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="max-w-4xl mx-auto mb-20">
+          <h2 className="text-3xl font-bold text-white text-center mb-12">
+            Frequently Asked Questions
+          </h2>
+          
+          <div className="space-y-6">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+              <h3 className="text-xl font-bold text-white mb-3">Can I switch plans anytime?</h3>
+              <p className="text-gray-300">
+                Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, 
+                and we'll prorate the billing accordingly.
+              </p>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+              <h3 className="text-xl font-bold text-white mb-3">What's included in the free trial?</h3>
+              <p className="text-gray-300">
+                All plans include a 30-day free trial with full access to features. No credit card required. 
+                You can perform up to 10 assessments during your trial period.
+              </p>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+              <h3 className="text-xl font-bold text-white mb-3">Do you offer custom enterprise solutions?</h3>
+              <p className="text-gray-300">
+                Yes, we work with large organizations to create custom solutions including API integrations, 
+                dedicated infrastructure, and tailored compliance requirements.
+              </p>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+              <h3 className="text-xl font-bold text-white mb-3">What payment methods do you accept?</h3>
+              <p className="text-gray-300">
+                We accept all major credit cards, PayPal, and can arrange ACH transfers for enterprise accounts. 
+                Annual plans can be invoiced if needed.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="text-center max-w-4xl mx-auto">
+          <h2 className="text-4xl font-bold text-white mb-6">
+            Ready to Transform Your Security Design Process?
+          </h2>
+          <p className="text-xl text-gray-400 mb-8">
+            Join thousands of security professionals who have revolutionized their workflow with Design-Rite.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button 
+              onClick={redirectToApp}
+              className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg"
+            >
+              Start Free Trial - No Credit Card Required
+            </button>
+            <Link 
+              href="/contact" 
+              className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block"
+            >
+              Talk to Sales
+            </Link>
+          </div>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
+        <div className="max-w-6xl mx-auto px-8 text-center">
+          <p className="text-white/70">© 2025 Design-Rite. All rights reserved.</p>
+          <div className="flex justify-center gap-6 mt-4">
+            <Link href="/" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Home</Link>
+            <Link href="/about" className="text-white/70 hover:text-purple-600 text-sm transition-colors">About</Link>
+            <Link href="/pricing" className="text-purple-600 text-sm font-medium">Pricing</Link>
+            <Link href="/contact" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Contact</Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  )
+}
