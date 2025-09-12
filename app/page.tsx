@@ -1,129 +1,34 @@
-﻿"use client"
+﻿'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isChatOpen, setIsChatOpen] = useState(false)
-  const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(true)
-  const [chatMessages, setChatMessages] = useState([
-    {
-      id: 1,
-      sender: 'bot',
-      content: '👋 Hi! I\'m here to help with Design-Rite\'s AI security platform!\n\nI can help you with:\n• Joining the Q4 2025 waitlist\n• Platform features & capabilities\n• Pricing & subscription plans\n• White-label opportunities\n• Getting started\n\nWhat would you like to know?',
-      timestamp: new Date()
-    }
-  ])
-  const [currentMessage, setCurrentMessage] = useState('')
-  const [isTyping, setIsTyping] = useState(false)
-  const router = useRouter()
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (localStorage.getItem('announcement_closed') === 'true') {
-        setIsAnnouncementVisible(false)
-      }
-    }
-    
-    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-      console.log('%c🛡️ DESIGN-RITE PROPRIETARY SOFTWARE', 'color: #8B5CF6; font-size: 16px; font-weight: bold;')
-      console.log('%c© 2025 Design-Rite. All rights reserved.', 'color: #666; font-size: 12px;')
-    }
-  }, [])
-
-  const redirectToWaitlist = () => {
-    router.push('/subscribe')
+  const redirectToApp = () => {
+    window.location.href = '/login-trial.html'
   }
 
-  const closeAnnouncement = () => {
-    setIsAnnouncementVisible(false)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('announcement_closed', 'true')
-    }
-  }
-
-  const toggleChat = () => {
-    setIsChatOpen(!isChatOpen)
-  }
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
-  }
-
-  const generateBotResponse = (userMessage) => {
-    const msg = userMessage.toLowerCase()
-    
-    if (msg.includes('waitlist') || msg.includes('join')) {
-      return '🎯 Join Our Waitlist!\n\nYou can join our exclusive Q4 2025 launch waitlist right now.\n\n✅ Early Access Benefits:\n• First access to the platform\n• Up to 50% off first year\n• Priority support\n\n👆 Click "Join Waitlist" to get started!'
-    }
-    
-    if (msg.includes('pricing') || msg.includes('cost')) {
-      return '💰 Pricing Plans (Q4 2025):\n\n🆓 Starter: 3 assessments/month\n💼 Professional: $197/month\n🏢 Enterprise: Custom pricing\n\nWaitlist members get up to 50% off first year!'
-    }
-    
-    if (msg.includes('feature') || msg.includes('platform')) {
-      return '🧠 AI Platform Features:\n\n• AI Security Assessments\n• Smart Recommendations\n• Professional Proposals\n• Compliance Tools\n• Multi-Site Management\n• White-Label Options\n\nLaunching Q4 2025!'
-    }
-    
-    return '🤔 I can help you with:\n\n• Joining the Q4 2025 waitlist\n• Platform features & capabilities\n• Pricing information\n• White-label opportunities\n\nTry asking: "How do I join the waitlist?"'
-  }
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      sendMessage()
-    }
-  }
-
-  const sendMessage = () => {
-    if (!currentMessage.trim()) return
-    
-    const userMessage = {
-      id: Date.now(),
-      sender: 'user',
-      content: currentMessage,
-      timestamp: new Date()
-    }
-    
-    setChatMessages(prev => [...prev, userMessage])
-    setCurrentMessage('')
-    setIsTyping(true)
-    
-    setTimeout(() => {
-      const botResponse = {
-        id: Date.now() + 1,
-        sender: 'bot', 
-        content: generateBotResponse(currentMessage),
-        timestamp: new Date()
-      }
-      
-      setChatMessages(prev => [...prev, botResponse])
-      setIsTyping(false)
-    }, 1500)
+  const scheduleDemo = () => {
+    window.location.href = '/demo.html'
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
-      {/* Announcement Bar */}
-      {isAnnouncementVisible && (
-        <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
-          <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
-            <span className="text-base">🎓</span>
-            <span className="flex-1 text-center">
-              Design-Rite's Revolutionary AI is launching Q4 2025 - Join the waitlist for early access to security design mastery
-            </span>
-            <Link href="/subscribe" className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30">
-              Join Waitlist
-            </Link>
-            <button onClick={closeAnnouncement} className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">
-              ×
-            </button>
-          </div>
+      {/* Top Announcement Bar */}
+      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
+        <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
+          <span className="text-base">🎓</span>
+          <span className="flex-1 text-center">Design-Rite's Revolutionary AI is launching Q4 2025 - Join the waitlist for early access to security design mastery</span>
+          <Link className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30" href="/subscribe">
+            Join Waitlist
+          </Link>
+          <button className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">×</button>
         </div>
-      )}
+      </div>
 
-      {/* Utility Bar */}
+      {/* Top Contact Bar */}
       <div className="bg-black/90 border-b border-purple-600/10 py-2 text-xs">
         <div className="max-w-6xl mx-auto px-8 flex justify-end items-center gap-8">
           <Link href="/login" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
@@ -141,7 +46,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Main Header */}
+      {/* Main Navigation Header with Dropdowns */}
       <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b border-purple-600/20 py-4">
         <nav className="max-w-6xl mx-auto px-8 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-3 text-white font-black text-2xl">
@@ -151,23 +56,163 @@ export default function HomePage() {
             Design-Rite
           </Link>
 
+          {/* Desktop Navigation with Dropdowns */}
+          <ul className="hidden lg:flex items-center gap-10">
+            {/* Platform Dropdown */}
+            <li className="relative group">
+              <Link href="#platform" className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+                Platform
+              </Link>
+              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+                <button onClick={redirectToApp} className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2 w-full text-left">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    🔍
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">AI Assessment</div>
+                    <div className="text-xs text-gray-400">Intelligent security analysis</div>
+                  </div>
+                </button>
+                <Link href="/proposal" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    📋
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Proposal Generator</div>
+                    <div className="text-xs text-gray-400">Professional BOMs & pricing</div>
+                  </div>
+                </Link>
+                <Link href="/white-label" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    🏢
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">White-Label Solutions</div>
+                    <div className="text-xs text-gray-400">Branded platforms for partners</div>
+                  </div>
+                </Link>
+                <Link href="/api" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    ⚡
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">API Access</div>
+                    <div className="text-xs text-gray-400">Integrate with your systems</div>
+                  </div>
+                </Link>
+              </div>
+            </li>
+
+            {/* Solutions Dropdown */}
+            <li className="relative group">
+              <Link href="#solutions" className="text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-full after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700">
+                Solutions
+              </Link>
+              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+                <Link href="/integrators" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    🔧
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Security Integrators</div>
+                    <div className="text-xs text-gray-400">Design & proposal automation</div>
+                  </div>
+                </Link>
+                <Link href="/enterprise" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    🏢
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Enterprise Security</div>
+                    <div className="text-xs text-gray-400">In-house team solutions</div>
+                  </div>
+                </Link>
+                <Link href="/education" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    🎓
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Education & Healthcare</div>
+                    <div className="text-xs text-gray-400">Specialized compliance tools</div>
+                  </div>
+                </Link>
+                <Link href="/consultants" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    💼
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Security Consultants</div>
+                    <div className="text-xs text-gray-400">Expert-level assessments</div>
+                  </div>
+                </Link>
+              </div>
+            </li>
+
+            {/* Company Dropdown */}
+            <li className="relative group">
+              <Link href="#company" className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+                Company
+              </Link>
+              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+                <Link href="/about" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    🏢
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">About Us</div>
+                    <div className="text-xs text-gray-400">Our mission and vision</div>
+                  </div>
+                </Link>
+                <Link href="/team" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    👥
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Team</div>
+                    <div className="text-xs text-gray-400">Meet the founders</div>
+                  </div>
+                </Link>
+                <Link href="/careers" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    💼
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Careers</div>
+                    <div className="text-xs text-gray-400">Join our growing team</div>
+                  </div>
+                </Link>
+                <Link href="/academy" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    🎓
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Design-Rite Academy</div>
+                    <div className="text-xs text-gray-400">Security design education</div>
+                  </div>
+                </Link>
+              </div>
+            </li>
+          </ul>
+
+          {/* Right Side Actions */}
           <div className="hidden lg:flex items-center gap-4">
-            <Link href="/subscribe" className="bg-purple-600/20 text-purple-600 border border-purple-600/30 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-purple-600/30 hover:border-purple-600 transition-all">
+            <Link className="bg-purple-600/20 text-purple-600 border border-purple-600/30 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-purple-600/30 hover:border-purple-600 transition-all" href="/subscribe">
               Subscribe
             </Link>
             <div className="flex items-center gap-4">
-              <Link href="/watch-demo" className="bg-purple-600/10 text-purple-600 border border-purple-600/30 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-purple-600/20 hover:border-purple-600 transition-all">
+              <button onClick={scheduleDemo} className="bg-purple-600/10 text-purple-600 border border-purple-600/30 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-purple-600/20 hover:border-purple-600 transition-all">
                 Watch Demo
-              </Link>
-              <button onClick={redirectToWaitlist} className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:shadow-lg hover:shadow-purple-600/30 transition-all">
+              </button>
+              <button onClick={redirectToApp} className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:shadow-lg hover:shadow-purple-600/30 transition-all">
                 Join Waitlist
               </button>
             </div>
           </div>
 
+          {/* Mobile Menu Button */}
           <button 
-            className="lg:hidden text-white text-2xl p-2 hover:bg-white/10 rounded transition-colors"
-            onClick={toggleMenu}
+            className="lg:hidden text-white text-2xl p-2 hover:bg-white/10 rounded transition-colors" 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle mobile menu"
           >
             ☰
@@ -176,23 +221,29 @@ export default function HomePage() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden bg-black/20 backdrop-blur-xl border-t border-purple-600/10 animate-in slide-in-from-top-2 duration-300">
-            <div className="px-8 py-4 space-y-4">
-              <Link href="/integrators" className="block text-gray-300 hover:text-white py-2 transition-colors">Security Integrators</Link>
-              <Link href="/enterprise" className="block text-gray-300 hover:text-white py-2 transition-colors">Enterprise</Link>
-              <Link href="/education" className="block text-gray-300 hover:text-white py-2 transition-colors">Education</Link>
-              <Link href="/solutions" className="block text-gray-300 hover:text-white py-2 transition-colors">Solutions</Link>
-              <Link href="/contact" className="block text-gray-300 hover:text-white py-2 transition-colors">Contact</Link>
-              <div className="pt-4 border-t border-white/10 space-y-3">
-                <Link href="/login" className="block text-center text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
-                  Sign In
-                </Link>
-                <button 
-                  onClick={redirectToWaitlist}
-                  className="block w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
-                >
-                  Join Waitlist
+          <div className="lg:hidden bg-black/95 backdrop-blur-xl border-t border-purple-600/30 py-4">
+            <div className="max-w-6xl mx-auto px-8">
+              <div className="space-y-4">
+                <button onClick={redirectToApp} className="block w-full text-left text-white hover:text-purple-600 py-2">
+                  Platform
                 </button>
+                <Link href="/integrators" className="block text-white hover:text-purple-600 py-2">
+                  Solutions
+                </Link>
+                <Link href="/about" className="block text-white hover:text-purple-600 py-2">
+                  Company
+                </Link>
+                <div className="pt-4 border-t border-purple-600/30 space-y-2">
+                  <Link href="/subscribe" className="block bg-purple-600/20 text-purple-600 px-4 py-2 rounded-lg font-medium text-center">
+                    Subscribe
+                  </Link>
+                  <button onClick={scheduleDemo} className="block w-full bg-purple-600/10 text-purple-600 border border-purple-600/30 px-4 py-2 rounded-lg font-medium">
+                    Watch Demo
+                  </button>
+                  <button onClick={redirectToApp} className="block w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-2 rounded-lg font-medium">
+                    Join Waitlist
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -202,38 +253,26 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="pt-32 pb-16 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-radial from-purple-600/10 via-transparent to-transparent"></div>
-        
         <div className="max-w-6xl mx-auto px-8 grid lg:grid-cols-2 gap-16 items-center relative z-10">
           <div className="max-w-2xl">
             <div className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-bold text-base tracking-widest uppercase mb-4">
               AI-Powered Security Design
             </div>
-            
             <h1 className="text-5xl lg:text-6xl font-black leading-tight mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
               Design right, with AI insight
             </h1>
-            
             <p className="text-xl text-gray-400 mb-10 leading-relaxed">
-              Revolutionary AI platform that transforms security system design. 
-              Generate comprehensive assessments, detailed proposals, and professional 
-              documentation in minutes, not days.
+              Revolutionary AI platform that transforms security system design. Generate comprehensive assessments, 
+              detailed proposals, and professional documentation in minutes, not days.
             </p>
-            
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <button 
-                onClick={redirectToWaitlist}
-                className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-purple-600/40 transition-all"
-              >
+              <button onClick={redirectToApp} className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-purple-600/40 transition-all">
                 Join Waitlist - Q4 2025
               </button>
-              <Link 
-                href="/watch-demo"
-                className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all text-center"
-              >
+              <button onClick={scheduleDemo} className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all">
                 Watch Demo
-              </Link>
+              </button>
             </div>
-            
             <div className="flex gap-12">
               <div>
                 <span className="text-3xl font-black text-purple-600 block">10x</span>
@@ -249,17 +288,16 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          
+
+          {/* Dashboard Preview */}
           <div className="bg-gray-800/80 backdrop-blur-xl border border-purple-600/30 rounded-3xl p-8 relative overflow-hidden animate-pulse">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-transparent to-transparent rounded-3xl"></div>
-            
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-white">Security Assessment Dashboard</h3>
               <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold animate-pulse">
                 Coming Q4 2025
               </div>
             </div>
-            
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="bg-purple-600/10 p-4 rounded-xl border border-purple-600/20">
                 <span className="text-2xl font-black text-purple-600 block">147</span>
@@ -278,7 +316,6 @@ export default function HomePage() {
                 <span className="text-gray-400 text-xs">Zones Secured</span>
               </div>
             </div>
-            
             <div className="bg-gray-600/30 h-2 rounded-full overflow-hidden mb-2">
               <div className="bg-gradient-to-r from-purple-600 to-purple-700 h-full w-3/4 rounded-full"></div>
             </div>
@@ -287,92 +324,108 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Platform Features Section */}
       <section className="py-24 bg-black/50">
         <div className="max-w-6xl mx-auto px-8 text-center">
           <h2 className="text-4xl lg:text-5xl font-black mb-4 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">
             Intelligent Security Design Platform
           </h2>
           <p className="text-xl text-gray-400 mb-16 max-w-2xl mx-auto">
-            Powered by advanced AI algorithms trained on thousands of security installations, 
-            our platform delivers professional-grade assessments and proposals.
+            Powered by advanced AI algorithms trained on thousands of security installations, our platform delivers 
+            professional-grade assessments and proposals.
           </p>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: "🧠",
-                title: "AI-Powered Analysis",
-                description: "Our advanced AI analyzes your facility requirements and generates comprehensive security assessments with detailed device specifications and placement recommendations.",
-                link: "/ai-powered-analyst"
-              },
-              {
-                icon: "📋",
-                title: "Professional Proposals",
-                description: "Generate client-ready proposals with detailed BOMs, pricing, compliance documentation, and implementation timelines in minutes.",
-                link: "/professional-proposals"
-              },
-              {
-                icon: "🏢",
-                title: "White-Label Solutions",
-                description: "Brand our platform as your own. Complete customization with your logo, colors, and pricing to seamlessly integrate with your business.",
-                link: "/white-label"
-              },
-              {
-                icon: "📊",
-                title: "Compliance Analytics",
-                description: "Ensure full compliance with industry standards including CJIS, FERPA, HIPAA, and local building codes with automated verification.",
-                link: "/compliance-analyst"
-              },
-              {
-                icon: "⚡",
-                title: "API Integration",
-                description: "Seamlessly integrate our AI capabilities into your existing workflows with our comprehensive REST API and webhooks.",
-                link: "/api"
-              },
-              {
-                icon: "📈",
-                title: "Project Management",
-                description: "Track project progress, manage client communications, and maintain detailed documentation throughout the entire installation lifecycle.",
-                link: "/project-management"
-              }
-            ].map((feature, index) => (
-              <div key={index} className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 text-left hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-                <div className="w-15 h-15 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-2xl mb-6">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-bold text-white mb-4">{feature.title}</h3>
-                <p className="text-gray-400 mb-6 leading-relaxed">{feature.description}</p>
-                <Link href={feature.link} className="text-purple-600 font-semibold text-sm hover:text-purple-700 transition-colors">
-                  Learn More →
-                </Link>
-              </div>
-            ))}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 text-left hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="w-15 h-15 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-2xl mb-6">🧠</div>
+              <h3 className="text-xl font-bold text-white mb-4">AI-Powered Analysis</h3>
+              <p className="text-gray-400 mb-6 leading-relaxed">
+                Our advanced AI analyzes your facility requirements and generates comprehensive security assessments 
+                with detailed device specifications and placement recommendations.
+              </p>
+              <Link href="/ai-powered-analyst" className="text-purple-600 font-semibold text-sm hover:text-purple-700 transition-colors">
+                Learn More →
+              </Link>
+            </div>
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 text-left hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="w-15 h-15 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-2xl mb-6">📋</div>
+              <h3 className="text-xl font-bold text-white mb-4">Professional Proposals</h3>
+              <p className="text-gray-400 mb-6 leading-relaxed">
+                Generate client-ready proposals with detailed BOMs, pricing, compliance documentation, and 
+                implementation timelines in minutes.
+              </p>
+              <Link href="/professional-proposals" className="text-purple-600 font-semibold text-sm hover:text-purple-700 transition-colors">
+                Learn More →
+              </Link>
+            </div>
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 text-left hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="w-15 h-15 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-2xl mb-6">🏢</div>
+              <h3 className="text-xl font-bold text-white mb-4">White-Label Solutions</h3>
+              <p className="text-gray-400 mb-6 leading-relaxed">
+                Brand our platform as your own. Complete customization with your logo, colors, and pricing to 
+                seamlessly integrate with your business.
+              </p>
+              <Link href="/white-label" className="text-purple-600 font-semibold text-sm hover:text-purple-700 transition-colors">
+                Learn More →
+              </Link>
+            </div>
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 text-left hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="w-15 h-15 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-2xl mb-6">📊</div>
+              <h3 className="text-xl font-bold text-white mb-4">Compliance Analytics</h3>
+              <p className="text-gray-400 mb-6 leading-relaxed">
+                Ensure full compliance with industry standards including CJIS, FERPA, HIPAA, and local building codes 
+                with automated verification.
+              </p>
+              <Link href="/compliance-analyst" className="text-purple-600 font-semibold text-sm hover:text-purple-700 transition-colors">
+                Learn More →
+              </Link>
+            </div>
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 text-left hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="w-15 h-15 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-2xl mb-6">⚡</div>
+              <h3 className="text-xl font-bold text-white mb-4">API Integration</h3>
+              <p className="text-gray-400 mb-6 leading-relaxed">
+                Seamlessly integrate our AI capabilities into your existing workflows with our comprehensive REST API 
+                and webhooks.
+              </p>
+              <Link href="/api" className="text-purple-600 font-semibold text-sm hover:text-purple-700 transition-colors">
+                Learn More →
+              </Link>
+            </div>
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 text-left hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="w-15 h-15 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-2xl mb-6">📈</div>
+              <h3 className="text-xl font-bold text-white mb-4">Project Management</h3>
+              <p className="text-gray-400 mb-6 leading-relaxed">
+                Track project progress, manage client communications, and maintain detailed documentation throughout 
+                the entire installation lifecycle.
+              </p>
+              <Link href="/project-management" className="text-purple-600 font-semibold text-sm hover:text-purple-700 transition-colors">
+                Learn More →
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Call to Action Section */}
       <section className="py-24 bg-gradient-to-r from-purple-600/10 to-purple-700/10">
         <div className="max-w-4xl mx-auto px-8 text-center">
           <h2 className="text-4xl lg:text-5xl font-black text-white mb-4">
             Ready to Transform Your Design Process?
           </h2>
           <p className="text-xl text-gray-400 mb-10">
-            Join hundreds of security integrators who are already on our waitlist for early access 
-            to the most advanced AI-powered security design platform launching Q4 2025.
+            Join hundreds of security integrators who are already on our waitlist for early access to the most advanced 
+            AI-powered security design platform launching Q4 2025.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
-              onClick={redirectToWaitlist}
-              className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-purple-600/40 transition-all"
-            >
+            <button onClick={redirectToApp} className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-purple-600/40 transition-all">
               Join Waitlist - Free Early Access
             </button>
-            <Link 
-              href="/contact"
-              className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all"
-            >
+            <Link href="/contact" className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all">
               Contact Sales
             </Link>
           </div>
@@ -391,22 +444,21 @@ export default function HomePage() {
                 Design-Rite
               </div>
               <p className="text-gray-400 leading-relaxed mb-6">
-                Transforming security system design with AI-powered intelligence. 
-                Professional assessments, automated proposals, and comprehensive 
-                documentation for the modern security industry.
+                Transforming security system design with AI-powered intelligence. Professional assessments, automated 
+                proposals, and comprehensive documentation for the modern security industry.
               </p>
             </div>
-            
+
             <div>
               <h3 className="text-white font-bold mb-4">Platform</h3>
               <ul className="space-y-2">
-                <li><button onClick={redirectToWaitlist} className="text-gray-400 hover:text-purple-600 text-sm transition-colors">AI Assessment</button></li>
+                <li><button onClick={redirectToApp} className="text-gray-400 hover:text-purple-600 text-sm transition-colors">AI Assessment</button></li>
                 <li><Link href="/professional-proposals" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Proposal Generator</Link></li>
                 <li><Link href="/white-label" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">White-Label</Link></li>
                 <li><Link href="/api" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">API Access</Link></li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="text-white font-bold mb-4">Solutions</h3>
               <ul className="space-y-2">
@@ -416,7 +468,7 @@ export default function HomePage() {
                 <li><Link href="/healthcare" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Healthcare</Link></li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="text-white font-bold mb-4">Company</h3>
               <ul className="space-y-2">
@@ -427,7 +479,7 @@ export default function HomePage() {
               </ul>
             </div>
           </div>
-          
+
           <div className="border-t border-gray-600/30 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
             <div>© 2025 Design-Rite. All rights reserved.</div>
             <div className="flex gap-4 mt-4 md:mt-0">
@@ -439,76 +491,11 @@ export default function HomePage() {
         </div>
       </footer>
 
-      {/* Working Chat Widget */}
+      {/* Chat Button */}
       <div className="fixed bottom-5 right-5 z-[999999]">
-        <button
-          onClick={toggleChat}
-          className="w-15 h-15 bg-purple-600 rounded-full cursor-pointer flex items-center justify-center shadow-lg hover:scale-110 hover:shadow-xl transition-all"
-        >
+        <button className="w-15 h-15 bg-purple-600 rounded-full cursor-pointer flex items-center justify-center shadow-lg hover:scale-110 hover:shadow-xl transition-all">
           <div className="text-white text-2xl font-bold">💬</div>
         </button>
-        
-        {isChatOpen && (
-          <div className="absolute bottom-16 right-0 w-[380px] h-[500px] bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col">
-            <div className="bg-purple-600 text-white p-4 font-semibold flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <span>Design-Rite Assistant</span>
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              </div>
-              <button onClick={toggleChat} className="text-white text-lg hover:bg-white/20 rounded w-6 h-6 flex items-center justify-center">×</button>
-            </div>
-            
-            <div className="flex-1 p-4 overflow-y-auto bg-gray-50" style={{maxHeight: '380px'}}>
-              {chatMessages.map((message) => (
-                <div key={message.id} className={`mb-4 ${message.sender === 'user' ? 'text-right' : 'text-left'}`}>
-                  <div
-                    className={`inline-block max-w-[80%] p-3 rounded-xl text-sm ${
-                      message.sender === 'user'
-                        ? 'bg-purple-600 text-white rounded-br-none'
-                        : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none'
-                    }`}
-                  >
-                    <div className="whitespace-pre-line">
-                      {message.content}
-                    </div>
-                  </div>
-                </div>
-              ))}
-              
-              {isTyping && (
-                <div className="text-left mb-4">
-                  <div className="inline-block bg-white border border-gray-200 rounded-xl rounded-bl-none p-3 text-sm text-gray-800">
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            <div className="p-4 border-t border-gray-200 flex gap-2">
-              <input 
-                type="text" 
-                placeholder="Ask me anything..."
-                value={currentMessage}
-                onChange={(e) => setCurrentMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-600 text-gray-800"
-                maxLength={200}
-                disabled={isTyping}
-              />
-              <button 
-                onClick={sendMessage}
-                disabled={!currentMessage.trim() || isTyping}
-                className="bg-purple-600 text-white rounded-full w-9 h-9 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-700 transition-colors"
-              >
-                →
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
