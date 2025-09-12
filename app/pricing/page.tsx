@@ -51,8 +51,8 @@ export default function PricingPage() {
     enterprise: {
       name: 'Enterprise',
       description: 'For large organizations with multiple facilities',
-      monthlyPrice: 299,
-      annualPrice: 2990, // 2 months free
+      monthlyPrice: 499,
+      annualPrice: 4990, // 2 months free
       features: [
         'Everything in Professional',
         'Multi-site management',
