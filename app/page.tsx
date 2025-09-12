@@ -158,9 +158,8 @@ export default function DesignRiteLandingPage() {
         </div>
       </div>
 
-      {/* Main Header - keeping existing navigation */}
+      {/* Main Header */}
       <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b border-purple-600/20 py-4">
-        {/* Navigation content stays the same as your original */}
         <nav className="max-w-6xl mx-auto px-8 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-3 text-white font-black text-2xl">
             <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
@@ -168,6 +167,154 @@ export default function DesignRiteLandingPage() {
             </div>
             Design-Rite
           </Link>
+
+          {/* Desktop Navigation */}
+          <ul className="hidden lg:flex items-center gap-10">
+            <li className="relative group">
+              <Link href="#platform" className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+                Platform
+              </Link>
+              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+                <button onClick={redirectToWaitlist} className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2 w-full text-left">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0 transition-all group-hover:bg-purple-600/30 group-hover:scale-110">
+                    🔍
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">AI Assessment</div>
+                    <div className="text-xs text-gray-400 leading-tight">Join waitlist for early access</div>
+                  </div>
+                </button>
+                <Link href="/proposal" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0 transition-all group-hover:bg-purple-600/30 group-hover:scale-110">
+                    📋
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Proposal Generator</div>
+                    <div className="text-xs text-gray-400 leading-tight">Professional BOMs & pricing</div>
+                  </div>
+                </Link>
+                <Link href="/white-label" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0 transition-all group-hover:bg-purple-600/30 group-hover:scale-110">
+                    🏢
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">White-Label Solutions</div>
+                    <div className="text-xs text-gray-400 leading-tight">Branded platforms for partners</div>
+                  </div>
+                </Link>
+                <Link href="/api" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0 transition-all group-hover:bg-purple-600/30 group-hover:scale-110">
+                    ⚡
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">API Access</div>
+                    <div className="text-xs text-gray-400 leading-tight">Integrate with your systems</div>
+                  </div>
+                </Link>
+              </div>
+            </li>
+
+            <li className="relative group">
+              <Link href="#solutions" className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+                Solutions
+              </Link>
+              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+                <Link href="/integrators" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🔧</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Security Integrators</div>
+                    <div className="text-xs text-gray-400 leading-tight">Design & proposal automation</div>
+                  </div>
+                </Link>
+                <Link href="/enterprise" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🏢</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Enterprise Security</div>
+                    <div className="text-xs text-gray-400 leading-tight">In-house team solutions</div>
+                  </div>
+                </Link>
+                <Link href="/education" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🎓</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Education & Healthcare</div>
+                    <div className="text-xs text-gray-400 leading-tight">Specialized compliance tools</div>
+                  </div>
+                </Link>
+                <Link href="/consultants" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">💼</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Security Consultants</div>
+                    <div className="text-xs text-gray-400 leading-tight">Expert-level assessments</div>
+                  </div>
+                </Link>
+              </div>
+            </li>
+
+            <li className="relative group">
+              <Link href="#partners" className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+                Partners
+              </Link>
+              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+                <Link href="/white-label-program" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🏷️</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">White-Label Program</div>
+                    <div className="text-xs text-gray-400 leading-tight">Brand our platform as your own</div>
+                  </div>
+                </Link>
+                <Link href="/integration" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🔗</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Technology Partners</div>
+                    <div className="text-xs text-gray-400 leading-tight">Integration ecosystem</div>
+                  </div>
+                </Link>
+                <Link href="/referral" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">💰</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Referral Program</div>
+                    <div className="text-xs text-gray-400 leading-tight">Earn commission for referrals</div>
+                  </div>
+                </Link>
+              </div>
+            </li>
+
+            <li className="relative group">
+              <Link href="#about" className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+                About
+              </Link>
+              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+                <Link href="/about" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🏢</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Company</div>
+                    <div className="text-xs text-gray-400 leading-tight">Our mission and vision</div>
+                  </div>
+                </Link>
+                <Link href="/team" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">👥</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Team</div>
+                    <div className="text-xs text-gray-400 leading-tight">Meet the founders</div>
+                  </div>
+                </Link>
+                <Link href="/careers" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">💼</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Careers</div>
+                    <div className="text-xs text-gray-400 leading-tight">Join our growing team</div>
+                  </div>
+                </Link>
+                <Link href="/academy" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🎓</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Design-Rite Academy</div>
+                    <div className="text-xs text-gray-400 leading-tight">Security design education</div>
+                  </div>
+                </Link>
+              </div>
+            </li>
+          </ul>
 
           <div className="hidden lg:flex items-center gap-4">
             <Link href="/subscribe" className="bg-purple-600/20 text-purple-600 border border-purple-600/30 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-purple-600/30 hover:border-purple-600 transition-all">
@@ -190,6 +337,19 @@ export default function DesignRiteLandingPage() {
             ☰
           </button>
         </nav>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="lg:hidden bg-black/20 backdrop-blur-xl border-t border-purple-600/10">
+            <div className="px-8 py-4 space-y-4">
+              <Link href="/platform" className="block text-gray-300 hover:text-white">Platform</Link>
+              <Link href="/solutions" className="block text-gray-300 hover:text-white">Solutions</Link>
+              <Link href="/partners" className="block text-gray-300 hover:text-white">Partners</Link>
+              <Link href="/about" className="block text-gray-300 hover:text-white">About</Link>
+              <button onClick={redirectToWaitlist} className="block bg-purple-600 text-white px-4 py-2 rounded-lg w-full text-left">Join Waitlist</button>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Rest of your page content stays the same... */}
