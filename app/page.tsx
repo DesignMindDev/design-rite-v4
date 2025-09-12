@@ -48,6 +48,10 @@ export default function HomePage() {
     setIsChatOpen(!isChatOpen)
   }
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen)
+  }
+
   const generateBotResponse = (userMessage) => {
     const msg = userMessage.toLowerCase()
     
@@ -162,8 +166,9 @@ export default function HomePage() {
           </div>
 
           <button 
-            className="lg:hidden text-white text-2xl p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="lg:hidden text-white text-2xl p-2 hover:bg-white/10 rounded transition-colors"
+            onClick={toggleMenu}
+            aria-label="Toggle mobile menu"
           >
             ☰
           </button>
@@ -171,13 +176,24 @@ export default function HomePage() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden bg-black/20 backdrop-blur-xl border-t border-purple-600/10">
+          <div className="lg:hidden bg-black/20 backdrop-blur-xl border-t border-purple-600/10 animate-in slide-in-from-top-2 duration-300">
             <div className="px-8 py-4 space-y-4">
-              <Link href="/integrators" className="block text-gray-300 hover:text-white">Security Integrators</Link>
-              <Link href="/enterprise" className="block text-gray-300 hover:text-white">Enterprise</Link>
-              <Link href="/education" className="block text-gray-300 hover:text-white">Education</Link>
-              <Link href="/solutions" className="block text-gray-300 hover:text-white">Solutions</Link>
-              <Link href="/contact" className="block text-gray-300 hover:text-white">Contact</Link>
+              <Link href="/integrators" className="block text-gray-300 hover:text-white py-2 transition-colors">Security Integrators</Link>
+              <Link href="/enterprise" className="block text-gray-300 hover:text-white py-2 transition-colors">Enterprise</Link>
+              <Link href="/education" className="block text-gray-300 hover:text-white py-2 transition-colors">Education</Link>
+              <Link href="/solutions" className="block text-gray-300 hover:text-white py-2 transition-colors">Solutions</Link>
+              <Link href="/contact" className="block text-gray-300 hover:text-white py-2 transition-colors">Contact</Link>
+              <div className="pt-4 border-t border-white/10 space-y-3">
+                <Link href="/login" className="block text-center text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
+                  Sign In
+                </Link>
+                <button 
+                  onClick={redirectToWaitlist}
+                  className="block w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
+                >
+                  Join Waitlist
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -294,7 +310,7 @@ export default function HomePage() {
                 icon: "📋",
                 title: "Professional Proposals",
                 description: "Generate client-ready proposals with detailed BOMs, pricing, compliance documentation, and implementation timelines in minutes.",
-                link: "/proposals"
+                link: "/professional-proposals"
               },
               {
                 icon: "🏢",
@@ -385,7 +401,7 @@ export default function HomePage() {
               <h3 className="text-white font-bold mb-4">Platform</h3>
               <ul className="space-y-2">
                 <li><button onClick={redirectToWaitlist} className="text-gray-400 hover:text-purple-600 text-sm transition-colors">AI Assessment</button></li>
-                <li><Link href="/proposals" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Proposal Generator</Link></li>
+                <li><Link href="/professional-proposals" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Proposal Generator</Link></li>
                 <li><Link href="/white-label" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">White-Label</Link></li>
                 <li><Link href="/api" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">API Access</Link></li>
               </ul>
