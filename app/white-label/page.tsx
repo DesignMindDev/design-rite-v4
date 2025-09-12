@@ -2,27 +2,46 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
-export default function WhiteLabelProgramPage() {
+export default function WhiteLabelPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const router = useRouter()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
+      {/* Top Announcement Bar */}
+      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
+        <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
+          <span className="text-base">🏢</span>
+          <span className="flex-1 text-center">
+            White-Label AI Platform - Launch your own branded security design solution in weeks, not years
+          </span>
+          <Link 
+            href="/subscribe"
+            className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30"
+          >
+            Partner With Us
+          </Link>
+        </div>
+      </div>
+
       {/* Header */}
       <header className="bg-black/10 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 py-5">
         <nav className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-3 text-white font-bold text-2xl">
-            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-purple-600 font-black text-sm">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-black text-sm">
               DR
             </div>
             Design-Rite
           </Link>
 
+          {/* Desktop Navigation */}
           <ul className="hidden lg:flex items-center gap-8">
-            <li><Link href="/platform" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Platform</Link></li>
-            <li><Link href="/solutions" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Solutions</Link></li>
-            <li><Link href="/partners" className="text-white bg-white/10 px-4 py-2 rounded-lg font-medium">Partners</Link></li>
-            <li><Link href="/about" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">About</Link></li>
+            <li><Link href="/integrators" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Security Integrators</Link></li>
+            <li><Link href="/enterprise" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Enterprise</Link></li>
+            <li><Link href="/education" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Education</Link></li>
+            <li><Link href="/white-label" className="text-white bg-white/10 px-4 py-2 rounded-lg font-medium">White Label</Link></li>
             <li><Link href="/contact" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Contact</Link></li>
           </ul>
 
@@ -30,61 +49,266 @@ export default function WhiteLabelProgramPage() {
             <Link href="/login" className="text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
               Sign In
             </Link>
-            <Link href="/app" className="bg-white text-purple-600 px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all">
-              Try Platform
-            </Link>
+            <button 
+              onClick={() => router.push('/contact')}
+              className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
+            >
+              Become Partner
+            </button>
           </div>
 
-          <button className="lg:hidden text-white text-2xl" onClick={() => setIsMenuOpen(!isMenuOpen)}>☰</button>
+          {/* Mobile Menu Button */}
+          <button 
+            className="lg:hidden text-white text-2xl"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            ☰
+          </button>
         </nav>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
+            <div className="px-6 py-4 space-y-4">
+              <Link href="/integrators" className="block text-white/80 hover:text-white transition-colors py-2">Security Integrators</Link>
+              <Link href="/enterprise" className="block text-white/80 hover:text-white transition-colors py-2">Enterprise</Link>
+              <Link href="/education" className="block text-white/80 hover:text-white transition-colors py-2">Education</Link>
+              <Link href="/white-label" className="block text-white bg-white/10 px-4 py-2 rounded-lg">White Label</Link>
+              <Link href="/contact" className="block text-white/80 hover:text-white transition-colors py-2">Contact</Link>
+              <div className="pt-4 border-t border-white/10 space-y-3">
+                <Link href="/login" className="block text-center text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
+                  Sign In
+                </Link>
+                <button 
+                  onClick={() => router.push('/contact')}
+                  className="block w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
+                >
+                  Become Partner
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
-      <main className="py-20 px-6">
+      <main className="flex-1">
         {/* Hero Section */}
-        <section className="text-center mb-20 max-w-4xl mx-auto">
-          <div className="text-purple-300 text-base font-semibold uppercase tracking-wider mb-4">
-            White-Label Partnership Program
+        <section className="max-w-6xl mx-auto px-8 pt-20 pb-16">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600/20 to-purple-700/20 border border-purple-500/30 rounded-full px-6 py-3 text-sm font-medium mb-8">
+              <span className="text-2xl">🚀</span>
+              <span>Partnership Opportunity</span>
+            </div>
+            
+            <h1 className="text-5xl lg:text-6xl font-bold mb-8 leading-tight">
+              Launch Your Own <span className="bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">AI Platform</span>
+            </h1>
+            
+            <p className="text-xl lg:text-2xl text-white/80 mb-12 max-w-4xl mx-auto leading-relaxed">
+              Transform your business with our white-label AI security platform. Complete branding customization, dedicated support, and proven technology that's already helping hundreds of integrators worldwide. Launch in weeks, not years.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button 
+                onClick={() => router.push('/contact')}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all transform hover:scale-[1.02] shadow-lg"
+              >
+                Become a Partner
+              </button>
+              <Link 
+                href="/watch-demo"
+                className="bg-white/10 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all border border-white/20"
+              >
+                See Platform Demo
+              </Link>
+            </div>
           </div>
-          <h1 className="text-5xl lg:text-6xl font-black leading-tight mb-6">
-            Your Brand, Our AI
-          </h1>
-          <p className="text-xl text-white/80 leading-relaxed">
-            Transform our cutting-edge AI security platform into your own branded solution. 
-            Complete customization, revenue sharing, and dedicated support to grow your business.
-          </p>
         </section>
 
-        {/* Key Benefits */}
-        <section className="max-w-6xl mx-auto mb-20">
-          <h2 className="text-4xl font-bold text-center mb-16">Why Choose White-Label?</h2>
+        {/* Value Proposition */}
+        <section className="max-w-6xl mx-auto px-8 py-20">
+          <h2 className="text-4xl font-bold text-center mb-16">Why White-Label Design-Rite?</h2>
           <div className="grid lg:grid-cols-3 gap-8">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 text-center">
-              <div className="text-4xl mb-4">🚀</div>
-              <h3 className="text-xl font-bold mb-4">Faster Time to Market</h3>
-              <p className="text-white/80">Launch your AI-powered security platform in weeks, not years. Skip development costs and focus on customers.</p>
+            <div className="bg-gradient-to-br from-purple-600/10 to-purple-700/10 backdrop-blur-sm rounded-2xl p-8 border border-purple-500/30 text-center">
+              <div className="text-4xl mb-6">🎯</div>
+              <h3 className="text-2xl font-bold mb-4">Complete Ownership</h3>
+              <p className="text-white/80 text-lg leading-relaxed">
+                Your brand, your customers, your pricing. We provide the technology engine while you maintain complete control over your business relationships and revenue streams.
+              </p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 text-center">
-              <div className="text-4xl mb-4">🎨</div>
-              <h3 className="text-xl font-bold mb-4">Complete Brand Control</h3>
-              <p className="text-white/80">Your customers see only your brand, never ours. Full customization of logos, colors, domain, and messaging.</p>
+            <div className="bg-gradient-to-br from-purple-600/10 to-purple-700/10 backdrop-blur-sm rounded-2xl p-8 border border-purple-500/30 text-center">
+              <div className="text-4xl mb-6">🚀</div>
+              <h3 className="text-2xl font-bold mb-4">Rapid Deployment</h3>
+              <p className="text-white/80 text-lg leading-relaxed">
+                Launch your AI-powered platform in 2-4 weeks with complete branding, custom domains, and integrated payment processing. Skip years of development and go to market immediately.
+              </p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 text-center">
-              <div className="text-4xl mb-4">⚡</div>
-              <h3 className="text-xl font-bold mb-4">Instant Launch</h3>
-              <p className="text-white/80">Go to market in weeks, not years. Skip the AI development and focus on what you do best - serving customers.</p>
+            <div className="bg-gradient-to-br from-purple-600/10 to-purple-700/10 backdrop-blur-sm rounded-2xl p-8 border border-purple-500/30 text-center">
+              <div className="text-4xl mb-6">💰</div>
+              <h3 className="text-2xl font-bold mb-4">Proven Revenue Model</h3>
+              <p className="text-white/80 text-lg leading-relaxed">
+                Join partners already generating 6-figure monthly recurring revenue. Our platform is proven, scalable, and continuously improved based on real-world usage.
+              </p>
             </div>
           </div>
         </section>
 
-        {/* How It Works */}
-        <section className="max-w-6xl mx-auto mb-20">
-          <h2 className="text-4xl font-bold text-center mb-16">How White-Label Works</h2>
+        {/* Customization Options */}
+        <section className="max-w-6xl mx-auto px-8 py-20">
+          <h2 className="text-4xl font-bold text-center mb-16">Complete Branding Control</h2>
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8">
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">
+                  🎨
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-3">Visual Branding</h3>
+                  <p className="text-white/80">Complete customization of logos, colors, fonts, and styling to match your brand identity perfectly. Your customers see only your brand, never ours.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">
+                  🌐
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-3">Custom Domain</h3>
+                  <p className="text-white/80">Host the platform on your own domain with SSL certificates, custom email addresses, and complete URL control for seamless brand integration.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">
+                  📝
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-3">Content Customization</h3>
+                  <p className="text-white/80">Modify all text, messaging, and documentation to reflect your expertise, specializations, and unique value proposition in the market.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">
+                  💳
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-3">Payment Integration</h3>
+                  <p className="text-white/80">Integrated Stripe processing with your merchant account. All payments go directly to you with transparent revenue sharing and detailed analytics.</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gradient-to-br from-purple-600/20 to-purple-700/20 rounded-2xl p-8 border border-purple-500/30">
+              <h3 className="text-2xl font-bold mb-6 text-center">Partner Success Example</h3>
+              <div className="space-y-6">
+                <div className="bg-white/10 p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-semibold">SecureFlow Systems</span>
+                    <span className="text-green-400 font-bold">$47K/month</span>
+                  </div>
+                  <div className="text-white/70 text-sm">8 months as partner • 340+ clients</div>
+                </div>
+                
+                <div className="bg-white/10 p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-semibold">Guardian Solutions</span>
+                    <span className="text-blue-400 font-bold">$23K/month</span>
+                  </div>
+                  <div className="text-white/70 text-sm">4 months as partner • 180+ clients</div>
+                </div>
+                
+                <div className="bg-white/10 p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-semibold">TechSecure Pro</span>
+                    <span className="text-purple-400 font-bold">$31K/month</span>
+                  </div>
+                  <div className="text-white/70 text-sm">6 months as partner • 250+ clients</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Partnership Tiers */}
+        <section className="max-w-6xl mx-auto px-8 py-20">
+          <h2 className="text-4xl font-bold text-center mb-16">Partnership Options</h2>
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+              <div className="text-center mb-6">
+                <div className="text-2xl font-bold text-white mb-2">Startup Partner</div>
+                <div className="text-4xl font-bold text-purple-400 mb-4">30%</div>
+                <div className="text-white/70">Revenue Share</div>
+              </div>
+              <ul className="space-y-3 text-white/80">
+                <li>• Complete platform branding</li>
+                <li>• Custom domain setup</li>
+                <li>• Basic support package</li>
+                <li>• Marketing materials</li>
+                <li>• 2-week launch timeline</li>
+              </ul>
+              <button 
+                onClick={() => router.push('/contact')}
+                className="w-full bg-purple-600/20 text-purple-300 px-6 py-3 rounded-xl font-semibold border border-purple-600/30 hover:bg-purple-600/30 transition-all mt-6"
+              >
+                Get Started
+              </button>
+            </div>
+            
+            <div className="bg-gradient-to-br from-purple-600/10 to-purple-700/10 backdrop-blur-sm rounded-2xl p-8 border border-purple-500/30 relative">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-1 rounded-full text-xs font-bold">
+                  MOST POPULAR
+                </div>
+              </div>
+              <div className="text-center mb-6">
+                <div className="text-2xl font-bold text-white mb-2">Growth Partner</div>
+                <div className="text-4xl font-bold text-purple-400 mb-4">40%</div>
+                <div className="text-white/70">Revenue Share</div>
+              </div>
+              <ul className="space-y-3 text-white/80">
+                <li>• Everything in Startup</li>
+                <li>• Priority support & training</li>
+                <li>• Custom feature requests</li>
+                <li>• Advanced analytics dashboard</li>
+                <li>• Dedicated account manager</li>
+              </ul>
+              <button 
+                onClick={() => router.push('/contact')}
+                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all mt-6"
+              >
+                Become Partner
+              </button>
+            </div>
+            
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+              <div className="text-center mb-6">
+                <div className="text-2xl font-bold text-white mb-2">Enterprise Partner</div>
+                <div className="text-4xl font-bold text-purple-400 mb-4">50%</div>
+                <div className="text-white/70">Revenue Share</div>
+              </div>
+              <ul className="space-y-3 text-white/80">
+                <li>• Everything in Growth</li>
+                <li>• White-label mobile app</li>
+                <li>• API access & integrations</li>
+                <li>• Co-marketing opportunities</li>
+                <li>• Exclusive territory rights</li>
+              </ul>
+              <button 
+                onClick={() => router.push('/contact')}
+                className="w-full bg-purple-600/20 text-purple-300 px-6 py-3 rounded-xl font-semibold border border-purple-600/30 hover:bg-purple-600/30 transition-all mt-6"
+              >
+                Contact Sales
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Implementation Process */}
+        <section className="max-w-6xl mx-auto px-8 py-20">
+          <h2 className="text-4xl font-bold text-center mb-16">Simple Implementation Process</h2>
           <div className="grid lg:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6">1</div>
               <h3 className="text-xl font-bold mb-4">Partner Agreement</h3>
-              <p className="text-white/80">Sign partnership agreement and define revenue sharing structure, territory, and customization requirements.</p>
+              <p className="text-white/80">Review partnership terms, revenue sharing structure, and territory agreements. Sign contracts and begin onboarding process.</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6">2</div>
@@ -94,237 +318,115 @@ export default function WhiteLabelProgramPage() {
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6">3</div>
               <h3 className="text-xl font-bold mb-4">Training & Launch</h3>
-              <p className="text-white/80">Comprehensive training for your team on platform features, sales process, and customer support procedures.</p>
+              <p className="text-white/80">Comprehensive platform training for your team, marketing material creation, and coordinated launch with ongoing support.</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6">4</div>
-              <h3 className="text-xl font-bold mb-4">Ongoing Support</h3>
-              <p className="text-white/80">Dedicated partner success manager, marketing resources, and technical support to ensure your success.</p>
+              <h3 className="text-xl font-bold mb-4">Growth & Scale</h3>
+              <p className="text-white/80">Continuous platform improvements, feature updates, and marketing support to help you scale your business rapidly.</p>
             </div>
           </div>
         </section>
 
-        {/* Customization Examples */}
-        <section className="max-w-6xl mx-auto mb-20">
-          <h2 className="text-4xl font-bold text-center mb-16">Complete Brand Control</h2>
-          <div className="grid lg:grid-cols-2 gap-12">
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-xl font-bold mb-4">Visual Branding</h3>
-                <ul className="space-y-3 text-white/80">
-                  <li className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                    Custom logo and brand colors throughout
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                    Personalized domain (yourcompany.com)
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                    Custom email templates and notifications
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                    Branded PDF reports and proposals
-                  </li>
-                </ul>
+        {/* Success Stories */}
+        <section className="max-w-6xl mx-auto px-8 py-20">
+          <h2 className="text-4xl font-bold text-center mb-16">Partner Success Stories</h2>
+          <div className="grid lg:grid-cols-2 gap-8">
+            <div className="bg-gradient-to-br from-purple-600/10 to-purple-700/10 backdrop-blur-sm rounded-2xl p-8 border border-purple-500/30">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center font-bold text-white">SF</div>
+                <div>
+                  <div className="font-bold">Sarah Foster</div>
+                  <div className="text-white/70 text-sm">CEO, SecureFlow Systems</div>
+                </div>
               </div>
-              
-              <div>
-                <h3 className="text-xl font-bold mb-4">Content Customization</h3>
-                <ul className="space-y-3 text-white/80">
-                  <li className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                    Company-specific messaging and positioning
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                    Your team members and contact information
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                    Custom pricing and service packages
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                    Industry-specific case studies and examples
-                  </li>
-                </ul>
-              </div>
+              <p className="text-white/80 leading-relaxed mb-4">
+                "The white-label platform transformed our business completely. We went from struggling with manual assessments to generating $47K monthly recurring revenue. The AI does the heavy lifting while we focus on client relationships."
+              </p>
+              <div className="text-purple-400 font-semibold">340+ clients • $47K MRR • 8 months</div>
             </div>
             
-            <div className="bg-gray-800/80 backdrop-blur-xl border border-purple-600/30 rounded-2xl p-8 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-transparent to-transparent rounded-2xl"></div>
-              <h3 className="text-xl font-bold mb-6 relative z-10">Example: "SecureAI Pro" Platform</h3>
-              <div className="relative z-10 space-y-4">
-                <div className="bg-white/10 rounded-lg p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-xs font-bold">SA</div>
-                    <span className="font-semibold">SecureAI Pro</span>
-                  </div>
-                  <div className="text-sm text-white/70">Custom branding example</div>
-                </div>
-                <div className="text-sm text-white/80">
-                  ✅ Custom domain: secureai-pro.com<br/>
-                  ✅ Blue/white color scheme<br/>
-                  ✅ Partner's contact information<br/>
-                  ✅ Custom pricing tiers
+            <div className="bg-gradient-to-br from-purple-600/10 to-purple-700/10 backdrop-blur-sm rounded-2xl p-8 border border-purple-500/30">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center font-bold text-white">MR</div>
+                <div>
+                  <div className="font-bold">Mike Rodriguez</div>
+                  <div className="text-white/70 text-sm">Founder, Guardian Solutions</div>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Revenue Model */}
-        <section className="max-w-4xl mx-auto mb-20 text-center">
-          <h2 className="text-4xl font-bold mb-8">Revenue Sharing Model</h2>
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-            <div className="grid md:grid-cols-3 gap-8">
-              <div>
-                <div className="text-3xl font-black text-purple-300 mb-2">70%</div>
-                <div className="text-lg font-semibold mb-2">Partner Revenue</div>
-                <div className="text-white/70 text-sm">You keep 70% of all subscription revenue from your customers</div>
-              </div>
-              <div>
-                <div className="text-3xl font-black text-purple-300 mb-2">30%</div>
-                <div className="text-lg font-semibold mb-2">Platform Fee</div>
-                <div className="text-white/70 text-sm">We handle infrastructure, AI models, and platform updates</div>
-              </div>
-              <div>
-                <div className="text-3xl font-black text-purple-300 mb-2">100%</div>
-                <div className="text-lg font-semibold mb-2">Your Brand</div>
-                <div className="text-white/70 text-sm">Complete white-label solution with zero Design-Rite branding</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Requirements */}
-        <section className="max-w-4xl mx-auto mb-20">
-          <h2 className="text-4xl font-bold text-center mb-12">Partnership Requirements</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <h3 className="text-xl font-bold mb-4">Minimum Requirements</h3>
-              <ul className="space-y-2 text-white/80">
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  Established security business (2+ years)
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  Minimum 50 potential customers
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  Dedicated sales and support team
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  Marketing budget for platform promotion
-                </li>
-              </ul>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <h3 className="text-xl font-bold mb-4">What We Provide</h3>
-              <ul className="space-y-2 text-white/80">
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                  Complete platform customization
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                  Training and onboarding support
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                  Marketing materials and resources
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                  Ongoing technical support
-                </li>
-              </ul>
+              <p className="text-white/80 leading-relaxed mb-4">
+                "Design-Rite's platform gave us enterprise-level capabilities without the development costs. Our clients love the professional assessments and we love the predictable revenue stream."
+              </p>
+              <div className="text-purple-400 font-semibold">180+ clients • $23K MRR • 4 months</div>
             </div>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-r from-purple-600/20 to-purple-700/20 backdrop-blur-sm rounded-3xl p-12 border border-purple-600/30">
-            <h2 className="text-4xl font-bold mb-6">Ready to Partner with Us?</h2>
+        <section className="max-w-4xl mx-auto px-8 py-20">
+          <div className="bg-gradient-to-r from-purple-600/20 to-purple-700/20 rounded-2xl p-12 text-center border border-purple-500/30">
+            <div className="text-5xl mb-6">🚀</div>
+            <h2 className="text-3xl font-bold mb-6">Ready to Launch Your AI Platform?</h2>
             <p className="text-xl text-white/80 mb-8">
-              Join our growing network of white-label partners and start offering AI-powered security design solutions under your brand.
+              Join successful partners who've transformed their businesses with our white-label AI platform. Launch in weeks, scale in months, succeed for years.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a 
-                href="mailto:partnerships@design-rite.com?subject=White-Label%20Partnership%20Inquiry"
-                className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl hover:shadow-purple-600/40 transition-all"
+              <button 
+                onClick={() => router.push('/contact')}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all transform hover:scale-[1.02] shadow-lg"
               >
-                Contact Partnerships Team
-              </a>
+                Start Partnership Process
+              </button>
               <Link 
-                href="/contact"
-                className="bg-white/10 border-2 border-white/30 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white/20 hover:border-white/50 transition-all"
+                href="/watch-demo"
+                className="bg-white/10 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all border border-white/20"
               >
-                Schedule a Demo
+                See Platform Demo
               </Link>
             </div>
-          </div>
-        </section>
-
-        {/* Quick Start Section */}
-        <section className="max-w-6xl mx-auto mt-20 mb-8">
-          <h2 className="text-3xl font-bold text-center mb-8 text-white/90">
-            Try these quick options to get started with Design-Rite
-          </h2>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link 
-              href="/app"
-              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 text-center hover:bg-white/15 hover:-translate-y-1 transition-all"
-            >
-              <div className="text-2xl mb-3">🆓</div>
-              <div className="font-semibold text-white">Start Free Trial</div>
-            </Link>
-            <a 
-              href="mailto:info@design-rite.com?subject=Pricing%20Information"
-              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 text-center hover:bg-white/15 hover:-translate-y-1 transition-all"
-            >
-              <div className="text-2xl mb-3">💰</div>
-              <div className="font-semibold text-white">Get Pricing</div>
-            </a>
-            <a 
-              href="mailto:partnerships@design-rite.com?subject=White-Label%20Partnership"
-              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 text-center hover:bg-white/15 hover:-translate-y-1 transition-all"
-            >
-              <div className="text-2xl mb-3">🏷️</div>
-              <div className="font-semibold text-white">Partner Program</div>
-            </a>
-            <a 
-              href="mailto:info@design-rite.com?subject=Technical%20Support"
-              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 text-center hover:bg-white/15 hover:-translate-y-1 transition-all"
-            >
-              <div className="text-2xl mb-3">🛠️</div>
-              <div className="font-semibold text-white">Technical Support</div>
-            </a>
           </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
-        <div className="max-w-6xl mx-auto px-8 text-center">
-          <p className="text-white/70">© 2025 Design-Rite. All rights reserved.</p>
-          <div className="flex justify-center gap-6 mt-4">
-            <Link href="/" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Home</Link>
-            <Link href="/about" className="text-white/70 hover:text-purple-600 text-sm transition-colors">About</Link>
-            <Link href="/careers" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Careers</Link>
-            <Link href="/app" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Try Platform</Link>
+      <footer className="border-t border-white/10 bg-black/20 mt-20">
+        <div className="max-w-6xl mx-auto px-8 py-12">
+          <div className="grid lg:grid-cols-4 gap-8 mb-12">
+            <div className="lg:col-span-2">
+              <Link href="/" className="flex items-center gap-3 text-white font-bold text-2xl mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-black text-sm">
+                  DR
+                </div>
+                Design-Rite
+              </Link>
+              <p className="text-white/70 text-lg leading-relaxed max-w-md">
+                Revolutionary AI-powered platform transforming security system design through intelligent automation and expert-level analysis.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold text-lg mb-4">Partnership</h4>
+              <ul className="space-y-3">
+                <li><Link href="/white-label" className="text-purple-400 hover:text-purple-300 transition-colors">White-Label Solutions</Link></li>
+                <li><Link href="/contact" className="text-white/70 hover:text-white transition-colors">Become a Partner</Link></li>
+                <li><Link href="/affiliates" className="text-white/70 hover:text-white transition-colors">Affiliate Program</Link></li>
+                <li><Link href="/referrals" className="text-white/70 hover:text-white transition-colors">Referral Rewards</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold text-lg mb-4">Company</h4>
+              <ul className="space-y-3">
+                <li><Link href="/about" className="text-white/70 hover:text-white transition-colors">About Us</Link></li>
+                <li><Link href="/contact" className="text-white/70 hover:text-white transition-colors">Contact</Link></li>
+                <li><Link href="/privacy" className="text-white/70 hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="text-white/70 hover:text-white transition-colors">Terms of Service</Link></li>
+              </ul>
+            </div>
           </div>
-          <p className="text-sm text-white/60 mt-4">
-            🔒 Your privacy is important to us. We'll never share your information.
-          </p>
+          <div className="border-t border-white/10 pt-8 text-center">
+            <p className="text-white/60">
+              © 2025 Design-Rite™. All rights reserved. | Revolutionary AI-Powered Security Solutions
+            </p>
+          </div>
         </div>
       </footer>
     </div>
