@@ -36,14 +36,51 @@ export default function ProjectManagementPage() {
             Design-Rite
           </Link>
 
-          {/* Desktop Navigation */}
-          <ul className="hidden lg:flex items-center gap-8">
-            <li><Link href="/integrators" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Security Integrators</Link></li>
-            <li><Link href="/enterprise" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Enterprise</Link></li>
-            <li><Link href="/education" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Education</Link></li>
-            <li><Link href="/solutions" className="text-white bg-white/10 px-4 py-2 rounded-lg font-medium">AI Solutions</Link></li>
-            <li><Link href="/contact" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Contact</Link></li>
-          </ul>
+{/* Mobile Menu */}
+{isMenuOpen && (
+  <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
+    <div className="px-6 py-4 space-y-4">
+      
+      {/* Platform Section */}
+      <div>
+        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Platform</div>
+        <Link href="/ai-assessment" className="block text-white/80 hover:text-white py-2 pl-4">AI Assessment</Link>
+        <Link href="/compliance-analyst" className="block text-white/80 hover:text-white py-2 pl-4">Compliance Tools</Link>
+        <Link href="/white-label" className="block text-white/80 hover:text-white py-2 pl-4">White Label</Link>
+        <Link href="/enterprise-roi" className="block text-white/80 hover:text-white py-2 pl-4">ROI Calculator</Link>
+      </div>
+      
+      {/* Solutions Section */}
+      <div className="border-t border-white/10 pt-2">
+        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Solutions</div>
+        <Link href="/integrators" className="block text-white/80 hover:text-white py-2 pl-4">Security Integrators</Link>
+        <Link href="/enterprise" className="block text-white/80 hover:text-white py-2 pl-4">Enterprise Security</Link>
+        <Link href="/education" className="block text-white/80 hover:text-white py-2 pl-4">Education & Healthcare</Link>
+        <Link href="/consultants" className="block text-white/80 hover:text-white py-2 pl-4">Security Consultants</Link>
+      </div>
+      
+      {/* Partners Link */}
+      <Link href="/partners" className="block text-white/80 hover:text-white py-2 border-t border-white/10 pt-2">Partners</Link>
+      
+      {/* Company Section */}
+      <div className="border-t border-white/10 pt-2">
+        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Company</div>
+        <Link href="/about" className="block text-white/80 hover:text-white py-2 pl-4">About Us</Link>
+        <Link href="/team" className="block text-white/80 hover:text-white py-2 pl-4">Team</Link>
+        <Link href="/careers" className="block text-white/80 hover:text-white py-2 pl-4">Careers</Link>
+        <Link href="/contact" className="block text-white/80 hover:text-white py-2 pl-4">Contact</Link>
+      </div>
+      
+      {/* Sign In and CTA */}
+      <div className="pt-4 border-t border-white/10">
+        <Link href="/login" className="block text-white/80 hover:text-white py-2">Sign In</Link>
+        <button onClick={redirectToWaitlist} className="block w-full text-left bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">
+          Join Waitlist
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
           <div className="hidden lg:flex items-center gap-3">
             <Link href="/login" className="text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
@@ -66,29 +103,51 @@ export default function ProjectManagementPage() {
           </button>
         </nav>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
-            <div className="px-6 py-4 space-y-4">
-              <Link href="/integrators" className="block text-white/80 hover:text-white transition-colors py-2">Security Integrators</Link>
-              <Link href="/enterprise" className="block text-white/80 hover:text-white transition-colors py-2">Enterprise</Link>
-              <Link href="/education" className="block text-white/80 hover:text-white transition-colors py-2">Education</Link>
-              <Link href="/solutions" className="block text-white bg-white/10 px-4 py-2 rounded-lg">AI Solutions</Link>
-              <Link href="/contact" className="block text-white/80 hover:text-white transition-colors py-2">Contact</Link>
-              <div className="pt-4 border-t border-white/10 space-y-3">
-                <Link href="/login" className="block text-center text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
-                  Sign In
-                </Link>
-                <button 
-                  onClick={() => router.push('/app')}
-                  className="block w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
-                >
-                  Try Demo
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+{/* Mobile Menu */}
+{isMenuOpen && (
+  <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
+    <div className="px-6 py-4 space-y-4">
+      
+      {/* Platform Section */}
+      <div>
+        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Platform</div>
+        <Link href="/ai-assessment" className="block text-white/80 hover:text-white py-2 pl-4">AI Assessment</Link>
+        <Link href="/compliance-analyst" className="block text-white/80 hover:text-white py-2 pl-4">Compliance Tools</Link>
+        <Link href="/white-label" className="block text-white/80 hover:text-white py-2 pl-4">White Label</Link>
+        <Link href="/enterprise-roi" className="block text-white/80 hover:text-white py-2 pl-4">ROI Calculator</Link>
+      </div>
+      
+      {/* Solutions Section */}
+      <div className="border-t border-white/10 pt-2">
+        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Solutions</div>
+        <Link href="/integrators" className="block text-white/80 hover:text-white py-2 pl-4">Security Integrators</Link>
+        <Link href="/enterprise" className="block text-white/80 hover:text-white py-2 pl-4">Enterprise Security</Link>
+        <Link href="/education" className="block text-white/80 hover:text-white py-2 pl-4">Education & Healthcare</Link>
+        <Link href="/consultants" className="block text-white/80 hover:text-white py-2 pl-4">Security Consultants</Link>
+      </div>
+      
+      {/* Partners Link */}
+      <Link href="/partners" className="block text-white/80 hover:text-white py-2 border-t border-white/10 pt-2">Partners</Link>
+      
+      {/* Company Section */}
+      <div className="border-t border-white/10 pt-2">
+        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Company</div>
+        <Link href="/about" className="block text-white/80 hover:text-white py-2 pl-4">About Us</Link>
+        <Link href="/team" className="block text-white/80 hover:text-white py-2 pl-4">Team</Link>
+        <Link href="/careers" className="block text-white/80 hover:text-white py-2 pl-4">Careers</Link>
+        <Link href="/contact" className="block text-white/80 hover:text-white py-2 pl-4">Contact</Link>
+      </div>
+      
+      {/* Sign In and CTA */}
+      <div className="pt-4 border-t border-white/10">
+        <Link href="/login" className="block text-white/80 hover:text-white py-2">Sign In</Link>
+        <button onClick={redirectToWaitlist} className="block w-full text-left bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">
+          Join Waitlist
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </header>
 
       {/* Main Content */}
