@@ -8,7 +8,7 @@ export default function PricingPage() {
   const [billingPeriod, setBillingPeriod] = useState('monthly') // 'monthly' or 'annual'
 
   const redirectToApp = () => {
-    window.location.href = '/login-trial.html'
+    window.location.href = '/waitlist'
   }
 
   const plans = {

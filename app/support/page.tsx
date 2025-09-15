@@ -9,7 +9,7 @@ export default function SupportPage() {
   const [activeCategory, setActiveCategory] = useState('all')
 
   const redirectToApp = () => {
-    window.location.href = '/login-trial.html'
+    window.location.href = '/waitlist'
   }
 
   const scheduleDemo = () => {

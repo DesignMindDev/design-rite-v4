@@ -7,7 +7,7 @@ export default function SecurityIntegratorsPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const redirectToApp = () => {
-    window.location.href = '/login-trial.html'
+    window.location.href = '/waitlist'
   }
 
   return (
