@@ -12,16 +12,38 @@ export default function WaitlistPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  e.preventDefault()
+  setIsSubmitting(true)
 
-    // Simulate form submission (replace with your actual endpoint)
-    setTimeout(() => {
+  try {
+    const response = await fetch('/api/waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        company,
+        role,
+        facilities,
+        source: 'waitlist-page'
+      })
+    })
+
+    const data = await response.json()
+    console.log('Response:', data) // Debug log
+
+    if (response.ok || data.success) {
       setIsSubmitted(true)
-      setIsSubmitting(false)
-    }, 1500)
+      console.log('✅ Lead captured:', email)
+    } else {
+      alert(data.error || 'Something went wrong')
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    alert('Failed to join waitlist. Please try again.')
+  } finally {
+    setIsSubmitting(false)
   }
-
+}
   if (isSubmitted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white flex items-center justify-center px-6">

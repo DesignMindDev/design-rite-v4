@@ -10,12 +10,32 @@ export default function SubscribePage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // For now, just show success message
-    // Later, you can connect this to your backend
-    setIsSubmitted(true)
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  
+  try {
+    const response = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        source: 'subscribe-page'
+      })
+    })
+
+    const data = await response.json()
+    
+    if (response.ok || data.success) {
+      setIsSubmitted(true)
+      console.log('✅ Subscriber added:', email)
+    } else {
+      alert(data.error || 'Something went wrong. Please try again.')
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    alert('Failed to subscribe. Please try again.')
   }
+}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
