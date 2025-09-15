@@ -59,25 +59,67 @@ export default function SecurityIntegratorsPage() {
             Design-Rite
           </Link>
 
-          {/* Desktop Navigation */}
+{/* Desktop Navigation */}
           <ul className="hidden lg:flex items-center gap-10">
+            
+            {/* Platform Dropdown */}
             <li className="relative group">
-              <Link href="/#platform" className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+              <span className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
                 Platform
-              </Link>
+              </span>
+              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[240px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+                <Link href="/ai-assessment" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    🧠
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">AI Assessment</div>
+                    <div className="text-xs text-gray-400 leading-tight">Intelligent security analysis</div>
+                  </div>
+                </Link>
+                <Link href="/compliance-analyst" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    ✅
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Compliance Tools</div>
+                    <div className="text-xs text-gray-400 leading-tight">Regulatory compliance</div>
+                  </div>
+                </Link>
+                <Link href="/white-label" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    🏷️
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">White Label</div>
+                    <div className="text-xs text-gray-400 leading-tight">Custom branding solutions</div>
+                  </div>
+                </Link>
+                <Link href="/enterprise-roi" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    💰
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">ROI Calculator</div>
+                    <div className="text-xs text-gray-400 leading-tight">Calculate your savings</div>
+                  </div>
+                </Link>
+              </div>
             </li>
+            
+            {/* Solutions Dropdown */}
             <li className="relative group">
-              <Link href="/#solutions" className="text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-full after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700">
+              <span className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
                 Solutions
-              </Link>
+              </span>
               <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
-                <Link href="/integrators" className="flex items-center gap-4 p-3 rounded-lg text-purple-600 bg-purple-600/10 transition-all hover:translate-x-1 mb-2">
-                  <div className="w-10 h-10 bg-purple-600/30 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                <Link href="/integrators" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                     🔧
                   </div>
                   <div>
-                    <div className="font-semibold text-sm text-purple-300 mb-1">Security Integrators</div>
-                    <div className="text-xs text-purple-400 leading-tight">Design & proposal automation</div>
+                    <div className="font-semibold text-sm text-white mb-1">Security Integrators</div>
+                    <div className="text-xs text-gray-400 leading-tight">Design & proposal automation</div>
                   </div>
                 </Link>
                 <Link href="/enterprise" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
@@ -109,20 +151,57 @@ export default function SecurityIntegratorsPage() {
                 </Link>
               </div>
             </li>
+
+            {/* Partners - Simple Link */}
             <li>
               <Link href="/partners" className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm">
                 Partners
               </Link>
             </li>
-            <li>
-              <Link href="/about" className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm">
-                About
-              </Link>
-            </li>
-            <li>
-              <Link href="/contact" className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm">
-                Contact
-              </Link>
+
+            {/* Company Dropdown */}
+            <li className="relative group">
+              <span className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+                Company
+              </span>
+              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[220px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+                <Link href="/about" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    ℹ️
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">About Us</div>
+                    <div className="text-xs text-gray-400 leading-tight">Our mission & vision</div>
+                  </div>
+                </Link>
+                <Link href="/team" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    👥
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Team</div>
+                    <div className="text-xs text-gray-400 leading-tight">Meet our experts</div>
+                  </div>
+                </Link>
+                <Link href="/careers" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    💼
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Careers</div>
+                    <div className="text-xs text-gray-400 leading-tight">Join our team</div>
+                  </div>
+                </Link>
+                <Link href="/contact" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    📧
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Contact</div>
+                    <div className="text-xs text-gray-400 leading-tight">Get in touch</div>
+                  </div>
+                </Link>
+              </div>
             </li>
           </ul>
 
@@ -148,23 +227,51 @@ export default function SecurityIntegratorsPage() {
           </button>
         </nav>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
-            <div className="px-6 py-4 space-y-4">
-              <Link href="/integrators" className="block text-purple-600 font-medium py-2">Security Integrators</Link>
-              <Link href="/enterprise" className="block text-white/80 hover:text-white py-2">Enterprise Security</Link>
-              <Link href="/education" className="block text-white/80 hover:text-white py-2">Education</Link>
-              <Link href="/consultants" className="block text-white/80 hover:text-white py-2">Consultants</Link>
-              <div className="pt-4 border-t border-white/10">
-                <Link href="/login" className="block text-white/80 hover:text-white py-2">Sign In</Link>
-                <button onClick={redirectToApp} className="block w-full text-left bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">
-                  Try Platform
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+{/* Mobile Menu */}
+{isMenuOpen && (
+  <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
+    <div className="px-6 py-4 space-y-4">
+      
+      {/* Platform Section */}
+      <div>
+        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Platform</div>
+        <Link href="/ai-assessment" className="block text-white/80 hover:text-white py-2 pl-4">AI Assessment</Link>
+        <Link href="/compliance-analyst" className="block text-white/80 hover:text-white py-2 pl-4">Compliance Tools</Link>
+        <Link href="/white-label" className="block text-white/80 hover:text-white py-2 pl-4">White Label</Link>
+        <Link href="/enterprise-roi" className="block text-white/80 hover:text-white py-2 pl-4">ROI Calculator</Link>
+      </div>
+      
+      {/* Solutions Section */}
+      <div className="border-t border-white/10 pt-2">
+        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Solutions</div>
+        <Link href="/integrators" className="block text-white/80 hover:text-white py-2 pl-4">Security Integrators</Link>
+        <Link href="/enterprise" className="block text-white/80 hover:text-white py-2 pl-4">Enterprise Security</Link>
+        <Link href="/education" className="block text-white/80 hover:text-white py-2 pl-4">Education & Healthcare</Link>
+        <Link href="/consultants" className="block text-white/80 hover:text-white py-2 pl-4">Security Consultants</Link>
+      </div>
+      
+      {/* Partners Link */}
+      <Link href="/partners" className="block text-white/80 hover:text-white py-2 border-t border-white/10 pt-2">Partners</Link>
+      
+      {/* Company Section */}
+      <div className="border-t border-white/10 pt-2">
+        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Company</div>
+        <Link href="/about" className="block text-white/80 hover:text-white py-2 pl-4">About Us</Link>
+        <Link href="/team" className="block text-white/80 hover:text-white py-2 pl-4">Team</Link>
+        <Link href="/careers" className="block text-white/80 hover:text-white py-2 pl-4">Careers</Link>
+        <Link href="/contact" className="block text-white/80 hover:text-white py-2 pl-4">Contact</Link>
+      </div>
+      
+      {/* Sign In and CTA */}
+      <div className="pt-4 border-t border-white/10">
+        <Link href="/login" className="block text-white/80 hover:text-white py-2">Sign In</Link>
+        <button onClick={redirectToWaitlist} className="block w-full text-left bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">
+          Join Waitlist
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </header>
 
       {/* Main Content */}
