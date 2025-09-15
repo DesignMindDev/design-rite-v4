@@ -54,6 +54,27 @@ export default function HomePage() {
           <Link className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30" href="/waitlist">
             Join Waitlist
           </Link>
+          <button className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">
+            ×
+          </button>
+        </div>
+      </div>
+
+      {/* Utility Bar */}
+      <div className="bg-black/90 border-b border-purple-600/10 py-2 text-xs">
+        <div className="max-w-6xl mx-auto px-8 flex justify-end items-center gap-8">
+          <Link href="/login" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>👤</span> Login
+          </Link>
+          <Link href="/pricing" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>💰</span> Plans & Pricing
+          </Link>
+          <Link href="/support" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>❓</span> Help Center
+          </Link>
+          <Link href="/contact" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>📧</span> Contact Us
+          </Link>
         </div>
       </div>
 
@@ -68,19 +89,81 @@ export default function HomePage() {
           </Link>
 
           {/* Desktop Navigation */}
-          <ul className="hidden lg:flex items-center gap-8">
-            <li><Link href="/integrators" className="text-gray-300 hover:text-purple-600 font-medium transition-all">Security Integrators</Link></li>
-            <li><Link href="/enterprise" className="text-gray-300 hover:text-purple-600 font-medium transition-all">Enterprise</Link></li>
-            <li><Link href="/education" className="text-gray-300 hover:text-purple-600 font-medium transition-all">Education</Link></li>
-            <li><Link href="/contact" className="text-gray-300 hover:text-purple-600 font-medium transition-all">Contact</Link></li>
+          <ul className="hidden lg:flex items-center gap-10">
+            <li className="relative group">
+              <Link href="/#platform" className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+                Platform
+              </Link>
+            </li>
+            <li className="relative group">
+              <Link href="/#solutions" className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+                Solutions
+              </Link>
+              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+                <Link href="/integrators" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    🔧
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Security Integrators</div>
+                    <div className="text-xs text-gray-400 leading-tight">Design & proposal automation</div>
+                  </div>
+                </Link>
+                <Link href="/enterprise" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    🏢
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Enterprise Security</div>
+                    <div className="text-xs text-gray-400 leading-tight">In-house team solutions</div>
+                  </div>
+                </Link>
+                <Link href="/education" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    🎓
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Education & Healthcare</div>
+                    <div className="text-xs text-gray-400 leading-tight">Specialized compliance tools</div>
+                  </div>
+                </Link>
+                <Link href="/consultants" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                    💼
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Security Consultants</div>
+                    <div className="text-xs text-gray-400 leading-tight">Expert advisory services</div>
+                  </div>
+                </Link>
+              </div>
+            </li>
+            <li>
+              <Link href="/partners" className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm">
+                Partners
+              </Link>
+            </li>
+            <li>
+              <Link href="/about" className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm">
+                About
+              </Link>
+            </li>
+            <li>
+              <Link href="/contact" className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm">
+                Contact
+              </Link>
+            </li>
           </ul>
 
-          {/* Right Side Actions */}
+          {/* CTA Buttons */}
           <div className="hidden lg:flex items-center gap-4">
-            <Link className="bg-purple-600/20 text-purple-600 border border-purple-600/30 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-purple-600/30 transition-all" href="/subscribe">
-              Subscribe
+            <Link href="/login" className="text-gray-300 hover:text-white transition-colors">
+              Sign In
             </Link>
-            <button onClick={redirectToApp} className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:shadow-lg transition-all">
+            <button
+              onClick={redirectToApp}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition-all"
+            >
               Join Waitlist
             </button>
           </div>
@@ -96,21 +179,17 @@ export default function HomePage() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden bg-black/95 backdrop-blur-xl border-t border-purple-600/30 py-4">
-            <div className="max-w-6xl mx-auto px-8">
-              <div className="space-y-4">
-                <Link href="/integrators" className="block text-white hover:text-purple-600 py-2">Security Integrators</Link>
-                <Link href="/enterprise" className="block text-white hover:text-purple-600 py-2">Enterprise</Link>
-                <Link href="/education" className="block text-white hover:text-purple-600 py-2">Education</Link>
-                <Link href="/contact" className="block text-white hover:text-purple-600 py-2">Contact</Link>
-                <div className="pt-4 border-t border-purple-600/30 space-y-2">
-                  <Link href="/subscribe" className="block bg-purple-600/20 text-purple-600 px-4 py-2 rounded-lg font-medium text-center">
-                    Subscribe
-                  </Link>
-                  <button onClick={redirectToApp} className="block w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-2 rounded-lg font-medium">
-                    Join Waitlist
-                  </button>
-                </div>
+          <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
+            <div className="px-6 py-4 space-y-4">
+              <Link href="/integrators" className="block text-white/80 hover:text-white py-2">Security Integrators</Link>
+              <Link href="/enterprise" className="block text-white/80 hover:text-white py-2">Enterprise Security</Link>
+              <Link href="/education" className="block text-white/80 hover:text-white py-2">Education</Link>
+              <Link href="/consultants" className="block text-white/80 hover:text-white py-2">Consultants</Link>
+              <div className="pt-4 border-t border-white/10">
+                <Link href="/login" className="block text-white/80 hover:text-white py-2">Sign In</Link>
+                <button onClick={redirectToApp} className="block w-full text-left bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">
+                  Join Waitlist
+                </button>
               </div>
             </div>
           </div>
@@ -236,7 +315,7 @@ export default function HomePage() {
             <button onClick={redirectToApp} className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl transition-all">
               Join Waitlist - Free Early Access
             </button>
-            <Link href="/contact" className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 transition-all">
+            <Link href="/contact" className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 transition-all inline-block text-center">
               Contact Sales
             </Link>
           </div>
@@ -265,6 +344,7 @@ export default function HomePage() {
                 <li><Link href="/integrators" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Security Integrators</Link></li>
                 <li><Link href="/enterprise" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Enterprise</Link></li>
                 <li><Link href="/education" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Education</Link></li>
+                <li><Link href="/consultants" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Consultants</Link></li>
               </ul>
             </div>
 
@@ -274,15 +354,17 @@ export default function HomePage() {
                 <li><Link href="/about" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">About Us</Link></li>
                 <li><Link href="/contact" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Contact</Link></li>
                 <li><Link href="/support" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Support</Link></li>
+                <li><Link href="/careers" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Careers</Link></li>
               </ul>
             </div>
 
             <div>
               <h3 className="text-white font-bold mb-4">Resources</h3>
               <ul className="space-y-2">
+                <li><Link href="/pricing" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Pricing</Link></li>
+                <li><Link href="/waitlist" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Join Waitlist</Link></li>
                 <li><Link href="/api/leads" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Lead Dashboard</Link></li>
                 <li><Link href="/api/leads/export" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Export Leads</Link></li>
-                <li><Link href="/pricing" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Pricing</Link></li>
               </ul>
             </div>
           </div>
