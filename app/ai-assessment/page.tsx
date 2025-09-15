@@ -262,14 +262,21 @@ export default function AIAssessmentPage() {
             <label className="block text-sm font-semibold text-purple-200 mb-3">
               Square Footage
             </label>
-            <input 
-              type="number"
-              placeholder="e.g., 25000"
-              className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-purple-300 focus:ring-2 focus:ring-purple-400 focus:border-transparent"
-              onChange={(e) => updateSessionData('squareFootage', e.target.value)}
-              value={sessionData.squareFootage}
-            />
-          </div>
+<input 
+  type="text"
+  inputMode="numeric"
+  pattern="[0-9]*"
+  placeholder="e.g., 25000"
+  className="w-full p-4 bg-black/50 border border-purple-600/30 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-400 focus:border-purple-400"
+  value={sessionData.squareFootage || ''}
+  onChange={(e) => {
+    const value = e.target.value.replace(/[^0-9]/g, '');
+    setSessionData(prev => ({
+      ...prev,
+      squareFootage: value
+    }));
+  }}
+/>       </div>
 
           <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
             <label className="block text-sm font-semibold text-purple-200 mb-3">
