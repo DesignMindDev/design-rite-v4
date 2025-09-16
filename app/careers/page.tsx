@@ -2,12 +2,15 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import CareerApplicationForm from '../../components/CareerApplicationForm'
 
 export default function CareersPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [selectedPosition, setSelectedPosition] = useState('')
   const [isApplicationOpen, setIsApplicationOpen] = useState(false)
+
+  const redirectToApp = () => {
+    window.location.href = '/app'
+  }
 
   const openApplicationModal = (position: string) => {
     setSelectedPosition(position)
@@ -71,8 +74,37 @@ export default function CareersPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
-      {/* Header navigation would go here - using the unified navigation template */}
-      
+      {/* Header - matches other pages */}
+      <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b border-purple-600/20 py-4">
+        <nav className="max-w-6xl mx-auto px-8 flex justify-between items-center">
+          <Link href="/" className="flex items-center gap-3 text-white font-black text-2xl">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
+              DR
+            </div>
+            Design-Rite
+          </Link>
+
+          <ul className="hidden lg:flex items-center gap-10">
+            <li><Link href="/platform" className="text-gray-300 hover:text-purple-600 font-medium transition-all">Platform</Link></li>
+            <li><Link href="/solutions" className="text-gray-300 hover:text-purple-600 font-medium transition-all">Solutions</Link></li>
+            <li><Link href="/partners" className="text-gray-300 hover:text-purple-600 font-medium transition-all">Partners</Link></li>
+            <li><Link href="/about" className="text-gray-300 hover:text-purple-600 font-medium transition-all">About</Link></li>
+            <li><Link href="/contact" className="text-gray-300 hover:text-purple-600 font-medium transition-all">Contact</Link></li>
+          </ul>
+
+          <div className="hidden lg:flex items-center gap-3">
+            <Link href="/login" className="text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
+              Sign In
+            </Link>
+            <button onClick={redirectToApp} className="bg-white text-purple-600 px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all">
+              Try Platform
+            </button>
+          </div>
+
+          <button className="lg:hidden text-white text-2xl" onClick={() => setIsMenuOpen(!isMenuOpen)}>☰</button>
+        </nav>
+      </header>
+
       {/* Hero Section */}
       <section className="pt-32 pb-16 relative overflow-hidden">
         <div className="max-w-6xl mx-auto px-8 text-center">
@@ -160,13 +192,13 @@ export default function CareersPage() {
                       </span>
                     </div>
                   </div>
-                  <button
-                    onClick={() => openApplicationModal(position.title)}
+                  <Link
+                    href="/contact"
                     className="mt-4 lg:mt-0 bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all hover:scale-105 flex items-center gap-2"
                   >
                     Apply Now
                     <span className="text-xl">→</span>
-                  </button>
+                  </Link>
                 </div>
                 
                 <p className="text-gray-300 mb-4">{position.description}</p>
@@ -192,12 +224,12 @@ export default function CareersPage() {
             <p className="text-gray-400 mb-6">
               We're always looking for exceptional talent. Send us your resume and tell us how you can contribute to our mission.
             </p>
-            <button
-              onClick={() => openApplicationModal('General Application')}
+            <Link
+              href="/contact"
               className="bg-white/10 text-white px-8 py-3 rounded-lg font-semibold border border-purple-600/30 hover:bg-purple-600/10 transition-all"
             >
               Submit General Application
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -276,13 +308,6 @@ export default function CareersPage() {
           </div>
         </div>
       </section>
-
-      {/* Application Modal */}
-      <CareerApplicationForm 
-        position={selectedPosition}
-        isOpen={isApplicationOpen}
-        onClose={() => setIsApplicationOpen(false)}
-      />
     </div>
   )
 }
