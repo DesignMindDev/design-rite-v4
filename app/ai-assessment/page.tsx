@@ -258,25 +258,27 @@ export default function AIAssessmentPage() {
             </select>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
-            <label className="block text-sm font-semibold text-purple-200 mb-3">
-              Square Footage
-            </label>
-<input 
-  type="text"
-  inputMode="numeric"
-  pattern="[0-9]*"
-  placeholder="e.g., 25000"
-  className="w-full p-4 bg-black/50 border border-purple-600/30 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-400 focus:border-purple-400"
-  value={sessionData.squareFootage || ''}
-  onChange={(e) => {
-    const value = e.target.value.replace(/[^0-9]/g, '');
-    setSessionData(prev => ({
-      ...prev,
-      squareFootage: value
-    }));
-  }}
-/>       </div>
+// Replace this section in your FacilityInfoStep component
+
+<div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
+  <label className="block text-sm font-semibold text-purple-200 mb-3">
+    Square Footage Range
+  </label>
+  <select 
+    className="w-full p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white focus:ring-2 focus:ring-purple-400 focus:border-transparent"
+    onChange={(e) => updateSessionData('squareFootage', e.target.value)}
+    value={sessionData.squareFootage}
+  >
+    <option value="" className="text-gray-800">Select square footage range</option>
+    <option value="1000-5000" className="text-gray-800">1,000 - 5,000 sq ft</option>
+    <option value="5000-10000" className="text-gray-800">5,000 - 10,000 sq ft</option>
+    <option value="10000-50000" className="text-gray-800">10,000 - 50,000 sq ft</option>
+    <option value="50000-100000" className="text-gray-800">50,000 - 100,000 sq ft</option>
+    <option value="100000-500000" className="text-gray-800">100,000 - 500,000 sq ft</option>
+    <option value="500000-1000000" className="text-gray-800">500,000 - 1,000,000 sq ft</option>
+    <option value="1000000+" className="text-gray-800">Over 1,000,000 sq ft</option>
+  </select>
+</div>
 
           <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
             <label className="block text-sm font-semibold text-purple-200 mb-3">
