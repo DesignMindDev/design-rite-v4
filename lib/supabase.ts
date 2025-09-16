@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+﻿import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -10,20 +10,3 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
-
-export interface JobApplication {
-  first_name: string
-  last_name: string
-  email: string
-  phone?: string
-  linkedin_url?: string
-  portfolio_url?: string
-  years_experience?: string
-  current_company?: string
-  current_job_title?: string
-  cover_letter?: string
-  salary_expectations?: string
-  available_start_date?: string
-  referral_source?: string
-  position_applied: string
-}
