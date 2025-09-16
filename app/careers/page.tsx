@@ -2,79 +2,428 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { createClient } from '@supabase/supabase-js'
 
+const supabaseUrl = 'https://ickwrbdpuorzqpzqbqpf.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlja3dyYmRwdW9yenFwenFicXBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjY0OTgzOTksImV4cCI6MjA0MjA3NDM5OX0.kQDLqZ8fZUlFZs3bJLGy0kEQRoqE_XvN1K8G0z_DkJg';
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Application Form Component
+interface ApplicationFormProps {
+  position: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+function ApplicationForm({ position, isOpen, onClose }: ApplicationFormProps) {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    linkedinUrl: '',
+    portfolioUrl: '',
+    yearsExperience: '',
+    currentCompany: '',
+    currentJobTitle: '',
+    coverLetter: '',
+    salaryExpectations: '',
+    availableStartDate: '',
+    referralSource: ''
+  })
+
+  const [resumeFile, setResumeFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.type !== 'application/pdf') {
+        setError('Please upload a PDF file only')
+        return
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError('File size must be less than 5MB')
+        return
+      }
+      setResumeFile(file)
+      setError('')
+    }
+  }
+
+  const uploadResume = async (file: File, applicantEmail: string) => {
+    const fileExt = 'pdf'
+    const fileName = `${applicantEmail}-${Date.now()}.${fileExt}`
+    const filePath = `resumes/${fileName}`
+
+    const { data, error } = await supabase.storage
+      .from('resumes')
+      .upload(filePath, file)
+
+    if (error) {
+      throw error
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('resumes')
+      .getPublicUrl(filePath)
+
+    return publicUrl
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setUploading(true)
+    setError('')
+
+    try {
+      let resumeUrl = ''
+
+      if (resumeFile) {
+        resumeUrl = await uploadResume(resumeFile, formData.email)
+      }
+
+      const response = await fetch('/api/careers/apply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          positionApplied: position,
+          resumeUrl: resumeUrl
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to submit application')
+      }
+
+      setSubmitted(true)
+    } catch (err: any) {
+      setError(err.message || 'Failed to submit application')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  if (!isOpen) return null
+
+  if (submitted) {
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-gray-900 rounded-2xl p-8 max-w-md w-full">
+          <div className="text-center">
+            <div className="text-4xl mb-4">✅</div>
+            <h3 className="text-2xl font-bold text-white mb-4">Application Submitted!</h3>
+            <p className="text-gray-400 mb-6">
+              Thank you for your interest in the {position} position. We'll review your application and get back to you soon.
+            </p>
+            <button
+              onClick={onClose}
+              className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-gray-900 rounded-2xl p-8 max-w-2xl w-full my-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-white">Apply for {position}</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white text-2xl"
+          >
+            ×
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-white font-semibold mb-2">First Name *</label>
+              <input
+                type="text"
+                name="firstName"
+                required
+                value={formData.firstName}
+                onChange={handleInputChange}
+                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-white font-semibold mb-2">Last Name *</label>
+              <input
+                type="text"
+                name="lastName"
+                required
+                value={formData.lastName}
+                onChange={handleInputChange}
+                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-white font-semibold mb-2">Email *</label>
+              <input
+                type="email"
+                name="email"
+                required
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-white font-semibold mb-2">Phone</label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-white font-semibold mb-2">Years of Experience</label>
+              <select
+                name="yearsExperience"
+                value={formData.yearsExperience}
+                onChange={handleInputChange}
+                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+              >
+                <option value="">Select experience level</option>
+                <option value="0-1">0-1 years</option>
+                <option value="2-3">2-3 years</option>
+                <option value="4-5">4-5 years</option>
+                <option value="6-10">6-10 years</option>
+                <option value="10+">10+ years</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-white font-semibold mb-2">Current Company</label>
+              <input
+                type="text"
+                name="currentCompany"
+                value={formData.currentCompany}
+                onChange={handleInputChange}
+                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-white font-semibold mb-2">Current Job Title</label>
+            <input
+              type="text"
+              name="currentJobTitle"
+              value={formData.currentJobTitle}
+              onChange={handleInputChange}
+              className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+            />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-white font-semibold mb-2">LinkedIn URL</label>
+              <input
+                type="url"
+                name="linkedinUrl"
+                value={formData.linkedinUrl}
+                onChange={handleInputChange}
+                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+                placeholder="https://linkedin.com/in/yourprofile"
+              />
+            </div>
+            <div>
+              <label className="block text-white font-semibold mb-2">Portfolio/Website</label>
+              <input
+                type="url"
+                name="portfolioUrl"
+                value={formData.portfolioUrl}
+                onChange={handleInputChange}
+                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+                placeholder="https://yourportfolio.com"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-white font-semibold mb-2">Resume (PDF) *</label>
+            <div className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-purple-500 transition-colors">
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={handleFileChange}
+                className="hidden"
+                id="resume-upload"
+                required
+              />
+              <label htmlFor="resume-upload" className="cursor-pointer">
+                <div className="text-4xl mb-2">📄</div>
+                <p className="text-gray-400 mb-2">
+                  {resumeFile ? resumeFile.name : 'Click to upload your resume (PDF only, max 5MB)'}
+                </p>
+                <p className="text-purple-400 font-semibold">Choose File</p>
+              </label>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-white font-semibold mb-2">Salary Expectations</label>
+              <input
+                type="text"
+                name="salaryExpectations"
+                value={formData.salaryExpectations}
+                onChange={handleInputChange}
+                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+                placeholder="e.g., $80k - $120k"
+              />
+            </div>
+            <div>
+              <label className="block text-white font-semibold mb-2">Available Start Date</label>
+              <input
+                type="date"
+                name="availableStartDate"
+                value={formData.availableStartDate}
+                onChange={handleInputChange}
+                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-white font-semibold mb-2">How did you hear about us?</label>
+            <select
+              name="referralSource"
+              value={formData.referralSource}
+              onChange={handleInputChange}
+              className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+            >
+              <option value="">Select source</option>
+              <option value="LinkedIn">LinkedIn</option>
+              <option value="Indeed">Indeed</option>
+              <option value="Company Website">Company Website</option>
+              <option value="Referral">Employee Referral</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-white font-semibold mb-2">Cover Letter</label>
+            <textarea
+              name="coverLetter"
+              value={formData.coverLetter}
+              onChange={handleInputChange}
+              rows={4}
+              className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+              placeholder="Tell us why you're interested in this position and what makes you a great fit..."
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-600/20 border border-red-600/30 rounded-lg p-4">
+              <p className="text-red-400">{error}</p>
+            </div>
+          )}
+
+          <div className="flex gap-4 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition-all"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={uploading}
+              className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+            >
+              {uploading ? 'Submitting...' : 'Submit Application'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// Main Careers Page Component
 export default function CareersPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [selectedPosition, setSelectedPosition] = useState('')
   const [isApplicationOpen, setIsApplicationOpen] = useState(false)
 
   const redirectToApp = () => {
-    window.location.href = '/app'
+    window.location.href = '/login-trial.html'
   }
 
-  const openApplicationModal = (position: string) => {
+  const scheduleDemo = () => {
+    window.location.href = '/demo.html'
+  }
+
+  const applyForPosition = (position: string) => {
     setSelectedPosition(position)
     setIsApplicationOpen(true)
   }
 
-  const positions = [
-    {
-      title: 'Senior Security Engineer',
-      department: 'Engineering',
-      location: 'Remote',
-      type: 'Full-time',
-      description: 'Lead the development of our AI-powered security assessment platform.',
-      requirements: [
-        '5+ years security systems experience',
-        'Strong knowledge of CCTV, access control, and intrusion detection',
-        'Experience with AI/ML applications in security',
-        'Leadership and mentoring skills'
-      ]
-    },
-    {
-      title: 'AI/ML Engineer',
-      department: 'Engineering',
-      location: 'Remote',
-      type: 'Full-time',
-      description: 'Develop and optimize machine learning models for security system design.',
-      requirements: [
-        '3+ years ML engineering experience',
-        'Proficiency in Python, TensorFlow/PyTorch',
-        'Experience with computer vision',
-        'Strong problem-solving skills'
-      ]
-    },
-    {
-      title: 'Product Designer',
-      department: 'Design',
-      location: 'Hybrid - San Francisco',
-      type: 'Full-time',
-      description: 'Design intuitive interfaces for our security design platform.',
-      requirements: [
-        '4+ years product design experience',
-        'Expertise in Figma and design systems',
-        'Understanding of B2B SaaS products',
-        'Portfolio demonstrating complex UI/UX work'
-      ]
-    },
-    {
-      title: 'Sales Executive - Security Industry',
-      department: 'Sales',
-      location: 'Remote - US',
-      type: 'Full-time',
-      description: 'Drive sales growth in the security integrator market.',
-      requirements: [
-        '5+ years B2B sales experience',
-        'Security industry background preferred',
-        'Track record of exceeding quotas',
-        'Strong presentation skills'
-      ]
-    }
-  ]
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
-      {/* Header - matches other pages */}
+      {/* Top Announcement Bar */}
+      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
+        <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
+          <span className="text-base">🎓</span>
+          <span className="flex-1 text-center">Design-Rite's Revolutionary AI is launching Q4 2025 - Join the waitlist for early access to security design mastery</span>
+          <Link className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30" href="/subscribe">
+            Join Waitlist
+          </Link>
+          <button className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">×</button>
+        </div>
+      </div>
+
+      {/* Top Contact Bar */}
+      <div className="bg-black/90 border-b border-purple-600/10 py-2 text-xs">
+        <div className="max-w-6xl mx-auto px-8 flex justify-end items-center gap-8">
+          <Link href="/login" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>👤</span> Login
+          </Link>
+          <Link href="/pricing" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>💰</span> Plans & Pricing
+          </Link>
+          <Link href="/help" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>❓</span> Help Center
+          </Link>
+          <Link href="/contact" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>📧</span> Contact Us
+          </Link>
+        </div>
+      </div>
+
+      {/* Main Navigation Header with Dropdowns */}
       <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b border-purple-600/20 py-4">
         <nav className="max-w-6xl mx-auto px-8 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-3 text-white font-black text-2xl">
@@ -84,82 +433,251 @@ export default function CareersPage() {
             Design-Rite
           </Link>
 
+          {/* Desktop Navigation with Dropdowns */}
           <ul className="hidden lg:flex items-center gap-10">
-            <li><Link href="/platform" className="text-gray-300 hover:text-purple-600 font-medium transition-all">Platform</Link></li>
-            <li><Link href="/solutions" className="text-gray-300 hover:text-purple-600 font-medium transition-all">Solutions</Link></li>
-            <li><Link href="/partners" className="text-gray-300 hover:text-purple-600 font-medium transition-all">Partners</Link></li>
-            <li><Link href="/about" className="text-gray-300 hover:text-purple-600 font-medium transition-all">About</Link></li>
-            <li><Link href="/contact" className="text-gray-300 hover:text-purple-600 font-medium transition-all">Contact</Link></li>
+            {/* Platform Dropdown */}
+            <li className="relative group">
+              <Link href="#platform" className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+                Platform
+              </Link>
+              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+                <button onClick={redirectToApp} className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2 w-full text-left">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🔍</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">AI Assessment</div>
+                    <div className="text-xs text-gray-400">Intelligent security analysis</div>
+                  </div>
+                </button>
+                <Link href="/professional-proposals" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">📋</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Proposal Generator</div>
+                    <div className="text-xs text-gray-400">Professional BOMs & pricing</div>
+                  </div>
+                </Link>
+                <Link href="/white-label" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🏢</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">White-Label Solutions</div>
+                    <div className="text-xs text-gray-400">Branded platforms for partners</div>
+                  </div>
+                </Link>
+                <Link href="/api" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">⚡</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">API Access</div>
+                    <div className="text-xs text-gray-400">Integrate with your systems</div>
+                  </div>
+                </Link>
+              </div>
+            </li>
+
+            {/* Solutions Dropdown */}
+            <li className="relative group">
+              <Link href="#solutions" className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+                Solutions
+              </Link>
+              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+                <Link href="/integrators" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🔧</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Security Integrators</div>
+                    <div className="text-xs text-gray-400">Design & proposal automation</div>
+                  </div>
+                </Link>
+                <Link href="/enterprise" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🏢</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Enterprise Security</div>
+                    <div className="text-xs text-gray-400">In-house team solutions</div>
+                  </div>
+                </Link>
+                <Link href="/education" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🎓</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Education & Healthcare</div>
+                    <div className="text-xs text-gray-400">Specialized compliance tools</div>
+                  </div>
+                </Link>
+                <Link href="/consultants" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">💼</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Security Consultants</div>
+                    <div className="text-xs text-gray-400">Expert-level assessments</div>
+                  </div>
+                </Link>
+              </div>
+            </li>
+
+            {/* Company Dropdown */}
+            <li className="relative group">
+              <Link href="#company" className="text-purple-600 font-medium transition-all relative py-2 block text-sm after:absolute after:bottom-[-5px] after:left-0 after:w-full after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700">
+                Company
+              </Link>
+              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+                <Link href="/about" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🏢</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">About Us</div>
+                    <div className="text-xs text-gray-400">Our mission and vision</div>
+                  </div>
+                </Link>
+                <Link href="/team" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">👥</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Team</div>
+                    <div className="text-xs text-gray-400">Meet the founders</div>
+                  </div>
+                </Link>
+                <Link href="/careers" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2 bg-purple-600/10 text-white">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">💼</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Careers</div>
+                    <div className="text-xs text-gray-400">Join our growing team</div>
+                  </div>
+                </Link>
+                <Link href="/academy" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
+                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🎓</div>
+                  <div>
+                    <div className="font-semibold text-sm text-white mb-1">Design-Rite Academy</div>
+                    <div className="text-xs text-gray-400">Security design education</div>
+                  </div>
+                </Link>
+              </div>
+            </li>
           </ul>
 
-          <div className="hidden lg:flex items-center gap-3">
-            <Link href="/login" className="text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
-              Sign In
+          {/* Right Side Actions */}
+          <div className="hidden lg:flex items-center gap-4">
+            <Link className="bg-purple-600/20 text-purple-600 border border-purple-600/30 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-purple-600/30 hover:border-purple-600 transition-all" href="/subscribe">
+              Subscribe
             </Link>
-            <button onClick={redirectToApp} className="bg-white text-purple-600 px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all">
-              Try Platform
-            </button>
+            <div className="flex items-center gap-4">
+              <button onClick={scheduleDemo} className="bg-purple-600/10 text-purple-600 border border-purple-600/30 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-purple-600/20 hover:border-purple-600 transition-all">
+                Watch Demo
+              </button>
+              <button onClick={redirectToApp} className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:shadow-lg hover:shadow-purple-600/30 transition-all">
+                Join Waitlist
+              </button>
+            </div>
           </div>
 
-          <button className="lg:hidden text-white text-2xl" onClick={() => setIsMenuOpen(!isMenuOpen)}>☰</button>
+          {/* Mobile Menu Button */}
+          <button 
+            className="lg:hidden text-white text-2xl p-2 hover:bg-white/10 rounded transition-colors" 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle mobile menu"
+          >
+            ☰
+          </button>
         </nav>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="lg:hidden bg-black/95 backdrop-blur-xl border-t border-purple-600/30 py-4">
+            <div className="max-w-6xl mx-auto px-8">
+              <div className="space-y-4">
+                <button onClick={redirectToApp} className="block w-full text-left text-white hover:text-purple-600 py-2">
+                  Platform
+                </button>
+                <Link href="/integrators" className="block text-white hover:text-purple-600 py-2">
+                  Solutions
+                </Link>
+                <Link href="/careers" className="block text-purple-600 font-medium py-2">
+                  Company
+                </Link>
+                <div className="pt-4 border-t border-purple-600/30 space-y-2">
+                  <Link href="/subscribe" className="block bg-purple-600/20 text-purple-600 px-4 py-2 rounded-lg font-medium text-center">
+                    Subscribe
+                  </Link>
+                  <button onClick={scheduleDemo} className="block w-full bg-purple-600/10 text-purple-600 border border-purple-600/30 px-4 py-2 rounded-lg font-medium">
+                    Watch Demo
+                  </button>
+                  <button onClick={redirectToApp} className="block w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-2 rounded-lg font-medium">
+                    Join Waitlist
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 relative overflow-hidden">
-        <div className="max-w-6xl mx-auto px-8 text-center">
+      <section className="pt-32 pb-16 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-radial from-purple-600/10 via-transparent to-transparent"></div>
+        <div className="max-w-6xl mx-auto px-8 text-center relative z-10">
           <div className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-bold text-base tracking-widest uppercase mb-4">
             Join Our Team
           </div>
           <h1 className="text-5xl lg:text-6xl font-black leading-tight mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
             Build the Future of Security Design
           </h1>
-          <p className="text-xl text-gray-400 mb-10 max-w-3xl mx-auto">
-            Join a team of passionate innovators transforming how security systems are designed. 
-            We're looking for talented individuals who want to make a real impact.
+          <p className="text-xl text-gray-400 mb-16 leading-relaxed max-w-4xl mx-auto">
+            Join a revolutionary team that's transforming the security industry with AI. We're looking for passionate 
+            engineers, designers, and industry experts to help shape the future of security design.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="#openings" className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl transition-all">
-              View Open Positions
-            </a>
-            <Link href="#culture" className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 transition-all">
-              Learn About Our Culture
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* Why Design-Rite Section */}
-      <section className="py-20 px-8">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">Why Design-Rite?</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
+      {/* Company Culture Section */}
+      <section className="py-16 bg-black/50">
+        <div className="max-w-6xl mx-auto px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-black mb-4 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">
+              Why Work at Design-Rite?
+            </h2>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              Be part of a team that's revolutionizing an entire industry with cutting-edge AI technology.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
               <div className="text-3xl mb-4">🚀</div>
-              <h3 className="text-lg font-bold text-white mb-2">Innovation First</h3>
-              <p className="text-gray-400 text-sm">
-                Work with cutting-edge AI technology in the security industry
+              <h3 className="text-xl font-bold text-white mb-4">Cutting-Edge Technology</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Work with the latest AI/ML technologies, building systems that transform how security professionals work.
               </p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
-              <div className="text-3xl mb-4">🌍</div>
-              <h3 className="text-lg font-bold text-white mb-2">Remote-First</h3>
-              <p className="text-gray-400 text-sm">
-                Work from anywhere with flexible hours and async collaboration
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="text-3xl mb-4">🌱</div>
+              <h3 className="text-xl font-bold text-white mb-4">Growth Opportunities</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Join a rapidly growing startup where your impact is visible and your career growth is accelerated.
               </p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
-              <div className="text-3xl mb-4">📈</div>
-              <h3 className="text-lg font-bold text-white mb-2">Growth & Learning</h3>
-              <p className="text-gray-400 text-sm">
-                Continuous learning budget and career development opportunities
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="text-3xl mb-4">🏠</div>
+              <h3 className="text-xl font-bold text-white mb-4">Remote-First Culture</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Work from anywhere while collaborating with a distributed team of talented professionals.
               </p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="text-3xl mb-4">🎯</div>
+              <h3 className="text-xl font-bold text-white mb-4">Meaningful Impact</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Your work directly helps security professionals deliver better solutions and protect more people.
+              </p>
+            </div>
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
               <div className="text-3xl mb-4">💰</div>
-              <h3 className="text-lg font-bold text-white mb-2">Competitive Package</h3>
-              <p className="text-gray-400 text-sm">
-                Top-tier compensation, equity, and comprehensive benefits
+              <h3 className="text-xl font-bold text-white mb-4">Competitive Benefits</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Equity participation, comprehensive health benefits, and generous PTO in a fast-growing company.
+              </p>
+            </div>
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+              <div className="text-3xl mb-4">🤝</div>
+              <h3 className="text-xl font-bold text-white mb-4">Collaborative Team</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Work with industry experts, AI researchers, and passionate builders who share your vision for innovation.
               </p>
             </div>
           </div>
@@ -167,147 +685,254 @@ export default function CareersPage() {
       </section>
 
       {/* Open Positions Section */}
-      <section id="openings" className="py-20 px-8 bg-black/30">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-white text-center mb-4">Open Positions</h2>
-          <p className="text-gray-400 text-center mb-12">
-            Join us in revolutionizing the security industry
-          </p>
-          
-          <div className="space-y-6">
-            {positions.map((position, index) => (
-              <div key={index} className="bg-gradient-to-r from-purple-600/10 to-purple-700/10 border border-purple-600/30 rounded-2xl p-8 hover:border-purple-600/50 transition-all">
-                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4">
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-2">{position.title}</h3>
-                    <div className="flex flex-wrap gap-3 text-sm">
-                      <span className="bg-purple-600/20 text-purple-300 px-3 py-1 rounded-full">
-                        {position.department}
-                      </span>
-                      <span className="bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full">
-                        {position.location}
-                      </span>
-                      <span className="bg-green-600/20 text-green-300 px-3 py-1 rounded-full">
-                        {position.type}
-                      </span>
-                    </div>
-                  </div>
-                  <Link
-                    href="/contact"
-                    className="mt-4 lg:mt-0 bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all hover:scale-105 flex items-center gap-2"
-                  >
-                    Apply Now
-                    <span className="text-xl">→</span>
-                  </Link>
-                </div>
-                
-                <p className="text-gray-300 mb-4">{position.description}</p>
-                
-                <div>
-                  <h4 className="text-white font-semibold mb-2">Requirements:</h4>
-                  <ul className="space-y-1">
-                    {position.requirements.map((req, idx) => (
-                      <li key={idx} className="text-gray-400 flex items-start gap-2">
-                        <span className="text-green-400 mt-1">✓</span>
-                        <span>{req}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Don't see a fit section */}
-          <div className="mt-12 bg-white/5 rounded-2xl p-8 text-center border border-white/10">
-            <h3 className="text-2xl font-bold text-white mb-4">Don't See the Right Fit?</h3>
-            <p className="text-gray-400 mb-6">
-              We're always looking for exceptional talent. Send us your resume and tell us how you can contribute to our mission.
+      <section className="py-16">
+        <div className="max-w-4xl mx-auto px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-black mb-4 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">
+              Open Positions
+            </h2>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              We're actively hiring for these key positions. Don't see a perfect fit? We'd still love to hear from you!
             </p>
-            <Link
-              href="/contact"
-              className="bg-white/10 text-white px-8 py-3 rounded-lg font-semibold border border-purple-600/30 hover:bg-purple-600/10 transition-all"
-            >
-              Submit General Application
-            </Link>
+          </div>
+
+          <div className="space-y-6">
+            {/* Senior AI/ML Engineer */}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:border-purple-600/50 transition-all">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Senior AI/ML Engineer</h3>
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    <span className="bg-purple-600/20 text-purple-600 px-3 py-1 rounded-full text-sm font-medium">Full-Time</span>
+                    <span className="bg-green-600/20 text-green-600 px-3 py-1 rounded-full text-sm font-medium">Remote</span>
+                    <span className="bg-blue-600/20 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">$120k - $180k</span>
+                  </div>
+                </div>
+                <div className="text-3xl">🧠</div>
+              </div>
+              <p className="text-gray-400 mb-6 leading-relaxed">
+                Lead the development of our core AI models that power security system design recommendations. 
+                Work with large language models, computer vision, and specialized domain knowledge to create 
+                intelligent assessment capabilities.
+              </p>
+              <div className="mb-6">
+                <h4 className="text-white font-semibold mb-3">Key Requirements:</h4>
+                <ul className="text-gray-400 space-y-1 text-sm">
+                  <li>• 5+ years experience with Python, TensorFlow/PyTorch</li>
+                  <li>• Experience with LLMs, RAG systems, and vector databases</li>
+                  <li>• Strong background in machine learning and deep learning</li>
+                  <li>• Experience with cloud platforms (AWS/GCP preferred)</li>
+                </ul>
+              </div>
+              <button 
+                onClick={() => applyForPosition('Senior AI/ML Engineer')}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all"
+              >
+                Apply Now
+              </button>
+            </div>
+
+            {/* Full-Stack Developer */}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:border-purple-600/50 transition-all">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Full-Stack Developer</h3>
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    <span className="bg-purple-600/20 text-purple-600 px-3 py-1 rounded-full text-sm font-medium">Full-Time</span>
+                    <span className="bg-green-600/20 text-green-600 px-3 py-1 rounded-full text-sm font-medium">Remote</span>
+                    <span className="bg-blue-600/20 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">$90k - $140k</span>
+                  </div>
+                </div>
+                <div className="text-3xl">💻</div>
+              </div>
+              <p className="text-gray-400 mb-6 leading-relaxed">
+                Build and maintain our web platform that delivers AI-powered security assessments to thousands of users. 
+                Create intuitive interfaces for complex AI-generated content and robust APIs for integration partners.
+              </p>
+              <div className="mb-6">
+                <h4 className="text-white font-semibold mb-3">Key Requirements:</h4>
+                <ul className="text-gray-400 space-y-1 text-sm">
+                  <li>• 4+ years experience with React, Next.js, TypeScript</li>
+                  <li>• Strong backend skills with Node.js, Python, or similar</li>
+                  <li>• Experience with databases (PostgreSQL, MongoDB)</li>
+                  <li>• API design and integration experience</li>
+                </ul>
+              </div>
+              <button 
+                onClick={() => applyForPosition('Full-Stack Developer')}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all"
+              >
+                Apply Now
+              </button>
+            </div>
+
+            {/* Security Industry Expert */}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:border-purple-600/50 transition-all">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Security Industry Expert</h3>
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    <span className="bg-purple-600/20 text-purple-600 px-3 py-1 rounded-full text-sm font-medium">Full-Time</span>
+                    <span className="bg-green-600/20 text-green-600 px-3 py-1 rounded-full text-sm font-medium">Remote</span>
+                    <span className="bg-blue-600/20 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">$80k - $120k</span>
+                  </div>
+                </div>
+                <div className="text-3xl">🔒</div>
+              </div>
+              <p className="text-gray-400 mb-6 leading-relaxed">
+                Shape our AI training data and validation processes with deep industry knowledge. Work closely 
+                with engineering to ensure our AI recommendations meet real-world security requirements and 
+                compliance standards.
+              </p>
+              <div className="mb-6">
+                <h4 className="text-white font-semibold mb-3">Key Requirements:</h4>
+                <ul className="text-gray-400 space-y-1 text-sm">
+                  <li>• 7+ years in security system design or integration</li>
+                  <li>• Deep knowledge of CJIS, FERPA, HIPAA compliance</li>
+                  <li>• Experience with major security vendors (Axis, Milestone, etc.)</li>
+                  <li>• Strong technical writing and documentation skills</li>
+                </ul>
+              </div>
+              <button 
+                onClick={() => applyForPosition('Security Industry Expert')}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all"
+              >
+                Apply Now
+              </button>
+            </div>
+
+            {/* Sales & Customer Success */}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:border-purple-600/50 transition-all">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Sales & Customer Success Manager</h3>
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    <span className="bg-purple-600/20 text-purple-600 px-3 py-1 rounded-full text-sm font-medium">Full-Time</span>
+                    <span className="bg-green-600/20 text-green-600 px-3 py-1 rounded-full text-sm font-medium">Remote</span>
+                    <span className="bg-blue-600/20 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">$70k - $110k + Commission</span>
+                  </div>
+                </div>
+                <div className="text-3xl">📈</div>
+              </div>
+              <p className="text-gray-400 mb-6 leading-relaxed">
+                Drive growth by building relationships with security integrators, consultants, and enterprise customers. 
+                Help customers maximize value from our AI platform while gathering feedback to improve our product.
+              </p>
+              <div className="mb-6">
+                <h4 className="text-white font-semibold mb-3">Key Requirements:</h4>
+                <ul className="text-gray-400 space-y-1 text-sm">
+                  <li>• 3+ years in B2B sales or customer success</li>
+                  <li>• Experience in security industry preferred</li>
+                  <li>• Strong communication and relationship-building skills</li>
+                  <li>• SaaS platform experience a plus</li>
+                </ul>
+              </div>
+              <button 
+                onClick={() => applyForPosition('Sales & Customer Success Manager')}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all"
+              >
+                Apply Now
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Culture Section */}
-      <section id="culture" className="py-20 px-8">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">Our Culture & Benefits</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <div className="flex gap-4">
-                <div className="text-2xl">🏥</div>
-                <div>
-                  <h3 className="text-white font-semibold mb-1">Health & Wellness</h3>
-                  <p className="text-gray-400 text-sm">100% covered health, dental, and vision insurance</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="text-2xl">🏖️</div>
-                <div>
-                  <h3 className="text-white font-semibold mb-1">Unlimited PTO</h3>
-                  <p className="text-gray-400 text-sm">Take the time you need to recharge and stay productive</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="text-2xl">💻</div>
-                <div>
-                  <h3 className="text-white font-semibold mb-1">Equipment Budget</h3>
-                  <p className="text-gray-400 text-sm">$3,000 for your home office setup</p>
-                </div>
-              </div>
-            </div>
-            <div className="space-y-6">
-              <div className="flex gap-4">
-                <div className="text-2xl">📚</div>
-                <div>
-                  <h3 className="text-white font-semibold mb-1">Learning Budget</h3>
-                  <p className="text-gray-400 text-sm">$2,000 annual budget for courses and conferences</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="text-2xl">💵</div>
-                <div>
-                  <h3 className="text-white font-semibold mb-1">401(k) Matching</h3>
-                  <p className="text-gray-400 text-sm">6% company match on retirement contributions</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="text-2xl">👶</div>
-                <div>
-                  <h3 className="text-white font-semibold mb-1">Parental Leave</h3>
-                  <p className="text-gray-400 text-sm">16 weeks paid leave for all new parents</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-8 bg-gradient-to-r from-purple-600/10 to-purple-700/10">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
-            Ready to Join Our Mission?
+      {/* Call to Action Section */}
+      <section className="py-24 bg-gradient-to-r from-purple-600/10 to-purple-700/10">
+        <div className="max-w-4xl mx-auto px-8 text-center">
+          <h2 className="text-4xl lg:text-5xl font-black text-white mb-4">
+            Ready to Join Us?
           </h2>
-          <p className="text-xl text-gray-300 mb-8">
-            Be part of the team that's transforming the security industry with AI.
+          <p className="text-xl text-gray-400 mb-10">
+            Don't see a position that matches your skills? We're always looking for exceptional talent.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="#openings" className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl transition-all">
-              View Open Positions
-            </a>
-            <Link href="/about" className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 transition-all">
-              Learn More About Us
+            <button 
+              onClick={() => applyForPosition('General Application')}
+              className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-purple-600/40 transition-all"
+            >
+              Send General Application
+            </button>
+            <Link href="/contact" className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all">
+              Contact HR Team
             </Link>
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12">
+        <div className="max-w-6xl mx-auto px-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-8">
+            <div>
+              <div className="flex items-center gap-3 text-white font-black text-2xl mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
+                  DR
+                </div>
+                Design-Rite
+              </div>
+              <p className="text-gray-400 leading-relaxed mb-6">
+                Transforming security system design with AI-powered intelligence. Professional assessments, automated 
+                proposals, and comprehensive documentation for the modern security industry.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-white font-bold mb-4">Platform</h3>
+              <ul className="space-y-2">
+                <li><button onClick={redirectToApp} className="text-gray-400 hover:text-purple-600 text-sm transition-colors">AI Assessment</button></li>
+                <li><Link href="/professional-proposals" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Proposal Generator</Link></li>
+                <li><Link href="/white-label" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">White-Label</Link></li>
+                <li><Link href="/api" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">API Access</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-white font-bold mb-4">Solutions</h3>
+              <ul className="space-y-2">
+                <li><Link href="/integrators" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Security Integrators</Link></li>
+                <li><Link href="/enterprise" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Enterprise</Link></li>
+                <li><Link href="/education" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Education</Link></li>
+                <li><Link href="/healthcare" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Healthcare</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-white font-bold mb-4">Company</h3>
+              <ul className="space-y-2">
+                <li><Link href="/about" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">About Us</Link></li>
+                <li><Link href="/careers" className="text-purple-600 font-medium text-sm">Careers</Link></li>
+                <li><Link href="/contact" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Contact</Link></li>
+                <li><Link href="/support" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Support</Link></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-600/30 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
+            <div>© 2025 Design-Rite. All rights reserved.</div>
+            <div className="flex gap-4 mt-4 md:mt-0">
+              <a href="mailto:careers@design-rite.com" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">📧</a>
+              <Link href="/linkedin" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">💼</Link>
+              <Link href="/twitter" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">🐦</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* Chat Button */}
+      <div className="fixed bottom-5 right-5 z-[999999]">
+        <button className="w-15 h-15 bg-purple-600 rounded-full cursor-pointer flex items-center justify-center shadow-lg hover:scale-110 hover:shadow-xl transition-all">
+          <div className="text-white text-2xl font-bold">💬</div>
+        </button>
+      </div>
+
+      {/* Application Form Modal */}
+      <ApplicationForm 
+        position={selectedPosition}
+        isOpen={isApplicationOpen}
+        onClose={() => setIsApplicationOpen(false)}
+      />
     </div>
   )
 }
