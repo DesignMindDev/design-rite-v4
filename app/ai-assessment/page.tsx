@@ -118,22 +118,37 @@ const callClaudeAPI = async (userMessage) => {
     try {
       const aiResponse = await callClaudeAPI(input);
       
-      const assistantMessage = {
-        role: 'assistant',
-        content: aiResponse,
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error('Failed to get AI response:', error);
-      
-      // Fallback response
-      const fallbackMessage = {
-        role: 'assistant',
-        content: "I'm experiencing some connectivity issues. Let's continue with the discovery process. Could you provide more details about what we were discussing?",
-        timestamp: new Date()
-      };
+      const callClaudeAPI = async (userMessage) => {
+  try {
+    const response = await fetch('/api/discovery-assistant', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: userMessage,
+        sessionData: sessionData,
+        conversationHistory: messages
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API call failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.success) {
+      // The API returns data.message.content
+      return data.message.content;
+    } else {
+      return data.error || "I apologize, but I'm having trouble processing that right now.";
+    }
+  } catch (error) {
+    console.error('Claude API call failed:', error);
+    return "I'm experiencing some technical difficulties. Let me help you manually - could you provide more details about your client's specific requirements?";
+  }
+};
       
       setMessages(prev => [...prev, fallbackMessage]);
     } finally {
