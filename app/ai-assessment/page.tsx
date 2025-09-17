@@ -40,20 +40,37 @@ const IntegratorDiscoveryAssistant = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Call Claude API for intelligent discovery assistance
-  const callClaudeAPI = async (userMessage) => {
-    try {
-      const response = await fetch('/api/discovery-assistant', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: userMessage,
-          sessionData: sessionData,
-          conversationHistory: messages
-        })
-      });
+const callClaudeAPI = async (userMessage) => {
+  try {
+    const response = await fetch('/api/discovery-assistant', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: userMessage,
+        sessionData: sessionData,
+        conversationHistory: messages
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API call failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.success) {
+      // The API returns data.message.content
+      return data.message.content;
+    } else {
+      return data.error || "I apologize, but I'm having trouble processing that right now.";
+    }
+  } catch (error) {
+    console.error('Claude API call failed:', error);
+    return "I'm experiencing some technical difficulties. Let me help you manually - could you provide more details about your client's specific requirements?";
+  }
+};
 
       if (!response.ok) {
         throw new Error(`API call failed: ${response.status}`);
