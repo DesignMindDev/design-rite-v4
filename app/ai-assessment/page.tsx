@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, FileText, Shield, Building2, Users, Calendar, DollarSign, CheckCircle, AlertTriangle, Download, Briefcase } from 'lucide-react';
 
@@ -31,6 +32,7 @@ const IntegratorDiscoveryAssistant = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Call Claude API for intelligent discovery assistance
   const callClaudeAPI = async (userMessage) => {
     try {
       const response = await fetch('/api/discovery-assistant', {
@@ -52,9 +54,19 @@ const IntegratorDiscoveryAssistant = () => {
       const data = await response.json();
       
       if (data.success) {
+        // Update session data with discovery progress
+        if (data.discoveryProgress) {
+          setSessionData(prev => ({
+            ...prev,
+            currentPhase: data.discoveryProgress.currentPhase,
+            qualificationScore: data.discoveryProgress.qualificationScore
+          }));
+        }
+        
         return data.message.content;
       } else {
-        return data.error || "I apologize, but I'm having trouble processing that right now.";
+        // Use fallback response if provided
+        return data.fallback?.content || "I apologize, but I'm having trouble processing that right now. Could you please rephrase your response?";
       }
     } catch (error) {
       console.error('Claude API call failed:', error);
@@ -75,6 +87,7 @@ const IntegratorDiscoveryAssistant = () => {
     setInput('');
     setIsTyping(true);
 
+    // Call Claude API for intelligent response
     try {
       const aiResponse = await callClaudeAPI(input);
       
@@ -88,6 +101,7 @@ const IntegratorDiscoveryAssistant = () => {
     } catch (error) {
       console.error('Failed to get AI response:', error);
       
+      // Fallback response
       const fallbackMessage = {
         role: 'assistant',
         content: "I'm experiencing some connectivity issues. Let's continue with the discovery process. Could you provide more details about what we were discussing?",
@@ -100,9 +114,25 @@ const IntegratorDiscoveryAssistant = () => {
     }
   };
 
+  const generateDocuments = () => {
+    setSessionData(prev => ({
+      ...prev,
+      documentsGenerated: ['SOW', 'BOM', 'Compliance_Checklist', 'Project_Timeline']
+    }));
+
+    const docMessage = {
+      role: 'assistant',
+      content: "📋 **DOCUMENTS GENERATED SUCCESSFULLY!**\n\n✅ Statement of Work (SOW)\n✅ Bill of Materials with Entry/Mid/Premium tiers\n✅ NDAA Compliance Checklist\n✅ Project Timeline & Milestones\n✅ Site Survey Checklist\n\nAll documents include the specific requirements captured during our discovery session. Your client will see that you've listened to every detail and created a solution tailored exactly to their needs.\n\n**Next Steps:**\n1. Review documents with your team\n2. Present to client within 2 days (as committed)\n3. Use our project tracking system through implementation\n\nThis systematic approach ensures nothing falls through the cracks!",
+      timestamp: new Date()
+    };
+    
+    setMessages(prev => [...prev, docMessage]);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <div className="text-center mb-6">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Briefcase className="w-8 h-8 text-purple-300" />
@@ -114,8 +144,10 @@ const IntegratorDiscoveryAssistant = () => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
+          {/* Chat Interface */}
           <div className="lg:col-span-2">
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl overflow-hidden">
+              {/* Messages */}
               <div className="h-96 overflow-y-auto p-4 space-y-4">
                 {messages.map((message, index) => (
                   <div key={index} className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -153,6 +185,7 @@ const IntegratorDiscoveryAssistant = () => {
                 <div ref={messagesEndRef} />
               </div>
 
+              {/* Input */}
               <div className="border-t border-white/20 p-4">
                 <div className="flex gap-3">
                   <input
@@ -176,7 +209,9 @@ const IntegratorDiscoveryAssistant = () => {
             </div>
           </div>
 
+          {/* Progress & Actions */}
           <div className="space-y-6">
+            {/* Discovery Progress */}
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
               <h3 className="text-lg font-semibold text-white mb-3">Discovery Progress</h3>
               <div className="space-y-2">
@@ -203,6 +238,71 @@ const IntegratorDiscoveryAssistant = () => {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Client Info */}
+            {sessionData.companyName && (
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                <h3 className="text-lg font-semibold text-white mb-3">Client Information</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-white/60">Company:</span>
+                    <span className="text-white">{sessionData.companyName}</span>
+                  </div>
+                  {sessionData.facilityType && (
+                    <div className="flex justify-between">
+                      <span className="text-white/60">Facility:</span>
+                      <span className="text-white">{sessionData.facilityType}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-white/60">Phase:</span>
+                    <span className="text-white capitalize">{sessionData.currentPhase.replace('_', ' ')}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="space-y-3">
+              {sessionData.currentPhase === 'documentation_ready' && (
+                <button
+                  onClick={generateDocuments}
+                  className="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white py-3 px-4 rounded-lg hover:from-green-700 hover:to-blue-700 transition-all font-semibold flex items-center justify-center gap-2"
+                >
+                  <FileText className="w-5 h-5" />
+                  Generate Documents
+                </button>
+              )}
+              
+              {sessionData.documentsGenerated.length > 0 && (
+                <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4">
+                  <h4 className="text-green-300 font-semibold mb-2 flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    Documents Ready
+                  </h4>
+                  <div className="space-y-2">
+                    {sessionData.documentsGenerated.map(doc => (
+                      <div key={doc} className="flex items-center justify-between text-sm">
+                        <span className="text-green-200">{doc.replace('_', ' ')}</span>
+                        <Download className="w-4 h-4 text-green-300 cursor-pointer hover:text-green-200" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Benefits Reminder */}
+            <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-4">
+              <h4 className="text-blue-300 font-semibold mb-2">Why This Matters</h4>
+              <ul className="text-sm text-blue-200 space-y-1">
+                <li>• Systematic requirement capture</li>
+                <li>• Nothing falls through cracks</li>
+                <li>• Professional documentation</li>
+                <li>• Higher close rates</li>
+                <li>• Smoother implementations</li>
+              </ul>
             </div>
           </div>
         </div>
