@@ -91,36 +91,71 @@ export default function ComplianceCheck() {
     );
   };
 
-  const analyzeCompliance = async () => {
-    setIsAnalyzing(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      const baseCompliance = complianceStandards[selectedFacility] || complianceStandards.office;
-      const additionalRequirements = [];
-      
-      // Add requirements based on data types
-      if (dataTypes.includes('pci')) additionalRequirements.push('PCI DSS');
-      if (dataTypes.includes('phi')) additionalRequirements.push('HIPAA', 'HITECH');
-      if (dataTypes.includes('student')) additionalRequirements.push('FERPA');
-      if (dataTypes.includes('classified')) additionalRequirements.push('FISMA', 'NIST 800-53');
+// Replace the analyzeCompliance function in your compliance-check/page.tsx with this:
 
-      // Merge and deduplicate requirements
-      const allRequired = [...new Set([...baseCompliance.required, ...additionalRequirements])];
-      
+const analyzeCompliance = async () => {
+  setIsAnalyzing(true);
+  
+  try {
+    // Call the real API endpoint
+    const response = await fetch('/api/compliance-check', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        facilityType: selectedFacility,
+        facilitySize: facilitySize,
+        dataTypes: dataTypes,
+        industry: selectedFacility
+      })
+    });
+
+    const result = await response.json();
+    
+    if (result.success) {
       setComplianceResults({
-        facilityType: facilityTypes.find(f => f.value === selectedFacility)?.label || 'General Facility',
-        industry: baseCompliance.industry,
-        description: baseCompliance.description,
-        required: allRequired,
-        recommended: baseCompliance.recommended,
-        riskLevel: allRequired.length > 3 ? 'High' : allRequired.length > 1 ? 'Medium' : 'Low',
-        dataTypes: dataTypes
+        facilityType: result.analysis.facilityInfo.type,
+        industry: result.analysis.facilityInfo.industry,
+        description: result.analysis.facilityInfo.description,
+        required: result.analysis.requirements.required,
+        recommended: result.analysis.requirements.recommended,
+        riskLevel: result.analysis.riskAssessment.level,
+        dataTypes: dataTypes,
+        implementationTime: result.analysis.implementation.estimatedTime,
+        estimatedCost: result.analysis.estimatedCost,
+        nextSteps: result.analysis.nextSteps
       });
-      
-      setIsAnalyzing(false);
-    }, 2000);
-  };
+    } else {
+      throw new Error(result.error || 'Analysis failed');
+    }
+  } catch (error) {
+    console.error('Compliance analysis error:', error);
+    
+    // Fallback to basic analysis if API fails
+    const baseCompliance = complianceStandards[selectedFacility] || complianceStandards.office;
+    const additionalRequirements = [];
+    
+    if (dataTypes.includes('pci')) additionalRequirements.push('PCI DSS');
+    if (dataTypes.includes('phi')) additionalRequirements.push('HIPAA', 'HITECH');
+    if (dataTypes.includes('student')) additionalRequirements.push('FERPA');
+    if (dataTypes.includes('classified')) additionalRequirements.push('FISMA', 'NIST 800-53');
+
+    const allRequired = [...new Set([...baseCompliance.required, ...additionalRequirements])];
+    
+    setComplianceResults({
+      facilityType: facilityTypes.find(f => f.value === selectedFacility)?.label || 'General Facility',
+      industry: baseCompliance.industry,
+      description: baseCompliance.description + ' (Basic analysis - API unavailable)',
+      required: allRequired,
+      recommended: baseCompliance.recommended,
+      riskLevel: allRequired.length > 3 ? 'High' : allRequired.length > 1 ? 'Medium' : 'Low',
+      dataTypes: dataTypes
+    });
+  } finally {
+    setIsAnalyzing(false);
+  }
+};
 
   const generateReport = () => {
     if (!complianceResults) return;
