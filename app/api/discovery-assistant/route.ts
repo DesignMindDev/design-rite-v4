@@ -37,11 +37,15 @@ export async function POST(request: NextRequest) {
       return generateFallbackResponse(message, sessionData);
     }
 
+    console.log('Claude API Key present:', ANTHROPIC_API_KEY ? 'YES' : 'NO');
+    console.log('Environment:', process.env.NODE_ENV);
+
     // Build conversation context
     const context = buildConversationContext(sessionData, conversationHistory);
     
     try {
       // Call Claude API with proper context
+      console.log('Attempting Claude API call...');
       const claudeResponse = await callClaudeAPI(message, context);
       
       return NextResponse.json({
@@ -52,7 +56,8 @@ export async function POST(request: NextRequest) {
       });
 
     } catch (claudeError) {
-      console.error('Claude API error:', claudeError);
+      console.error('Claude API error details:', claudeError.message);
+      console.error('Full error:', claudeError);
       
       // Intelligent fallback instead of generic error
       return generateFallbackResponse(message, sessionData);
@@ -106,34 +111,56 @@ CURRENT SESSION DATA:`;
   return context;
 }
 
-// Call Claude API with proper error handling
+// Call Claude API with proper error handling and production timeout handling
 async function callClaudeAPI(message: string, context: string): Promise<string> {
-  const response = await fetch(ANTHROPIC_BASE_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': ANTHROPIC_API_KEY!,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: CLAUDE_MODEL,
-      max_tokens: 1500,
-      messages: [
-        {
-          role: 'user',
-          content: `${context}\n\nCurrent message: ${message}`
-        }
-      ]
-    })
-  });
+  // Add timeout handling for production environment
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000); // 25 second timeout
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Claude API error: ${response.status} ${response.statusText} - ${errorText}`);
+  try {
+    console.log('Calling Claude API with model:', CLAUDE_MODEL);
+    
+    const response = await fetch(ANTHROPIC_BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY!,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: CLAUDE_MODEL,
+        max_tokens: 1500,
+        messages: [
+          {
+            role: 'user',
+            content: `${context}\n\nCurrent message: ${message}`
+          }
+        ]
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Claude API error:', response.status, response.statusText, errorText);
+      throw new Error(`Claude API error: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('Claude API response received successfully');
+    return data.content[0].text;
+    
+  } catch (error) {
+    clearTimeout(timeout);
+    if (error.name === 'AbortError') {
+      console.error('Claude API timeout after 25 seconds');
+      throw new Error('Request timeout - Claude API took too long to respond');
+    }
+    console.error('Claude API call failed:', error);
+    throw error;
   }
-
-  const data = await response.json();
-  return data.content[0].text;
 }
 
 // Generate intelligent fallback responses based on context
