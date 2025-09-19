@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import UnifiedNavigation from '../components/UnifiedNavigation';
 
 export default function ConsultantsPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -31,148 +32,9 @@ export default function ConsultantsPage() {
         </div>
       </div>
 
-      {/* Utility Bar */}
-      <div className="bg-black/90 border-b border-purple-600/10 py-2 text-xs">
-        <div className="max-w-6xl mx-auto px-8 flex justify-end items-center gap-8">
-          <Link href="/login" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
-            <span>👤</span> Login
-          </Link>
-          <Link href="/pricing" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
-            <span>💰</span> Plans & Pricing
-          </Link>
-          <Link href="/support" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
-            <span>❓</span> Help Center
-          </Link>
-          <Link href="/contact" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
-            <span>📧</span> Contact Us
-          </Link>
-        </div>
-      </div>
 
       {/* Main Navigation Header */}
-      <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b border-purple-600/20 py-4">
-        <nav className="max-w-6xl mx-auto px-8 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-3 text-white font-black text-2xl">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
-              DR
-            </div>
-            Design-Rite
-          </Link>
-
-{/* Mobile Menu */}
-{isMenuOpen && (
-  <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
-    <div className="px-6 py-4 space-y-4">
-      
-      {/* Platform Section */}
-      <div>
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Platform</div>
-        <Link href="/ai-assessment" className="block text-white/80 hover:text-white py-2 pl-4">AI Assessment</Link>
-        <Link href="/compliance-analyst" className="block text-white/80 hover:text-white py-2 pl-4">Compliance Tools</Link>
-        <Link href="/white-label" className="block text-white/80 hover:text-white py-2 pl-4">White Label</Link>
-        <Link href="/enterprise-roi" className="block text-white/80 hover:text-white py-2 pl-4">ROI Calculator</Link>
-      </div>
-      
-      {/* Solutions Section */}
-      <div className="border-t border-white/10 pt-2">
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Solutions</div>
-        <Link href="/integrators" className="block text-white/80 hover:text-white py-2 pl-4">Security Integrators</Link>
-        <Link href="/enterprise" className="block text-white/80 hover:text-white py-2 pl-4">Enterprise Security</Link>
-        <Link href="/education" className="block text-white/80 hover:text-white py-2 pl-4">Education & Healthcare</Link>
-        <Link href="/consultants" className="block text-white/80 hover:text-white py-2 pl-4">Security Consultants</Link>
-      </div>
-      
-      {/* Partners Link */}
-      <Link href="/partners" className="block text-white/80 hover:text-white py-2 border-t border-white/10 pt-2">Partners</Link>
-      
-      {/* Company Section */}
-      <div className="border-t border-white/10 pt-2">
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Company</div>
-        <Link href="/about" className="block text-white/80 hover:text-white py-2 pl-4">About Us</Link>
-        <Link href="/team" className="block text-white/80 hover:text-white py-2 pl-4">Team</Link>
-        <Link href="/careers" className="block text-white/80 hover:text-white py-2 pl-4">Careers</Link>
-        <Link href="/contact" className="block text-white/80 hover:text-white py-2 pl-4">Contact</Link>
-      </div>
-      
-      {/* Sign In and CTA */}
-      <div className="pt-4 border-t border-white/10">
-        <Link href="/login" className="block text-white/80 hover:text-white py-2">Sign In</Link>
-        <button onClick={redirectToWaitlist} className="block w-full text-left bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">
-          Join Waitlist
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-          {/* CTA Buttons */}
-          <div className="hidden lg:flex items-center gap-4">
-            <Link href="/login" className="text-gray-300 hover:text-white transition-colors">
-              Sign In
-            </Link>
-            <button
-              onClick={redirectToWaitlist}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition-all"
-            >
-              Join Waitlist
-            </button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden text-white text-2xl p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            ☰
-          </button>
-        </nav>
-
-{/* Mobile Menu */}
-{isMenuOpen && (
-  <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
-    <div className="px-6 py-4 space-y-4">
-      
-      {/* Platform Section */}
-      <div>
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Platform</div>
-        <Link href="/ai-assessment" className="block text-white/80 hover:text-white py-2 pl-4">AI Assessment</Link>
-        <Link href="/compliance-analyst" className="block text-white/80 hover:text-white py-2 pl-4">Compliance Tools</Link>
-        <Link href="/white-label" className="block text-white/80 hover:text-white py-2 pl-4">White Label</Link>
-        <Link href="/enterprise-roi" className="block text-white/80 hover:text-white py-2 pl-4">ROI Calculator</Link>
-      </div>
-      
-      {/* Solutions Section */}
-      <div className="border-t border-white/10 pt-2">
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Solutions</div>
-        <Link href="/integrators" className="block text-white/80 hover:text-white py-2 pl-4">Security Integrators</Link>
-        <Link href="/enterprise" className="block text-white/80 hover:text-white py-2 pl-4">Enterprise Security</Link>
-        <Link href="/education" className="block text-white/80 hover:text-white py-2 pl-4">Education & Healthcare</Link>
-        <Link href="/consultants" className="block text-white/80 hover:text-white py-2 pl-4">Security Consultants</Link>
-      </div>
-      
-      {/* Partners Link */}
-      <Link href="/partners" className="block text-white/80 hover:text-white py-2 border-t border-white/10 pt-2">Partners</Link>
-      
-      {/* Company Section */}
-      <div className="border-t border-white/10 pt-2">
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Company</div>
-        <Link href="/about" className="block text-white/80 hover:text-white py-2 pl-4">About Us</Link>
-        <Link href="/team" className="block text-white/80 hover:text-white py-2 pl-4">Team</Link>
-        <Link href="/careers" className="block text-white/80 hover:text-white py-2 pl-4">Careers</Link>
-        <Link href="/contact" className="block text-white/80 hover:text-white py-2 pl-4">Contact</Link>
-      </div>
-      
-      {/* Sign In and CTA */}
-      <div className="pt-4 border-t border-white/10">
-        <Link href="/login" className="block text-white/80 hover:text-white py-2">Sign In</Link>
-        <button onClick={redirectToWaitlist} className="block w-full text-left bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">
-          Join Waitlist
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-      </header>
+<UnifiedNavigation />
 
       {/* Main Content */}
       <main className="py-20 px-6">

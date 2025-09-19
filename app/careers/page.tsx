@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import UnifiedNavigation from '../components/UnifiedNavigation';
 
 interface ApplicationFormProps {
   position: string
@@ -241,7 +242,10 @@ export default function CareersPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+
       {/* Header */}
+<UnifiedNavigation />
+
       <div className="bg-gradient-to-b from-gray-900 to-black py-20">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
