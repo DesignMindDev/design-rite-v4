@@ -1,4 +1,4 @@
-'use client'
+ï»¿'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -27,7 +27,7 @@ export default function EnterpriseSecurityPage() {
             Get Demo
           </Link>
           <button className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">
-            ×
+            Ã—
           </button>
         </div>
       </div>
@@ -195,7 +195,7 @@ export default function EnterpriseSecurityPage() {
       {/* Footer */}
       <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
         <div className="max-w-6xl mx-auto px-8 text-center">
-          <p className="text-white/70">© 2025 Design-Rite. All rights reserved.</p>
+          <p className="text-white/70">Â© 2025 Design-Rite. All rights reserved.</p>
           <div className="flex justify-center gap-6 mt-4">
             <Link href="/" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Home</Link>
             <Link href="/about" className="text-white/70 hover:text-purple-600 text-sm transition-colors">About</Link>
@@ -207,5 +207,6 @@ export default function EnterpriseSecurityPage() {
     </div>
   )
 }
+
 
 

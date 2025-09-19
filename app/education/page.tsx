@@ -1,4 +1,4 @@
-?"use client"
+ï»¿?"use client"
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -29,7 +29,7 @@ export default function EducationHealthcarePage() {
             Join Waitlist
           </Link>
           <button className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">
-            ×
+            Ã—
           </button>
         </div>
       </div>
@@ -82,11 +82,11 @@ export default function EducationHealthcarePage() {
               <div className="mt-8 p-6 bg-blue-600/20 rounded-xl border border-blue-600/30">
                 <h4 className="font-bold mb-3">Key Features for Schools:</h4>
                 <ul className="space-y-2 text-gray-300">
-                  <li>• Visitor management integration</li>
-                  <li>• Emergency lockdown protocols</li>
-                  <li>• Campus-wide communication systems</li>
-                  <li>• Student privacy protection</li>
-                  <li>• Grant funding documentation</li>
+                  <li>â€¢ Visitor management integration</li>
+                  <li>â€¢ Emergency lockdown protocols</li>
+                  <li>â€¢ Campus-wide communication systems</li>
+                  <li>â€¢ Student privacy protection</li>
+                  <li>â€¢ Grant funding documentation</li>
                 </ul>
               </div>
             </div>
@@ -116,11 +116,11 @@ export default function EducationHealthcarePage() {
               <div className="mt-8 p-6 bg-green-600/20 rounded-xl border border-green-600/30">
                 <h4 className="font-bold mb-3">Key Features for Healthcare:</h4>
                 <ul className="space-y-2 text-gray-300">
-                  <li>• HIPAA compliance validation</li>
-                  <li>• Pharmaceutical security zones</li>
-                  <li>• Patient flow monitoring</li>
-                  <li>• Staff duress systems</li>
-                  <li>• Medical equipment tracking</li>
+                  <li>â€¢ HIPAA compliance validation</li>
+                  <li>â€¢ Pharmaceutical security zones</li>
+                  <li>â€¢ Patient flow monitoring</li>
+                  <li>â€¢ Staff duress systems</li>
+                  <li>â€¢ Medical equipment tracking</li>
                 </ul>
               </div>
             </div>
@@ -164,10 +164,10 @@ export default function EducationHealthcarePage() {
               <div className="bg-blue-600/20 p-4 rounded-lg border border-blue-600/30">
                 <div className="text-sm font-semibold text-blue-300 mb-2">Implementation Highlights:</div>
                 <ul className="text-gray-300 text-sm space-y-1">
-                  <li>• Visitor management at all entry points</li>
-                  <li>• Campus-wide emergency communication</li>
-                  <li>• Playground and athletic facility monitoring</li>
-                  <li>• Bus loading zone security</li>
+                  <li>â€¢ Visitor management at all entry points</li>
+                  <li>â€¢ Campus-wide emergency communication</li>
+                  <li>â€¢ Playground and athletic facility monitoring</li>
+                  <li>â€¢ Bus loading zone security</li>
                 </ul>
               </div>
             </div>
@@ -183,10 +183,10 @@ export default function EducationHealthcarePage() {
               <div className="bg-green-600/20 p-4 rounded-lg border border-green-600/30">
                 <div className="text-sm font-semibold text-green-300 mb-2">Implementation Highlights:</div>
                 <ul className="text-gray-300 text-sm space-y-1">
-                  <li>• Emergency department violence prevention</li>
-                  <li>• Pharmaceutical storage security</li>
-                  <li>• Patient room privacy protection</li>
-                  <li>• Medical equipment asset tracking</li>
+                  <li>â€¢ Emergency department violence prevention</li>
+                  <li>â€¢ Pharmaceutical storage security</li>
+                  <li>â€¢ Patient room privacy protection</li>
+                  <li>â€¢ Medical equipment asset tracking</li>
                 </ul>
               </div>
             </div>
@@ -264,7 +264,7 @@ export default function EducationHealthcarePage() {
             </div>
           </div>
           <div className="border-t border-gray-600/30 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
-            <div>© 2025 Design-Rite. All rights reserved.</div>
+            <div>Â© 2025 Design-Rite. All rights reserved.</div>
             <div className="flex gap-4 mt-4 md:mt-0">
               <Link href="mailto:hello@design-rite.com" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">??</Link>
               <Link href="/linkedin" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">??</Link>
@@ -276,5 +276,6 @@ export default function EducationHealthcarePage() {
     </div>
   )
 }
+
 
 
