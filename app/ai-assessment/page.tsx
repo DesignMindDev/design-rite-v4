@@ -7,7 +7,7 @@ const IntegratorDiscoveryAssistant = () => {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Hello! I'm your Design-Rite AI Discovery Assistant. I'll help you conduct a thorough client discovery session using our proven 7-step methodology. This ensures you capture every critical detail for your security system proposal.\n\nTo get started, tell me about this client meeting - what's the company name and what type of facility are we designing security for?",
+      content: "Hello! I'm your Design-Rite AI Discovery Assistant. I'll help you conduct a thorough client discovery session using our proven 7-step methodology. This ensures you capture every critical detail for your security system proposal.\n\nTo get started, tell me about what you're working on - what's the company name and what type of facility are we designing security for?",
       timestamp: new Date()
     }
   ]);
