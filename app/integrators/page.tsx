@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import UnifiedNavigation from '../components/UnifiedNavigation';
+import UnifiedNavigation from '@/app/components/UnifiedNavigation';
 
 
 export default function SecurityIntegratorsPage() {

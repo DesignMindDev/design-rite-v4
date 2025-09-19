@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import UnifiedNavigation from '../components/UnifiedNavigation';
+import UnifiedNavigation from '@/app/components/UnifiedNavigation';
 
 export default function EnterpriseSecurityPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -34,7 +34,7 @@ export default function EnterpriseSecurityPage() {
 
 
       {/* Main Navigation Header */}
-<UnifiedNavigation />
+       <UnifiedNavigation />
       
           {/* Main Content */}
       <main className="py-20 px-6">
