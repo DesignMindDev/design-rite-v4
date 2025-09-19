@@ -125,10 +125,17 @@ export default function UnifiedNavigation() {
             </div>
           </li>
 
-         {/* Pricing - Simple Link */}
+          {/* Pricing - Simple Link */}
           <li>
             <Link href="/pricing" className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm">
               Pricing
+            </Link>
+          </li>
+
+          {/* Partners - Simple Link */}
+          <li>
+            <Link className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm" href="/partners">
+              Partners
             </Link>
           </li>
 
@@ -171,21 +178,21 @@ export default function UnifiedNavigation() {
           </li>
         </ul>
 
-{/* Right Side Actions - EXACT Homepage Match */}
-<div className="hidden lg:flex items-center gap-4">
-  <button 
-    onClick={redirectToWaitlist}
-    className="bg-white/10 text-white px-4 py-2 rounded-lg font-semibold border border-white/20 hover:bg-white/20 transition-all"
-  >
-    Try It Free
-  </button>
-  <button 
-    onClick={redirectToWaitlist}
-    className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition-all"
-  >
-    Join Waitlist
-  </button>
-</div>
+        {/* Right Side Actions - EXACT Homepage Match */}
+        <div className="hidden lg:flex items-center gap-4">
+          <button 
+            onClick={redirectToWaitlist}
+            className="bg-white/10 text-white px-4 py-2 rounded-lg font-semibold border border-white/20 hover:bg-white/20 transition-all"
+          >
+            Try It Free
+          </button>
+          <button 
+            onClick={redirectToWaitlist}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition-all"
+          >
+            Join Waitlist
+          </button>
+        </div>
 
         {/* Mobile Menu Button */}
         <button 
@@ -221,12 +228,10 @@ export default function UnifiedNavigation() {
             
             {/* Pricing Link */}
             <Link href="/pricing" className="block text-white/80 hover:text-white py-2 border-t border-white/10 pt-2">💰 Pricing</Link>
-            {/* Partners - Simple Link */}
-<li>
-  <Link className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm" href="/partners">
-    Partners
-  </Link>
-</li>
+
+            {/* Partners Link */}
+            <Link href="/partners" className="block text-white/80 hover:text-white py-2">🤝 Partners</Link>
+
             {/* Company Section */}
             <div className="border-t border-white/10 pt-2">
               <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Company</div>
