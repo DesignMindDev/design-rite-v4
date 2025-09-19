@@ -302,7 +302,7 @@ export default function SupportPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12">
+      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
         <div className="max-w-6xl mx-auto px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-8">
             <div>
@@ -369,3 +369,5 @@ export default function SupportPage() {
     </div>
   )
 }
+
+

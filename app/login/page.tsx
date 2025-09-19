@@ -141,8 +141,8 @@ export default function LoginPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 bg-black/20 mt-20">
-        <div className="max-w-6xl mx-auto px-8 py-8">
+      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
+        <div className="max-w-6xl mx-auto px-8 py-12">
           <div className="text-center">
             <Link href="/" className="flex items-center gap-3 text-white font-bold text-xl justify-center mb-4">
               <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-black text-xs">
@@ -159,3 +159,5 @@ export default function LoginPage() {
     </div>
   )
 }
+
+

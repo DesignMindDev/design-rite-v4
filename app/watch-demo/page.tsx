@@ -236,7 +236,7 @@ export default function WatchDemoPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 bg-black/20 mt-20">
+      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
         <div className="max-w-6xl mx-auto px-8 py-12">
           <div className="grid lg:grid-cols-4 gap-8 mb-12">
             <div className="lg:col-span-2">
@@ -279,3 +279,5 @@ export default function WatchDemoPage() {
     </div>
   )
 }
+
+

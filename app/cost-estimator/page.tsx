@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -387,7 +387,7 @@ export default function CostEstimator() {
                   </div>
                   
                   <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 p-6 rounded-lg border border-purple-500/30 mb-8">
-                    <h3 className="text-xl font-semibold mb-4">🎯 Ready for a Detailed Assessment?</h3>
+                    <h3 className="text-xl font-semibold mb-4">?? Ready for a Detailed Assessment?</h3>
                     <p className="text-white/80 mb-4">
                       Get a comprehensive security analysis with compliance requirements, detailed equipment specifications, 
                       and a complete implementation plan tailored to your facility.
@@ -396,7 +396,7 @@ export default function CostEstimator() {
                       onClick={exportToAIAssessment}
                       className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all text-lg"
                     >
-                      Continue to AI Security Assessment →
+                      Continue to AI Security Assessment ?
                     </button>
                   </div>
                   
@@ -423,3 +423,6 @@ export default function CostEstimator() {
     </div>
   );
 }
+
+
+

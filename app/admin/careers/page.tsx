@@ -174,7 +174,7 @@ export default function CareerAdminDashboard() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-purple-600/20">
@@ -514,3 +514,5 @@ export default function CareerAdminDashboard() {
     </div>
   )
 }
+
+

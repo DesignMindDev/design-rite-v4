@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -16,7 +16,7 @@ export default function ConsultantsPage() {
       {/* Top Announcement Bar */}
       <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
         <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
-          <span className="text-base">💼</span>
+          <span className="text-base">??</span>
           <span className="flex-1 text-center">
             Security Consultants: Elevate your advisory services with AI-powered tools
           </span>
@@ -27,7 +27,7 @@ export default function ConsultantsPage() {
             Partner With Us
           </Link>
           <button className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">
-            ×
+            �
           </button>
         </div>
       </div>
@@ -55,13 +55,13 @@ export default function ConsultantsPage() {
               href="/waitlist"
               className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg inline-block text-center"
             >
-              🚀 Partner With Design-Rite
+              ?? Partner With Design-Rite
             </Link>
             <Link
               href="/contact"
               className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block text-center"
             >
-              📞 Schedule Consultation
+              ?? Schedule Consultation
             </Link>
           </div>
         </section>
@@ -69,7 +69,7 @@ export default function ConsultantsPage() {
         {/* Consultant Benefits Grid */}
         <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 max-w-6xl mx-auto">
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">🎯</div>
+            <div className="text-4xl mb-4">??</div>
             <h3 className="text-xl font-bold text-white mb-4">Expert Assessments</h3>
             <p className="text-gray-300">
               Generate comprehensive security assessments backed by AI analysis and 
@@ -78,7 +78,7 @@ export default function ConsultantsPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">🏷️</div>
+            <div className="text-4xl mb-4">???</div>
             <h3 className="text-xl font-bold text-white mb-4">White-Label Platform</h3>
             <p className="text-gray-300">
               Brand our entire platform as your own, offering clients cutting-edge 
@@ -87,7 +87,7 @@ export default function ConsultantsPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">📊</div>
+            <div className="text-4xl mb-4">??</div>
             <h3 className="text-xl font-bold text-white mb-4">Compliance Reports</h3>
             <p className="text-gray-300">
               Automatically generate compliance documentation for various standards 
@@ -96,7 +96,7 @@ export default function ConsultantsPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">💡</div>
+            <div className="text-4xl mb-4">??</div>
             <h3 className="text-xl font-bold text-white mb-4">Strategic Insights</h3>
             <p className="text-gray-300">
               Leverage AI-powered analytics to provide data-driven recommendations 
@@ -105,7 +105,7 @@ export default function ConsultantsPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">🚀</div>
+            <div className="text-4xl mb-4">??</div>
             <h3 className="text-xl font-bold text-white mb-4">Scale Your Practice</h3>
             <p className="text-gray-300">
               Handle more clients efficiently with automated workflows and 
@@ -114,7 +114,7 @@ export default function ConsultantsPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">🤝</div>
+            <div className="text-4xl mb-4">??</div>
             <h3 className="text-xl font-bold text-white mb-4">Partner Support</h3>
             <p className="text-gray-300">
               Dedicated consultant success team, training resources, and 
@@ -174,19 +174,19 @@ export default function ConsultantsPage() {
               <h3 className="text-2xl font-bold text-white mb-4">Security Assessments</h3>
               <ul className="space-y-3 text-gray-300">
                 <li className="flex items-start gap-3">
-                  <span className="text-green-400 mt-1">✓</span>
+                  <span className="text-green-400 mt-1">?</span>
                   <span>Physical security audits with AI-powered analysis</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-green-400 mt-1">✓</span>
+                  <span className="text-green-400 mt-1">?</span>
                   <span>Vulnerability assessments and risk scoring</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-green-400 mt-1">✓</span>
+                  <span className="text-green-400 mt-1">?</span>
                   <span>Compliance gap analysis and remediation plans</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-green-400 mt-1">✓</span>
+                  <span className="text-green-400 mt-1">?</span>
                   <span>Executive-ready reports and presentations</span>
                 </li>
               </ul>
@@ -196,19 +196,19 @@ export default function ConsultantsPage() {
               <h3 className="text-2xl font-bold text-white mb-4">Strategic Advisory</h3>
               <ul className="space-y-3 text-gray-300">
                 <li className="flex items-start gap-3">
-                  <span className="text-green-400 mt-1">✓</span>
+                  <span className="text-green-400 mt-1">?</span>
                   <span>Security program development and maturity modeling</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-green-400 mt-1">✓</span>
+                  <span className="text-green-400 mt-1">?</span>
                   <span>Technology stack recommendations and roadmaps</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-green-400 mt-1">✓</span>
+                  <span className="text-green-400 mt-1">?</span>
                   <span>Budget optimization and ROI analysis</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-green-400 mt-1">✓</span>
+                  <span className="text-green-400 mt-1">?</span>
                   <span>Vendor evaluation and selection support</span>
                 </li>
               </ul>
@@ -229,13 +229,13 @@ export default function ConsultantsPage() {
               href="/waitlist"
               className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg inline-block text-center"
             >
-              🚀 Apply for Partnership
+              ?? Apply for Partnership
             </Link>
             <Link
               href="/contact"
               className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block text-center"
             >
-              📞 Schedule Consultation
+              ?? Schedule Consultation
             </Link>
           </div>
         </section>
@@ -244,7 +244,7 @@ export default function ConsultantsPage() {
       {/* Footer */}
       <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
         <div className="max-w-6xl mx-auto px-8 text-center">
-          <p className="text-white/70">© 2025 Design-Rite. All rights reserved.</p>
+          <p className="text-white/70">� 2025 Design-Rite. All rights reserved.</p>
           <div className="flex justify-center gap-6 mt-4">
             <Link href="/" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Home</Link>
             <Link href="/about" className="text-white/70 hover:text-purple-600 text-sm transition-colors">About</Link>
@@ -256,3 +256,5 @@ export default function ConsultantsPage() {
     </div>
   )
 }
+
+

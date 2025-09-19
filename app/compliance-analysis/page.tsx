@@ -199,7 +199,7 @@ For detailed implementation guidance, contact Design-Rite security consultants.`
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center items-center mb-6">
@@ -440,3 +440,5 @@ For detailed implementation guidance, contact Design-Rite security consultants.`
     </div>
   );
 }
+
+

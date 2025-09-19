@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 export default function Partners() {
   return (
@@ -17,3 +17,6 @@ export default function Partners() {
     </div>
   );
 }
+
+
+

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -16,7 +16,7 @@ export default function EnterpriseSecurityPage() {
       {/* Top Announcement Bar */}
       <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
         <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
-          <span className="text-base">🏢</span>
+          <span className="text-base">??</span>
           <span className="flex-1 text-center">
             Enterprise Security Teams: Streamline multi-site security management with AI
           </span>
@@ -27,7 +27,7 @@ export default function EnterpriseSecurityPage() {
             Get Demo
           </Link>
           <button className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">
-            ×
+            �
           </button>
         </div>
       </div>
@@ -55,13 +55,13 @@ export default function EnterpriseSecurityPage() {
               onClick={redirectToApp}
               className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg"
             >
-              🚀 Start Enterprise Trial
+              ?? Start Enterprise Trial
             </button>
             <Link 
               href="/contact" 
               className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block"
             >
-              📞 Schedule Enterprise Demo
+              ?? Schedule Enterprise Demo
             </Link>
           </div>
         </section>
@@ -69,7 +69,7 @@ export default function EnterpriseSecurityPage() {
         {/* Enterprise Features Grid */}
         <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 max-w-6xl mx-auto">
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">🏢</div>
+            <div className="text-4xl mb-4">??</div>
             <h3 className="text-xl font-bold text-white mb-4">Multi-Site Management</h3>
             <p className="text-gray-300">
               Centrally manage security assessments across all your facilities with 
@@ -78,7 +78,7 @@ export default function EnterpriseSecurityPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">📊</div>
+            <div className="text-4xl mb-4">??</div>
             <h3 className="text-xl font-bold text-white mb-4">Vendor Comparison</h3>
             <p className="text-gray-300">
               Evaluate and compare proposals from multiple security vendors with 
@@ -87,7 +87,7 @@ export default function EnterpriseSecurityPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">✅</div>
+            <div className="text-4xl mb-4">?</div>
             <h3 className="text-xl font-bold text-white mb-4">Compliance Reporting</h3>
             <p className="text-gray-300">
               Generate comprehensive compliance reports for regulatory requirements, 
@@ -96,7 +96,7 @@ export default function EnterpriseSecurityPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">💰</div>
+            <div className="text-4xl mb-4">??</div>
             <h3 className="text-xl font-bold text-white mb-4">Budget Planning</h3>
             <p className="text-gray-300">
               Plan security budgets with accurate cost projections, ROI analysis, 
@@ -105,7 +105,7 @@ export default function EnterpriseSecurityPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">👥</div>
+            <div className="text-4xl mb-4">??</div>
             <h3 className="text-xl font-bold text-white mb-4">Team Collaboration</h3>
             <p className="text-gray-300">
               Enable seamless collaboration between security teams, facilities management, 
@@ -114,7 +114,7 @@ export default function EnterpriseSecurityPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">🔐</div>
+            <div className="text-4xl mb-4">??</div>
             <h3 className="text-xl font-bold text-white mb-4">Enterprise Security</h3>
             <p className="text-gray-300">
               SOC 2 compliant platform with enterprise-grade security, data encryption, 
@@ -153,7 +153,7 @@ export default function EnterpriseSecurityPage() {
           </div>
           <div className="text-center mt-8">
             <div className="text-2xl font-bold text-white mb-4">
-              💡 Estimated Annual Savings: <span className="text-green-400">$500,000+</span>
+              ?? Estimated Annual Savings: <span className="text-green-400">$500,000+</span>
             </div>
             <p className="text-gray-300 mb-6">
               Based on 50+ facility locations with standardized security processes
@@ -180,13 +180,13 @@ export default function EnterpriseSecurityPage() {
               onClick={redirectToApp}
               className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg"
             >
-              🚀 Start Enterprise Trial
+              ?? Start Enterprise Trial
             </button>
             <Link 
               href="/contact" 
               className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block"
             >
-              📞 Schedule Enterprise Demo
+              ?? Schedule Enterprise Demo
             </Link>
           </div>
         </section>
@@ -195,7 +195,7 @@ export default function EnterpriseSecurityPage() {
       {/* Footer */}
       <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
         <div className="max-w-6xl mx-auto px-8 text-center">
-          <p className="text-white/70">© 2025 Design-Rite. All rights reserved.</p>
+          <p className="text-white/70">� 2025 Design-Rite. All rights reserved.</p>
           <div className="flex justify-center gap-6 mt-4">
             <Link href="/" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Home</Link>
             <Link href="/about" className="text-white/70 hover:text-purple-600 text-sm transition-colors">About</Link>
@@ -207,3 +207,5 @@ export default function EnterpriseSecurityPage() {
     </div>
   )
 }
+
+
