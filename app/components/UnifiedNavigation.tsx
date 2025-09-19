@@ -54,7 +54,7 @@ export default function UnifiedNavigation() {
                 </div>
               </Link>
 
-              <Link href="/proposals" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+              <Link href="/professional-proposals" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   📋
                 </div>
@@ -213,7 +213,7 @@ export default function UnifiedNavigation() {
               <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Platform</div>
               <Link href="/ai-assessment" className="block text-white/80 hover:text-white py-2 pl-4">🧠 AI Security Assessment</Link>
               <Link href="/compliance-analyst" className="block text-white/80 hover:text-white py-2 pl-4">✅ Compliance Tools</Link>
-              <Link href="/proposals" className="block text-white/80 hover:text-white py-2 pl-4">📋 Proposal Generator</Link>
+              <Link href="/professional-proposals" className="block text-white/80 hover:text-white py-2 pl-4">📋 Proposal Generator</Link>
               <Link href="/white-label" className="block text-white/80 hover:text-white py-2 pl-4">🏷️ White Label Solutions</Link>
             </div>
             

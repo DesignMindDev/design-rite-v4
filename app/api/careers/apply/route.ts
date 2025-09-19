@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '../../../../lib/supabase'
 
 export async function POST(request: NextRequest) {
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('job_applications')
+      .from('career_applications')
       .insert([applicationData])
       .select()
 
