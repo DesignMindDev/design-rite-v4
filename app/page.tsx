@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import UnifiedNavigation from '@/app/components/UnifiedNavigation';
+import UnifiedNavigation from './components/UnifiedNavigation';
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
