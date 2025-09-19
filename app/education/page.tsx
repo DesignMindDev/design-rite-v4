@@ -1,4 +1,4 @@
-﻿?"use client"
+﻿"use client"
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -18,7 +18,7 @@ export default function EducationHealthcarePage() {
       {/* Top Announcement Bar */}
       <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
         <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
-          <span className="text-base">??</span>
+          <span className="text-base">🚀</span>
           <span className="flex-1 text-center">
             Design-Rite's Revolutionary AI is launching Q4 2025 - Join the waitlist for early access to security design mastery
           </span>
@@ -59,7 +59,7 @@ export default function EducationHealthcarePage() {
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Education Section */}
             <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-3xl p-12 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="text-5xl mb-6 text-center">??</div>
+              <div className="text-5xl mb-6 text-center">🚀</div>
               <h2 className="text-3xl font-bold text-center mb-8">Educational Institutions</h2>
               
               <div className="space-y-6">
@@ -93,7 +93,7 @@ export default function EducationHealthcarePage() {
 
             {/* Healthcare Section */}
             <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-3xl p-12 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="text-5xl mb-6 text-center">??</div>
+              <div className="text-5xl mb-6 text-center">🚀</div>
               <h2 className="text-3xl font-bold text-center mb-8">Healthcare Facilities</h2>
               
               <div className="space-y-6">
@@ -132,17 +132,17 @@ export default function EducationHealthcarePage() {
           <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">Regulatory Compliance Built-In</h2>
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="bg-blue-600/20 rounded-2xl p-8 text-center border border-blue-600/30 hover:-translate-y-1 transition-all">
-              <div className="text-4xl mb-4">??</div>
+              <div className="text-4xl mb-4">🚀</div>
               <h3 className="text-xl font-bold mb-4">FERPA Compliance</h3>
               <p className="text-gray-400">Automated validation of Family Educational Rights and Privacy Act requirements for educational institutions.</p>
             </div>
             <div className="bg-green-600/20 rounded-2xl p-8 text-center border border-green-600/30 hover:-translate-y-1 transition-all">
-              <div className="text-4xl mb-4">??</div>
+              <div className="text-4xl mb-4">🚀</div>
               <h3 className="text-xl font-bold mb-4">HIPAA Compliance</h3>
               <p className="text-gray-400">Health Insurance Portability and Accountability Act compliance for healthcare facility security requirements.</p>
             </div>
             <div className="bg-purple-600/20 rounded-2xl p-8 text-center border border-purple-600/30 hover:-translate-y-1 transition-all">
-              <div className="text-4xl mb-4">???</div>
+              <div className="text-4xl mb-4">🚀?</div>
               <h3 className="text-xl font-bold mb-4">Local Codes</h3>
               <p className="text-gray-400">Integration with local building codes, fire safety requirements, and emergency response protocols.</p>
             </div>
@@ -155,7 +155,7 @@ export default function EducationHealthcarePage() {
           <div className="grid lg:grid-cols-2 gap-8">
             <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
               <h3 className="text-xl font-bold mb-4 flex items-center gap-3">
-                ?? K-12 School District
+                🚀 K-12 School District
               </h3>
               <p className="text-gray-400 mb-4">
                 Comprehensive security upgrade for a 15-school district including elementary, middle, and high schools. 
@@ -174,7 +174,7 @@ export default function EducationHealthcarePage() {
 
             <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
               <h3 className="text-xl font-bold mb-4 flex items-center gap-3">
-                ?? Regional Medical Center
+                🚀 Regional Medical Center
               </h3>
               <p className="text-gray-400 mb-4">
                 Multi-building hospital campus with emergency department, surgical suites, and outpatient facilities. 
@@ -266,9 +266,9 @@ export default function EducationHealthcarePage() {
           <div className="border-t border-gray-600/30 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
             <div>© 2025 Design-Rite. All rights reserved.</div>
             <div className="flex gap-4 mt-4 md:mt-0">
-              <Link href="mailto:hello@design-rite.com" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">??</Link>
-              <Link href="/linkedin" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">??</Link>
-              <Link href="/twitter" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">??</Link>
+              <Link href="mailto:hello@design-rite.com" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">🚀</Link>
+              <Link href="/linkedin" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">🚀</Link>
+              <Link href="/twitter" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">🚀</Link>
             </div>
           </div>
         </div>
@@ -276,6 +276,7 @@ export default function EducationHealthcarePage() {
     </div>
   )
 }
+
 
 
 
