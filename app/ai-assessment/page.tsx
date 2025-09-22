@@ -24,6 +24,7 @@ const IntegratorDiscoveryAssistant = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [ndaAccepted, setNdaAccepted] = useState(false);
   const [showNdaModal, setShowNdaModal] = useState(false);
+  const [showDocuments, setShowDocuments] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [selectedScenario, setSelectedScenario] = useState('');
@@ -267,16 +268,17 @@ const IntegratorDiscoveryAssistant = () => {
   const generateDocuments = () => {
     setSessionData(prev => ({
       ...prev,
-      documentsGenerated: ['SOW', 'BOM', 'Compliance_Checklist', 'Project_Timeline']
+      documentsGenerated: ['Executive_Summary', 'SOW', 'BOM', 'Implementation_Plan', 'Service_Plan']
     }));
 
     const docMessage = {
       role: 'assistant',
-      content: "📋 **DOCUMENTS GENERATED SUCCESSFULLY!**\n\n✅ Statement of Work (SOW)\n✅ Bill of Materials with Entry/Mid/Premium tiers\n✅ NDAA Compliance Checklist\n✅ Project Timeline & Milestones\n✅ Site Survey Checklist\n\nAll documents include the specific requirements captured during our discovery session. Your client will see that you've listened to every detail and created a solution tailored exactly to their needs.\n\n**Next Steps:**\n1. Review documents with your team\n2. Present to client within 2 days (as committed)\n3. Use our project tracking system through implementation\n\nThis systematic approach ensures nothing falls through the cracks!",
+      content: "📋 **PROFESSIONAL DOCUMENTS GENERATED!**\n\n✅ Executive Summary\n✅ Statement of Work (SOW)\n✅ Bill of Materials (3-Tier Pricing)\n✅ Implementation Plan & Timeline\n✅ Service & Maintenance Plan\n\nAll documents are customized based on your specific requirements and include detailed specifications, pricing, and timelines. Click 'View Documents' below to see the complete professional package.",
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, docMessage]);
+    setShowDocuments(true);
   };
 
   return (
@@ -491,6 +493,12 @@ const IntegratorDiscoveryAssistant = () => {
                       </div>
                     ))}
                   </div>
+                  <button
+                    onClick={() => setShowDocuments(true)}
+                    className="w-full mt-4 bg-gradient-to-r from-green-600 to-blue-600 text-white py-2 px-4 rounded-lg hover:from-green-700 hover:to-blue-700 transition-all font-medium text-sm"
+                  >
+                    📄 View Document Previews
+                  </button>
                 </div>
               )}
             </div>
@@ -656,6 +664,331 @@ const IntegratorDiscoveryAssistant = () => {
                     className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Accept NDA & Request Enterprise Access
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Document Preview Modal */}
+        {showDocuments && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 overflow-y-auto">
+            <div className="bg-white rounded-xl max-w-6xl w-full max-h-[95vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-3xl font-bold text-gray-900">📋 Generated Documents</h2>
+                  <button
+                    onClick={() => setShowDocuments(false)}
+                    className="text-gray-500 hover:text-gray-700 text-2xl"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <div className="space-y-8">
+                  {/* Executive Summary */}
+                  <div className="border-l-4 border-blue-500 pl-6">
+                    <h3 className="text-2xl font-bold text-blue-600 mb-4">📊 Executive Summary</h3>
+                    <div className="bg-blue-50 p-6 rounded-lg">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <h4 className="font-semibold text-gray-800 mb-3">Project Overview</h4>
+                          <p className="text-gray-700 text-sm mb-3">
+                            <strong>Client:</strong> {sessionData.facilityType || 'Demo University Campus'}<br/>
+                            <strong>Facility Type:</strong> Educational Institution<br/>
+                            <strong>Assessment Date:</strong> {new Date().toLocaleDateString()}<br/>
+                            <strong>Compliance Requirements:</strong> FERPA, ADA, Local Fire Codes
+                          </p>
+                          <h4 className="font-semibold text-gray-800 mb-2">Key Requirements</h4>
+                          <ul className="text-sm text-gray-700 space-y-1">
+                            <li>• 15 building multi-campus security system</li>
+                            <li>• Student dormitory access control</li>
+                            <li>• Administrative building protection</li>
+                            <li>• Research facility secured zones</li>
+                            <li>• Emergency notification integration</li>
+                          </ul>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-800 mb-3">Investment Summary</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between"><span>Essential Package:</span><span className="font-semibold">$285,000</span></div>
+                            <div className="flex justify-between"><span>Professional Package:</span><span className="font-semibold">$425,000</span></div>
+                            <div className="flex justify-between"><span>Enterprise Package:</span><span className="font-semibold text-blue-600">$580,000</span></div>
+                          </div>
+                          <h4 className="font-semibold text-gray-800 mb-2 mt-4">Timeline</h4>
+                          <p className="text-sm text-gray-700">
+                            <strong>Design Phase:</strong> 3-4 weeks<br/>
+                            <strong>Installation:</strong> 8-12 weeks<br/>
+                            <strong>Training & Handover:</strong> 2 weeks
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Statement of Work */}
+                  <div className="border-l-4 border-green-500 pl-6">
+                    <h3 className="text-2xl font-bold text-green-600 mb-4">📋 Statement of Work</h3>
+                    <div className="bg-green-50 p-6 rounded-lg">
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="font-semibold text-gray-800 mb-2">Scope of Services</h4>
+                          <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
+                            <div>
+                              <h5 className="font-medium text-gray-800">Design Services</h5>
+                              <ul className="space-y-1 ml-4">
+                                <li>• Site security assessment</li>
+                                <li>• System architecture design</li>
+                                <li>• CAD drawings and layouts</li>
+                                <li>• Integration specifications</li>
+                              </ul>
+                            </div>
+                            <div>
+                              <h5 className="font-medium text-gray-800">Installation Services</h5>
+                              <ul className="space-y-1 ml-4">
+                                <li>• Access control system installation</li>
+                                <li>• Video surveillance deployment</li>
+                                <li>• Intrusion detection setup</li>
+                                <li>• System integration & testing</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-800 mb-2">Deliverables</h4>
+                          <div className="grid md:grid-cols-3 gap-3 text-sm">
+                            <div className="bg-white p-3 rounded border">
+                              <h5 className="font-medium text-green-700">Design Phase</h5>
+                              <p>Site plans, equipment specs, installation drawings</p>
+                            </div>
+                            <div className="bg-white p-3 rounded border">
+                              <h5 className="font-medium text-green-700">Installation Phase</h5>
+                              <p>Fully operational security system with documentation</p>
+                            </div>
+                            <div className="bg-white p-3 rounded border">
+                              <h5 className="font-medium text-green-700">Support Phase</h5>
+                              <p>Training materials, warranties, maintenance plans</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bill of Materials */}
+                  <div className="border-l-4 border-purple-500 pl-6">
+                    <h3 className="text-2xl font-bold text-purple-600 mb-4">💰 Bill of Materials</h3>
+                    <div className="bg-purple-50 p-6 rounded-lg">
+                      <div className="grid md:grid-cols-3 gap-6">
+                        <div className="bg-white p-4 rounded-lg border-2 border-gray-200">
+                          <h4 className="font-bold text-gray-800 mb-3 text-center">Essential Package</h4>
+                          <div className="text-center mb-4">
+                            <span className="text-3xl font-bold text-gray-800">$285,000</span>
+                          </div>
+                          <ul className="text-sm space-y-2">
+                            <li>• Basic access control (5 doors)</li>
+                            <li>• 16-camera surveillance system</li>
+                            <li>• Central monitoring station</li>
+                            <li>• Basic intrusion detection</li>
+                            <li>• 1-year warranty</li>
+                          </ul>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg border-2 border-blue-500 relative">
+                          <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                            Recommended
+                          </div>
+                          <h4 className="font-bold text-blue-600 mb-3 text-center">Professional Package</h4>
+                          <div className="text-center mb-4">
+                            <span className="text-3xl font-bold text-blue-600">$425,000</span>
+                          </div>
+                          <ul className="text-sm space-y-2">
+                            <li>• Advanced access control (15 doors)</li>
+                            <li>• 32-camera IP surveillance</li>
+                            <li>• Video analytics & facial recognition</li>
+                            <li>• Perimeter intrusion detection</li>
+                            <li>• Emergency notification system</li>
+                            <li>• Mobile app integration</li>
+                            <li>• 3-year warranty & support</li>
+                          </ul>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg border-2 border-purple-500">
+                          <h4 className="font-bold text-purple-600 mb-3 text-center">Enterprise Package</h4>
+                          <div className="text-center mb-4">
+                            <span className="text-3xl font-bold text-purple-600">$580,000</span>
+                          </div>
+                          <ul className="text-sm space-y-2">
+                            <li>• Enterprise access control (25+ doors)</li>
+                            <li>• 64-camera AI-powered system</li>
+                            <li>• Advanced analytics & reporting</li>
+                            <li>• Multi-layer security integration</li>
+                            <li>• Command center setup</li>
+                            <li>• 24/7 monitoring service</li>
+                            <li>• 5-year comprehensive warranty</li>
+                            <li>• Annual system upgrades</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Implementation Plan */}
+                  <div className="border-l-4 border-orange-500 pl-6">
+                    <h3 className="text-2xl font-bold text-orange-600 mb-4">🚀 Implementation Plan</h3>
+                    <div className="bg-orange-50 p-6 rounded-lg">
+                      <div className="space-y-6">
+                        <div className="grid md:grid-cols-4 gap-4">
+                          <div className="bg-white p-4 rounded border-l-4 border-orange-300">
+                            <h4 className="font-semibold text-orange-700 mb-2">Phase 1: Design</h4>
+                            <p className="text-sm text-gray-700 mb-2"><strong>Duration:</strong> 3-4 weeks</p>
+                            <ul className="text-sm text-gray-600 space-y-1">
+                              <li>• Site survey & assessment</li>
+                              <li>• System design & CAD</li>
+                              <li>• Equipment specification</li>
+                              <li>• Client approval</li>
+                            </ul>
+                          </div>
+                          <div className="bg-white p-4 rounded border-l-4 border-orange-400">
+                            <h4 className="font-semibold text-orange-700 mb-2">Phase 2: Procurement</h4>
+                            <p className="text-sm text-gray-700 mb-2"><strong>Duration:</strong> 2-3 weeks</p>
+                            <ul className="text-sm text-gray-600 space-y-1">
+                              <li>• Equipment ordering</li>
+                              <li>• Material staging</li>
+                              <li>• Pre-configuration</li>
+                              <li>• Quality testing</li>
+                            </ul>
+                          </div>
+                          <div className="bg-white p-4 rounded border-l-4 border-orange-500">
+                            <h4 className="font-semibold text-orange-700 mb-2">Phase 3: Installation</h4>
+                            <p className="text-sm text-gray-700 mb-2"><strong>Duration:</strong> 8-12 weeks</p>
+                            <ul className="text-sm text-gray-600 space-y-1">
+                              <li>• Infrastructure installation</li>
+                              <li>• System deployment</li>
+                              <li>• Integration & testing</li>
+                              <li>• System commissioning</li>
+                            </ul>
+                          </div>
+                          <div className="bg-white p-4 rounded border-l-4 border-orange-600">
+                            <h4 className="font-semibold text-orange-700 mb-2">Phase 4: Handover</h4>
+                            <p className="text-sm text-gray-700 mb-2"><strong>Duration:</strong> 2 weeks</p>
+                            <ul className="text-sm text-gray-600 space-y-1">
+                              <li>• Staff training</li>
+                              <li>• Documentation delivery</li>
+                              <li>• Warranty activation</li>
+                              <li>• Go-live support</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="bg-white p-4 rounded">
+                          <h4 className="font-semibold text-gray-800 mb-3">Critical Milestones</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                              <span>Design Approval</span>
+                              <span className="text-orange-600 font-medium">Week 4</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                              <span>Equipment Delivery</span>
+                              <span className="text-orange-600 font-medium">Week 7</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                              <span>System Testing Complete</span>
+                              <span className="text-orange-600 font-medium">Week 16</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                              <span>Final Handover</span>
+                              <span className="text-orange-600 font-medium">Week 18</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Service & Maintenance Plan */}
+                  <div className="border-l-4 border-red-500 pl-6">
+                    <h3 className="text-2xl font-bold text-red-600 mb-4">🔧 Service & Maintenance Plan</h3>
+                    <div className="bg-red-50 p-6 rounded-lg">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <h4 className="font-semibold text-gray-800 mb-3">Preventive Maintenance</h4>
+                          <div className="space-y-3">
+                            <div className="bg-white p-3 rounded border">
+                              <h5 className="font-medium text-red-700">Monthly Service</h5>
+                              <ul className="text-sm text-gray-600 mt-1 space-y-1">
+                                <li>• System health monitoring</li>
+                                <li>• Software updates</li>
+                                <li>• Performance optimization</li>
+                              </ul>
+                            </div>
+                            <div className="bg-white p-3 rounded border">
+                              <h5 className="font-medium text-red-700">Quarterly Service</h5>
+                              <ul className="text-sm text-gray-600 mt-1 space-y-1">
+                                <li>• Hardware inspection</li>
+                                <li>• Camera cleaning & calibration</li>
+                                <li>• Access control audit</li>
+                              </ul>
+                            </div>
+                            <div className="bg-white p-3 rounded border">
+                              <h5 className="font-medium text-red-700">Annual Service</h5>
+                              <ul className="text-sm text-gray-600 mt-1 space-y-1">
+                                <li>• Comprehensive system review</li>
+                                <li>• Security assessment update</li>
+                                <li>• Technology refresh planning</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-800 mb-3">Support Services</h4>
+                          <div className="space-y-3">
+                            <div className="bg-white p-3 rounded border">
+                              <h5 className="font-medium text-red-700">24/7 Technical Support</h5>
+                              <p className="text-sm text-gray-600 mt-1">
+                                Round-the-clock phone and remote support for critical issues
+                              </p>
+                            </div>
+                            <div className="bg-white p-3 rounded border">
+                              <h5 className="font-medium text-red-700">4-Hour Response SLA</h5>
+                              <p className="text-sm text-gray-600 mt-1">
+                                On-site technician dispatch for urgent repairs
+                              </p>
+                            </div>
+                            <div className="bg-white p-3 rounded border">
+                              <h5 className="font-medium text-red-700">Parts & Labor Warranty</h5>
+                              <p className="text-sm text-gray-600 mt-1">
+                                All replacement parts and labor covered under warranty
+                              </p>
+                            </div>
+                          </div>
+                          <h4 className="font-semibold text-gray-800 mb-3 mt-4">Service Pricing</h4>
+                          <div className="bg-white p-3 rounded border">
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span>Basic Support Plan:</span>
+                                <span className="font-semibold">$2,400/month</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Premium Support Plan:</span>
+                                <span className="font-semibold">$4,200/month</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Enterprise Support Plan:</span>
+                                <span className="font-semibold">$6,800/month</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-center mt-8 pt-6 border-t">
+                  <button
+                    onClick={() => setShowDocuments(false)}
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all font-semibold"
+                  >
+                    Close Preview
                   </button>
                 </div>
               </div>
