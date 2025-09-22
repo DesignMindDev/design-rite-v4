@@ -344,7 +344,7 @@ export default function EducationPage() {
             <div>
               <h3 className="text-white font-bold mb-4">Platform</h3>
               <ul className="space-y-2">
-                <li><Link href="/ai-assessment" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">AI Assessment</Link></li>
+                <li><button onClick={handleStartAssessment} className="text-gray-400 hover:text-purple-600 text-sm transition-colors text-left">AI Assessment</button></li>
                 <li><Link href="/professional-proposals" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Proposal Generator</Link></li>
                 <li><Link href="/white-label" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">White-Label</Link></li>
                 <li><Link href="/compliance-analyst" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Compliance Tools</Link></li>

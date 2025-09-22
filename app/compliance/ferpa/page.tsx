@@ -540,7 +540,10 @@ Design-Rite AI Assessment Platform
                     <span className="text-gray-300">Implementation roadmap</span>
                   </div>
                 </div>
-                <button className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-xl transition-all">
+                <button
+                  onClick={handleStartAssessment}
+                  className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-xl transition-all"
+                >
                   Start Free Assessment
                 </button>
               </div>
