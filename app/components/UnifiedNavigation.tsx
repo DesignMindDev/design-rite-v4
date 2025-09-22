@@ -3,14 +3,23 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import EmailGate from './EmailGate';
+import { useAuthCache } from '../hooks/useAuthCache';
 
 export default function UnifiedNavigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEmailGate, setShowEmailGate] = useState(false);
+  const { isAuthenticated, extendSession } = useAuthCache();
 
   const handleAIAssessmentClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    setShowEmailGate(true);
+
+    // Check if user is already authenticated
+    if (isAuthenticated) {
+      extendSession();
+      window.location.href = '/ai-assessment';
+    } else {
+      setShowEmailGate(true);
+    }
   };
 
   const handleEmailGateSuccess = () => {

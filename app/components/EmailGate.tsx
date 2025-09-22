@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuthCache } from '../hooks/useAuthCache';
 
 interface EmailGateProps {
   isOpen: boolean;
@@ -13,6 +14,24 @@ const EmailGate = ({ isOpen, onClose, onSuccess }: EmailGateProps) => {
   const [company, setCompany] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const { isAuthenticated, authData, saveAuthentication, extendSession } = useAuthCache();
+
+  // Check if user is already authenticated when modal opens
+  useEffect(() => {
+    if (isOpen && isAuthenticated && authData) {
+      // User is already authenticated, extend session and proceed
+      extendSession();
+      onSuccess();
+    }
+  }, [isOpen, isAuthenticated, authData, extendSession, onSuccess]);
+
+  // Pre-fill form with cached data if available
+  useEffect(() => {
+    if (authData && !email && !company) {
+      setEmail(authData.email);
+      setCompany(authData.company);
+    }
+  }, [authData, email, company]);
 
   const validateBusinessEmail = (email: string): boolean => {
     const freeEmailDomains = [
@@ -65,6 +84,8 @@ const EmailGate = ({ isOpen, onClose, onSuccess }: EmailGateProps) => {
         throw new Error('Failed to process request');
       }
 
+      // Save authentication to cache on successful submission
+      saveAuthentication(email.trim(), company.trim());
       onSuccess();
     } catch (error) {
       console.error('Error submitting lead:', error);

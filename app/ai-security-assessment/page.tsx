@@ -1,17 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import UnifiedNavigation from '../components/UnifiedNavigation';
 import EmailGate from '../components/EmailGate';
+import { useAuthCache } from '../hooks/useAuthCache';
 
 export default function AISecurityAssessmentPage() {
   const [showDocument, setShowDocument] = useState('');
   const [showEmailGate, setShowEmailGate] = useState(false);
+  const { isAuthenticated, extendSession } = useAuthCache();
 
   const handleTryDemoClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    setShowEmailGate(true);
+
+    // Check if user is already authenticated
+    if (isAuthenticated) {
+      extendSession();
+      window.location.href = '/ai-assessment';
+    } else {
+      setShowEmailGate(true);
+    }
   };
 
   const handleEmailGateSuccess = () => {
