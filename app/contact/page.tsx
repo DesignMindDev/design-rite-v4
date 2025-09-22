@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import EmailGate from '../components/EmailGate'
 
 export default function ContactPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [showEmailGate, setShowEmailGate] = useState(false)
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -66,6 +68,16 @@ Sent from Design-Rite Contact Form
     // In a real implementation, this would open Calendly
     alert('📅 Demo scheduling would open here. For now, please use the contact form or email info@design-rite.com')
   }
+
+  const handleTryItFreeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowEmailGate(true);
+  };
+
+  const handleEmailGateSuccess = () => {
+    setShowEmailGate(false);
+    window.location.href = '/ai-assessment';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
@@ -256,7 +268,7 @@ Sent from Design-Rite Contact Form
             <Link className="bg-purple-600/20 text-purple-600 border border-purple-600/30 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-purple-600/30 hover:border-purple-600 transition-all" href="/subscribe">Subscribe</Link>
             <div className="flex items-center gap-4">
               <Link className="bg-purple-600/10 text-purple-600 border border-purple-600/30 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-purple-600/20 hover:border-purple-600 transition-all" href="/demo">Watch Demo</Link>
-              <Link href="/app" className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:shadow-lg hover:shadow-purple-600/30 transition-all">Try It Free</Link>
+              <button onClick={handleTryItFreeClick} className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:shadow-lg hover:shadow-purple-600/30 transition-all">Try It Free</button>
             </div>
           </div>
 
@@ -606,6 +618,11 @@ Sent from Design-Rite Contact Form
           </div>
         </div>
       </footer>
+      <EmailGate
+        isOpen={showEmailGate}
+        onClose={() => setShowEmailGate(false)}
+        onSuccess={handleEmailGateSuccess}
+      />
     </div>
   )
 }

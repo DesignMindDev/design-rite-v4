@@ -3,10 +3,22 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import EmailGate from '../components/EmailGate'
 
 export default function ProfessionalProposalsPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [showEmailGate, setShowEmailGate] = useState(false)
   const router = useRouter()
+
+  const handleGenerateProposalClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowEmailGate(true);
+  };
+
+  const handleEmailGateSuccess = () => {
+    setShowEmailGate(false);
+    window.location.href = '/ai-assessment';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
@@ -269,8 +281,8 @@ export default function ProfessionalProposalsPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => router.push('/app')}
+              <button
+                onClick={handleGenerateProposalClick}
                 className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all transform hover:scale-[1.02] shadow-lg"
               >
                 Generate Sample Proposal
@@ -508,8 +520,8 @@ export default function ProfessionalProposalsPage() {
               Transform your proposal process with AI-powered generation. Impress clients, win more deals, and reduce time-to-quote from days to minutes.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => router.push('/app')}
+              <button
+                onClick={handleGenerateProposalClick}
                 className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all transform hover:scale-[1.02] shadow-lg"
               >
                 Generate Sample Proposal
@@ -566,6 +578,12 @@ export default function ProfessionalProposalsPage() {
           </div>
         </div>
       </footer>
+
+      <EmailGate
+        isOpen={showEmailGate}
+        onClose={() => setShowEmailGate(false)}
+        onSuccess={handleEmailGateSuccess}
+      />
     </div>
   )
 }

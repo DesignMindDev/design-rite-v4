@@ -3,9 +3,21 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import UnifiedNavigation from '../components/UnifiedNavigation';
+import EmailGate from '../components/EmailGate';
 
 export default function AISecurityAssessmentPage() {
   const [showDocument, setShowDocument] = useState('');
+  const [showEmailGate, setShowEmailGate] = useState(false);
+
+  const handleTryDemoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowEmailGate(true);
+  };
+
+  const handleEmailGateSuccess = () => {
+    setShowEmailGate(false);
+    window.location.href = '/ai-assessment';
+  };
 
   const documents = {
     executive: {
@@ -123,12 +135,12 @@ Target: Large facilities, maximum security`
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Link
-              href="/ai-assessment"
+            <button
+              onClick={handleTryDemoClick}
               className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl transition-all"
             >
               Try Free Demo
-            </Link>
+            </button>
             <Link
               href="/contact"
               className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 transition-all"
@@ -244,12 +256,12 @@ Target: Large facilities, maximum security`
             Join hundreds of security professionals using our platform
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/ai-assessment"
+            <button
+              onClick={handleTryDemoClick}
               className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl transition-all"
             >
               Start Free Assessment Demo
-            </Link>
+            </button>
             <Link
               href="/contact"
               className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 transition-all"
@@ -259,6 +271,12 @@ Target: Large facilities, maximum security`
           </div>
         </div>
       </section>
+
+      <EmailGate
+        isOpen={showEmailGate}
+        onClose={() => setShowEmailGate(false)}
+        onSuccess={handleEmailGateSuccess}
+      />
     </div>
   );
 }
