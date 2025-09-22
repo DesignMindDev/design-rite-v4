@@ -42,15 +42,15 @@ export default function UnifiedNavigation() {
             </span>
             <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
 
-              <button onClick={handleAIAssessmentClick} className="w-full flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+              <Link href="/ai-security-assessment" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🧠
                 </div>
-                <div className="text-left">
+                <div>
                   <div className="font-semibold text-sm text-white mb-1">AI Security Assessment</div>
-                  <div className="text-xs text-gray-400 leading-tight">Intelligent discovery consultation</div>
+                  <div className="text-xs text-gray-400 leading-tight">Professional security analysis with AI</div>
                 </div>
-              </button>
+              </Link>
 
               <Link href="/compliance-analyst" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
@@ -278,7 +278,7 @@ export default function UnifiedNavigation() {
             {/* Platform Section */}
             <div>
               <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Platform</div>
-              <button onClick={handleAIAssessmentClick} className="block w-full text-left text-white/80 hover:text-white py-2 pl-4">🧠 AI Security Assessment</button>
+              <Link href="/ai-security-assessment" className="block text-white/80 hover:text-white py-2 pl-4">🧠 AI Security Assessment</Link>
               <Link href="/compliance-analyst" className="block text-white/80 hover:text-white py-2 pl-4">✅ Compliance Tools</Link>
               <Link href="/professional-proposals" className="block text-white/80 hover:text-white py-2 pl-4">📋 Proposal Generator</Link>
               <Link href="/white-label" className="block text-white/80 hover:text-white py-2 pl-4">🏷️ White Label Solutions</Link>
