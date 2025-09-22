@@ -135,6 +135,55 @@ export default function UnifiedNavigation() {
             </div>
           </li>
 
+          {/* Compliance Dropdown */}
+          <li className="relative group">
+            <span className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+              Compliance
+            </span>
+            <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+
+              <Link href="/compliance" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                  📋
+                </div>
+                <div>
+                  <div className="font-semibold text-sm text-white mb-1">Compliance Overview</div>
+                  <div className="text-xs text-gray-400 leading-tight">Regulatory frameworks & standards</div>
+                </div>
+              </Link>
+
+              <Link href="/compliance/ferpa" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                  🎓
+                </div>
+                <div>
+                  <div className="font-semibold text-sm text-white mb-1">FERPA Compliance</div>
+                  <div className="text-xs text-gray-400 leading-tight">Educational records protection</div>
+                </div>
+              </Link>
+
+              <Link href="/compliance/hipaa" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                  🏥
+                </div>
+                <div>
+                  <div className="font-semibold text-sm text-white mb-1">HIPAA Compliance</div>
+                  <div className="text-xs text-gray-400 leading-tight">Healthcare data protection</div>
+                </div>
+              </Link>
+
+              <Link href="/compliance/general-security" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
+                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                  🔒
+                </div>
+                <div>
+                  <div className="font-semibold text-sm text-white mb-1">Security Frameworks</div>
+                  <div className="text-xs text-gray-400 leading-tight">NIST, SOC 2, ISO 27001</div>
+                </div>
+              </Link>
+            </div>
+          </li>
+
           {/* Pricing - Simple Link */}
           <li>
             <Link href="/pricing" className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm">
@@ -235,6 +284,15 @@ export default function UnifiedNavigation() {
               <Link href="/education" className="block text-white/80 hover:text-white py-2 pl-4">🎓 Education</Link>
               <Link href="/healthcare" className="block text-white/80 hover:text-white py-2 pl-4">🏥 Healthcare</Link>
               <Link href="/consultants" className="block text-white/80 hover:text-white py-2 pl-4">💼 Security Consultants</Link>
+            </div>
+
+            {/* Compliance Section */}
+            <div className="border-t border-white/10 pt-2">
+              <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Compliance</div>
+              <Link href="/compliance" className="block text-white/80 hover:text-white py-2 pl-4">📋 Compliance Overview</Link>
+              <Link href="/compliance/ferpa" className="block text-white/80 hover:text-white py-2 pl-4">🎓 FERPA Compliance</Link>
+              <Link href="/compliance/hipaa" className="block text-white/80 hover:text-white py-2 pl-4">🏥 HIPAA Compliance</Link>
+              <Link href="/compliance/general-security" className="block text-white/80 hover:text-white py-2 pl-4">🔒 Security Frameworks</Link>
             </div>
 
             {/* Pricing Link */}
