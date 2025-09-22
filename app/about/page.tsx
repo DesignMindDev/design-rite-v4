@@ -93,10 +93,10 @@ export default function AboutPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <TeamMember
-              name="Dan Koziol"
+              name="Dan Kozich"
               role="Founder & Principal Designer"
               description="Over two decades of expertise in low-voltage design, security systems, and technology integration. Trusted advisor to Fortune 500 companies, school districts, hospitals, and critical infrastructure facilities. Subject matter expert automating compliance checks and design optimization."
-              imagePath="/team/dan-koziol.jpg"
+              imagePath="/team/dan-kozich.jpg"
               initials="DK"
             />
 
@@ -106,7 +106,6 @@ export default function AboutPage() {
               description="Strategic leadership driving Design-Rite's growth and market expansion. Expertise in business development, operations, and scaling technology solutions in the security industry."
               imagePath="/team/philip-lisk.jpg"
               initials="PL"
-              href="https://philiplisk.com/"
             />
 
             <TeamMember
