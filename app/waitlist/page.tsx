@@ -144,13 +144,14 @@ export default function WaitlistPage() {
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                    style={{ colorScheme: 'dark' }}
                   >
-                    <option value="">Select your role</option>
-                    <option value="security_integrator">Security Integrator</option>
-                    <option value="enterprise_security">Enterprise Security Manager</option>
-                    <option value="consultant">Security Consultant</option>
-                    <option value="education">Education/Healthcare</option>
-                    <option value="other">Other</option>
+                    <option value="" style={{ backgroundColor: '#1a1a2e', color: '#ffffff' }}>Select your role</option>
+                    <option value="security_integrator" style={{ backgroundColor: '#1a1a2e', color: '#ffffff' }}>Security Integrator</option>
+                    <option value="enterprise_security" style={{ backgroundColor: '#1a1a2e', color: '#ffffff' }}>Enterprise Security Manager</option>
+                    <option value="consultant" style={{ backgroundColor: '#1a1a2e', color: '#ffffff' }}>Security Consultant</option>
+                    <option value="education" style={{ backgroundColor: '#1a1a2e', color: '#ffffff' }}>Education/Healthcare</option>
+                    <option value="other" style={{ backgroundColor: '#1a1a2e', color: '#ffffff' }}>Other</option>
                   </select>
                 </div>
 
@@ -160,12 +161,13 @@ export default function WaitlistPage() {
                     value={facilities}
                     onChange={(e) => setFacilities(e.target.value)}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                    style={{ colorScheme: 'dark' }}
                   >
-                    <option value="">Select range</option>
-                    <option value="1-5">1-5 facilities</option>
-                    <option value="6-25">6-25 facilities</option>
-                    <option value="26-100">26-100 facilities</option>
-                    <option value="100+">100+ facilities</option>
+                    <option value="" style={{ backgroundColor: '#1a1a2e', color: '#ffffff' }}>Select range</option>
+                    <option value="1-5" style={{ backgroundColor: '#1a1a2e', color: '#ffffff' }}>1-5 facilities</option>
+                    <option value="6-25" style={{ backgroundColor: '#1a1a2e', color: '#ffffff' }}>6-25 facilities</option>
+                    <option value="26-100" style={{ backgroundColor: '#1a1a2e', color: '#ffffff' }}>26-100 facilities</option>
+                    <option value="100+" style={{ backgroundColor: '#1a1a2e', color: '#ffffff' }}>100+ facilities</option>
                   </select>
                 </div>
 
