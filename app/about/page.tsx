@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import UnifiedNavigation from '../components/UnifiedNavigation';
+import TeamMember from '../components/TeamMember';
 
 export default function AboutPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -59,19 +60,19 @@ export default function AboutPage() {
             </h2>
             <div className="text-lg text-gray-300 leading-relaxed space-y-6">
               <p>
-                Design-Rite exists to democratize professional security design expertise through artificial intelligence. 
-                We believe that every building deserves a well-designed security system, but the traditional process 
-                is too slow, expensive, and dependent on scarce expertise.
+                Design-Rite was founded to solve one of the industry's biggest challenges: the overlooked details that can derail security projects.
+                With over two decades of low-voltage design expertise, we've seen how traditional processes leave gaps in compliance,
+                optimization, and reliability.
               </p>
               <p>
-                Our AI platform empowers security integrators, consultants, and designers to deliver professional-grade 
-                assessments and proposals in minutes instead of days. We bridge the expertise gap, making professional 
-                security design accessible to everyone.
+                Our AI platform transforms complex security requirements into clear, actionable designs. By automating compliance checks
+                and optimization processes, we ensure clients never sacrifice safety, efficiency, or reliability. From Fortune 500 companies
+                to school districts, hospitals, and critical infrastructure—every project gets the expert-level attention it deserves.
               </p>
               <p>
-                By combining cutting-edge AI with deep industry knowledge, we're not just improving existing processes—we're 
-                creating an entirely new way to approach security design that's faster, more accurate, and more accessible 
-                than ever before.
+                We're not just digitizing existing processes—we're revolutionizing how security design is approached. Our platform
+                combines deep industry knowledge with cutting-edge AI to deliver solutions that blend innovation with compliance,
+                making professional-grade security design accessible to integrators and consultants of all sizes.
               </p>
             </div>
           </div>
@@ -91,46 +92,41 @@ export default function AboutPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Founder */}
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 text-center hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6">
-                DK
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Dan Koziol</h3>
-              <p className="text-purple-600 font-semibold mb-4">Founder & CEO</p>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Visionary leader with 15+ years in security technology and AI development. 
-                Leading the revolution in automated security design.
-              </p>
-            </div>
+            <TeamMember
+              name="Dan Koziol"
+              role="Founder & Principal Designer"
+              description="Over two decades of expertise in low-voltage design, security systems, and technology integration. Trusted advisor to Fortune 500 companies, school districts, hospitals, and critical infrastructure facilities. Subject matter expert automating compliance checks and design optimization."
+              imagePath="/team/dan-koziol.jpg"
+              initials="DK"
+            />
 
-            {/* CTO */}
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 text-center hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6">
-                💻
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Engineering Team</h3>
-              <p className="text-purple-600 font-semibold mb-4">Technical Leadership</p>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                World-class AI engineers and security experts building the most advanced 
-                platform in the industry.
-              </p>
-            </div>
+            <TeamMember
+              name="Philip Lisk"
+              role="Managing Director"
+              description="Strategic leadership driving Design-Rite's growth and market expansion. Expertise in business development, operations, and scaling technology solutions in the security industry."
+              imagePath="/team/philip-lisk.jpg"
+              initials="PL"
+              href="https://philiplisk.com/"
+            />
 
-            {/* AI Team */}
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 text-center hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6">
-                🧠
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">AI Research Team</h3>
-              <p className="text-purple-600 font-semibold mb-4">Core Intelligence</p>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Advanced AI models trained on thousands of security designs, compliance standards, 
-                and industry best practices.
-              </p>
-            </div>
+            <TeamMember
+              name="Munnyman Communications"
+              role="Development Team"
+              description="Expert development team bringing Design-Rite's vision to life. Specializing in AI platforms, modern web technologies, and scalable solutions that deliver powerful word-of-mouth results."
+              imagePath="/team/munnyman-communications.jpg"
+              initials="MC"
+              href="https://mmcommunications-newsletter-elitemembers.beehiiv.com/p/powerful-word-of-mouth-real-results"
+            />
 
-            {/* Join Us */}
+            <TeamMember
+              name="AI Research Team"
+              role="Core Intelligence"
+              description="Advanced AI models trained on thousands of security designs, compliance standards, and industry best practices."
+              imagePath="/team/ai-research.jpg"
+              initials="🧠"
+            />
+
+            {/* Join Us - Special Card */}
             <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 text-center hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
               <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6">
                 +
@@ -138,10 +134,10 @@ export default function AboutPage() {
               <h3 className="text-xl font-bold text-white mb-2">Join Our Team</h3>
               <p className="text-purple-600 font-semibold mb-4">We're Hiring</p>
               <p className="text-gray-400 text-sm leading-relaxed mb-6">
-                Help us build the future of security design. We're looking for passionate 
+                Help us build the future of security design. We're looking for passionate
                 engineers and industry experts.
               </p>
-              <Link 
+              <Link
                 href="/careers"
                 className="inline-block bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all text-sm"
               >
