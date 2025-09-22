@@ -16,7 +16,7 @@ export default function ConsultantsPage() {
       {/* Top Announcement Bar */}
       <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
         <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
-          <span className="text-base">??</span>
+          <span className="text-base">🤝</span>
           <span className="flex-1 text-center">
             Security Consultants: Elevate your advisory services with AI-powered tools
           </span>
@@ -55,13 +55,13 @@ export default function ConsultantsPage() {
               href="/waitlist"
               className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg inline-block text-center"
             >
-              ?? Partner With Design-Rite
+              🤝 Partner With Design-Rite
             </Link>
             <Link
               href="/contact"
               className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block text-center"
             >
-              ?? Schedule Consultation
+              📅 Schedule Consultation
             </Link>
           </div>
         </section>
@@ -69,7 +69,7 @@ export default function ConsultantsPage() {
         {/* Consultant Benefits Grid */}
         <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 max-w-6xl mx-auto">
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">??</div>
+            <div className="text-4xl mb-4">🎯</div>
             <h3 className="text-xl font-bold text-white mb-4">Expert Assessments</h3>
             <p className="text-gray-300">
               Generate comprehensive security assessments backed by AI analysis and 
@@ -78,7 +78,7 @@ export default function ConsultantsPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">???</div>
+            <div className="text-4xl mb-4">📋</div>
             <h3 className="text-xl font-bold text-white mb-4">White-Label Platform</h3>
             <p className="text-gray-300">
               Brand our entire platform as your own, offering clients cutting-edge 
@@ -87,7 +87,7 @@ export default function ConsultantsPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">??</div>
+            <div className="text-4xl mb-4">📄</div>
             <h3 className="text-xl font-bold text-white mb-4">Compliance Reports</h3>
             <p className="text-gray-300">
               Automatically generate compliance documentation for various standards 
@@ -96,7 +96,7 @@ export default function ConsultantsPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">??</div>
+            <div className="text-4xl mb-4">💡</div>
             <h3 className="text-xl font-bold text-white mb-4">Strategic Insights</h3>
             <p className="text-gray-300">
               Leverage AI-powered analytics to provide data-driven recommendations 
@@ -105,7 +105,7 @@ export default function ConsultantsPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">??</div>
+            <div className="text-4xl mb-4">🚀</div>
             <h3 className="text-xl font-bold text-white mb-4">Scale Your Practice</h3>
             <p className="text-gray-300">
               Handle more clients efficiently with automated workflows and 
@@ -114,7 +114,7 @@ export default function ConsultantsPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">??</div>
+            <div className="text-4xl mb-4">🎆</div>
             <h3 className="text-xl font-bold text-white mb-4">Partner Support</h3>
             <p className="text-gray-300">
               Dedicated consultant success team, training resources, and 
@@ -229,13 +229,13 @@ export default function ConsultantsPage() {
               href="/waitlist"
               className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg inline-block text-center"
             >
-              ?? Apply for Partnership
+              🤝 Apply for Partnership
             </Link>
             <Link
               href="/contact"
               className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block text-center"
             >
-              ?? Schedule Consultation
+              📅 Schedule Consultation
             </Link>
           </div>
         </section>

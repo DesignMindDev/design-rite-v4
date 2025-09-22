@@ -4,13 +4,27 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import UnifiedNavigation from '../components/UnifiedNavigation';
+import EmailGate from '../components/EmailGate';
+import { useAuthCache } from '../hooks/useAuthCache';
 
 export default function EducationPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [showEmailGate, setShowEmailGate] = useState(false)
   const router = useRouter()
+  const { isAuthenticated, extendSession } = useAuthCache()
 
-  const redirectToApp = () => {
-    router.push('/app')
+  const handleStartAssessment = () => {
+    if (isAuthenticated) {
+      extendSession()
+      router.push('/ai-assessment')
+    } else {
+      setShowEmailGate(true)
+    }
+  }
+
+  const handleEmailGateSuccess = () => {
+    setShowEmailGate(false)
+    router.push('/ai-assessment')
   }
 
   return (
@@ -295,7 +309,7 @@ export default function EducationPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={redirectToApp}
+                onClick={handleStartAssessment}
                 className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-blue-600/40 transition-all"
               >
                 Start Education Assessment
@@ -366,6 +380,12 @@ export default function EducationPage() {
           </div>
         </div>
       </footer>
+
+      <EmailGate
+        isOpen={showEmailGate}
+        onClose={() => setShowEmailGate(false)}
+        onSuccess={handleEmailGateSuccess}
+      />
     </div>
   )
 }
