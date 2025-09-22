@@ -324,7 +324,7 @@ const IntegratorDiscoveryAssistant = () => {
           <div className="lg:col-span-2">
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl overflow-hidden">
               {/* Messages */}
-              <div className="h-96 overflow-y-auto p-4 space-y-4">
+              <div className="h-[600px] overflow-y-auto p-4 space-y-4">
                 {messages.map((message, index) => (
                   <div key={index} className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-3xl p-4 rounded-xl ${
