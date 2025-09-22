@@ -26,14 +26,14 @@ export default function UnifiedNavigation() {
 
         {/* Desktop Navigation */}
         <ul className="hidden lg:flex items-center gap-10">
-          
+
           {/* Platform Dropdown */}
           <li className="relative group">
             <span className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
               Platform
             </span>
             <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
-              
+
               <Link href="/ai-assessment" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🧠
@@ -43,7 +43,7 @@ export default function UnifiedNavigation() {
                   <div className="text-xs text-gray-400 leading-tight">Intelligent discovery consultation</div>
                 </div>
               </Link>
-              
+
               <Link href="/compliance-analyst" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   ✅
@@ -75,14 +75,14 @@ export default function UnifiedNavigation() {
               </Link>
             </div>
           </li>
-          
+
           {/* Solutions Dropdown */}
           <li className="relative group">
             <span className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
               Solutions
             </span>
             <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
-              
+
               <Link href="/integrators" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🔧
@@ -92,7 +92,7 @@ export default function UnifiedNavigation() {
                   <div className="text-xs text-gray-400 leading-tight">Design & proposal automation</div>
                 </div>
               </Link>
-              
+
               <Link href="/enterprise" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🏢
@@ -102,17 +102,27 @@ export default function UnifiedNavigation() {
                   <div className="text-xs text-gray-400 leading-tight">In-house team solutions</div>
                 </div>
               </Link>
-              
+
               <Link href="/education" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🎓
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">Education & Healthcare</div>
-                  <div className="text-xs text-gray-400 leading-tight">FERPA/HIPAA compliant security</div>
+                  <div className="font-semibold text-sm text-white mb-1">Education</div>
+                  <div className="text-xs text-gray-400 leading-tight">FERPA compliant school security</div>
                 </div>
               </Link>
-              
+
+              <Link href="/healthcare" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                  🏥
+                </div>
+                <div>
+                  <div className="font-semibold text-sm text-white mb-1">Healthcare</div>
+                  <div className="text-xs text-gray-400 leading-tight">HIPAA compliant medical security</div>
+                </div>
+              </Link>
+
               <Link href="/consultants" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
                 <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   💼
@@ -145,7 +155,7 @@ export default function UnifiedNavigation() {
               Company
             </span>
             <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[220px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
-              
+
               <Link href="/about" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   ℹ️
@@ -155,7 +165,7 @@ export default function UnifiedNavigation() {
                   <div className="text-xs text-gray-400 leading-tight">Our mission & vision</div>
                 </div>
               </Link>
-              
+
               <Link href="/careers" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   💼
@@ -164,7 +174,7 @@ export default function UnifiedNavigation() {
                   <div className="font-semibold text-sm text-white mb-1">Careers</div>
                   <div className="text-xs text-gray-400 leading-tight">Join our team</div>
                 </div>
-              </Link>                          
+              </Link>
               <Link href="/contact" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
                 <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   📧
@@ -178,15 +188,15 @@ export default function UnifiedNavigation() {
           </li>
         </ul>
 
-        {/* Right Side Actions - EXACT Homepage Match */}
+        {/* Right Side Actions */}
         <div className="hidden lg:flex items-center gap-4">
-          <button 
+          <button
             onClick={redirectToWaitlist}
             className="bg-white/10 text-white px-4 py-2 rounded-lg font-semibold border border-white/20 hover:bg-white/20 transition-all"
           >
             Try It Free
           </button>
-          <button 
+          <button
             onClick={redirectToWaitlist}
             className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition-all"
           >
@@ -195,7 +205,7 @@ export default function UnifiedNavigation() {
         </div>
 
         {/* Mobile Menu Button */}
-        <button 
+        <button
           className="lg:hidden text-white text-2xl p-2"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
@@ -207,7 +217,7 @@ export default function UnifiedNavigation() {
       {isMenuOpen && (
         <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
           <div className="px-6 py-4 space-y-4">
-            
+
             {/* Platform Section */}
             <div>
               <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Platform</div>
@@ -216,16 +226,17 @@ export default function UnifiedNavigation() {
               <Link href="/professional-proposals" className="block text-white/80 hover:text-white py-2 pl-4">📋 Proposal Generator</Link>
               <Link href="/white-label" className="block text-white/80 hover:text-white py-2 pl-4">🏷️ White Label Solutions</Link>
             </div>
-            
+
             {/* Solutions Section */}
             <div className="border-t border-white/10 pt-2">
               <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Solutions</div>
               <Link href="/integrators" className="block text-white/80 hover:text-white py-2 pl-4">🔧 Security Integrators</Link>
               <Link href="/enterprise" className="block text-white/80 hover:text-white py-2 pl-4">🏢 Enterprise Security</Link>
-              <Link href="/education" className="block text-white/80 hover:text-white py-2 pl-4">🎓 Education & Healthcare</Link>
+              <Link href="/education" className="block text-white/80 hover:text-white py-2 pl-4">🎓 Education</Link>
+              <Link href="/healthcare" className="block text-white/80 hover:text-white py-2 pl-4">🏥 Healthcare</Link>
               <Link href="/consultants" className="block text-white/80 hover:text-white py-2 pl-4">💼 Security Consultants</Link>
             </div>
-            
+
             {/* Pricing Link */}
             <Link href="/pricing" className="block text-white/80 hover:text-white py-2 border-t border-white/10 pt-2">💰 Pricing</Link>
 
@@ -240,7 +251,7 @@ export default function UnifiedNavigation() {
               <Link href="/support" className="block text-white/80 hover:text-white py-2 pl-4">❓ Support</Link>
               <Link href="/contact" className="block text-white/80 hover:text-white py-2 pl-4">📧 Contact</Link>
             </div>
-            
+
             {/* Sign In and CTA */}
             <div className="pt-4 border-t border-white/10">
               <Link href="/login" className="block text-white/80 hover:text-white py-2">👤 Sign In</Link>
@@ -254,6 +265,3 @@ export default function UnifiedNavigation() {
     </header>
   );
 }
-
-
-
