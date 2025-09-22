@@ -25,6 +25,7 @@ const IntegratorDiscoveryAssistant = () => {
   const [ndaAccepted, setNdaAccepted] = useState(false);
   const [showNdaModal, setShowNdaModal] = useState(false);
   const [userEmail, setUserEmail] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [selectedScenario, setSelectedScenario] = useState('');
   const [sessionData, setSessionData] = useState({
     sessionId: Date.now().toString(),
@@ -96,6 +97,31 @@ const IntegratorDiscoveryAssistant = () => {
       ]);
     } catch (error) {
       console.error('Failed to log interaction:', error);
+    }
+  };
+
+  // Log NDA acceptances to dedicated table
+  const logNDAAcceptance = async (email, companyInfo = null) => {
+    try {
+      await supabase.from('nda_acceptances').insert([
+        {
+          session_id: sessionData.sessionId,
+          user_email: email,
+          acceptance_timestamp: new Date().toISOString(),
+          scenario_context: selectedScenario,
+          facility_type: sessionData.facilityType,
+          qualification_score: sessionData.qualificationScore,
+          user_interactions_count: sessionData.userInteractions,
+          session_duration_minutes: Math.round((new Date() - sessionData.startTime) / 60000),
+          ip_address: null, // Can be populated server-side if needed
+          user_agent: navigator.userAgent,
+          company_info: companyInfo,
+          nda_version: '1.0',
+          acceptance_method: 'web_form'
+        }
+      ]);
+    } catch (error) {
+      console.error('Failed to log NDA acceptance:', error);
     }
   };
 
@@ -551,6 +577,19 @@ const IntegratorDiscoveryAssistant = () => {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Company Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        placeholder="Your Company Name"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Email Address *
                       </label>
                       <input
@@ -595,19 +634,28 @@ const IntegratorDiscoveryAssistant = () => {
                   </button>
                   <button
                     onClick={async () => {
-                      if (userEmail && ndaAccepted) {
+                      if (userEmail && companyName && ndaAccepted) {
+                        // Log to dedicated NDA table
+                        await logNDAAcceptance(userEmail, {
+                          company_name: companyName,
+                          request_type: 'enterprise_demo'
+                        });
+
+                        // Also log as interaction
                         await logInteraction({
                           type: 'nda_accepted',
-                          content: `User ${userEmail} accepted NDA and requested enterprise access`
+                          content: `User ${userEmail} from ${companyName} accepted NDA and requested enterprise access`
                         });
+
+                        setNdaAccepted(true);
                         setShowNdaModal(false);
                         alert('Thank you! Our team will contact you within 24 hours to schedule your personalized enterprise demo.');
                       }
                     }}
-                    disabled={!userEmail || !ndaAccepted}
+                    disabled={!userEmail || !companyName || !ndaAccepted}
                     className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Request Enterprise Access
+                    Accept NDA & Request Enterprise Access
                   </button>
                 </div>
               </div>
