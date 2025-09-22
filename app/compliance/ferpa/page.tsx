@@ -3,9 +3,126 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import UnifiedNavigation from '../../components/UnifiedNavigation';
+import EmailGate from '../../components/EmailGate';
+import { useAuthCache } from '../../hooks/useAuthCache';
 
 export default function FERPACompliance() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [showEmailGate, setShowEmailGate] = useState(false);
+  const { isAuthenticated, extendSession } = useAuthCache();
+
+  const handleStartAssessment = () => {
+    if (isAuthenticated) {
+      extendSession();
+      window.location.href = '/ai-assessment';
+    } else {
+      setShowEmailGate(true);
+    }
+  };
+
+  const handleEmailGateSuccess = () => {
+    setShowEmailGate(false);
+    window.location.href = '/ai-assessment';
+  };
+
+  const handleDownloadChecklist = () => {
+    // Create a simple checklist content
+    const checklistContent = `FERPA COMPLIANCE CHECKLIST
+
+Educational Institution Security Compliance
+
+✓ STUDENT RECORDS PROTECTION
+  ○ Educational records encryption in place
+  ○ Access control systems implemented
+  ○ Audit trail logging enabled
+  ○ Data classification completed
+
+✓ DIRECTORY INFORMATION MANAGEMENT
+  ○ Consent management system active
+  ○ Opt-out procedures documented
+  ○ Public information controls set
+  ○ Parent notification process established
+
+✓ THIRD-PARTY DISCLOSURE
+  ○ Vendor agreements reviewed
+  ○ Data sharing protocols defined
+  ○ Legitimate interest documentation complete
+  ○ Emergency disclosure procedures ready
+
+✓ CAMPUS SECURITY INTEGRATION
+  ○ Emergency response systems tested
+  ○ Visitor management system operational
+  ○ Physical access controls verified
+  ○ Incident reporting process active
+
+Design-Rite AI Assessment Platform
+© 2025 Design-Rite. All rights reserved.`;
+
+    const blob = new Blob([checklistContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'FERPA-Compliance-Checklist.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadGuide = () => {
+    // Create a simple guide content
+    const guideContent = `FERPA COMPLIANCE GUIDE
+
+Family Educational Rights and Privacy Act (FERPA) Security Requirements
+
+OVERVIEW
+FERPA protects the privacy of student education records and applies to all schools that receive funds under an applicable program of the U.S. Department of Education.
+
+KEY REQUIREMENTS:
+
+1. STUDENT RECORDS PROTECTION
+   - Implement strong encryption for all educational records
+   - Deploy multi-factor authentication for system access
+   - Maintain comprehensive audit logs of all data access
+   - Classify data according to sensitivity levels
+
+2. ACCESS CONTROLS
+   - Role-based access control (RBAC) implementation
+   - Regular access reviews and certifications
+   - Automated provisioning and deprovisioning
+   - Emergency access procedures
+
+3. PHYSICAL SECURITY
+   - Secure storage for physical records
+   - Controlled access to server rooms and data centers
+   - Visitor management and badge systems
+   - Environmental monitoring and controls
+
+4. INCIDENT RESPONSE
+   - Documented breach notification procedures
+   - Privacy incident response team
+   - Regular security awareness training
+   - Vendor security assessment protocols
+
+IMPLEMENTATION STEPS:
+1. Conduct comprehensive data inventory
+2. Implement technical safeguards
+3. Establish administrative procedures
+4. Deploy physical security controls
+5. Create monitoring and auditing processes
+6. Develop incident response capabilities
+
+For more detailed guidance, contact Design-Rite's compliance experts.
+
+Design-Rite AI Assessment Platform
+© 2025 Design-Rite. All rights reserved.`;
+
+    const blob = new Blob([guideContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'FERPA-Compliance-Guide.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const ferpaRequirements = [
     { category: 'Student Records Protection', items: ['Educational records encryption', 'Access control systems', 'Audit trail logging', 'Data classification'], status: 'critical' },
@@ -74,10 +191,16 @@ export default function FERPACompliance() {
             Navigate the Family Educational Rights and Privacy Act with confidence. Our comprehensive security solutions ensure student privacy protection while maintaining operational efficiency.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-xl transition-all hover:scale-105">
+            <button
+              onClick={handleStartAssessment}
+              className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-xl transition-all hover:scale-105"
+            >
               Start FERPA Assessment
             </button>
-            <button className="border border-purple-600 text-purple-400 px-8 py-4 rounded-lg font-semibold hover:bg-purple-600/10 transition-all">
+            <button
+              onClick={handleDownloadChecklist}
+              className="border border-purple-600 text-purple-400 px-8 py-4 rounded-lg font-semibold hover:bg-purple-600/10 transition-all"
+            >
               Download Compliance Checklist
             </button>
           </div>
@@ -470,13 +593,22 @@ export default function FERPACompliance() {
               <button className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-xl transition-all">
                 Schedule FERPA Consultation
               </button>
-              <button className="border border-purple-600 text-purple-400 px-8 py-4 rounded-lg font-semibold hover:bg-purple-600/10 transition-all">
+              <button
+                onClick={handleDownloadGuide}
+                className="border border-purple-600 text-purple-400 px-8 py-4 rounded-lg font-semibold hover:bg-purple-600/10 transition-all"
+              >
                 Download FERPA Guide
               </button>
             </div>
           </div>
         </section>
       </main>
+
+      <EmailGate
+        isOpen={showEmailGate}
+        onClose={() => setShowEmailGate(false)}
+        onSuccess={handleEmailGateSuccess}
+      />
     </div>
   );
 }

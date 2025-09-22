@@ -3,9 +3,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import UnifiedNavigation from '../../components/UnifiedNavigation';
+import EmailGate from '../../components/EmailGate';
+import { useAuthCache } from '../../hooks/useAuthCache';
 
 export default function HIPAACompliance() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [showEmailGate, setShowEmailGate] = useState(false);
+  const { isAuthenticated, extendSession } = useAuthCache();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
@@ -43,10 +47,110 @@ export default function HIPAACompliance() {
             Protect patient health information with comprehensive HIPAA compliance solutions. Secure your healthcare facility while maintaining operational excellence and patient trust.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-xl transition-all hover:scale-105">
+            <button
+              onClick={() => {
+                if (isAuthenticated) {
+                  extendSession();
+                  window.location.href = '/ai-assessment';
+                } else {
+                  setShowEmailGate(true);
+                }
+              }}
+              className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-xl transition-all hover:scale-105"
+            >
               Start HIPAA Assessment
             </button>
-            <button className="border border-blue-600 text-blue-400 px-8 py-4 rounded-lg font-semibold hover:bg-blue-600/10 transition-all">
+            <button
+              onClick={() => {
+                const securityGuideContent = `HIPAA SECURITY GUIDE
+=====================
+
+Comprehensive Physical Security Controls for Healthcare Facilities
+
+1. FACILITY ACCESS CONTROLS (§164.310(a)(1))
+   - Implement badge-based access control systems
+   - Establish visitor management procedures
+   - Create secure areas for PHI storage
+   - Install security cameras in appropriate areas
+   - Maintain access logs for audit purposes
+
+2. WORKSTATION SECURITY (§164.310(b))
+   - Configure workstations for specific functions
+   - Implement automatic screen locks
+   - Position monitors away from public view
+   - Use privacy screens where necessary
+   - Establish clean desk policies
+
+3. DEVICE AND MEDIA CONTROLS (§164.310(d))
+   - Track all devices containing PHI
+   - Implement secure disposal procedures
+   - Use encryption for portable devices
+   - Control media reuse and disposal
+   - Document hardware movements
+
+4. ADMINISTRATIVE SAFEGUARDS
+   - Designate HIPAA Security Officer
+   - Conduct workforce training programs
+   - Implement information access management
+   - Establish security incident procedures
+   - Create contingency plans
+
+5. TECHNICAL SAFEGUARDS
+   - Implement unique user identification
+   - Set up automatic logoff procedures
+   - Deploy audit controls and monitoring
+   - Ensure data integrity controls
+   - Use transmission security measures
+
+6. RISK ASSESSMENT PROCEDURES
+   - Identify potential threats and vulnerabilities
+   - Assess likelihood and impact of threats
+   - Document existing security measures
+   - Determine risk levels and priorities
+   - Develop mitigation strategies
+
+7. BUSINESS ASSOCIATE AGREEMENTS
+   - Identify all business associates
+   - Execute proper BAA contracts
+   - Monitor vendor compliance
+   - Conduct periodic reviews
+   - Document relationships
+
+8. BREACH NOTIFICATION REQUIREMENTS
+   - Establish breach identification procedures
+   - Implement 60-day notification timeline
+   - Create patient notification templates
+   - Document breach assessment processes
+   - Maintain breach logs
+
+9. EMPLOYEE TRAINING MODULES
+   - HIPAA privacy fundamentals
+   - Physical security procedures
+   - Workstation security practices
+   - Incident reporting procedures
+   - Password and access management
+
+10. COMPLIANCE MONITORING
+    - Regular security assessments
+    - Policy and procedure reviews
+    - Audit log monitoring
+    - Vulnerability scanning
+    - Penetration testing
+
+For detailed implementation guidance, consult with qualified HIPAA compliance experts.
+
+© 2025 Design-Rite Security Solutions. All rights reserved.`;
+
+                const blob = new Blob([securityGuideContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'HIPAA-Security-Guide.txt';
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+              className="border border-blue-600 text-blue-400 px-8 py-4 rounded-lg font-semibold hover:bg-blue-600/10 transition-all"
+            >
               Download Security Guide
             </button>
           </div>
@@ -443,16 +547,157 @@ export default function HIPAACompliance() {
               Protect patient information, avoid costly penalties, and maintain trust with comprehensive HIPAA compliance solutions designed for healthcare environments.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-xl transition-all">
+              <button
+                onClick={() => {
+                  if (isAuthenticated) {
+                    extendSession();
+                    window.location.href = '/contact';
+                  } else {
+                    setShowEmailGate(true);
+                  }
+                }}
+                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-xl transition-all"
+              >
                 Schedule HIPAA Consultation
               </button>
-              <button className="border border-blue-600 text-blue-400 px-8 py-4 rounded-lg font-semibold hover:bg-blue-600/10 transition-all">
-                Download Implementation Guide
-              </button>
+              <button
+                onClick={() => {
+                  const implementationGuideContent = `HIPAA IMPLEMENTATION GUIDE
+==========================
+
+Step-by-Step Implementation Plan for Healthcare Organizations
+
+PHASE 1: FOUNDATION (Weeks 1-4)
+
+1. LEADERSHIP COMMITMENT
+   - Executive sponsorship and support
+   - Budget allocation for HIPAA compliance
+   - Appointment of HIPAA Security Officer
+   - Formation of compliance team
+
+2. INITIAL RISK ASSESSMENT
+   - Inventory all systems handling PHI
+   - Identify current security measures
+   - Document gaps and vulnerabilities
+   - Prioritize remediation efforts
+
+3. POLICY DEVELOPMENT
+   - Create HIPAA privacy policies
+   - Develop security procedures
+   - Establish incident response plans
+   - Draft employee handbooks
+
+PHASE 2: TECHNICAL IMPLEMENTATION (Weeks 5-12)
+
+4. ACCESS CONTROLS
+   - Implement unique user IDs
+   - Deploy role-based access
+   - Set up automatic logoff
+   - Configure password policies
+
+5. AUDIT SYSTEMS
+   - Deploy logging mechanisms
+   - Set up monitoring tools
+   - Create audit procedures
+   - Establish review schedules
+
+6. ENCRYPTION AND TRANSMISSION
+   - Encrypt data at rest
+   - Secure data in transit
+   - Implement VPN solutions
+   - Deploy secure email systems
+
+7. PHYSICAL SECURITY
+   - Install access control systems
+   - Deploy surveillance cameras
+   - Secure workstation areas
+   - Implement device tracking
+
+PHASE 3: ADMINISTRATIVE CONTROLS (Weeks 13-16)
+
+8. WORKFORCE TRAINING
+   - Conduct HIPAA awareness sessions
+   - Provide role-specific training
+   - Create training documentation
+   - Implement testing procedures
+
+9. BUSINESS ASSOCIATE MANAGEMENT
+   - Identify all business associates
+   - Execute BAA agreements
+   - Monitor vendor compliance
+   - Establish review procedures
+
+10. INCIDENT RESPONSE
+    - Create incident response team
+    - Develop escalation procedures
+    - Establish notification processes
+    - Create documentation templates
+
+PHASE 4: ONGOING COMPLIANCE (Weeks 17+)
+
+11. CONTINUOUS MONITORING
+    - Regular risk assessments
+    - Periodic security audits
+    - Policy reviews and updates
+    - Training refreshers
+
+12. DOCUMENTATION AND REPORTING
+    - Maintain compliance records
+    - Generate audit reports
+    - Track remediation efforts
+    - Document lessons learned
+
+13. BREACH PREPAREDNESS
+    - Regular breach response drills
+    - Update notification procedures
+    - Review insurance coverage
+    - Maintain legal relationships
+
+KEY MILESTONES:
+- Week 4: Complete initial assessment
+- Week 8: Deploy technical controls
+- Week 12: Complete physical security
+- Week 16: Finish training programs
+- Week 20: Achieve full compliance
+
+SUCCESS METRICS:
+- Zero security incidents
+- 100% staff training completion
+- Successful audit outcomes
+- Reduced compliance costs
+- Improved patient trust
+
+For customized implementation support, contact our HIPAA compliance experts.
+
+© 2025 Design-Rite Security Solutions. All rights reserved.`;
+
+                const blob = new Blob([implementationGuideContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'HIPAA-Implementation-Guide.txt';
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+              className="border border-blue-600 text-blue-400 px-8 py-4 rounded-lg font-semibold hover:bg-blue-600/10 transition-all"
+            >
+              Download Implementation Guide
+            </button>
             </div>
           </div>
         </section>
       </main>
+
+      {/* Email Gate Modal */}
+      {showEmailGate && (
+        <EmailGate
+          onClose={() => setShowEmailGate(false)}
+          onSuccess={() => {
+            setShowEmailGate(false);
+            // The useAuthCache hook will handle the authentication state
+          }}
+        />
+      )}
     </div>
   );
 }

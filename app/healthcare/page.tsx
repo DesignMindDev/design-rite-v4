@@ -329,8 +329,8 @@ export default function HealthcarePage() {
             <div>© 2025 Design-Rite. All rights reserved.</div>
             <div className="flex gap-4 mt-4 md:mt-0">
               <Link href="mailto:hello@design-rite.com" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">📧</Link>
-              <Link href="/linkedin" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">💼</Link>
-              <Link href="/twitter" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">🐦</Link>
+              <a href="https://linkedin.com/company/design-rite" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">💼</a>
+              <a href="https://twitter.com/designrite" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">🐦</a>
             </div>
           </div>
         </div>
