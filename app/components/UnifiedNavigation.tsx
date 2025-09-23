@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import EmailGate from './EmailGate';
@@ -14,11 +14,17 @@ interface SiteSettings {
 export default function UnifiedNavigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEmailGate, setShowEmailGate] = useState(false);
+  const [showAnnouncement, setShowAnnouncement] = useState(true);
   const [settings, setSettings] = useState<SiteSettings>({ logoPath: '', footerLogoPath: '' });
   const { isAuthenticated, extendSession } = useAuthCache();
 
   useEffect(() => {
     loadSettings()
+    // Load announcement state from localStorage
+    const announcementClosed = localStorage.getItem('announcementClosed');
+    if (announcementClosed === 'true') {
+      setShowAnnouncement(false);
+    }
   }, [])
 
   const loadSettings = async () => {
@@ -54,10 +60,16 @@ export default function UnifiedNavigation() {
     window.location.href = '/waitlist';
   };
 
+  const closeAnnouncement = () => {
+    setShowAnnouncement(false);
+    localStorage.setItem('announcementClosed', 'true');
+  };
+
   return (
-    <>
+    <React.Fragment>
       {/* Top Announcement Bar */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
+      {showAnnouncement && (
+        <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
         <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
           <span className="text-base">🎓</span>
           <span className="flex-1 text-center">
@@ -69,11 +81,16 @@ export default function UnifiedNavigation() {
           >
             Join Waitlist
           </Link>
-          <button className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">
+          <button
+            onClick={closeAnnouncement}
+            className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center hover:bg-white/10 rounded-full"
+            aria-label="Close announcement"
+          >
             ×
           </button>
         </div>
       </div>
+      )}
 
       {/* Utility Bar */}
       <div className="bg-black/90 border-b border-purple-600/10 py-2 text-xs">
@@ -414,6 +431,6 @@ export default function UnifiedNavigation() {
         onClose={() => setShowEmailGate(false)}
         onSuccess={handleEmailGateSuccess}
       />
-    </>
+    </React.Fragment>
   );
 }

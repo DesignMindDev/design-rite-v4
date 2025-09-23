@@ -14,38 +14,6 @@ export default function SecurityIntegratorsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
-      {/* Top Announcement Bar */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
-        <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
-          <span className="text-base">??</span>
-          <span className="flex-1 text-center">
-            Transform your design process with AI - Complete assessments in minutes, not days
-          </span>
-          <Link 
-            href="/contact"
-            className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30"
-          >
-            Get Started
-          </Link>
-          <button className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">
-            ×
-          </button>
-        </div>
-      </div>
-
-{/* Utility Bar */}
-<div className="bg-black/90 border-b border-purple-600/10 py-2 text-xs">
-  <div className="max-w-6xl mx-auto px-8 flex justify-end items-center gap-8">
-    <Link href="/login" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
-      <span>??</span> Login
-    </Link>
-    <Link href="/contact" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
-      <span>??</span> Contact Us
-    </Link>
-  </div>
-</div>
-
-{/* Main Navigation Header */}
 <UnifiedNavigation />
 
 

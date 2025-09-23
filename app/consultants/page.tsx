@@ -13,26 +13,6 @@ export default function ConsultantsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
-      {/* Top Announcement Bar */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
-        <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
-          <span className="text-base">🤝</span>
-          <span className="flex-1 text-center">
-            Security Consultants: Elevate your advisory services with AI-powered tools
-          </span>
-          <Link
-            href="/contact"
-            className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30"
-          >
-            Partner With Us
-          </Link>
-          <button className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">
-            ×
-          </button>
-        </div>
-      </div>
-
-
       {/* Main Navigation Header */}
 <UnifiedNavigation />
 
