@@ -67,6 +67,12 @@ const nextConfig = {
         destination: '/professional-proposals',
         permanent: false,
       },
+      // Ensure waitlist goes to waitlist (not subscribe)
+      {
+        source: '/join',
+        destination: '/waitlist',
+        permanent: false,
+      },
     ]
   },
   // Don't interfere with Next.js routes - let them work normally

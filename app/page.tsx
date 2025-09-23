@@ -27,18 +27,18 @@ export default function HomePage() {
             <div className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-bold text-base tracking-widest uppercase mb-4">
               AI-Powered Security Design
             </div>
-            <h1 className="text-5xl lg:text-6xl font-black leading-tight mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            <h1 className="text-5xl lg:text-6xl font-black leading-tight mb-8 pb-2 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
               Design right, with AI insight
             </h1>
             <p className="text-xl text-gray-400 mb-10 leading-relaxed">
               Revolutionary AI platform that transforms security system design. Generate comprehensive assessments, detailed proposals, and professional documentation in minutes, not days.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <button 
+              <button
                 onClick={redirectToWaitlist}
                 className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl transition-all"
               >
-                Join Waitlist - Q4 2025
+                Join Waitlist - Free Early Access
               </button>
               <button 
                 onClick={scheduleDemo}
@@ -95,7 +95,7 @@ export default function HomePage() {
       {/* Features Section */}
       <section className="py-24 bg-black/50">
         <div className="max-w-6xl mx-auto px-8 text-center">
-          <h2 className="text-4xl lg:text-5xl font-black mb-4 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">
+          <h2 className="text-4xl lg:text-5xl font-black mb-6 pb-2 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">
             Intelligent Security Design Platform
           </h2>
           <p className="text-xl text-gray-400 mb-16 max-w-2xl mx-auto">

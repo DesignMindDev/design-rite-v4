@@ -99,7 +99,7 @@ export default function WaitlistPage() {
             <div className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-bold text-base tracking-widest uppercase mb-4">
               Coming Soon
             </div>
-            <h1 className="text-5xl lg:text-6xl font-black leading-tight mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            <h1 className="text-5xl lg:text-6xl font-black leading-tight mb-8 pb-2 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
               The AI Revolution in Security Design
             </h1>
             <p className="text-xl text-gray-400 leading-relaxed mb-8 max-w-3xl mx-auto">
