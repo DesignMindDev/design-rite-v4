@@ -97,7 +97,7 @@ export default function UnifiedNavigation() {
       <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b border-purple-600/20 py-4">
       <nav className="max-w-6xl mx-auto px-8 flex justify-between items-center">
         <Link href="/" className="flex items-center">
-          {settings.logoPath ? (
+          {settings.logoPath && (
             <Image
               src={settings.logoPath}
               alt="Design-Rite - AI-Powered Security Design Platform"
@@ -106,13 +106,6 @@ export default function UnifiedNavigation() {
               className="h-20 w-auto hover:opacity-90 transition-opacity"
               priority
             />
-          ) : (
-            <div className="flex items-center gap-3 text-white font-black text-2xl">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-3xl">
-                DR
-              </div>
-              Design-Rite
-            </div>
           )}
         </Link>
 
