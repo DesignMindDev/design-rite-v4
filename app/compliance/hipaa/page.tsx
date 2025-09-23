@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import UnifiedNavigation from '../../components/UnifiedNavigation';
 import EmailGate from '../../components/EmailGate';
 import { useAuthCache } from '../../hooks/useAuthCache';
@@ -9,6 +10,7 @@ import { useAuthCache } from '../../hooks/useAuthCache';
 export default function HIPAACompliance() {
   const [activeTab, setActiveTab] = useState('overview');
   const [showEmailGate, setShowEmailGate] = useState(false);
+  const router = useRouter();
   const { isAuthenticated, extendSession } = useAuthCache();
 
   return (
@@ -32,7 +34,7 @@ export default function HIPAACompliance() {
               onClick={() => {
                 if (isAuthenticated) {
                   extendSession();
-                  window.location.href = '/ai-assessment';
+                  router.push('/ai-assessment');
                 } else {
                   setShowEmailGate(true);
                 }
@@ -532,7 +534,7 @@ For detailed implementation guidance, consult with qualified HIPAA compliance ex
                 onClick={() => {
                   if (isAuthenticated) {
                     extendSession();
-                    window.location.href = '/contact';
+                    router.push('/contact');
                   } else {
                     setShowEmailGate(true);
                   }
