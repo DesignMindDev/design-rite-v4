@@ -1,13 +1,26 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
+
+// Only create Supabase client if environment variables are available
+let supabase: any = null
+if (supabaseUrl && supabaseServiceKey) {
+  supabase = createClient(supabaseUrl, supabaseServiceKey)
+}
 
 // GET - Harvester dashboard data
 export async function GET(request: Request) {
   try {
+    // Check if Supabase is configured
+    if (!supabase) {
+      return NextResponse.json({
+        error: 'Database not configured',
+        message: 'Supabase environment variables are missing'
+      }, { status: 500 })
+    }
+
     const { searchParams } = new URL(request.url)
     const view = searchParams.get('view') || 'overview'
 
@@ -273,6 +286,14 @@ async function getHarvestStatus() {
 // POST - Trigger harvest operations
 export async function POST(request: Request) {
   try {
+    // Check if Supabase is configured
+    if (!supabase) {
+      return NextResponse.json({
+        error: 'Database not configured',
+        message: 'Supabase environment variables are missing'
+      }, { status: 500 })
+    }
+
     const body = await request.json()
     const { action, manufacturer } = body
 
