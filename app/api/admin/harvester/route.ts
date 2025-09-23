@@ -37,6 +37,10 @@ export async function GET(request: Request) {
         return await getRedditData(searchParams)
       case 'youtube':
         return await getYouTubeData(searchParams)
+      case 'manufacturers':
+        return await getManufacturersData(searchParams)
+      case 'publications':
+        return await getPublicationsData(searchParams)
       default:
         return NextResponse.json({ error: 'Invalid view' }, { status: 400 })
     }
@@ -110,6 +114,52 @@ async function getOverviewData() {
       .order('harvested_at', { ascending: false })
       .limit(5)
 
+    // NEW: Get adapters and documents data
+    const { count: adaptersCount, error: adaptersError } = await supabase
+      .from('adapters')
+      .select('*', { count: 'exact', head: true })
+
+    const { count: documentsCount, error: documentsError } = await supabase
+      .from('documents')
+      .select('*', { count: 'exact', head: true })
+
+    // Get manufacturer counts from adapters (check what columns exist first)
+    const { data: adapterSample, error: adapterSampleError } = await supabase
+      .from('adapters')
+      .select('*')
+      .limit(1)
+
+    let adapterMfgCounts = {}
+    if (adapterSample && adapterSample.length > 0) {
+      // Check if manufacturer column exists, otherwise use brand or another column
+      const columns = Object.keys(adapterSample[0])
+      const mfgColumn = columns.find(col =>
+        col.toLowerCase().includes('manufacturer') ||
+        col.toLowerCase().includes('brand') ||
+        col.toLowerCase().includes('vendor')
+      )
+
+      if (mfgColumn) {
+        const { data: manufacturerData, error: manufacturerError } = await supabase
+          .from('adapters')
+          .select(mfgColumn)
+          .not(mfgColumn, 'is', null)
+
+        adapterMfgCounts = manufacturerData?.reduce((acc: any, item: any) => {
+          const mfgName = item[mfgColumn]
+          acc[mfgName] = (acc[mfgName] || 0) + 1
+          return acc
+        }, {}) || {}
+      }
+    }
+
+    // Get recent documents
+    const { data: recentDocuments, error: recentDocsError } = await supabase
+      .from('documents')
+      .select('title, source, document_type, created_at')
+      .order('created_at', { ascending: false })
+      .limit(5)
+
     return NextResponse.json({
       success: true,
       data: {
@@ -126,6 +176,14 @@ async function getOverviewData() {
           youtubeVideos: youtubeVideos || 0,
           recentReddit: recentReddit || [],
           recentYoutube: recentYoutube || []
+        },
+
+        // NEW: Product catalog data
+        productCatalog: {
+          adaptersCount: adaptersCount || 0,
+          documentsCount: documentsCount || 0,
+          manufacturerCounts: adapterMfgCounts,
+          recentDocuments: recentDocuments || []
         },
 
         lastUpdated: new Date().toISOString()
@@ -503,4 +561,250 @@ async function updatePricing() {
     message: 'Pricing update requested',
     instructions: 'Connect to distributor APIs for real-time pricing'
   })
+}
+
+async function getManufacturersData(searchParams: URLSearchParams) {
+  try {
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '25')
+    const search = searchParams.get('search') || ''
+    const offset = (page - 1) * limit
+
+    // First, get a sample to determine the schema
+    const { data: sampleAdapter, error: sampleError } = await supabase
+      .from('adapters')
+      .select('*')
+      .limit(1)
+
+    if (sampleError) throw sampleError
+
+    if (!sampleAdapter || sampleAdapter.length === 0) {
+      return NextResponse.json({
+        success: true,
+        data: {
+          adapters: [],
+          manufacturerStats: [],
+          pagination: { total: 0, page, limit, totalPages: 0 }
+        }
+      })
+    }
+
+    // Determine available columns
+    const columns = Object.keys(sampleAdapter[0])
+    const selectColumns = columns.slice(0, 10) // Select first 10 columns to avoid overwhelming response
+
+    // Get manufacturer statistics from adapters
+    let query = supabase
+      .from('adapters')
+      .select(selectColumns.join(', '))
+
+    // Apply search filter on available text columns
+    if (search) {
+      const textColumns = selectColumns.filter(col =>
+        typeof sampleAdapter[0][col] === 'string'
+      )
+      if (textColumns.length > 0) {
+        const searchConditions = textColumns.map(col => `${col}.ilike.%${search}%`).join(',')
+        query = query.or(searchConditions)
+      }
+    }
+
+    // Get paginated results
+    const { data: adapters, error: adaptersError } = await query
+      .range(offset, offset + limit - 1)
+      .order('created_at', { ascending: false })
+
+    if (adaptersError) throw adaptersError
+
+    // Get manufacturer summary stats
+    const mfgColumn = columns.find(col =>
+      col.toLowerCase().includes('manufacturer') ||
+      col.toLowerCase().includes('brand') ||
+      col.toLowerCase().includes('vendor') ||
+      col.toLowerCase().includes('company')
+    )
+
+    let manufacturerCounts = {}
+    if (mfgColumn) {
+      const { data: manufacturerStats, error: statsError } = await supabase
+        .from('adapters')
+        .select(mfgColumn)
+        .not(mfgColumn, 'is', null)
+
+      if (!statsError && manufacturerStats) {
+        manufacturerCounts = manufacturerStats.reduce((acc: any, item: any) => {
+          const mfgName = item[mfgColumn]
+          acc[mfgName] = (acc[mfgName] || 0) + 1
+          return acc
+        }, {})
+      }
+    }
+
+    // Get total count for pagination
+    let countQuery = supabase
+      .from('adapters')
+      .select('*', { count: 'exact', head: true })
+
+    if (search) {
+      const textColumns = selectColumns.filter(col =>
+        typeof sampleAdapter[0][col] === 'string'
+      )
+      if (textColumns.length > 0) {
+        const searchConditions = textColumns.map(col => `${col}.ilike.%${search}%`).join(',')
+        countQuery = countQuery.or(searchConditions)
+      }
+    }
+
+    const { count: totalCount, error: countError } = await countQuery
+
+    if (countError) throw countError
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        adapters,
+        manufacturerStats: Object.entries(manufacturerCounts)
+          .map(([name, count]) => ({ name, count }))
+          .sort((a: any, b: any) => b.count - a.count),
+        schema: {
+          columns: columns,
+          manufacturerColumn: mfgColumn || 'none'
+        },
+        pagination: {
+          total: totalCount,
+          page,
+          limit,
+          totalPages: Math.ceil((totalCount || 0) / limit)
+        }
+      }
+    })
+  } catch (error) {
+    console.error('Manufacturers data error:', error)
+    return NextResponse.json({ error: 'Failed to fetch manufacturers data' }, { status: 500 })
+  }
+}
+
+async function getPublicationsData(searchParams: URLSearchParams) {
+  try {
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '25')
+    const search = searchParams.get('search') || ''
+    const source = searchParams.get('source') || ''
+    const offset = (page - 1) * limit
+
+    // First, get a sample to determine the schema
+    const { data: sampleDocument, error: sampleError } = await supabase
+      .from('documents')
+      .select('*')
+      .limit(1)
+
+    if (sampleError) throw sampleError
+
+    if (!sampleDocument || sampleDocument.length === 0) {
+      return NextResponse.json({
+        success: true,
+        data: {
+          documents: [],
+          sourceStats: [],
+          pagination: { total: 0, page, limit, totalPages: 0 }
+        }
+      })
+    }
+
+    // Determine available columns
+    const columns = Object.keys(sampleDocument[0])
+    const selectColumns = columns.slice(0, 10) // Select first 10 columns to avoid overwhelming response
+
+    let query = supabase
+      .from('documents')
+      .select(selectColumns.join(', '))
+
+    // Apply filters
+    if (source && columns.includes('source')) {
+      query = query.eq('source', source)
+    }
+
+    if (search) {
+      const textColumns = selectColumns.filter(col =>
+        typeof sampleDocument[0][col] === 'string'
+      )
+      if (textColumns.length > 0) {
+        const searchConditions = textColumns.map(col => `${col}.ilike.%${search}%`).join(',')
+        query = query.or(searchConditions)
+      }
+    }
+
+    // Get paginated results
+    const { data: documents, error: documentsError } = await query
+      .range(offset, offset + limit - 1)
+      .order('created_at', { ascending: false })
+
+    if (documentsError) throw documentsError
+
+    // Get source statistics
+    let sourceStats = []
+    if (columns.includes('source')) {
+      const { data: sourceData, error: sourceStatsError } = await supabase
+        .from('documents')
+        .select('source')
+        .not('source', 'is', null)
+
+      if (!sourceStatsError && sourceData) {
+        const sourceCounts = sourceData.reduce((acc: any, item: any) => {
+          const sourceName = item.source
+          acc[sourceName] = (acc[sourceName] || 0) + 1
+          return acc
+        }, {})
+
+        sourceStats = Object.entries(sourceCounts)
+          .map(([name, count]) => ({ name, total: count }))
+          .sort((a: any, b: any) => b.total - a.total)
+      }
+    }
+
+    // Get total count for pagination
+    let countQuery = supabase
+      .from('documents')
+      .select('*', { count: 'exact', head: true })
+
+    if (source && columns.includes('source')) {
+      countQuery = countQuery.eq('source', source)
+    }
+
+    if (search) {
+      const textColumns = selectColumns.filter(col =>
+        typeof sampleDocument[0][col] === 'string'
+      )
+      if (textColumns.length > 0) {
+        const searchConditions = textColumns.map(col => `${col}.ilike.%${search}%`).join(',')
+        countQuery = countQuery.or(searchConditions)
+      }
+    }
+
+    const { count: totalCount, error: countError } = await countQuery
+
+    if (countError) throw countError
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        documents,
+        sourceStats,
+        schema: {
+          columns: columns,
+          hasSource: columns.includes('source'),
+          hasContent: columns.includes('content')
+        },
+        pagination: {
+          total: totalCount,
+          page,
+          limit,
+          totalPages: Math.ceil((totalCount || 0) / limit)
+        }
+      }
+    })
+  } catch (error) {
+    console.error('Publications data error:', error)
+    return NextResponse.json({ error: 'Failed to fetch publications data' }, { status: 500 })
+  }
 }

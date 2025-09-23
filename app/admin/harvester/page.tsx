@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Database, TrendingUp, Package, RefreshCw, DollarSign, AlertCircle, CheckCircle, Activity, BarChart3, Search, Filter, ExternalLink, Eye, MessageSquare, Play } from 'lucide-react'
+import { Database, TrendingUp, Package, RefreshCw, DollarSign, AlertCircle, CheckCircle, Activity, BarChart3, Search, Filter, ExternalLink, Eye, MessageSquare, Play, Building2, FileText } from 'lucide-react'
 
 interface HarvesterStats {
   totalProducts: number
@@ -14,6 +14,12 @@ interface HarvesterStats {
     youtubeVideos: number
     recentReddit: any[]
     recentYoutube: any[]
+  }
+  productCatalog: {
+    adaptersCount: number
+    documentsCount: number
+    manufacturerCounts: Record<string, number>
+    recentDocuments: any[]
   }
   lastUpdated: string
 }
@@ -42,6 +48,8 @@ export default function HarvesterDashboard() {
   const [products, setProducts] = useState<Product[]>([])
   const [redditPosts, setRedditPosts] = useState<any[]>([])
   const [youtubeVideos, setYoutubeVideos] = useState<any[]>([])
+  const [manufacturers, setManufacturers] = useState<any[]>([])
+  const [publications, setPublications] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedManufacturer, setSelectedManufacturer] = useState('')
@@ -150,6 +158,54 @@ export default function HarvesterDashboard() {
     }
   }
 
+  // Load Manufacturers data
+  const loadManufacturers = async () => {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '25'
+      })
+
+      if (searchTerm) params.append('search', searchTerm)
+
+      const response = await fetch(`/api/admin/harvester?view=manufacturers&${params}`)
+      const data = await response.json()
+      if (data.success) {
+        setManufacturers(data.data.adapters)
+        setTotalPages(data.data.pagination.totalPages)
+      }
+    } catch (error) {
+      console.error('Failed to load manufacturers:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Load Publications data
+  const loadPublications = async () => {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '25'
+      })
+
+      if (searchTerm) params.append('search', searchTerm)
+
+      const response = await fetch(`/api/admin/harvester?view=publications&${params}`)
+      const data = await response.json()
+      if (data.success) {
+        setPublications(data.data.documents)
+        setTotalPages(data.data.pagination.totalPages)
+      }
+    } catch (error) {
+      console.error('Failed to load publications:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Trigger harvest
   const triggerHarvest = async (manufacturer?: string) => {
     try {
@@ -183,6 +239,10 @@ export default function HarvesterDashboard() {
       loadRedditPosts()
     } else if (isAuthenticated && activeTab === 'youtube') {
       loadYouTubeVideos()
+    } else if (isAuthenticated && activeTab === 'manufacturers') {
+      loadManufacturers()
+    } else if (isAuthenticated && activeTab === 'publications') {
+      loadPublications()
     }
   }, [isAuthenticated, activeTab, page, searchTerm, selectedManufacturer, selectedSubreddit, selectedChannel])
 
@@ -235,6 +295,8 @@ export default function HarvesterDashboard() {
             { id: 'products', label: 'Products', icon: Package },
             { id: 'reddit', label: 'Reddit Posts', icon: MessageSquare },
             { id: 'youtube', label: 'YouTube Videos', icon: Play },
+            { id: 'manufacturers', label: 'Manufacturers', icon: Building2 },
+            { id: 'publications', label: 'Publications', icon: FileText },
             { id: 'pricing', label: 'Pricing', icon: DollarSign },
             { id: 'operations', label: 'Operations', icon: Activity }
           ].map(tab => (
@@ -835,6 +897,206 @@ export default function HarvesterDashboard() {
                 >
                   Next
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Manufacturers Tab */}
+        {activeTab === 'manufacturers' && (
+          <div className="space-y-6">
+            {/* Search */}
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
+                  placeholder="Search manufacturers, models, or descriptions..."
+                />
+              </div>
+            </div>
+
+            {/* Manufacturers Table */}
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-700/50">
+                    <tr>
+                      <th className="px-6 py-4 text-left dr-text-pearl font-semibold">Name</th>
+                      <th className="px-6 py-4 text-left dr-text-pearl font-semibold">Base URL</th>
+                      <th className="px-6 py-4 text-left dr-text-pearl font-semibold">Status</th>
+                      <th className="px-6 py-4 text-left dr-text-pearl font-semibold">Created</th>
+                      <th className="px-6 py-4 text-left dr-text-pearl font-semibold">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {manufacturers.map((manufacturer) => (
+                      <tr key={manufacturer.id} className="border-t border-gray-700/50 hover:bg-gray-700/30">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <Building2 className="w-5 h-5 dr-text-violet" />
+                            <div>
+                              <div className="dr-text-pearl font-medium">{manufacturer.name}</div>
+                              <div className="text-gray-400 text-sm">{manufacturer.slug}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <a
+                            href={manufacturer.base_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:text-blue-300 flex items-center gap-2"
+                          >
+                            {manufacturer.base_url}
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            manufacturer.enabled
+                              ? 'bg-green-900/30 text-green-400 border border-green-400/30'
+                              : 'bg-red-900/30 text-red-400 border border-red-400/30'
+                          }`}>
+                            {manufacturer.enabled ? 'Enabled' : 'Disabled'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-gray-300">
+                          {new Date(manufacturer.created_at).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4">
+                          <a
+                            href={manufacturer.base_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-3 py-1 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-colors"
+                          >
+                            <Eye className="w-4 h-4" />
+                            Visit
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              <div className="flex items-center justify-between p-6 bg-gray-700/30">
+                <div className="text-gray-300">
+                  Showing {((page - 1) * 25) + 1} to {Math.min(page * 25, totalPages * 25)} of {totalPages * 25} manufacturers
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setPage(page - 1)}
+                    disabled={page <= 1}
+                    className="px-4 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <span className="px-4 py-2 bg-gray-600 text-white rounded-lg">
+                    {page} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setPage(page + 1)}
+                    disabled={page >= totalPages}
+                    className="px-4 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Publications Tab */}
+        {activeTab === 'publications' && (
+          <div className="space-y-6">
+            {/* Search */}
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
+                  placeholder="Search publications by title, source, or content..."
+                />
+              </div>
+            </div>
+
+            {/* Publications Grid */}
+            <div className="grid gap-6">
+              {publications.map((doc) => (
+                <div key={doc.id} className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-start gap-4">
+                      <FileText className="w-6 h-6 dr-text-violet mt-1" />
+                      <div className="flex-1">
+                        <h3 className="dr-text-pearl font-semibold text-lg mb-2">{doc.title}</h3>
+                        <div className="flex items-center gap-4 text-sm text-gray-400">
+                          <span className="flex items-center gap-2">
+                            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                            Source: {doc.source}
+                          </span>
+                          <span>Type: {doc.mime_type}</span>
+                          <span>Status: {doc.status}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      {doc.url && (
+                        <a
+                          href={doc.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-3 py-1 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-colors"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          Visit
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm text-gray-500">
+                    <div>ID: {doc.id}</div>
+                    <div>Added: {new Date(doc.created_at).toLocaleDateString()}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6">
+              <div className="flex items-center justify-between">
+                <div className="text-gray-300">
+                  Showing {((page - 1) * 25) + 1} to {Math.min(page * 25, totalPages * 25)} of {totalPages * 25} publications
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setPage(page - 1)}
+                    disabled={page <= 1}
+                    className="px-4 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <span className="px-4 py-2 bg-gray-600 text-white rounded-lg">
+                    {page} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setPage(page + 1)}
+                    disabled={page >= totalPages}
+                    className="px-4 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             </div>
           </div>
