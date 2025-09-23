@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 interface TeamMember {
   id: string
@@ -56,6 +57,19 @@ export default function AdminPage() {
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null)
   const [newPost, setNewPost] = useState<Partial<BlogPost>>({})
   const [uploadingBlogImage, setUploadingBlogImage] = useState(false)
+
+  // Blog Management Functions
+  const loadBlogPosts = async () => {
+    try {
+      const response = await fetch('/api/admin/blog')
+      if (response.ok) {
+        const data = await response.json()
+        setBlogPosts(data)
+      }
+    } catch (error) {
+      console.error('Failed to load blog posts:', error)
+    }
+  }
 
   useEffect(() => {
     const authStatus = localStorage.getItem('adminAuth')
@@ -224,19 +238,6 @@ export default function AdminPage() {
     )
   }
 
-  // Blog Management Functions
-  const loadBlogPosts = async () => {
-    try {
-      const response = await fetch('/api/admin/blog')
-      if (response.ok) {
-        const data = await response.json()
-        setBlogPosts(data)
-      }
-    } catch (error) {
-      console.error('Failed to load blog posts:', error)
-    }
-  }
-
   const handleBlogImageUpload = async (file: File): Promise<string | null> => {
     setUploadingBlogImage(true)
     const formData = new FormData()
@@ -337,12 +338,21 @@ export default function AdminPage() {
           <h1 className="text-4xl font-black bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">
             Admin Dashboard
           </h1>
-          <button
-            onClick={handleLogout}
-            className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
-          >
-            Logout
-          </button>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/admin/harvester"
+              className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all flex items-center gap-2"
+            >
+              <span>🗄️</span>
+              Product Harvester
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         {/* Tab Navigation */}
