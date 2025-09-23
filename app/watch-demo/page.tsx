@@ -1,79 +1,68 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import UnifiedNavigation from '../components/UnifiedNavigation'
+import Footer from '../components/Footer'
+
+interface SiteSettings {
+  logoPath: string
+  footerLogoPath: string
+  demoVideoUrl: string
+}
+
+function getYouTubeEmbedUrl(url: string): string | null {
+  if (!url) return null
+
+  const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+  const match = url.match(regex)
+  return match ? `https://www.youtube.com/embed/${match[1]}` : null
+}
 
 export default function WatchDemoPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [settings, setSettings] = useState<SiteSettings>({ logoPath: '', footerLogoPath: '', demoVideoUrl: '' })
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
+
+  useEffect(() => {
+    loadSettings()
+  }, [])
+
+  const loadSettings = async () => {
+    try {
+      const response = await fetch('/api/admin/settings')
+      if (response.ok) {
+        const data = await response.json()
+        setSettings(data)
+      }
+    } catch (error) {
+      console.error('Failed to load settings:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const redirectToApp = () => {
+    window.location.href = '/waitlist'
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
-      {/* Header */}
-      <header className="bg-black/10 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 py-5">
-        <nav className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-3 text-white font-bold text-2xl">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-black text-sm">
-              DR
-            </div>
-            Design-Rite
+      {/* Top Announcement Bar */}
+      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
+        <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
+          <span className="text-base">🎓</span>
+          <span className="flex-1 text-center">Design-Rite's Revolutionary AI is launching Q4 2025 - Join the waitlist for early access to security design mastery</span>
+          <Link className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30" href="/subscribe">
+            Join Waitlist
           </Link>
+          <button className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">×</button>
+        </div>
+      </div>
 
-          {/* Desktop Navigation */}
-          <ul className="hidden lg:flex items-center gap-8">
-            <li><Link href="/integrators" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Security Integrators</Link></li>
-            <li><Link href="/enterprise" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Enterprise</Link></li>
-            <li><Link href="/education" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Education</Link></li>
-            <li><Link href="/solutions" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Solutions</Link></li>
-            <li><Link href="/contact" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Contact</Link></li>
-          </ul>
-
-          <div className="hidden lg:flex items-center gap-3">
-            <Link href="/login" className="text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
-              Sign In
-            </Link>
-            <button 
-              onClick={() => router.push('/app')}
-              className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
-            >
-              Try Platform
-            </button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button 
-            className="lg:hidden text-white text-2xl"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            ☰
-          </button>
-        </nav>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
-            <div className="px-6 py-4 space-y-4">
-              <Link href="/integrators" className="block text-white/80 hover:text-white transition-colors py-2">Security Integrators</Link>
-              <Link href="/enterprise" className="block text-white/80 hover:text-white transition-colors py-2">Enterprise</Link>
-              <Link href="/education" className="block text-white/80 hover:text-white transition-colors py-2">Education</Link>
-              <Link href="/solutions" className="block text-white/80 hover:text-white transition-colors py-2">Solutions</Link>
-              <Link href="/contact" className="block text-white/80 hover:text-white transition-colors py-2">Contact</Link>
-              <div className="pt-4 border-t border-white/10 space-y-3">
-                <Link href="/login" className="block text-center text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
-                  Sign In
-                </Link>
-                <button 
-                  onClick={() => router.push('/app')}
-                  className="block w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
-                >
-                  Try Platform
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
+      <UnifiedNavigation />
 
       {/* Main Content */}
       <main className="flex-1">
@@ -95,31 +84,50 @@ export default function WatchDemoPage() {
           </p>
         </section>
 
-        {/* Video Placeholder Section */}
+        {/* Video Section */}
         <section className="max-w-4xl mx-auto px-8 mb-20">
-          <div className="relative bg-black/50 rounded-2xl border border-purple-500/30 overflow-hidden aspect-video">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-purple-700/20 flex items-center justify-center">
+          {loading ? (
+            <div className="relative bg-black/50 rounded-2xl border border-purple-500/30 overflow-hidden aspect-video flex items-center justify-center">
               <div className="text-center">
-                <div className="text-8xl mb-6">🎬</div>
-                <h3 className="text-3xl font-bold mb-4">Demo Video Coming Soon</h3>
-                <p className="text-xl text-white/80 mb-8">We're creating an incredible demo showcasing our AI platform in action.</p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button 
-                    onClick={() => router.push('/app')}
-                    className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all transform hover:scale-[1.02] shadow-lg"
-                  >
-                    Try Live Demo Instead
-                  </button>
-                  <Link 
-                    href="/subscribe"
-                    className="bg-white/10 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all border border-white/20"
-                  >
-                    Notify Me When Ready
-                  </Link>
+                <div className="text-4xl mb-4">⏳</div>
+                <p className="text-xl text-white/80">Loading demo video...</p>
+              </div>
+            </div>
+          ) : settings.demoVideoUrl ? (
+            <div className="relative bg-black/50 rounded-2xl border border-purple-500/30 overflow-hidden aspect-video">
+              <iframe
+                src={getYouTubeEmbedUrl(settings.demoVideoUrl) || ''}
+                title="Design-Rite Demo Video"
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              ></iframe>
+            </div>
+          ) : (
+            <div className="relative bg-black/50 rounded-2xl border border-purple-500/30 overflow-hidden aspect-video">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-purple-700/20 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-8xl mb-6">🎬</div>
+                  <h3 className="text-3xl font-bold mb-4">Demo Video Coming Soon</h3>
+                  <p className="text-xl text-white/80 mb-8">We're creating an incredible demo showcasing our AI platform in action.</p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button
+                      onClick={redirectToApp}
+                      className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all transform hover:scale-[1.02] shadow-lg"
+                    >
+                      Try Live Demo Instead
+                    </button>
+                    <Link
+                      href="/subscribe"
+                      className="bg-white/10 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all border border-white/20"
+                    >
+                      Notify Me When Ready
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </section>
 
         {/* What You'll See Section */}
@@ -196,8 +204,8 @@ export default function WatchDemoPage() {
               Experience our AI security assessment platform right now with our interactive demo. No signup required.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => router.push('/app')}
+              <button
+                onClick={redirectToApp}
                 className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all transform hover:scale-[1.02] shadow-lg"
               >
                 Try Interactive Demo
@@ -235,47 +243,14 @@ export default function WatchDemoPage() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
-        <div className="max-w-6xl mx-auto px-8 py-12">
-          <div className="grid lg:grid-cols-4 gap-8 mb-12">
-            <div className="lg:col-span-2">
-              <Link href="/" className="flex items-center gap-3 text-white font-bold text-2xl mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-black text-sm">
-                  DR
-                </div>
-                Design-Rite
-              </Link>
-              <p className="text-white/70 text-lg leading-relaxed max-w-md">
-                Revolutionary AI-powered platform transforming security system design through intelligent automation and expert-level analysis.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold text-lg mb-4">Solutions</h4>
-              <ul className="space-y-3">
-                <li><Link href="/integrators" className="text-white/70 hover:text-white transition-colors">Security Integrators</Link></li>
-                <li><Link href="/enterprise" className="text-white/70 hover:text-white transition-colors">Enterprise Security</Link></li>
-                <li><Link href="/education" className="text-white/70 hover:text-white transition-colors">Education & Healthcare</Link></li>
-                <li><Link href="/consultants" className="text-white/70 hover:text-white transition-colors">Security Consultants</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold text-lg mb-4">Company</h4>
-              <ul className="space-y-3">
-                <li><Link href="/about" className="text-white/70 hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="/contact" className="text-white/70 hover:text-white transition-colors">Contact</Link></li>
-                <li><Link href="/privacy" className="text-white/70 hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="text-white/70 hover:text-white transition-colors">Terms of Service</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-white/10 pt-8 text-center">
-            <p className="text-white/60">
-              © 2025 Design-Rite™. All rights reserved. | Revolutionary AI-Powered Security Solutions
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer redirectToApp={redirectToApp} />
+
+      {/* Chat Button */}
+      <div className="fixed bottom-5 right-5 z-[999999]">
+        <button className="w-15 h-15 bg-purple-600 rounded-full cursor-pointer flex items-center justify-center shadow-lg hover:scale-110 hover:shadow-xl transition-all">
+          <div className="text-white text-2xl font-bold">💬</div>
+        </button>
+      </div>
     </div>
   )
 }

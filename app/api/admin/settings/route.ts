@@ -7,6 +7,7 @@ const SETTINGS_PATH = path.join(process.cwd(), 'data', 'settings.json')
 interface SiteSettings {
   logoPath: string
   footerLogoPath: string
+  demoVideoUrl: string
 }
 
 // Ensure data directory exists
@@ -24,7 +25,8 @@ function loadSettings(): SiteSettings {
   if (!fs.existsSync(SETTINGS_PATH)) {
     const defaultSettings: SiteSettings = {
       logoPath: '',
-      footerLogoPath: ''
+      footerLogoPath: '',
+      demoVideoUrl: ''
     }
     fs.writeFileSync(SETTINGS_PATH, JSON.stringify(defaultSettings, null, 2))
     return defaultSettings
@@ -41,5 +43,17 @@ export async function GET() {
   } catch (error) {
     console.error('Error loading settings:', error)
     return NextResponse.json({ error: 'Failed to load settings' }, { status: 500 })
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const updatedSettings: SiteSettings = await request.json()
+    ensureDataDirectory()
+    fs.writeFileSync(SETTINGS_PATH, JSON.stringify(updatedSettings, null, 2))
+    return NextResponse.json({ success: true, settings: updatedSettings })
+  } catch (error) {
+    console.error('Error updating settings:', error)
+    return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 })
   }
 }

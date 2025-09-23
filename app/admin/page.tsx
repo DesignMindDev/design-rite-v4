@@ -16,18 +16,46 @@ interface TeamMember {
 interface SiteSettings {
   logoPath: string
   footerLogoPath: string
+  demoVideoUrl: string
+}
+
+interface VideoContent {
+  id: string
+  title: string
+  description: string
+  youtubeUrl: string
+  type: 'demo' | 'testimonial' | 'tutorial' | 'company'
+  isActive: boolean
+}
+
+interface BlogPost {
+  id: string
+  title: string
+  excerpt: string
+  content: string
+  author: string
+  publishedDate: string
+  featuredImage: string
+  videoUrl: string
+  tags: string[]
+  published: boolean
 }
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [password, setPassword] = useState('')
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>({ logoPath: '', footerLogoPath: '' })
-  const [activeTab, setActiveTab] = useState<'team' | 'logos'>('team')
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>({ logoPath: '', footerLogoPath: '', demoVideoUrl: '' })
+  const [videos, setVideos] = useState<VideoContent[]>([])
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
+  const [activeTab, setActiveTab] = useState<'team' | 'logos' | 'videos' | 'blog'>('team')
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null)
   const [newMember, setNewMember] = useState<Partial<TeamMember>>({})
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [editingPost, setEditingPost] = useState<BlogPost | null>(null)
+  const [newPost, setNewPost] = useState<Partial<BlogPost>>({})
+  const [uploadingBlogImage, setUploadingBlogImage] = useState(false)
 
   useEffect(() => {
     const authStatus = localStorage.getItem('adminAuth')
@@ -35,6 +63,7 @@ export default function AdminPage() {
       setIsAuthenticated(true)
       loadTeamMembers()
       loadSiteSettings()
+      loadBlogPosts()
     }
   }, [])
 
@@ -44,6 +73,7 @@ export default function AdminPage() {
       localStorage.setItem('adminAuth', 'authenticated')
       loadTeamMembers()
       loadSiteSettings()
+      loadBlogPosts()
     } else {
       alert('Invalid password')
     }
@@ -194,6 +224,112 @@ export default function AdminPage() {
     )
   }
 
+  // Blog Management Functions
+  const loadBlogPosts = async () => {
+    try {
+      const response = await fetch('/api/admin/blog')
+      if (response.ok) {
+        const data = await response.json()
+        setBlogPosts(data)
+      }
+    } catch (error) {
+      console.error('Failed to load blog posts:', error)
+    }
+  }
+
+  const handleBlogImageUpload = async (file: File): Promise<string | null> => {
+    setUploadingBlogImage(true)
+    const formData = new FormData()
+    formData.append('image', file)
+
+    try {
+      const response = await fetch('/api/admin/upload-blog-image', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        return data.imagePath
+      }
+    } catch (error) {
+      console.error('Failed to upload blog image:', error)
+    } finally {
+      setUploadingBlogImage(false)
+    }
+    return null
+  }
+
+  const saveBlogPost = async () => {
+    if (!newPost.title || !newPost.content || !newPost.excerpt) {
+      alert('Please fill in all required fields')
+      return
+    }
+
+    try {
+      const postData = {
+        ...newPost,
+        publishedDate: newPost.publishedDate || new Date().toISOString(),
+        tags: newPost.tags || [],
+        published: newPost.published || false
+      }
+
+      const response = await fetch('/api/admin/blog', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(postData)
+      })
+
+      if (response.ok) {
+        await loadBlogPosts()
+        setNewPost({})
+        alert('Blog post created successfully!')
+      }
+    } catch (error) {
+      console.error('Failed to save blog post:', error)
+      alert('Failed to save blog post')
+    }
+  }
+
+  const updateBlogPost = async () => {
+    if (!editingPost) return
+
+    try {
+      const response = await fetch('/api/admin/blog', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingPost)
+      })
+
+      if (response.ok) {
+        await loadBlogPosts()
+        setEditingPost(null)
+        alert('Blog post updated successfully!')
+      }
+    } catch (error) {
+      console.error('Failed to update blog post:', error)
+      alert('Failed to update blog post')
+    }
+  }
+
+  const deleteBlogPost = async (id: string) => {
+    if (confirm('Are you sure you want to delete this blog post?')) {
+      try {
+        const response = await fetch(`/api/admin/blog?id=${id}`, {
+          method: 'DELETE'
+        })
+
+        if (response.ok) {
+          await loadBlogPosts()
+          alert('Blog post deleted successfully!')
+        }
+      } catch (error) {
+        console.error('Failed to delete blog post:', error)
+        alert('Failed to delete blog post')
+      }
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white">
       <div className="max-w-6xl mx-auto px-8 py-8">
@@ -210,26 +346,46 @@ export default function AdminPage() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex mb-8 bg-gray-800/30 rounded-lg p-1">
+        <div className="grid grid-cols-2 md:grid-cols-4 mb-8 bg-gray-800/30 rounded-lg p-1">
           <button
             onClick={() => setActiveTab('team')}
-            className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-all ${
+            className={`py-3 px-4 rounded-lg font-semibold transition-all ${
               activeTab === 'team'
                 ? 'bg-purple-600 text-white'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            Team Management
+            Team
           </button>
           <button
             onClick={() => setActiveTab('logos')}
-            className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-all ${
+            className={`py-3 px-4 rounded-lg font-semibold transition-all ${
               activeTab === 'logos'
                 ? 'bg-purple-600 text-white'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            Logo Management
+            Logos
+          </button>
+          <button
+            onClick={() => setActiveTab('videos')}
+            className={`py-3 px-4 rounded-lg font-semibold transition-all ${
+              activeTab === 'videos'
+                ? 'bg-purple-600 text-white'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            Videos
+          </button>
+          <button
+            onClick={() => setActiveTab('blog')}
+            className={`py-3 px-4 rounded-lg font-semibold transition-all ${
+              activeTab === 'blog'
+                ? 'bg-purple-600 text-white'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            Blog
           </button>
         </div>
 
@@ -427,6 +583,344 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'videos' && (
+          <div className="space-y-8">
+            {/* Demo Video Management */}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+              <h2 className="text-2xl font-bold mb-6">Demo Video</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    YouTube Video URL
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    value={siteSettings.demoVideoUrl || ''}
+                    onChange={(e) => setSiteSettings(prev => ({ ...prev, demoVideoUrl: e.target.value }))}
+                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600"
+                  />
+                  <p className="text-gray-400 text-sm mt-2">
+                    This video will be shown when users click "Watch Demo"
+                  </p>
+                </div>
+                {siteSettings.demoVideoUrl && (
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold mb-2">Preview:</h3>
+                    <div className="aspect-video bg-gray-900 rounded-lg overflow-hidden">
+                      <iframe
+                        src={siteSettings.demoVideoUrl.replace('watch?v=', 'embed/')}
+                        className="w-full h-full"
+                        frameBorder="0"
+                        allowFullScreen
+                      />
+                    </div>
+                  </div>
+                )}
+                <button
+                  onClick={async () => {
+                    try {
+                      const response = await fetch('/api/admin/settings', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(siteSettings),
+                      });
+                      if (response.ok) {
+                        alert('Demo video saved successfully!');
+                      }
+                    } catch (error) {
+                      console.error('Failed to save demo video:', error);
+                    }
+                  }}
+                  className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all"
+                >
+                  Save Demo Video
+                </button>
+              </div>
+            </div>
+
+            {/* YouTube Channel Integration */}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+              <h2 className="text-2xl font-bold mb-6">YouTube Channel</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    YouTube Channel URL
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://www.youtube.com/@designrite"
+                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600"
+                  />
+                  <p className="text-gray-400 text-sm mt-2">
+                    Link to your YouTube channel for marketing purposes
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Video Library Placeholder */}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+              <h2 className="text-2xl font-bold mb-6">Video Library</h2>
+              <div className="text-center py-8 text-gray-400">
+                <div className="text-4xl mb-4">🎥</div>
+                <p>Video library coming soon!</p>
+                <p className="text-sm mt-2">Manage testimonials, tutorials, and promotional videos.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'blog' && (
+          <div className="space-y-8">
+            {/* Create New Blog Post */}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+              <h2 className="text-2xl font-bold mb-6">Create New Blog Post</h2>
+              <div className="grid gap-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Post Title"
+                    value={newPost.title || ''}
+                    onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+                    className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Author"
+                    value={newPost.author || ''}
+                    onChange={(e) => setNewPost({ ...newPost, author: e.target.value })}
+                    className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600"
+                  />
+                </div>
+                <textarea
+                  placeholder="Post Excerpt/Summary"
+                  value={newPost.excerpt || ''}
+                  onChange={(e) => setNewPost({ ...newPost, excerpt: e.target.value })}
+                  rows={3}
+                  className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600 resize-none"
+                />
+                <textarea
+                  placeholder="Post Content (HTML/Markdown supported)"
+                  value={newPost.content || ''}
+                  onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                  rows={8}
+                  className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600 resize-none"
+                />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <input
+                    type="url"
+                    placeholder="Video URL (YouTube, etc.)"
+                    value={newPost.videoUrl || ''}
+                    onChange={(e) => setNewPost({ ...newPost, videoUrl: e.target.value })}
+                    className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Tags (comma separated)"
+                    value={newPost.tags?.join(', ') || ''}
+                    onChange={(e) => setNewPost({ ...newPost, tags: e.target.value.split(',').map(tag => tag.trim()).filter(Boolean) })}
+                    className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600"
+                  />
+                </div>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={newPost.published || false}
+                      onChange={(e) => setNewPost({ ...newPost, published: e.target.checked })}
+                      className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-600"
+                    />
+                    <span className="text-white">Publish immediately</span>
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      if (file) {
+                        const imagePath = await handleBlogImageUpload(file)
+                        if (imagePath) {
+                          setNewPost({ ...newPost, featuredImage: imagePath })
+                        }
+                      }
+                    }}
+                    className="block text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
+                  />
+                  {uploadingBlogImage && <span className="text-purple-400">Uploading...</span>}
+                </div>
+                {newPost.featuredImage && (
+                  <div className="flex items-center gap-4">
+                    <Image
+                      src={newPost.featuredImage}
+                      alt="Featured Image"
+                      width={100}
+                      height={60}
+                      className="rounded-lg object-cover"
+                    />
+                    <button
+                      onClick={() => setNewPost({ ...newPost, featuredImage: '' })}
+                      className="text-red-400 hover:text-red-300"
+                    >
+                      Remove Image
+                    </button>
+                  </div>
+                )}
+                <button
+                  onClick={saveBlogPost}
+                  className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+                >
+                  Create Blog Post
+                </button>
+              </div>
+            </div>
+
+            {/* Existing Blog Posts */}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+              <h2 className="text-2xl font-bold mb-6">Existing Blog Posts ({blogPosts.length})</h2>
+              {blogPosts.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
+                  <div className="text-4xl mb-4">📝</div>
+                  <p>No blog posts yet. Create your first post above!</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {blogPosts.map((post) => (
+                    <div key={post.id} className="bg-gray-700/30 rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-white">{post.title}</h3>
+                          <p className="text-gray-400 text-sm">
+                            By {post.author} • {new Date(post.publishedDate).toLocaleDateString()}
+                            {post.published ? (
+                              <span className="ml-2 inline-block bg-green-600 text-white px-2 py-1 rounded text-xs">Published</span>
+                            ) : (
+                              <span className="ml-2 inline-block bg-yellow-600 text-white px-2 py-1 rounded text-xs">Draft</span>
+                            )}
+                          </p>
+                          <p className="text-gray-300 text-sm mt-2">{post.excerpt}</p>
+                          {post.tags.length > 0 && (
+                            <div className="flex gap-2 mt-2">
+                              {post.tags.map((tag, index) => (
+                                <span key={index} className="bg-purple-600/20 text-purple-300 px-2 py-1 rounded text-xs">
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {post.featuredImage && (
+                          <Image
+                            src={post.featuredImage}
+                            alt={post.title}
+                            width={80}
+                            height={50}
+                            className="rounded-lg object-cover ml-4"
+                          />
+                        )}
+                      </div>
+                      <div className="flex gap-2 mt-4">
+                        <button
+                          onClick={() => setEditingPost(post)}
+                          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => deleteBlogPost(post.id)}
+                          className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-700 transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Edit Blog Post Modal */}
+            {editingPost && (
+              <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+                <h2 className="text-2xl font-bold mb-6">Edit Blog Post</h2>
+                <div className="grid gap-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      placeholder="Post Title"
+                      value={editingPost.title}
+                      onChange={(e) => setEditingPost({ ...editingPost, title: e.target.value })}
+                      className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Author"
+                      value={editingPost.author}
+                      onChange={(e) => setEditingPost({ ...editingPost, author: e.target.value })}
+                      className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600"
+                    />
+                  </div>
+                  <textarea
+                    placeholder="Post Excerpt/Summary"
+                    value={editingPost.excerpt}
+                    onChange={(e) => setEditingPost({ ...editingPost, excerpt: e.target.value })}
+                    rows={3}
+                    className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600 resize-none"
+                  />
+                  <textarea
+                    placeholder="Post Content"
+                    value={editingPost.content}
+                    onChange={(e) => setEditingPost({ ...editingPost, content: e.target.value })}
+                    rows={8}
+                    className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600 resize-none"
+                  />
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <input
+                      type="url"
+                      placeholder="Video URL"
+                      value={editingPost.videoUrl}
+                      onChange={(e) => setEditingPost({ ...editingPost, videoUrl: e.target.value })}
+                      className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Tags (comma separated)"
+                      value={editingPost.tags.join(', ')}
+                      onChange={(e) => setEditingPost({ ...editingPost, tags: e.target.value.split(',').map(tag => tag.trim()).filter(Boolean) })}
+                      className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600"
+                    />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={editingPost.published}
+                        onChange={(e) => setEditingPost({ ...editingPost, published: e.target.checked })}
+                        className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-600"
+                      />
+                      <span className="text-white">Published</span>
+                    </label>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={updateBlogPost}
+                      className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+                    >
+                      Update Post
+                    </button>
+                    <button
+                      onClick={() => setEditingPost(null)}
+                      className="bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

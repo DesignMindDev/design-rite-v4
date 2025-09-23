@@ -347,6 +347,7 @@ export default function UnifiedNavigation() {
           ☰
         </button>
       </nav>
+      </header>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
@@ -413,7 +414,6 @@ export default function UnifiedNavigation() {
         onClose={() => setShowEmailGate(false)}
         onSuccess={handleEmailGateSuccess}
       />
-      </header>
     </>
   );
 }

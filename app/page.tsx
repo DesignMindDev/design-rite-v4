@@ -12,7 +12,7 @@ export default function HomePage() {
   }
 
   const scheduleDemo = () => {
-    window.location.href = '/contact'
+    window.location.href = '/watch-demo'
   }
 
   return (
