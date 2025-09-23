@@ -120,12 +120,12 @@ export default function UnifiedNavigation() {
               alt="Design-Rite - AI-Powered Security Design Platform"
               width={180}
               height={45}
-              className="h-10 w-auto hover:opacity-90 transition-opacity"
+              className="h-20 w-auto hover:opacity-90 transition-opacity"
               priority
             />
           ) : (
             <div className="flex items-center gap-3 text-white font-black text-2xl">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
+              <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-3xl">
                 DR
               </div>
               Design-Rite
