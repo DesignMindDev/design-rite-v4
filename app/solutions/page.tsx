@@ -2,13 +2,28 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import EmailGate from '../components/EmailGate'
+import { useAuthCache } from '../hooks/useAuthCache'
 
 export default function SolutionsPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [showEmailGate, setShowEmailGate] = useState(false)
+  const { isAuthenticated, extendSession } = useAuthCache()
 
-  const redirectToApp = () => {
-    window.location.href = '/app'
-  }
+  const handleTryPlatformClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isAuthenticated) {
+      extendSession();
+      window.location.href = '/ai-assessment';
+    } else {
+      setShowEmailGate(true);
+    }
+  };
+
+  const handleEmailGateSuccess = () => {
+    setShowEmailGate(false);
+    window.location.href = '/ai-assessment';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 text-white">
@@ -35,8 +50,8 @@ export default function SolutionsPage() {
             <Link href="/login" className="text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
               Sign In
             </Link>
-            <button 
-              onClick={redirectToApp}
+            <button
+              onClick={handleTryPlatformClick}
               className="bg-white text-purple-600 px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all"
             >
               Try Platform
@@ -274,8 +289,8 @@ export default function SolutionsPage() {
             delivering faster, more accurate results with Design-Rite's AI platform.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
-              onClick={redirectToApp}
+            <button
+              onClick={handleTryPlatformClick}
               className="bg-white text-purple-600 px-8 py-4 rounded-xl text-lg font-bold hover:bg-gray-100 transition-all"
             >
               Start Free Trial
@@ -289,6 +304,13 @@ export default function SolutionsPage() {
           </div>
         </section>
       </main>
+
+      {/* Email Gate Modal */}
+      <EmailGate
+        isOpen={showEmailGate}
+        onClose={() => setShowEmailGate(false)}
+        onSuccess={handleEmailGateSuccess}
+      />
     </div>
   )
 }

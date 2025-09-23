@@ -3,140 +3,39 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import UnifiedNavigation from '../components/UnifiedNavigation'
+import EmailGate from '../components/EmailGate'
+import { useAuthCache } from '../hooks/useAuthCache'
 
 export default function ComplianceAnalystPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [showEmailGate, setShowEmailGate] = useState(false)
   const router = useRouter()
+  const { isAuthenticated, extendSession } = useAuthCache()
+
+  const handleTryComplianceClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isAuthenticated) {
+      extendSession();
+      router.push('/ai-assessment');
+    } else {
+      setShowEmailGate(true);
+    }
+  };
+
+  const handleEmailGateSuccess = () => {
+    setShowEmailGate(false);
+    router.push('/ai-assessment');
+  };
+
+  const redirectToWaitlist = () => {
+    router.push('/waitlist');
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
-      {/* Top Announcement Bar */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
-        <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
-          <span className="text-base">📋</span>
-          <span className="flex-1 text-center">
-            AI-Powered Compliance Analysis - Ensure 100% regulatory adherence across all security projects
-          </span>
-          <Link 
-            href="/subscribe"
-            className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30"
-          >
-            Get Early Access
-          </Link>
-        </div>
-      </div>
+      <UnifiedNavigation />
 
-      {/* Header */}
-      <header className="bg-black/10 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 py-5">
-        <nav className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-3 text-white font-bold text-2xl">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-black text-sm">
-              DR
-            </div>
-            Design-Rite
-          </Link>
-
-{/* Mobile Menu */}
-{isMenuOpen && (
-  <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
-    <div className="px-6 py-4 space-y-4">
-      
-      {/* Platform Section */}
-      <div>
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Platform</div>
-        <Link href="/ai-assessment" className="block text-white/80 hover:text-white py-2 pl-4">AI Assessment</Link>
-        <Link href="/compliance-analyst" className="block text-white/80 hover:text-white py-2 pl-4">Compliance Tools</Link>
-        <Link href="/white-label" className="block text-white/80 hover:text-white py-2 pl-4">White Label</Link>
-        <Link href="/enterprise-roi" className="block text-white/80 hover:text-white py-2 pl-4">ROI Calculator</Link>
-      </div>
-      
-      {/* Solutions Section */}
-      <div className="border-t border-white/10 pt-2">
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Solutions</div>
-        <Link href="/integrators" className="block text-white/80 hover:text-white py-2 pl-4">Security Integrators</Link>
-        <Link href="/enterprise" className="block text-white/80 hover:text-white py-2 pl-4">Enterprise Security</Link>
-        <Link href="/education" className="block text-white/80 hover:text-white py-2 pl-4">Education & Healthcare</Link>
-        <Link href="/consultants" className="block text-white/80 hover:text-white py-2 pl-4">Security Consultants</Link>
-      </div>
-      
-      {/* Partners Link */}
-      <Link href="/partners" className="block text-white/80 hover:text-white py-2 border-t border-white/10 pt-2">Partners</Link>
-      
-      {/* Company Section */}
-      <div className="border-t border-white/10 pt-2">
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Company</div>
-        <Link href="/about" className="block text-white/80 hover:text-white py-2 pl-4">About Us</Link>
-        <Link href="/team" className="block text-white/80 hover:text-white py-2 pl-4">Team</Link>
-        <Link href="/careers" className="block text-white/80 hover:text-white py-2 pl-4">Careers</Link>
-        <Link href="/contact" className="block text-white/80 hover:text-white py-2 pl-4">Contact</Link>
-      </div>
-      
-      {/* Sign In and CTA */}
-      <div className="pt-4 border-t border-white/10">
-        <Link href="/login" className="block text-white/80 hover:text-white py-2">Sign In</Link>
-        <button onClick={redirectToWaitlist} className="block w-full text-left bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">
-          Join Waitlist
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-          {/* Mobile Menu Button */}
-          <button 
-            className="lg:hidden text-white text-2xl"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            ☰
-          </button>
-        </nav>
-
-{/* Mobile Menu */}
-{isMenuOpen && (
-  <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
-    <div className="px-6 py-4 space-y-4">
-      
-      {/* Platform Section */}
-      <div>
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Platform</div>
-        <Link href="/ai-assessment" className="block text-white/80 hover:text-white py-2 pl-4">AI Assessment</Link>
-        <Link href="/compliance-analyst" className="block text-white/80 hover:text-white py-2 pl-4">Compliance Tools</Link>
-        <Link href="/white-label" className="block text-white/80 hover:text-white py-2 pl-4">White Label</Link>
-        <Link href="/enterprise-roi" className="block text-white/80 hover:text-white py-2 pl-4">ROI Calculator</Link>
-      </div>
-      
-      {/* Solutions Section */}
-      <div className="border-t border-white/10 pt-2">
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Solutions</div>
-        <Link href="/integrators" className="block text-white/80 hover:text-white py-2 pl-4">Security Integrators</Link>
-        <Link href="/enterprise" className="block text-white/80 hover:text-white py-2 pl-4">Enterprise Security</Link>
-        <Link href="/education" className="block text-white/80 hover:text-white py-2 pl-4">Education & Healthcare</Link>
-        <Link href="/consultants" className="block text-white/80 hover:text-white py-2 pl-4">Security Consultants</Link>
-      </div>
-      
-      {/* Partners Link */}
-      <Link href="/partners" className="block text-white/80 hover:text-white py-2 border-t border-white/10 pt-2">Partners</Link>
-      
-      {/* Company Section */}
-      <div className="border-t border-white/10 pt-2">
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Company</div>
-        <Link href="/about" className="block text-white/80 hover:text-white py-2 pl-4">About Us</Link>
-        <Link href="/team" className="block text-white/80 hover:text-white py-2 pl-4">Team</Link>
-        <Link href="/careers" className="block text-white/80 hover:text-white py-2 pl-4">Careers</Link>
-        <Link href="/contact" className="block text-white/80 hover:text-white py-2 pl-4">Contact</Link>
-      </div>
-      
-      {/* Sign In and CTA */}
-      <div className="pt-4 border-t border-white/10">
-        <Link href="/login" className="block text-white/80 hover:text-white py-2">Sign In</Link>
-        <button onClick={redirectToWaitlist} className="block w-full text-left bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">
-          Join Waitlist
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-      </header>
 
       {/* Main Content */}
       <main className="flex-1">
@@ -157,8 +56,8 @@ export default function ComplianceAnalystPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => router.push('/app')}
+              <button
+                onClick={handleTryComplianceClick}
                 className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all transform hover:scale-[1.02] shadow-lg"
               >
                 Try Compliance Check
@@ -328,8 +227,8 @@ export default function ComplianceAnalystPage() {
               Join security integrators who trust AI-powered compliance analysis to protect their projects and reputation.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => router.push('/app')}
+              <button
+                onClick={handleTryComplianceClick}
                 className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all transform hover:scale-[1.02] shadow-lg"
               >
                 Try Compliance Demo
@@ -386,6 +285,13 @@ export default function ComplianceAnalystPage() {
           </div>
         </div>
       </footer>
+
+      {/* Email Gate Modal */}
+      <EmailGate
+        isOpen={showEmailGate}
+        onClose={() => setShowEmailGate(false)}
+        onSuccess={handleEmailGateSuccess}
+      />
     </div>
   )
 }

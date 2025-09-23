@@ -561,13 +561,13 @@ export default function APIAccessPage() {
           </h2>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link 
-              href="/app"
-              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 text-center hover:bg-white/15 hover:-translate-y-1 transition-all"
+            <button
+              onClick={handleTryPlatformClick}
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 text-center hover:bg-white/15 hover:-translate-y-1 transition-all w-full"
             >
               <div className="text-2xl mb-3">🆓</div>
               <div className="font-semibold text-white">Start Free Trial</div>
-            </Link>
+            </button>
             <a 
               href="mailto:api@design-rite.com?subject=API%20Pricing%20Information"
               className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 text-center hover:bg-white/15 hover:-translate-y-1 transition-all"
@@ -601,13 +601,20 @@ export default function APIAccessPage() {
             <Link href="/" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Home</Link>
             <Link href="/about" className="text-white/70 hover:text-purple-600 text-sm transition-colors">About</Link>
             <Link href="/contact" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Contact</Link>
-            <Link href="/app" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Try Platform</Link>
+            <button onClick={handleTryPlatformClick} className="text-white/70 hover:text-purple-600 text-sm transition-colors text-left">Try Platform</button>
           </div>
           <p className="text-sm text-white/60 mt-4">
             🔒 Your API keys and data are secure with enterprise-grade encryption.
           </p>
         </div>
       </footer>
+
+      {/* Email Gate Modal */}
+      <EmailGate
+        isOpen={showEmailGate}
+        onClose={() => setShowEmailGate(false)}
+        onSuccess={handleEmailGateSuccess}
+      />
     </div>
   )
 }

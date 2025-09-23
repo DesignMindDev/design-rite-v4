@@ -3,10 +3,29 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import EmailGate from '../components/EmailGate'
+import { useAuthCache } from '../hooks/useAuthCache'
 
 export default function LoginPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [showEmailGate, setShowEmailGate] = useState(false)
   const router = useRouter()
+  const { isAuthenticated, extendSession } = useAuthCache()
+
+  const handleTryPlatformClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isAuthenticated) {
+      extendSession();
+      router.push('/ai-assessment');
+    } else {
+      setShowEmailGate(true);
+    }
+  };
+
+  const handleEmailGateSuccess = () => {
+    setShowEmailGate(false);
+    router.push('/ai-assessment');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
@@ -33,8 +52,8 @@ export default function LoginPage() {
             <Link href="/subscribe" className="text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
               Join Waitlist
             </Link>
-            <button 
-              onClick={() => router.push('/app')}
+            <button
+              onClick={handleTryPlatformClick}
               className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
             >
               Try Platform
@@ -63,8 +82,8 @@ export default function LoginPage() {
                 <Link href="/subscribe" className="block text-center text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
                   Join Waitlist
                 </Link>
-                <button 
-                  onClick={() => router.push('/app')}
+                <button
+                  onClick={handleTryPlatformClick}
                   className="block w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
                 >
                   Try Platform
@@ -109,8 +128,8 @@ export default function LoginPage() {
                 Try Platform Demo
               </h4>
               <p className="text-white/70 text-sm mb-4">Experience our AI security assessment without signing up.</p>
-              <button 
-                onClick={() => router.push('/app')}
+              <button
+                onClick={handleTryPlatformClick}
                 className="w-full bg-white/10 text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/20 transition-all"
               >
                 Try Demo Now
@@ -156,6 +175,13 @@ export default function LoginPage() {
           </div>
         </div>
       </footer>
+
+      {/* Email Gate Modal */}
+      <EmailGate
+        isOpen={showEmailGate}
+        onClose={() => setShowEmailGate(false)}
+        onSuccess={handleEmailGateSuccess}
+      />
     </div>
   )
 }

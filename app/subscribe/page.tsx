@@ -3,12 +3,31 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import EmailGate from '../components/EmailGate'
+import { useAuthCache } from '../hooks/useAuthCache'
 
 export default function SubscribePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [email, setEmail] = useState('')
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [showEmailGate, setShowEmailGate] = useState(false)
   const router = useRouter()
+  const { isAuthenticated, extendSession } = useAuthCache()
+
+  const handleTryPlatformClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isAuthenticated) {
+      extendSession();
+      router.push('/ai-assessment');
+    } else {
+      setShowEmailGate(true);
+    }
+  };
+
+  const handleEmailGateSuccess = () => {
+    setShowEmailGate(false);
+    router.push('/ai-assessment');
+  };
 
  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault()
@@ -62,8 +81,8 @@ export default function SubscribePage() {
             <Link href="/login" className="text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
               Sign In
             </Link>
-            <button 
-              onClick={() => router.push('/app')}
+            <button
+              onClick={handleTryPlatformClick}
               className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
             >
               Try Platform
@@ -92,8 +111,8 @@ export default function SubscribePage() {
                 <Link href="/login" className="block text-center text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
                   Sign In
                 </Link>
-                <button 
-                  onClick={() => router.push('/app')}
+                <button
+                  onClick={handleTryPlatformClick}
                   className="block w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
                 >
                   Try Platform
@@ -220,6 +239,13 @@ export default function SubscribePage() {
           </div>
         </section>
       </main>
+
+      {/* Email Gate Modal */}
+      <EmailGate
+        isOpen={showEmailGate}
+        onClose={() => setShowEmailGate(false)}
+        onSuccess={handleEmailGateSuccess}
+      />
 
       {/* Footer */}
       <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">

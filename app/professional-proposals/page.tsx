@@ -3,12 +3,29 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import UnifiedNavigation from '../components/UnifiedNavigation'
 import EmailGate from '../components/EmailGate'
+import { useAuthCache } from '../hooks/useAuthCache'
 
 export default function ProfessionalProposalsPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showEmailGate, setShowEmailGate] = useState(false)
   const router = useRouter()
+  const { isAuthenticated, extendSession } = useAuthCache()
+
+  const redirectToWaitlist = () => {
+    router.push('/waitlist');
+  };
+
+  const handleTryDemoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isAuthenticated) {
+      extendSession();
+      router.push('/ai-assessment');
+    } else {
+      setShowEmailGate(true);
+    }
+  }
 
   const handleGenerateProposalClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -17,250 +34,13 @@ export default function ProfessionalProposalsPage() {
 
   const handleEmailGateSuccess = () => {
     setShowEmailGate(false);
-    window.location.href = '/ai-assessment';
+    router.push('/ai-assessment');
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
-      {/* Top Announcement Bar */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
-        <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
-          <span className="text-base">📋</span>
-          <span className="flex-1 text-center">
-            AI-Generated Professional Proposals - Transform assessments into winning client presentations
-          </span>
-          <Link 
-            href="/subscribe"
-            className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30"
-          >
-            Get Early Access
-          </Link>
-        </div>
-      </div>
+      <UnifiedNavigation />
 
-      {/* Header */}
-      <header className="bg-black/10 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 py-5">
-        <nav className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-3 text-white font-bold text-2xl">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-black text-sm">
-              DR
-            </div>
-            Design-Rite
-          </Link>
-
-{/* Desktop Navigation */}
-          <ul className="hidden lg:flex items-center gap-10">
-            
-            {/* Platform Dropdown */}
-            <li className="relative group">
-              <span className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
-                Platform
-              </span>
-              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[240px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
-                <Link href="/ai-assessment" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                    🧠
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">AI Assessment</div>
-                    <div className="text-xs text-gray-400 leading-tight">Intelligent security analysis</div>
-                  </div>
-                </Link>
-                <Link href="/compliance-analyst" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                    ✅
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Compliance Tools</div>
-                    <div className="text-xs text-gray-400 leading-tight">Regulatory compliance</div>
-                  </div>
-                </Link>
-                <Link href="/white-label" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                    🏷️
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">White Label</div>
-                    <div className="text-xs text-gray-400 leading-tight">Custom branding solutions</div>
-                  </div>
-                </Link>
-                <Link href="/enterprise-roi" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                    💰
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">ROI Calculator</div>
-                    <div className="text-xs text-gray-400 leading-tight">Calculate your savings</div>
-                  </div>
-                </Link>
-              </div>
-            </li>
-            
-            {/* Solutions Dropdown */}
-            <li className="relative group">
-              <span className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
-                Solutions
-              </span>
-              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
-                <Link href="/integrators" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                    🔧
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Security Integrators</div>
-                    <div className="text-xs text-gray-400 leading-tight">Design & proposal automation</div>
-                  </div>
-                </Link>
-                <Link href="/enterprise" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                    🏢
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Enterprise Security</div>
-                    <div className="text-xs text-gray-400 leading-tight">In-house team solutions</div>
-                  </div>
-                </Link>
-                <Link href="/education" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                    🎓
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Education & Healthcare</div>
-                    <div className="text-xs text-gray-400 leading-tight">Specialized compliance tools</div>
-                  </div>
-                </Link>
-                <Link href="/consultants" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                    💼
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Security Consultants</div>
-                    <div className="text-xs text-gray-400 leading-tight">Expert advisory services</div>
-                  </div>
-                </Link>
-              </div>
-            </li>
-
-            {/* Partners - Simple Link */}
-            <li>
-              <Link href="/partners" className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm">
-                Partners
-              </Link>
-            </li>
-
-            {/* Company Dropdown */}
-            <li className="relative group">
-              <span className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
-                Company
-              </span>
-              <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[220px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
-                <Link href="/about" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                    ℹ️
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">About Us</div>
-                    <div className="text-xs text-gray-400 leading-tight">Our mission & vision</div>
-                  </div>
-                </Link>
-                <Link href="/team" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                    👥
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Team</div>
-                    <div className="text-xs text-gray-400 leading-tight">Meet our experts</div>
-                  </div>
-                </Link>
-                <Link href="/careers" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                    💼
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Careers</div>
-                    <div className="text-xs text-gray-400 leading-tight">Join our team</div>
-                  </div>
-                </Link>
-                <Link href="/contact" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
-                  <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                    📧
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm text-white mb-1">Contact</div>
-                    <div className="text-xs text-gray-400 leading-tight">Get in touch</div>
-                  </div>
-                </Link>
-              </div>
-            </li>
-          </ul>
-
-          <div className="hidden lg:flex items-center gap-3">
-            <Link href="/login" className="text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
-              Sign In
-            </Link>
-            <button 
-              onClick={() => router.push('/app')}
-              className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
-            >
-              Try Demo
-            </button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button 
-            className="lg:hidden text-white text-2xl"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            ☰
-          </button>
-        </nav>
-
-{/* Mobile Menu */}
-{isMenuOpen && (
-  <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
-    <div className="px-6 py-4 space-y-4">
-      
-      {/* Platform Section */}
-      <div>
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Platform</div>
-        <Link href="/ai-assessment" className="block text-white/80 hover:text-white py-2 pl-4">AI Assessment</Link>
-        <Link href="/compliance-analyst" className="block text-white/80 hover:text-white py-2 pl-4">Compliance Tools</Link>
-        <Link href="/white-label" className="block text-white/80 hover:text-white py-2 pl-4">White Label</Link>
-        <Link href="/enterprise-roi" className="block text-white/80 hover:text-white py-2 pl-4">ROI Calculator</Link>
-      </div>
-      
-      {/* Solutions Section */}
-      <div className="border-t border-white/10 pt-2">
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Solutions</div>
-        <Link href="/integrators" className="block text-white/80 hover:text-white py-2 pl-4">Security Integrators</Link>
-        <Link href="/enterprise" className="block text-white/80 hover:text-white py-2 pl-4">Enterprise Security</Link>
-        <Link href="/education" className="block text-white/80 hover:text-white py-2 pl-4">Education & Healthcare</Link>
-        <Link href="/consultants" className="block text-white/80 hover:text-white py-2 pl-4">Security Consultants</Link>
-      </div>
-      
-      {/* Partners Link */}
-      <Link href="/partners" className="block text-white/80 hover:text-white py-2 border-t border-white/10 pt-2">Partners</Link>
-      
-      {/* Company Section */}
-      <div className="border-t border-white/10 pt-2">
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Company</div>
-        <Link href="/about" className="block text-white/80 hover:text-white py-2 pl-4">About Us</Link>
-        <Link href="/team" className="block text-white/80 hover:text-white py-2 pl-4">Team</Link>
-        <Link href="/careers" className="block text-white/80 hover:text-white py-2 pl-4">Careers</Link>
-        <Link href="/contact" className="block text-white/80 hover:text-white py-2 pl-4">Contact</Link>
-      </div>
-      
-      {/* Sign In and CTA */}
-      <div className="pt-4 border-t border-white/10">
-        <Link href="/login" className="block text-white/80 hover:text-white py-2">Sign In</Link>
-        <button onClick={redirectToWaitlist} className="block w-full text-left bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">
-          Join Waitlist
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-      </header>
 
       {/* Main Content */}
       <main className="flex-1">
