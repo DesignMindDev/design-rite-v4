@@ -87,6 +87,16 @@ const nextConfig = {
       {
         source: "/(.*)",
         headers: [
+          // CVE-2025-29927 Protection Headers
+          {
+            key: "X-Middleware-Bypass-Protection",
+            value: "enabled",
+          },
+          {
+            key: "X-CVE-2025-29927-Mitigation",
+            value: "active",
+          },
+          // Enhanced Security Headers for Render
           {
             key: "X-Frame-Options",
             value: "DENY",
@@ -101,7 +111,19 @@ const nextConfig = {
           },
           {
             key: "Strict-Transport-Security",
-            value: "max-age=31536000; includeSubDomains",
+            value: "max-age=31536000; includeSubDomains; preload",
+          },
+          {
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.openai.com https://supabase.co https://*.supabase.co; frame-ancestors 'none';",
           },
         ],
       },

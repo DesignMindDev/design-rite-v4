@@ -61,6 +61,35 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Compression
 app.use(compression());
 
+// CVE-2025-29927 Security Middleware - Block middleware bypass attempts
+app.use((req, res, next) => {
+  // Log and block suspicious middleware bypass attempts
+  const bypassHeader = req.headers['x-middleware-subrequest'];
+  const rewriteHeader = req.headers['x-middleware-rewrite'];
+  const nextRewrite = req.headers['x-nextjs-rewrite'];
+
+  if (bypassHeader || rewriteHeader || nextRewrite) {
+    console.warn(`🚨 SECURITY ALERT: CVE-2025-29927 bypass attempt detected from ${req.ip}`);
+    console.warn(`Method: ${req.method} | Path: ${req.path}`);
+    console.warn(`Suspicious headers:`, {
+      'x-middleware-subrequest': bypassHeader,
+      'x-middleware-rewrite': rewriteHeader,
+      'x-nextjs-rewrite': nextRewrite
+    });
+    console.warn(`User-Agent: ${req.headers['user-agent']}`);
+
+    // Block the request
+    return res.status(403).json({
+      error: 'Forbidden - Security Protection Enabled',
+      message: 'Middleware bypass attempt detected',
+      timestamp: new Date().toISOString(),
+      requestId: Math.random().toString(36).substr(2, 9)
+    });
+  }
+
+  next();
+});
+
 // Request logging
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
