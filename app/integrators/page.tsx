@@ -36,13 +36,13 @@ export default function SecurityIntegratorsPage() {
               onClick={redirectToApp}
               className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg"
             >
-              ?? Start Free Trial
+              🚀 Start Free Trial
             </button>
             <Link 
               href="/contact" 
               className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block"
             >
-              ?? Schedule Demo
+              📅 Schedule Demo
             </Link>
           </div>
         </section>
@@ -50,7 +50,7 @@ export default function SecurityIntegratorsPage() {
         {/* Features Grid */}
         <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 max-w-6xl mx-auto">
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">??</div>
+            <div className="text-4xl mb-4">🧠</div>
             <h3 className="text-xl font-bold text-white mb-4">AI Site Assessment</h3>
             <p className="text-gray-300">
               Upload floor plans or photos and get comprehensive threat analysis with 
@@ -59,7 +59,7 @@ export default function SecurityIntegratorsPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">??</div>
+            <div className="text-4xl mb-4">📋</div>
             <h3 className="text-xl font-bold text-white mb-4">Automated Proposals</h3>
             <p className="text-gray-300">
               Generate professional BOMs, installation diagrams, and pricing 
@@ -68,7 +68,7 @@ export default function SecurityIntegratorsPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">??</div>
+            <div className="text-4xl mb-4">💰</div>
             <h3 className="text-xl font-bold text-white mb-4">Custom Pricing</h3>
             <p className="text-gray-300">
               Set your markup rates, labor costs, and profit margins for 
@@ -77,7 +77,7 @@ export default function SecurityIntegratorsPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">???</div>
+            <div className="text-4xl mb-4">🏷️</div>
             <h3 className="text-xl font-bold text-white mb-4">White-Label Ready</h3>
             <p className="text-gray-300">
               Brand the platform with your logo, colors, and company information 
@@ -86,7 +86,7 @@ export default function SecurityIntegratorsPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">??</div>
+            <div className="text-4xl mb-4">📊</div>
             <h3 className="text-xl font-bold text-white mb-4">Project Management</h3>
             <p className="text-gray-300">
               Track projects, manage client communications, and monitor 
@@ -95,7 +95,7 @@ export default function SecurityIntegratorsPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">?</div>
+            <div className="text-4xl mb-4">⚡</div>
             <h3 className="text-xl font-bold text-white mb-4">10x Faster</h3>
             <p className="text-gray-300">
               Complete assessments that used to take days in under 30 minutes. 
@@ -113,27 +113,27 @@ export default function SecurityIntegratorsPage() {
             <div>
               <h3 className="text-xl font-bold text-white mb-4">Without Design-Rite:</h3>
               <ul className="space-y-3 text-gray-300">
-                <li>?? 8-16 hours per assessment</li>
-                <li>?? Manual proposal creation</li>
-                <li>? Higher error rates</li>
-                <li>?? Lost opportunities due to slow turnaround</li>
-                <li>?? Client frustration with delays</li>
+                <li>⏰ 8-16 hours per assessment</li>
+                <li>📝 Manual proposal creation</li>
+                <li>❌ Higher error rates</li>
+                <li>💸 Lost opportunities due to slow turnaround</li>
+                <li>😤 Client frustration with delays</li>
               </ul>
             </div>
             <div>
               <h3 className="text-xl font-bold text-white mb-4">With Design-Rite:</h3>
               <ul className="space-y-3 text-green-400">
-                <li>? 30 minutes per assessment</li>
-                <li>?? Automated proposal generation</li>
-                <li>? AI-verified accuracy</li>
-                <li>?? Same-day proposal delivery</li>
-                <li>?? Impressed clients, more referrals</li>
+                <li>⚡ 30 minutes per assessment</li>
+                <li>🤖 Automated proposal generation</li>
+                <li>✅ AI-verified accuracy</li>
+                <li>🚀 Same-day proposal delivery</li>
+                <li>🌟 Impressed clients, more referrals</li>
               </ul>
             </div>
           </div>
           <div className="text-center mt-8">
             <div className="text-2xl font-bold text-white mb-4">
-              ?? Potential Savings: <span className="text-green-400">$50,000+</span> per year
+              💰 Potential Savings: <span className="text-green-400">$50,000+</span> per year
             </div>
             <p className="text-gray-300 mb-6">
               Based on completing 2x more projects with 90% less time investment
@@ -154,7 +154,7 @@ export default function SecurityIntegratorsPage() {
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-              <div className="text-yellow-400 text-2xl mb-4">?????</div>
+              <div className="text-yellow-400 text-2xl mb-4">⭐⭐⭐⭐⭐</div>
               <p className="text-gray-300 mb-4">
                 "Design-Rite cut our assessment time from 2 days to 30 minutes. 
                 We're now completing 3x more projects and our clients love the fast turnaround."
@@ -163,7 +163,7 @@ export default function SecurityIntegratorsPage() {
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-              <div className="text-yellow-400 text-2xl mb-4">?????</div>
+              <div className="text-yellow-400 text-2xl mb-4">⭐⭐⭐⭐⭐</div>
               <p className="text-gray-300 mb-4">
                 "The AI recommendations are spot-on and the automated proposals look incredibly professional. 
                 Our close rate has increased by 40%."
@@ -172,7 +172,7 @@ export default function SecurityIntegratorsPage() {
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-              <div className="text-yellow-400 text-2xl mb-4">?????</div>
+              <div className="text-yellow-400 text-2xl mb-4">⭐⭐⭐⭐⭐</div>
               <p className="text-gray-300 mb-4">
                 "White-labeling was seamless. Our clients think we built this amazing tool in-house. 
                 It's given us a huge competitive advantage."
@@ -195,13 +195,13 @@ export default function SecurityIntegratorsPage() {
               onClick={redirectToApp}
               className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg"
             >
-              ?? Start Free Trial - No Credit Card Required
+              🚀 Start Free Trial - No Credit Card Required
             </button>
             <Link 
               href="/contact" 
               className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block"
             >
-              ?? Talk to Our Team
+              💬 Talk to Our Team
             </Link>
           </div>
         </section>
