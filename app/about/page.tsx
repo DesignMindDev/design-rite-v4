@@ -48,22 +48,22 @@ export default function AboutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
+    <div className="min-h-screen dr-bg-charcoal dr-text-pearl overflow-x-hidden">
       {/* Main Navigation Header with Dropdowns */}
       <UnifiedNavigation />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] relative overflow-hidden">
+      <section className="pt-32 pb-16 dr-bg-charcoal relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-radial from-purple-600/10 via-transparent to-transparent"></div>
         <div className="max-w-6xl mx-auto px-8 text-center relative z-10">
-          <div className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-bold text-base tracking-widest uppercase mb-4">
+          <div className="dr-text-violet dr-ui font-bold tracking-widest uppercase mb-4">
             About Design-Rite
           </div>
-          <h1 className="text-5xl lg:text-6xl font-black leading-tight mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+          <h1 className="dr-heading-xl dr-text-pearl leading-tight mb-8 pb-2 whitespace-nowrap">
             Revolutionizing Security Design
           </h1>
-          <p className="text-xl text-gray-400 mb-16 leading-relaxed max-w-4xl mx-auto">
-            We're transforming security system design with AI-powered intelligence, making professional-grade 
+          <p className="dr-body text-gray-300 mb-16 leading-relaxed max-w-4xl mx-auto">
+            We're transforming security system design with AI-powered intelligence, making professional-grade
             assessments accessible to everyone in the industry.
           </p>
         </div>
@@ -72,11 +72,11 @@ export default function AboutPage() {
       {/* Mission Section */}
       <section className="py-16 bg-black/50">
         <div className="max-w-4xl mx-auto px-8">
-          <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-12">
-            <h2 className="text-4xl font-black mb-8 flex items-center gap-4 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">
+          <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-12">
+            <h2 className="dr-heading-lg font-black mb-8 pb-2 flex items-center gap-4 dr-text-pearl">
               <span className="text-3xl">🎯</span> Our Mission
             </h2>
-            <div className="text-lg text-gray-300 leading-relaxed space-y-6">
+            <div className="dr-body text-gray-300 leading-relaxed space-y-6">
               <p>
                 Design-Rite was founded to solve one of the industry's biggest challenges: the overlooked details that can derail security projects.
                 With over two decades of low-voltage design expertise, we've seen how traditional processes leave gaps in compliance,
@@ -101,10 +101,10 @@ export default function AboutPage() {
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-black mb-4 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">
+            <h2 className="dr-heading-lg font-black mb-4 pb-2 dr-text-pearl">
               Meet Our Team
             </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+            <p className="dr-body text-gray-300 max-w-2xl mx-auto">
               Industry veterans and AI experts working together to revolutionize security design.
             </p>
           </div>
@@ -129,19 +129,19 @@ export default function AboutPage() {
                 ))}
 
                 {/* Join Us - Special Card */}
-                <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 text-center hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-                  <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6">
+                <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-8 text-center hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+                  <div className="w-20 h-20 dr-bg-violet rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6">
                     +
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Join Our Team</h3>
-                  <p className="text-purple-600 font-semibold mb-4">We're Hiring</p>
-                  <p className="text-gray-400 text-sm leading-relaxed mb-6">
+                  <h3 className="dr-subheading font-bold dr-text-pearl mb-2">Join Our Team</h3>
+                  <p className="dr-text-violet dr-ui font-semibold mb-4">We're Hiring</p>
+                  <p className="text-gray-300 dr-ui leading-relaxed mb-6">
                     Help us build the future of security design. We're looking for passionate
                     engineers and industry experts.
                   </p>
                   <Link
                     href="/careers"
-                    className="inline-block bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all text-sm"
+                    className="inline-block dr-bg-violet dr-text-pearl px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all dr-ui"
                   >
                     View Careers
                   </Link>
@@ -156,65 +156,65 @@ export default function AboutPage() {
       <section className="py-16 bg-black/50">
         <div className="max-w-6xl mx-auto px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-black mb-4 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">
+            <h2 className="dr-heading-lg font-black mb-4 pb-2 dr-text-pearl">
               Our Values
             </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+            <p className="dr-body text-gray-300 max-w-2xl mx-auto">
               These principles guide everything we do, from product development to customer relationships.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
               <div className="text-3xl mb-4">⚡</div>
-              <h3 className="text-xl font-bold text-white mb-4">Speed & Efficiency</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Transform weeks of work into minutes. We obsess over making security design faster without 
+              <h3 className="dr-subheading font-bold dr-text-pearl mb-4">Speed & Efficiency</h3>
+              <p className="dr-body text-gray-300 leading-relaxed">
+                Transform weeks of work into minutes. We obsess over making security design faster without
                 sacrificing quality or accuracy.
               </p>
             </div>
 
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
               <div className="text-3xl mb-4">🎯</div>
-              <h3 className="text-xl font-bold text-white mb-4">Precision & Accuracy</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Our AI delivers professional-grade results with 95%+ accuracy, backed by industry expertise 
+              <h3 className="dr-subheading font-bold dr-text-pearl mb-4">Precision & Accuracy</h3>
+              <p className="dr-body text-gray-300 leading-relaxed">
+                Our AI delivers professional-grade results with 95%+ accuracy, backed by industry expertise
                 and compliance knowledge.
               </p>
             </div>
 
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
               <div className="text-3xl mb-4">🌐</div>
-              <h3 className="text-xl font-bold text-white mb-4">Accessibility</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Making professional security design expertise accessible to integrators and consultants 
+              <h3 className="dr-subheading font-bold dr-text-pearl mb-4">Accessibility</h3>
+              <p className="dr-body text-gray-300 leading-relaxed">
+                Making professional security design expertise accessible to integrators and consultants
                 of all sizes.
               </p>
             </div>
 
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
               <div className="text-3xl mb-4">🔒</div>
-              <h3 className="text-xl font-bold text-white mb-4">Security First</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Every recommendation prioritizes security effectiveness, compliance requirements, 
+              <h3 className="dr-subheading font-bold dr-text-pearl mb-4">Security First</h3>
+              <p className="dr-body text-gray-300 leading-relaxed">
+                Every recommendation prioritizes security effectiveness, compliance requirements,
                 and industry best practices.
               </p>
             </div>
 
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
               <div className="text-3xl mb-4">🚀</div>
-              <h3 className="text-xl font-bold text-white mb-4">Innovation</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Constantly pushing the boundaries of what's possible with AI and machine learning 
+              <h3 className="dr-subheading font-bold dr-text-pearl mb-4">Innovation</h3>
+              <p className="dr-body text-gray-300 leading-relaxed">
+                Constantly pushing the boundaries of what's possible with AI and machine learning
                 in security design.
               </p>
             </div>
 
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-8 hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
               <div className="text-3xl mb-4">🤝</div>
-              <h3 className="text-xl font-bold text-white mb-4">Partnership</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Building lasting relationships with integrators, consultants, and security professionals 
+              <h3 className="dr-subheading font-bold dr-text-pearl mb-4">Partnership</h3>
+              <p className="dr-body text-gray-300 leading-relaxed">
+                Building lasting relationships with integrators, consultants, and security professionals
                 who trust our platform.
               </p>
             </div>
@@ -225,24 +225,24 @@ export default function AboutPage() {
       {/* Technology Section */}
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-8">
-          <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-12">
-            <h2 className="text-4xl font-black mb-8 flex items-center gap-4 bg-gradient-to-r from-white to-purple-600 bg-clip-text text-transparent">
+          <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-12">
+            <h2 className="dr-heading-lg font-black mb-8 pb-2 flex items-center gap-4 dr-text-pearl">
               <span className="text-3xl">🧠</span> Our Technology
             </h2>
-            <div className="text-lg text-gray-300 leading-relaxed space-y-6">
+            <div className="dr-body text-gray-300 leading-relaxed space-y-6">
               <p>
-                At the heart of Design-Rite is a sophisticated AI engine trained on thousands of real-world security 
-                installations, compliance requirements, and industry standards. Our machine learning models understand 
+                At the heart of Design-Rite is a sophisticated AI engine trained on thousands of real-world security
+                installations, compliance requirements, and industry standards. Our machine learning models understand
                 the nuanced relationships between facility types, threat vectors, and optimal security solutions.
               </p>
               <p>
-                Our platform combines multiple AI technologies to analyze facility layouts, assess security 
-                risks, recommend optimal device placement, and generate comprehensive documentation that 
+                Our platform combines multiple AI technologies to analyze facility layouts, assess security
+                risks, recommend optimal device placement, and generate comprehensive documentation that
                 meets industry standards including CJIS, FERPA, and HIPAA compliance.
               </p>
               <p>
-                The system continuously learns and improves, ensuring recommendations stay current with evolving 
-                threats, new technologies, and changing compliance requirements. This creates a platform that gets 
+                The system continuously learns and improves, ensuring recommendations stay current with evolving
+                threats, new technologies, and changing compliance requirements. This creates a platform that gets
                 smarter with every assessment generated.
               </p>
             </div>
@@ -251,20 +251,20 @@ export default function AboutPage() {
       </section>
 
       {/* Call to Action Section */}
-      <section className="py-24 bg-gradient-to-r from-purple-600/10 to-purple-700/10">
+      <section className="py-24 bg-gradient-to-r from-violet-600/10 to-violet-700/10">
         <div className="max-w-4xl mx-auto px-8 text-center">
-          <h2 className="text-4xl lg:text-5xl font-black text-white mb-4">
+          <h2 className="dr-heading-lg font-black dr-text-pearl mb-4 pb-2">
             Ready to Join the Revolution?
           </h2>
-          <p className="text-xl text-gray-400 mb-10">
-            Experience the future of security design today. Join our waitlist for early access to the most 
+          <p className="dr-body text-gray-300 mb-10">
+            Experience the future of security design today. Join our waitlist for early access to the most
             advanced AI-powered security design platform launching Q4 2025.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button onClick={redirectToApp} className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-purple-600/40 transition-all">
+            <button onClick={redirectToApp} className="dr-bg-violet dr-text-pearl px-8 py-4 rounded-xl dr-ui font-bold hover:shadow-xl hover:shadow-purple-600/40 transition-all">
               Join Waitlist - Free Early Access
             </button>
-            <Link href="/contact" className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all">
+            <Link href="/contact" className="bg-white/10 dr-text-pearl px-8 py-4 rounded-xl dr-ui font-semibold border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all">
               Contact Us
             </Link>
           </div>
@@ -275,12 +275,10 @@ export default function AboutPage() {
 
       {/* Chat Button */}
       <div className="fixed bottom-5 right-5 z-[999999]">
-        <button className="w-15 h-15 bg-purple-600 rounded-full cursor-pointer flex items-center justify-center shadow-lg hover:scale-110 hover:shadow-xl transition-all">
+        <button className="w-15 h-15 dr-bg-violet rounded-full cursor-pointer flex items-center justify-center shadow-lg hover:scale-110 hover:shadow-xl transition-all">
           <div className="text-white text-2xl font-bold">💬</div>
         </button>
       </div>
     </div>
   )
 }
-
-
