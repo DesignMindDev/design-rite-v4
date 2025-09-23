@@ -52,7 +52,7 @@ export default function HarvesterDashboard() {
 
   // Simple authentication
   const handleAuth = () => {
-    if (password === 'design-rite-admin-2024') {
+    if (password === 'designrite2025admin') {
       setIsAuthenticated(true)
     } else {
       alert('Invalid password')
