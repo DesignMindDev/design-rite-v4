@@ -1,12 +1,43 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import UnifiedNavigation from '../components/UnifiedNavigation';
 import TeamMember from '../components/TeamMember';
+import Footer from '../components/Footer';
+
+interface TeamMemberData {
+  id: string
+  name: string
+  role: string
+  description: string
+  imagePath: string
+  initials: string
+  href?: string
+}
 
 export default function AboutPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [teamMembers, setTeamMembers] = useState<TeamMemberData[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadTeamMembers()
+  }, [])
+
+  const loadTeamMembers = async () => {
+    try {
+      const response = await fetch('/api/admin/team')
+      if (response.ok) {
+        const data = await response.json()
+        setTeamMembers(data)
+      }
+    } catch (error) {
+      console.error('Failed to load team members:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const redirectToApp = () => {
     window.location.href = '/waitlist'
@@ -92,57 +123,44 @@ export default function AboutPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <TeamMember
-              name="Dan Kozich"
-              role="Founder & Principal Designer"
-              description="Over two decades of expertise in low-voltage design, security systems, and technology integration. Trusted advisor to Fortune 500 companies, school districts, hospitals, and critical infrastructure facilities. Subject matter expert automating compliance checks and design optimization."
-              imagePath="/team/dan-kozich.jpg"
-              initials="DK"
-            />
-
-            <TeamMember
-              name="Philip Lisk"
-              role="Managing Director"
-              description="Strategic leadership driving Design-Rite's growth and market expansion. Expertise in business development, operations, and scaling technology solutions in the security industry."
-              imagePath="/team/philip-lisk.jpg"
-              initials="PL"
-            />
-
-            <TeamMember
-              name="Munnyman Communications"
-              role="Development Team"
-              description="Expert development team bringing Design-Rite's vision to life. Specializing in AI platforms, modern web technologies, and scalable solutions that deliver powerful word-of-mouth results."
-              imagePath="/team/munnyman-communications.jpg"
-              initials="MC"
-              href="https://mmcommunications-newsletter-elitemembers.beehiiv.com/p/powerful-word-of-mouth-real-results"
-            />
-
-            <TeamMember
-              name="AI Research Team"
-              role="Core Intelligence"
-              description="Advanced AI models trained on thousands of security designs, compliance standards, and industry best practices."
-              imagePath="/team/ai-research.jpg"
-              initials="🧠"
-            />
-
-            {/* Join Us - Special Card */}
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 text-center hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6">
-                +
+            {loading ? (
+              <div className="col-span-full text-center text-gray-400">
+                Loading team members...
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Join Our Team</h3>
-              <p className="text-purple-600 font-semibold mb-4">We're Hiring</p>
-              <p className="text-gray-400 text-sm leading-relaxed mb-6">
-                Help us build the future of security design. We're looking for passionate
-                engineers and industry experts.
-              </p>
-              <Link
-                href="/careers"
-                className="inline-block bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all text-sm"
-              >
-                View Careers
-              </Link>
-            </div>
+            ) : (
+              <>
+                {teamMembers.map((member) => (
+                  <TeamMember
+                    key={member.id}
+                    name={member.name}
+                    role={member.role}
+                    description={member.description}
+                    imagePath={member.imagePath}
+                    initials={member.initials}
+                    href={member.href}
+                  />
+                ))}
+
+                {/* Join Us - Special Card */}
+                <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 text-center hover:-translate-y-1 hover:border-purple-600/50 hover:shadow-xl hover:shadow-purple-600/15 transition-all">
+                  <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6">
+                    +
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Join Our Team</h3>
+                  <p className="text-purple-600 font-semibold mb-4">We're Hiring</p>
+                  <p className="text-gray-400 text-sm leading-relaxed mb-6">
+                    Help us build the future of security design. We're looking for passionate
+                    engineers and industry experts.
+                  </p>
+                  <Link
+                    href="/careers"
+                    className="inline-block bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all text-sm"
+                  >
+                    View Careers
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -266,64 +284,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
-        <div className="max-w-6xl mx-auto px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-8">
-            <div>
-              <div className="flex items-center gap-3 text-white font-black text-2xl mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
-                  DR
-                </div>
-                Design-Rite
-              </div>
-              <p className="text-gray-400 leading-relaxed mb-6">
-                Transforming security system design with AI-powered intelligence. Professional assessments, automated 
-                proposals, and comprehensive documentation for the modern security industry.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-white font-bold mb-4">Platform</h3>
-              <ul className="space-y-2">
-                <li><button onClick={redirectToApp} className="text-gray-400 hover:text-purple-600 text-sm transition-colors">AI Assessment</button></li>
-                <li><Link href="/professional-proposals" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Proposal Generator</Link></li>
-                <li><Link href="/white-label" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">White-Label</Link></li>
-                <li><Link href="/api" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">API Access</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-white font-bold mb-4">Solutions</h3>
-              <ul className="space-y-2">
-                <li><Link href="/integrators" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Security Integrators</Link></li>
-                <li><Link href="/enterprise" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Enterprise</Link></li>
-                <li><Link href="/education" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Education</Link></li>
-                <li><Link href="/healthcare" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Healthcare</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-white font-bold mb-4">Company</h3>
-              <ul className="space-y-2">
-                <li><Link href="/about" className="text-purple-600 font-medium text-sm">About Us</Link></li>
-                <li><Link href="/careers" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Careers</Link></li>
-                <li><Link href="/contact" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Contact</Link></li>
-                <li><Link href="/support" className="text-gray-400 hover:text-purple-600 text-sm transition-colors">Support</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-600/30 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
-            <div>© 2025 Design-Rite. All rights reserved.</div>
-            <div className="flex gap-4 mt-4 md:mt-0">
-              <a href="mailto:hello@design-rite.com" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">📧</a>
-              <a href="https://linkedin.com/company/design-rite" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">💼</a>
-              <a href="https://twitter.com/designrite" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">🐦</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer redirectToApp={redirectToApp} />
 
       {/* Chat Button */}
       <div className="fixed bottom-5 right-5 z-[999999]">

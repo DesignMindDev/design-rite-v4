@@ -1,14 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import EmailGate from './EmailGate';
 import { useAuthCache } from '../hooks/useAuthCache';
+
+interface SiteSettings {
+  logoPath: string
+  footerLogoPath: string
+}
 
 export default function UnifiedNavigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEmailGate, setShowEmailGate] = useState(false);
+  const [settings, setSettings] = useState<SiteSettings>({ logoPath: '', footerLogoPath: '' });
   const { isAuthenticated, extendSession } = useAuthCache();
+
+  useEffect(() => {
+    loadSettings()
+  }, [])
+
+  const loadSettings = async () => {
+    try {
+      const response = await fetch('/api/admin/settings')
+      if (response.ok) {
+        const data = await response.json()
+        setSettings(data)
+      }
+    } catch (error) {
+      console.error('Failed to load settings:', error)
+    }
+  }
 
   const handleAIAssessmentClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -35,9 +58,19 @@ export default function UnifiedNavigation() {
     <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b border-purple-600/20 py-4">
       <nav className="max-w-6xl mx-auto px-8 flex justify-between items-center">
         <Link href="/" className="flex items-center gap-3 text-white font-black text-2xl">
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
-            DR
-          </div>
+          {settings.logoPath ? (
+            <Image
+              src={settings.logoPath}
+              alt="Design-Rite Logo"
+              width={40}
+              height={40}
+              className="rounded-lg object-contain"
+            />
+          ) : (
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
+              DR
+            </div>
+          )}
           Design-Rite
         </Link>
 
