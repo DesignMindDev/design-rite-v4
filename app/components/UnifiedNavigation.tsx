@@ -55,23 +55,65 @@ export default function UnifiedNavigation() {
   };
 
   return (
-    <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b border-purple-600/20 py-4">
+    <>
+      {/* Top Announcement Bar */}
+      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
+        <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
+          <span className="text-base">🎓</span>
+          <span className="flex-1 text-center">
+            Design-Rite's Revolutionary AI is launching Q4 2025 - Join the waitlist for early access to security design mastery
+          </span>
+          <Link
+            href="/subscribe"
+            className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30"
+          >
+            Join Waitlist
+          </Link>
+          <button className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center">
+            ×
+          </button>
+        </div>
+      </div>
+
+      {/* Utility Bar */}
+      <div className="bg-black/90 border-b border-purple-600/10 py-2 text-xs">
+        <div className="max-w-6xl mx-auto px-8 flex justify-end items-center gap-8">
+          <Link href="/login" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>👤</span> Login
+          </Link>
+          <Link href="/pricing" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>💰</span> Plans & Pricing
+          </Link>
+          <Link href="/support" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>❓</span> Help Center
+          </Link>
+          <Link href="/contact" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
+            <span>📧</span> Contact Us
+          </Link>
+        </div>
+      </div>
+
+      {/* Main Navigation Header */}
+      <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b border-purple-600/20 py-4">
       <nav className="max-w-6xl mx-auto px-8 flex justify-between items-center">
-        <Link href="/" className="flex items-center gap-3 text-white font-black text-2xl">
+        <Link href="/" className="flex items-center">
           {settings.logoPath ? (
             <Image
               src={settings.logoPath}
-              alt="Design-Rite Logo"
-              width={40}
-              height={40}
-              className="rounded-lg object-contain"
+              alt="Design-Rite - AI-Powered Security Design Platform"
+              width={180}
+              height={45}
+              className="h-10 w-auto hover:opacity-90 transition-opacity"
+              priority
             />
           ) : (
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
-              DR
+            <div className="flex items-center gap-3 text-white font-black text-2xl">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
+                DR
+              </div>
+              Design-Rite
             </div>
           )}
-          Design-Rite
         </Link>
 
         {/* Desktop Navigation */}
@@ -287,19 +329,13 @@ export default function UnifiedNavigation() {
           </li>
         </ul>
 
-        {/* Right Side Actions */}
-        <div className="hidden lg:flex items-center gap-4">
+        {/* Call to Action Button */}
+        <div className="hidden lg:block">
           <button
-            onClick={(e) => { e.preventDefault(); setShowEmailGate(true); }}
-            className="bg-white/10 text-white px-4 py-2 rounded-lg font-semibold border border-white/20 hover:bg-white/20 transition-all"
+            onClick={handleAIAssessmentClick}
+            className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:from-purple-700 hover:to-purple-800 transition-all hover:scale-105 shadow-lg hover:shadow-purple-600/25"
           >
-            Try It Free
-          </button>
-          <button
-            onClick={redirectToWaitlist}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition-all"
-          >
-            Join Waitlist
+            Try Platform
           </button>
         </div>
 
@@ -377,6 +413,7 @@ export default function UnifiedNavigation() {
         onClose={() => setShowEmailGate(false)}
         onSuccess={handleEmailGateSuccess}
       />
-    </header>
+      </header>
+    </>
   );
 }

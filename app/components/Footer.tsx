@@ -43,21 +43,23 @@ export default function Footer({ redirectToApp }: FooterProps) {
       <div className="max-w-6xl mx-auto px-8">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-8">
           <div>
-            <div className="flex items-center gap-3 text-white font-black text-2xl mb-4">
+            <div className="mb-4">
               {settings.footerLogoPath ? (
                 <Image
                   src={settings.footerLogoPath}
-                  alt="Design-Rite Footer Logo"
-                  width={40}
+                  alt="Design-Rite - AI-Powered Security Design Platform"
+                  width={160}
                   height={40}
-                  className="rounded-lg object-contain"
+                  className="h-8 w-auto hover:opacity-90 transition-opacity"
                 />
               ) : (
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
-                  DR
+                <div className="flex items-center gap-3 text-white font-black text-2xl">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
+                    DR
+                  </div>
+                  Design-Rite
                 </div>
               )}
-              Design-Rite
             </div>
             <p className="text-gray-400 leading-relaxed mb-6">
               Transforming security system design with AI-powered intelligence. Professional assessments, automated
