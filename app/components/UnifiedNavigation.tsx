@@ -69,21 +69,21 @@ export default function UnifiedNavigation() {
     <React.Fragment>
       {/* Top Announcement Bar */}
       {showAnnouncement && (
-        <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
+        <div className="dr-bg-violet dr-text-pearl py-2.5 text-center dr-ui font-semibold relative z-[1001]">
         <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
           <span className="text-base">🎓</span>
           <span className="flex-1 text-center">
             Design-Rite's Revolutionary AI is launching Q4 2025 - Join the waitlist for early access to security design mastery
           </span>
           <Link
-            href="/subscribe"
-            className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30"
+            href="/waitlist"
+            className="bg-white/20 dr-text-pearl px-3 py-1 rounded-full dr-ui font-semibold hover:bg-white/30 transition-all border border-white/30"
           >
             Join Waitlist
           </Link>
           <button
             onClick={closeAnnouncement}
-            className="text-white text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center hover:bg-white/10 rounded-full"
+            className="dr-text-pearl text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center hover:bg-white/10 rounded-full"
             aria-label="Close announcement"
           >
             ×
@@ -94,10 +94,10 @@ export default function UnifiedNavigation() {
 
 
       {/* Main Navigation Header */}
-      <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b border-purple-600/20 py-4">
+      <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b dr-border-violet py-4">
       <nav className="max-w-6xl mx-auto px-8 flex justify-between items-center">
         <Link href="/" className="flex items-center">
-          {settings.logoPath && (
+          {settings.logoPath ? (
             <Image
               src={settings.logoPath}
               alt="Design-Rite - AI-Powered Security Design Platform"
@@ -106,6 +106,13 @@ export default function UnifiedNavigation() {
               className="h-20 w-auto hover:opacity-90 transition-opacity"
               priority
             />
+          ) : (
+            <div className="flex items-center gap-3 dr-text-pearl font-black text-2xl">
+              <div className="w-10 h-10 dr-bg-violet rounded-lg flex items-center justify-center font-black text-lg">
+                DR
+              </div>
+              Design-Rite
+            </div>
           )}
         </Link>
 
@@ -114,48 +121,48 @@ export default function UnifiedNavigation() {
 
           {/* Platform Dropdown */}
           <li className="relative group">
-            <span className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+            <span className="text-gray-300 hover:dr-text-violet font-medium transition-all relative py-2 block dr-ui cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-violet-600 after:to-violet-700 after:transition-all hover:after:w-full">
               Platform
             </span>
-            <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+            <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl dr-border-violet rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
 
-              <Link href="/ai-security-assessment" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/ai-security-assessment" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🧠
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">AI Security Assessment</div>
-                  <div className="text-xs text-gray-400 leading-tight">Professional security analysis with AI</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">AI Security Assessment</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Professional security analysis with AI</div>
                 </div>
               </Link>
 
-              <Link href="/compliance-analyst" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/compliance-analyst" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   ✅
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">Compliance Tools</div>
-                  <div className="text-xs text-gray-400 leading-tight">Regulatory compliance analysis</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">Compliance Tools</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Regulatory compliance analysis</div>
                 </div>
               </Link>
 
-              <Link href="/professional-proposals" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/professional-proposals" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   📋
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">Proposal Generator</div>
-                  <div className="text-xs text-gray-400 leading-tight">Professional BOMs & pricing</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">Proposal Generator</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Professional BOMs & pricing</div>
                 </div>
               </Link>
 
-              <Link href="/white-label" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/white-label" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🏷️
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">White Label Solutions</div>
-                  <div className="text-xs text-gray-400 leading-tight">Branded platforms for partners</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">White Label Solutions</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Branded platforms for partners</div>
                 </div>
               </Link>
             </div>
@@ -163,58 +170,58 @@ export default function UnifiedNavigation() {
 
           {/* Solutions Dropdown */}
           <li className="relative group">
-            <span className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+            <span className="text-gray-300 hover:dr-text-violet font-medium transition-all relative py-2 block dr-ui cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-violet-600 after:to-violet-700 after:transition-all hover:after:w-full">
               Solutions
             </span>
-            <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+            <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl dr-border-violet rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
 
-              <Link href="/integrators" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/integrators" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🔧
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">Security Integrators</div>
-                  <div className="text-xs text-gray-400 leading-tight">Design & proposal automation</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">Security Integrators</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Design & proposal automation</div>
                 </div>
               </Link>
 
-              <Link href="/enterprise" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/enterprise" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🏢
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">Enterprise Security</div>
-                  <div className="text-xs text-gray-400 leading-tight">In-house team solutions</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">Enterprise Security</div>
+                  <div className="dr-ui text-gray-400 leading-tight">In-house team solutions</div>
                 </div>
               </Link>
 
-              <Link href="/education" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/education" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🎓
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">Education</div>
-                  <div className="text-xs text-gray-400 leading-tight">FERPA compliant school security</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">Education</div>
+                  <div className="dr-ui text-gray-400 leading-tight">FERPA compliant school security</div>
                 </div>
               </Link>
 
-              <Link href="/healthcare" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/healthcare" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🏥
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">Healthcare</div>
-                  <div className="text-xs text-gray-400 leading-tight">HIPAA compliant medical security</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">Healthcare</div>
+                  <div className="dr-ui text-gray-400 leading-tight">HIPAA compliant medical security</div>
                 </div>
               </Link>
 
-              <Link href="/consultants" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/consultants" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   💼
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">Security Consultants</div>
-                  <div className="text-xs text-gray-400 leading-tight">Expert advisory services</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">Security Consultants</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Expert advisory services</div>
                 </div>
               </Link>
             </div>
@@ -222,48 +229,48 @@ export default function UnifiedNavigation() {
 
           {/* Compliance Dropdown */}
           <li className="relative group">
-            <span className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+            <span className="text-gray-300 hover:dr-text-violet font-medium transition-all relative py-2 block dr-ui cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-violet-600 after:to-violet-700 after:transition-all hover:after:w-full">
               Compliance
             </span>
-            <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+            <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl dr-border-violet rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
 
-              <Link href="/compliance" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/compliance" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   📋
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">Compliance Overview</div>
-                  <div className="text-xs text-gray-400 leading-tight">Regulatory frameworks & standards</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">Compliance Overview</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Regulatory frameworks & standards</div>
                 </div>
               </Link>
 
-              <Link href="/compliance/ferpa" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/compliance/ferpa" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🎓
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">FERPA Compliance</div>
-                  <div className="text-xs text-gray-400 leading-tight">Educational records protection</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">FERPA Compliance</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Educational records protection</div>
                 </div>
               </Link>
 
-              <Link href="/compliance/hipaa" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/compliance/hipaa" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🏥
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">HIPAA Compliance</div>
-                  <div className="text-xs text-gray-400 leading-tight">Healthcare data protection</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">HIPAA Compliance</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Healthcare data protection</div>
                 </div>
               </Link>
 
-              <Link href="/compliance/general-security" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/compliance/general-security" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🔒
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">Security Frameworks</div>
-                  <div className="text-xs text-gray-400 leading-tight">NIST, SOC 2, ISO 27001</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">Security Frameworks</div>
+                  <div className="dr-ui text-gray-400 leading-tight">NIST, SOC 2, ISO 27001</div>
                 </div>
               </Link>
             </div>
@@ -271,51 +278,51 @@ export default function UnifiedNavigation() {
 
           {/* Pricing - Simple Link */}
           <li>
-            <Link href="/pricing" className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm">
+            <Link href="/pricing" className="text-gray-300 hover:dr-text-violet font-medium transition-all dr-ui">
               Pricing
             </Link>
           </li>
 
           {/* Partners - Simple Link */}
           <li>
-            <Link className="text-gray-300 hover:text-purple-600 font-medium transition-all text-sm" href="/partners">
+            <Link className="text-gray-300 hover:dr-text-violet font-medium transition-all dr-ui" href="/partners">
               Partners
             </Link>
           </li>
 
           {/* Company Dropdown */}
           <li className="relative group">
-            <span className="text-gray-300 hover:text-purple-600 font-medium transition-all relative py-2 block text-sm cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:to-purple-700 after:transition-all hover:after:w-full">
+            <span className="text-gray-300 hover:dr-text-violet font-medium transition-all relative py-2 block dr-ui cursor-pointer after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-violet-600 after:to-violet-700 after:transition-all hover:after:w-full">
               Company
             </span>
-            <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl border border-purple-600/30 rounded-xl p-4 min-w-[220px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
+            <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl dr-border-violet rounded-xl p-4 min-w-[220px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
 
-              <Link href="/about" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/about" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   ℹ️
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">About Us</div>
-                  <div className="text-xs text-gray-400 leading-tight">Our mission & vision</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">About Us</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Our mission & vision</div>
                 </div>
               </Link>
 
-              <Link href="/careers" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1 mb-2">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/careers" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   💼
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">Careers</div>
-                  <div className="text-xs text-gray-400 leading-tight">Join our team</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">Careers</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Join our team</div>
                 </div>
               </Link>
-              <Link href="/contact" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-purple-600/10 hover:text-white transition-all hover:translate-x-1">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+              <Link href="/contact" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   📧
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-white mb-1">Contact</div>
-                  <div className="text-xs text-gray-400 leading-tight">Get in touch</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">Contact</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Get in touch</div>
                 </div>
               </Link>
             </div>
@@ -326,7 +333,7 @@ export default function UnifiedNavigation() {
         <div className="hidden lg:block">
           <button
             onClick={handleAIAssessmentClick}
-            className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:from-purple-700 hover:to-purple-800 transition-all hover:scale-105 shadow-lg hover:shadow-purple-600/25"
+            className="dr-bg-violet dr-text-pearl px-6 py-2.5 rounded-lg font-semibold dr-ui hover:bg-purple-700 transition-all hover:scale-105 shadow-lg hover:shadow-purple-600/25"
           >
             Try Platform
           </button>
@@ -334,7 +341,7 @@ export default function UnifiedNavigation() {
 
         {/* Mobile Menu Button */}
         <button
-          className="lg:hidden text-white text-2xl p-2"
+          className="lg:hidden dr-text-pearl text-2xl p-2"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           ☰
@@ -349,51 +356,51 @@ export default function UnifiedNavigation() {
 
             {/* Platform Section */}
             <div>
-              <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Platform</div>
-              <Link href="/ai-security-assessment" className="block text-white/80 hover:text-white py-2 pl-4">🧠 AI Security Assessment</Link>
-              <Link href="/compliance-analyst" className="block text-white/80 hover:text-white py-2 pl-4">✅ Compliance Tools</Link>
-              <Link href="/professional-proposals" className="block text-white/80 hover:text-white py-2 pl-4">📋 Proposal Generator</Link>
-              <Link href="/white-label" className="block text-white/80 hover:text-white py-2 pl-4">🏷️ White Label Solutions</Link>
+              <div className="text-gray-400 dr-ui uppercase tracking-wider mb-2">Platform</div>
+              <Link href="/ai-security-assessment" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🧠 AI Security Assessment</Link>
+              <Link href="/compliance-analyst" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">✅ Compliance Tools</Link>
+              <Link href="/professional-proposals" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">📋 Proposal Generator</Link>
+              <Link href="/white-label" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🏷️ White Label Solutions</Link>
             </div>
 
             {/* Solutions Section */}
             <div className="border-t border-white/10 pt-2">
-              <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Solutions</div>
-              <Link href="/integrators" className="block text-white/80 hover:text-white py-2 pl-4">🔧 Security Integrators</Link>
-              <Link href="/enterprise" className="block text-white/80 hover:text-white py-2 pl-4">🏢 Enterprise Security</Link>
-              <Link href="/education" className="block text-white/80 hover:text-white py-2 pl-4">🎓 Education</Link>
-              <Link href="/healthcare" className="block text-white/80 hover:text-white py-2 pl-4">🏥 Healthcare</Link>
-              <Link href="/consultants" className="block text-white/80 hover:text-white py-2 pl-4">💼 Security Consultants</Link>
+              <div className="text-gray-400 dr-ui uppercase tracking-wider mb-2">Solutions</div>
+              <Link href="/integrators" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🔧 Security Integrators</Link>
+              <Link href="/enterprise" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🏢 Enterprise Security</Link>
+              <Link href="/education" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🎓 Education</Link>
+              <Link href="/healthcare" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🏥 Healthcare</Link>
+              <Link href="/consultants" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">💼 Security Consultants</Link>
             </div>
 
             {/* Compliance Section */}
             <div className="border-t border-white/10 pt-2">
-              <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Compliance</div>
-              <Link href="/compliance" className="block text-white/80 hover:text-white py-2 pl-4">📋 Compliance Overview</Link>
-              <Link href="/compliance/ferpa" className="block text-white/80 hover:text-white py-2 pl-4">🎓 FERPA Compliance</Link>
-              <Link href="/compliance/hipaa" className="block text-white/80 hover:text-white py-2 pl-4">🏥 HIPAA Compliance</Link>
-              <Link href="/compliance/general-security" className="block text-white/80 hover:text-white py-2 pl-4">🔒 Security Frameworks</Link>
+              <div className="text-gray-400 dr-ui uppercase tracking-wider mb-2">Compliance</div>
+              <Link href="/compliance" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">📋 Compliance Overview</Link>
+              <Link href="/compliance/ferpa" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🎓 FERPA Compliance</Link>
+              <Link href="/compliance/hipaa" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🏥 HIPAA Compliance</Link>
+              <Link href="/compliance/general-security" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🔒 Security Frameworks</Link>
             </div>
 
             {/* Pricing Link */}
-            <Link href="/pricing" className="block text-white/80 hover:text-white py-2 border-t border-white/10 pt-2">💰 Pricing</Link>
+            <Link href="/pricing" className="block text-white/80 hover:dr-text-pearl py-2 border-t border-white/10 pt-2">💰 Pricing</Link>
 
             {/* Partners Link */}
-            <Link href="/partners" className="block text-white/80 hover:text-white py-2">🤝 Partners</Link>
+            <Link href="/partners" className="block text-white/80 hover:dr-text-pearl py-2">🤝 Partners</Link>
 
             {/* Company Section */}
             <div className="border-t border-white/10 pt-2">
-              <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Company</div>
-              <Link href="/about" className="block text-white/80 hover:text-white py-2 pl-4">ℹ️ About Us</Link>
-              <Link href="/careers" className="block text-white/80 hover:text-white py-2 pl-4">💼 Careers</Link>
-              <Link href="/support" className="block text-white/80 hover:text-white py-2 pl-4">❓ Support</Link>
-              <Link href="/contact" className="block text-white/80 hover:text-white py-2 pl-4">📧 Contact</Link>
+              <div className="text-gray-400 dr-ui uppercase tracking-wider mb-2">Company</div>
+              <Link href="/about" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">ℹ️ About Us</Link>
+              <Link href="/careers" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">💼 Careers</Link>
+              <Link href="/support" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">❓ Support</Link>
+              <Link href="/contact" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">📧 Contact</Link>
             </div>
 
             {/* Sign In and CTA */}
             <div className="pt-4 border-t border-white/10">
-              <Link href="/login" className="block text-white/80 hover:text-white py-2">👤 Sign In</Link>
-              <button onClick={handleAIAssessmentClick} className="block w-full text-left bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">
+              <Link href="/login" className="block text-white/80 hover:dr-text-pearl py-2">👤 Sign In</Link>
+              <button onClick={handleAIAssessmentClick} className="block w-full text-left dr-bg-violet dr-text-pearl px-4 py-2 rounded-lg mt-2">
                 🚀 Try AI Assessment
               </button>
             </div>

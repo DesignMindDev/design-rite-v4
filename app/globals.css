@@ -1,14 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Design-Rite Brand Style Guide Implementation */
+:root {
+  /* Brand Colors */
+  --dr-charcoal: #1C1C1C;
+  --dr-electric-violet: #8B5CF6;
+  --dr-pearl-white: #F4F4F5;
+
+  /* Typography Scale */
+  --dr-heading-large: clamp(36px, 5vw, 72px);
+  --dr-heading-medium: clamp(24px, 3vw, 48px);
+  --dr-subheading: clamp(24px, 2.5vw, 36px);
+  --dr-body: clamp(16px, 1.2vw, 20px);
+  --dr-ui: clamp(14px, 1vw, 16px);
+}
+
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 400;
+  color: var(--dr-pearl-white);
+  background-color: var(--dr-charcoal);
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Design-Rite Brand Utilities */
+  .dr-bg-charcoal { background-color: var(--dr-charcoal); }
+  .dr-bg-violet { background-color: var(--dr-electric-violet); }
+  .dr-bg-pearl { background-color: var(--dr-pearl-white); }
+
+  .dr-text-charcoal { color: var(--dr-charcoal); }
+  .dr-text-violet { color: var(--dr-electric-violet); }
+  .dr-text-pearl { color: var(--dr-pearl-white); }
+
+  .dr-border-violet { border-color: var(--dr-electric-violet); }
+
+  /* Typography Classes */
+  .dr-heading-xl {
+    font-size: var(--dr-heading-large);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  .dr-heading-lg {
+    font-size: var(--dr-heading-medium);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .dr-subheading {
+    font-size: var(--dr-subheading);
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  .dr-body {
+    font-size: var(--dr-body);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .dr-ui {
+    font-size: var(--dr-ui);
+    font-weight: 500;
+    line-height: 1.4;
   }
 }
 
