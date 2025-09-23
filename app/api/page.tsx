@@ -2,10 +2,31 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import EmailGate from '../components/EmailGate'
+import { useAuthCache } from '../hooks/useAuthCache'
 
 export default function APIAccessPage() {
   const [selectedTab, setSelectedTab] = useState('overview')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [showEmailGate, setShowEmailGate] = useState(false)
+  const router = useRouter()
+  const { isAuthenticated, extendSession } = useAuthCache()
+
+  const handleTryPlatformClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isAuthenticated) {
+      extendSession();
+      router.push('/ai-assessment');
+    } else {
+      setShowEmailGate(true);
+    }
+  };
+
+  const handleEmailGateSuccess = () => {
+    setShowEmailGate(false);
+    router.push('/ai-assessment');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white">
