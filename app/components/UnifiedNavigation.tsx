@@ -92,23 +92,6 @@ export default function UnifiedNavigation() {
       </div>
       )}
 
-      {/* Utility Bar */}
-      <div className="bg-black/90 border-b border-purple-600/10 py-2 text-xs">
-        <div className="max-w-6xl mx-auto px-8 flex justify-end items-center gap-8">
-          <Link href="/login" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
-            <span>👤</span> Login
-          </Link>
-          <Link href="/pricing" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
-            <span>💰</span> Plans & Pricing
-          </Link>
-          <Link href="/support" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
-            <span>❓</span> Help Center
-          </Link>
-          <Link href="/contact" className="text-gray-400 hover:text-purple-600 transition-colors flex items-center gap-2">
-            <span>📧</span> Contact Us
-          </Link>
-        </div>
-      </div>
 
       {/* Main Navigation Header */}
       <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b border-purple-600/20 py-4">
