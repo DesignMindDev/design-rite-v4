@@ -82,7 +82,7 @@ export default function AdminPage() {
   }, [])
 
   const handleLogin = async () => {
-    if (password === 'designrite2025admin') {
+    if (password === 'ProcessM@ker2025') {
       setIsAuthenticated(true)
       localStorage.setItem('adminAuth', 'authenticated')
       loadTeamMembers()

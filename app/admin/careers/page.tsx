@@ -27,6 +27,8 @@ interface Application {
 }
 
 export default function CareerAdminDashboard() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [password, setPassword] = useState('')
   const [applications, setApplications] = useState<Application[]>([])
   const [filteredApplications, setFilteredApplications] = useState<Application[]>([])
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null)
@@ -35,9 +37,20 @@ export default function CareerAdminDashboard() {
   const [searchTerm, setSearchTerm] = useState('')
   const [isLoading, setIsLoading] = useState(true)
 
+  // Simple authentication
+  const handleAuth = () => {
+    if (password === 'ProcessM@ker2025') {
+      setIsAuthenticated(true)
+    } else {
+      alert('Invalid password')
+    }
+  }
+
   useEffect(() => {
-    fetchApplications()
-  }, [])
+    if (isAuthenticated) {
+      fetchApplications()
+    }
+  }, [isAuthenticated])
 
   useEffect(() => {
     filterApplications()
@@ -150,6 +163,32 @@ export default function CareerAdminDashboard() {
   }
 
   const positions = [...new Set(applications.map(app => app.position_applied))]
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] flex items-center justify-center">
+        <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 max-w-md w-full mx-4">
+          <h1 className="text-3xl font-black text-white mb-6 text-center">Career Admin Login</h1>
+          <div className="space-y-4">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter admin password"
+              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600"
+              onKeyPress={(e) => e.key === 'Enter' && handleAuth()}
+            />
+            <button
+              onClick={handleAuth}
+              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all"
+            >
+              Login
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white">
