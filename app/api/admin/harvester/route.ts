@@ -33,6 +33,10 @@ export async function GET(request: Request) {
         return await getPricingData()
       case 'harvest-status':
         return await getHarvestStatus()
+      case 'reddit':
+        return await getRedditData(searchParams)
+      case 'youtube':
+        return await getYouTubeData(searchParams)
       default:
         return NextResponse.json({ error: 'Invalid view' }, { status: 400 })
     }
@@ -335,6 +339,161 @@ async function triggerHarvest(manufacturer?: string) {
     harvestId: data.id,
     instructions: 'Run your Python harvester script to process this request'
   })
+}
+
+async function getRedditData(searchParams: URLSearchParams) {
+  try {
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '25')
+    const search = searchParams.get('search') || ''
+    const subreddit = searchParams.get('subreddit') || ''
+    const offset = (page - 1) * limit
+
+    let query = supabase
+      .from('reddit_posts')
+      .select(`
+        id,
+        subreddit,
+        title,
+        author,
+        score,
+        num_comments,
+        url,
+        text_content,
+        keywords_found,
+        product_models,
+        created_date,
+        harvested_at
+      `)
+
+    // Apply filters
+    if (subreddit) {
+      query = query.eq('subreddit', subreddit)
+    }
+
+    if (search) {
+      query = query.or(`title.ilike.%${search}%,text_content.ilike.%${search}%,keywords_found.ilike.%${search}%`)
+    }
+
+    // Get paginated results
+    const { data: posts, error: postsError } = await query
+      .range(offset, offset + limit - 1)
+      .order('created_date', { ascending: false })
+
+    if (postsError) throw postsError
+
+    // Get total count for pagination
+    let countQuery = supabase
+      .from('reddit_posts')
+      .select('*', { count: 'exact', head: true })
+
+    if (subreddit) {
+      countQuery = countQuery.eq('subreddit', subreddit)
+    }
+
+    if (search) {
+      countQuery = countQuery.or(`title.ilike.%${search}%,text_content.ilike.%${search}%,keywords_found.ilike.%${search}%`)
+    }
+
+    const { count: totalCount, error: countError } = await countQuery
+
+    if (countError) throw countError
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        posts,
+        pagination: {
+          total: totalCount,
+          page,
+          limit,
+          totalPages: Math.ceil((totalCount || 0) / limit)
+        }
+      }
+    })
+  } catch (error) {
+    console.error('Reddit data error:', error)
+    return NextResponse.json({ error: 'Failed to fetch Reddit data' }, { status: 500 })
+  }
+}
+
+async function getYouTubeData(searchParams: URLSearchParams) {
+  try {
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '25')
+    const search = searchParams.get('search') || ''
+    const channel = searchParams.get('channel') || ''
+    const offset = (page - 1) * limit
+
+    let query = supabase
+      .from('youtube_videos')
+      .select(`
+        id,
+        video_id,
+        title,
+        description,
+        channel_title,
+        published_at,
+        thumbnail_url,
+        url,
+        view_count,
+        like_count,
+        comment_count,
+        duration,
+        product_models,
+        search_term,
+        harvested_at
+      `)
+
+    // Apply filters
+    if (channel) {
+      query = query.eq('channel_title', channel)
+    }
+
+    if (search) {
+      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%,channel_title.ilike.%${search}%`)
+    }
+
+    // Get paginated results
+    const { data: videos, error: videosError } = await query
+      .range(offset, offset + limit - 1)
+      .order('harvested_at', { ascending: false })
+
+    if (videosError) throw videosError
+
+    // Get total count for pagination
+    let countQuery = supabase
+      .from('youtube_videos')
+      .select('*', { count: 'exact', head: true })
+
+    if (channel) {
+      countQuery = countQuery.eq('channel_title', channel)
+    }
+
+    if (search) {
+      countQuery = countQuery.or(`title.ilike.%${search}%,description.ilike.%${search}%,channel_title.ilike.%${search}%`)
+    }
+
+    const { count: totalCount, error: countError } = await countQuery
+
+    if (countError) throw countError
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        videos,
+        pagination: {
+          total: totalCount,
+          page,
+          limit,
+          totalPages: Math.ceil((totalCount || 0) / limit)
+        }
+      }
+    })
+  } catch (error) {
+    console.error('YouTube data error:', error)
+    return NextResponse.json({ error: 'Failed to fetch YouTube data' }, { status: 500 })
+  }
 }
 
 async function updatePricing() {

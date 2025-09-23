@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Database, TrendingUp, Package, RefreshCw, DollarSign, AlertCircle, CheckCircle, Activity, BarChart3, Search, Filter } from 'lucide-react'
+import { Database, TrendingUp, Package, RefreshCw, DollarSign, AlertCircle, CheckCircle, Activity, BarChart3, Search, Filter, ExternalLink, Eye, MessageSquare, Play } from 'lucide-react'
 
 interface HarvesterStats {
   totalProducts: number
@@ -40,9 +40,13 @@ export default function HarvesterDashboard() {
   const [activeTab, setActiveTab] = useState('overview')
   const [stats, setStats] = useState<HarvesterStats | null>(null)
   const [products, setProducts] = useState<Product[]>([])
+  const [redditPosts, setRedditPosts] = useState<any[]>([])
+  const [youtubeVideos, setYoutubeVideos] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedManufacturer, setSelectedManufacturer] = useState('')
+  const [selectedSubreddit, setSelectedSubreddit] = useState('')
+  const [selectedChannel, setSelectedChannel] = useState('')
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
@@ -96,6 +100,56 @@ export default function HarvesterDashboard() {
     }
   }
 
+  // Load Reddit data
+  const loadRedditPosts = async () => {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '25'
+      })
+
+      if (searchTerm) params.append('search', searchTerm)
+      if (selectedSubreddit) params.append('subreddit', selectedSubreddit)
+
+      const response = await fetch(`/api/admin/harvester?view=reddit&${params}`)
+      const data = await response.json()
+      if (data.success) {
+        setRedditPosts(data.data.posts)
+        setTotalPages(data.data.pagination.totalPages)
+      }
+    } catch (error) {
+      console.error('Failed to load Reddit posts:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Load YouTube data
+  const loadYouTubeVideos = async () => {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '25'
+      })
+
+      if (searchTerm) params.append('search', searchTerm)
+      if (selectedChannel) params.append('channel', selectedChannel)
+
+      const response = await fetch(`/api/admin/harvester?view=youtube&${params}`)
+      const data = await response.json()
+      if (data.success) {
+        setYoutubeVideos(data.data.videos)
+        setTotalPages(data.data.pagination.totalPages)
+      }
+    } catch (error) {
+      console.error('Failed to load YouTube videos:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Trigger harvest
   const triggerHarvest = async (manufacturer?: string) => {
     try {
@@ -125,8 +179,12 @@ export default function HarvesterDashboard() {
   useEffect(() => {
     if (isAuthenticated && activeTab === 'products') {
       loadProducts()
+    } else if (isAuthenticated && activeTab === 'reddit') {
+      loadRedditPosts()
+    } else if (isAuthenticated && activeTab === 'youtube') {
+      loadYouTubeVideos()
     }
-  }, [isAuthenticated, activeTab, page, searchTerm, selectedManufacturer])
+  }, [isAuthenticated, activeTab, page, searchTerm, selectedManufacturer, selectedSubreddit, selectedChannel])
 
   if (!isAuthenticated) {
     return (
@@ -175,12 +233,21 @@ export default function HarvesterDashboard() {
           {[
             { id: 'overview', label: 'Overview', icon: BarChart3 },
             { id: 'products', label: 'Products', icon: Package },
+            { id: 'reddit', label: 'Reddit Posts', icon: MessageSquare },
+            { id: 'youtube', label: 'YouTube Videos', icon: Play },
             { id: 'pricing', label: 'Pricing', icon: DollarSign },
             { id: 'operations', label: 'Operations', icon: Activity }
           ].map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {
+                setActiveTab(tab.id)
+                setPage(1)
+                setSearchTerm('')
+                setSelectedManufacturer('')
+                setSelectedSubreddit('')
+                setSelectedChannel('')
+              }}
               className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
                 activeTab === tab.id
                   ? 'dr-bg-violet dr-text-pearl'
@@ -537,6 +604,237 @@ export default function HarvesterDashboard() {
                     Next
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Reddit Posts Tab */}
+        {activeTab === 'reddit' && (
+          <div className="space-y-6">
+            {/* Filters */}
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
+                      placeholder="Search Reddit posts by title, content, or keywords..."
+                    />
+                  </div>
+                </div>
+                <div className="md:w-64">
+                  <select
+                    value={selectedSubreddit}
+                    onChange={(e) => setSelectedSubreddit(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl focus:outline-none focus:dr-border-violet"
+                  >
+                    <option value="">All Subreddits</option>
+                    <option value="SecurityCameras">r/SecurityCameras</option>
+                    <option value="homedefense">r/homedefense</option>
+                    <option value="CommercialAV">r/CommercialAV</option>
+                    <option value="videosurveillance">r/videosurveillance</option>
+                    <option value="CCTV">r/CCTV</option>
+                    <option value="networking">r/networking</option>
+                    <option value="sysadmin">r/sysadmin</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Reddit Posts Table */}
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-700/40">
+                    <tr>
+                      <th className="text-left p-4 font-semibold dr-text-pearl">Post</th>
+                      <th className="text-left p-4 font-semibold dr-text-pearl">Subreddit</th>
+                      <th className="text-right p-4 font-semibold dr-text-pearl">Score</th>
+                      <th className="text-center p-4 font-semibold dr-text-pearl">Keywords</th>
+                      <th className="text-center p-4 font-semibold dr-text-pearl">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {redditPosts.map((post) => (
+                      <tr key={post.id} className="border-t border-gray-600/30 hover:bg-gray-700/20">
+                        <td className="p-4">
+                          <div>
+                            <div className="font-semibold dr-text-pearl mb-1">{post.title}</div>
+                            <div className="text-sm text-gray-300">u/{post.author}</div>
+                            <div className="text-xs text-gray-400 mt-1">
+                              {new Date(post.created_date).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <span className="px-2 py-1 bg-orange-500/20 text-orange-300 rounded text-sm">
+                            r/{post.subreddit}
+                          </span>
+                        </td>
+                        <td className="p-4 text-right">
+                          <div className="text-lg font-bold dr-text-pearl">{post.score}</div>
+                          <div className="text-xs text-gray-400">{post.num_comments} comments</div>
+                        </td>
+                        <td className="p-4 text-center">
+                          <div className="text-sm text-gray-300 max-w-xs truncate">
+                            {post.keywords_found || 'None'}
+                          </div>
+                        </td>
+                        <td className="p-4 text-center">
+                          <div className="flex justify-center gap-2">
+                            <a
+                              href={post.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 dr-bg-violet hover:bg-purple-600 rounded-lg transition-colors"
+                              title="View on Reddit"
+                            >
+                              <ExternalLink className="w-4 h-4 dr-text-pearl" />
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              <div className="p-4 border-t border-gray-600/30 flex justify-between items-center">
+                <div className="text-sm text-gray-400">
+                  Page {page} of {totalPages}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setPage(Math.max(1, page - 1))}
+                    disabled={page === 1}
+                    className="px-4 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => setPage(Math.min(totalPages, page + 1))}
+                    disabled={page === totalPages}
+                    className="px-4 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* YouTube Videos Tab */}
+        {activeTab === 'youtube' && (
+          <div className="space-y-6">
+            {/* Filters */}
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
+                      placeholder="Search YouTube videos by title, description, or channel..."
+                    />
+                  </div>
+                </div>
+                <div className="md:w-64">
+                  <select
+                    value={selectedChannel}
+                    onChange={(e) => setSelectedChannel(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl focus:outline-none focus:dr-border-violet"
+                  >
+                    <option value="">All Channels</option>
+                    <option value="Best Buys Reviewed">Best Buys Reviewed</option>
+                    <option value="Axis Technical Support Videos">Axis Technical Support</option>
+                    <option value="SK Enterprises">SK Enterprises</option>
+                    <option value="Bosch Security and Safety Systems">Bosch Security</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* YouTube Videos Grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {youtubeVideos.map((video) => (
+                <div key={video.id} className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl overflow-hidden">
+                  {/* Thumbnail */}
+                  <div className="relative">
+                    <img
+                      src={video.thumbnail_url || `https://img.youtube.com/vi/${video.video_id}/mqdefault.jpg`}
+                      alt={video.title}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <Play className="w-12 h-12 text-white opacity-80" />
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-4">
+                    <h3 className="font-semibold dr-text-pearl mb-2 line-clamp-2">
+                      {video.title}
+                    </h3>
+                    <div className="text-sm text-gray-300 mb-2">{video.channel_title}</div>
+
+                    <div className="flex justify-between items-center text-sm text-gray-400 mb-3">
+                      <span>{video.view_count ? `${video.view_count.toLocaleString()} views` : 'No view data'}</span>
+                      {video.published_at && (
+                        <span>{new Date(video.published_at).toLocaleDateString()}</span>
+                      )}
+                    </div>
+
+                    {video.search_term && (
+                      <div className="text-xs text-violet-300 mb-3">
+                        Found via: {video.search_term}
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <a
+                        href={video.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 dr-bg-violet hover:bg-purple-600 dr-text-pearl py-2 px-3 rounded-lg text-center text-sm font-medium transition-colors"
+                      >
+                        Watch on YouTube
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-gray-400">
+                Page {page} of {totalPages}
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setPage(Math.max(1, page - 1))}
+                  disabled={page === 1}
+                  className="px-4 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setPage(Math.min(totalPages, page + 1))}
+                  disabled={page === totalPages}
+                  className="px-4 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50"
+                >
+                  Next
+                </button>
               </div>
             </div>
           </div>
