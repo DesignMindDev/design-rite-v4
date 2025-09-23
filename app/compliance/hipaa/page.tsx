@@ -677,7 +677,7 @@ For customized implementation support, contact our HIPAA compliance experts.
           onClose={() => setShowEmailGate(false)}
           onSuccess={() => {
             setShowEmailGate(false);
-            // The useAuthCache hook will handle the authentication state
+            router.push('/ai-assessment');
           }}
         />
       )}
