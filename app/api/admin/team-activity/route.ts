@@ -16,9 +16,8 @@ interface ActivityLog {
 // GET - Retrieve team member activity logs
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    const limit = parseInt(searchParams.get('limit') || '50')
-    const memberName = searchParams.get('member')
+    const limit = parseInt(request.nextUrl.searchParams.get('limit') || '50')
+    const memberName = request.nextUrl.searchParams.get('member')
 
     if (!fs.existsSync(ACTIVITY_LOG_PATH)) {
       return NextResponse.json([])
