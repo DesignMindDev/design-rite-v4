@@ -94,9 +94,24 @@ export default function HarvesterDashboard() {
   // Load overview data
   const loadOverview = async () => {
     setLoading(true)
+    console.log('🔄 loadOverview: Starting API call...')
+
+    const apiUrl = `${process.env.NEXT_PUBLIC_HARVESTER_API_URL || 'http://localhost:8000'}/api/v1/harvester/stats`
+    console.log('🔗 API URL:', apiUrl)
+    console.log('🌐 Environment variable NEXT_PUBLIC_HARVESTER_API_URL:', process.env.NEXT_PUBLIC_HARVESTER_API_URL)
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_HARVESTER_API_URL || 'http://localhost:8000'}/api/v1/harvester/stats`)
+      console.log('📡 Making fetch request to:', apiUrl)
+      const response = await fetch(apiUrl)
+      console.log('📊 Response status:', response.status, response.statusText)
+      console.log('✅ Response ok:', response.ok)
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+
       const data = await response.json()
+      console.log('📦 Raw API response data:', data)
 
       // Transform API response to match dashboard expectations
       const transformedData = {
@@ -128,11 +143,17 @@ export default function HarvesterDashboard() {
         lastUpdated: data.last_harvest || new Date().toISOString()
       }
 
+      console.log('🔄 Transformed data for dashboard:', transformedData)
       setStats(transformedData)
+      console.log('✅ Successfully set stats state')
     } catch (error) {
-      console.error('Failed to load overview:', error)
+      console.error('❌ Failed to load overview - Full error details:', error)
+      console.error('❌ Error name:', error.name)
+      console.error('❌ Error message:', error.message)
+      if (error.stack) console.error('❌ Error stack:', error.stack)
     } finally {
       setLoading(false)
+      console.log('🏁 loadOverview: Finished (loading set to false)')
     }
   }
 
