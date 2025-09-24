@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, FileText, Shield, Building2, Users, Calendar, DollarSign, CheckCircle, AlertTriangle, Download, Briefcase, ArrowLeft, ExternalLink, Database, GitBranch, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
-import { productIntelligenceAPI, type ProductData } from '../../lib/product-intelligence';
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -41,11 +40,11 @@ const IntegratorDiscoveryAssistant = () => {
   });
 
   const [realPricingData, setRealPricingData] = useState({
-    cameras: [],
-    controllers: [],
-    nvrs: [],
+    recommendations: [],
     lastUpdated: null,
-    isLoading: false
+    isLoading: false,
+    realDataCount: 0,
+    totalProducts: 0
   });
 
   const messagesEndRef = useRef(null);
@@ -58,34 +57,58 @@ const IntegratorDiscoveryAssistant = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Fetch real pricing data from harvester API
+  // Fetch real pricing data from AI Assessment API
   const fetchRealPricingData = async () => {
     setRealPricingData(prev => ({ ...prev, isLoading: true }));
 
     try {
-      // Fetch cameras
-      const cameraResults = await productIntelligenceAPI.searchProducts('camera', 10);
-      const controllerResults = await productIntelligenceAPI.searchProducts('controller', 5);
-      const nvrResults = await productIntelligenceAPI.searchProducts('nvr', 5);
-
-      setRealPricingData({
-        cameras: cameraResults.products || [],
-        controllers: controllerResults.products || [],
-        nvrs: nvrResults.products || [],
-        lastUpdated: new Date(),
-        isLoading: false
+      // Use AI Assessment API for recommendations
+      const response = await fetch('/api/ai-assessment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'generate_recommendations',
+          sessionData: {
+            facilityType: sessionData.facilityType || 'Office Building',
+            squareFootage: 10000,
+            budget: '$50,000-$100,000',
+            securityLevel: 'standard'
+          }
+        })
       });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setRealPricingData({
+          recommendations: data.recommendations || [],
+          lastUpdated: new Date(),
+          isLoading: false,
+          realDataCount: data.realDataCount || 0,
+          totalProducts: data.totalProducts || 0
+        });
+      } else {
+        throw new Error('Failed to get recommendations');
+      }
     } catch (error) {
       console.error('Failed to fetch real pricing data:', error);
-      setRealPricingData(prev => ({ ...prev, isLoading: false }));
+      setRealPricingData(prev => ({
+        ...prev,
+        isLoading: false,
+        recommendations: [],
+        realDataCount: 0,
+        totalProducts: 0
+      }));
     }
   };
 
   // Calculate package pricing based on real data
   const calculatePackagePricing = () => {
-    const { cameras, controllers, nvrs } = realPricingData;
+    const { recommendations } = realPricingData;
 
-    if (cameras.length === 0) {
+    if (recommendations.length === 0) {
       // Return default pricing if no data available
       return {
         essential: 285000,
@@ -94,41 +117,36 @@ const IntegratorDiscoveryAssistant = () => {
       };
     }
 
-    // Calculate based on real pricing data
-    const avgCameraPrice = cameras.reduce((sum, camera) =>
-      sum + (camera.pricing?.street_price || camera.pricing?.msrp || 500), 0
-    ) / cameras.length;
+    // Calculate average price from real recommendations
+    const pricesWithData = recommendations
+      .filter(rec => rec.priceNumeric && rec.priceNumeric > 0)
+      .map(rec => rec.priceNumeric);
 
-    const avgControllerPrice = controllers.length > 0 ?
-      controllers.reduce((sum, controller) =>
-        sum + (controller.pricing?.street_price || controller.pricing?.msrp || 2000), 0
-      ) / controllers.length : 2000;
+    if (pricesWithData.length === 0) {
+      // Fallback to defaults
+      return {
+        essential: 285000,
+        professional: 425000,
+        enterprise: 580000
+      };
+    }
 
-    const avgNvrPrice = nvrs.length > 0 ?
-      nvrs.reduce((sum, nvr) =>
-        sum + (nvr.pricing?.street_price || nvr.pricing?.msrp || 3000), 0
-      ) / nvrs.length : 3000;
+    const avgProductPrice = pricesWithData.reduce((sum, price) => sum + price, 0) / pricesWithData.length;
 
-    // Calculate package totals with real pricing
+    // Calculate package totals with real pricing (scaled for different package sizes)
     const essential = Math.round(
-      (avgCameraPrice * 16) + // 16 cameras
-      (avgControllerPrice * 2) + // 2 controllers
-      (avgNvrPrice * 1) + // 1 NVR
-      (15000) // Installation & misc
+      (avgProductPrice * 8) +  // 8 products for essential
+      (20000) // Installation & misc
     );
 
     const professional = Math.round(
-      (avgCameraPrice * 32) + // 32 cameras
-      (avgControllerPrice * 4) + // 4 controllers
-      (avgNvrPrice * 2) + // 2 NVRs
-      (25000) // Installation & analytics
+      (avgProductPrice * 12) + // 12 products for professional
+      (35000) // Installation & analytics
     );
 
     const enterprise = Math.round(
-      (avgCameraPrice * 48) + // 48 cameras
-      (avgControllerPrice * 6) + // 6 controllers
-      (avgNvrPrice * 3) + // 3 NVRs
-      (50000) // Installation & enterprise features
+      (avgProductPrice * 16) + // 16 products for enterprise
+      (55000) // Installation & enterprise features
     );
 
     return { essential, professional, enterprise };
@@ -362,7 +380,7 @@ const IntegratorDiscoveryAssistant = () => {
     }));
 
     const pricingStatus = realPricingData.lastUpdated ?
-      `\n\n🔥 **LIVE PRICING ACTIVE** - Proposal includes real-time pricing from ${realPricingData.cameras.length + realPricingData.controllers.length + realPricingData.nvrs.length} harvested products (CDW, manufacturer data)` :
+      `\n\n🔥 **LIVE PRICING ACTIVE** - Proposal includes real-time CDW pricing from ${realPricingData.realDataCount}/${realPricingData.totalProducts} products (${Math.round((realPricingData.realDataCount / realPricingData.totalProducts) * 100)}% live pricing)` :
       '';
 
     const docMessage = {
@@ -509,6 +527,50 @@ const IntegratorDiscoveryAssistant = () => {
 
           {/* Progress & Actions */}
           <div className="space-y-6">
+            {/* Live Product Intelligence */}
+            {realPricingData.recommendations.length > 0 && (
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                  <Database className="w-5 h-5 text-green-400" />
+                  Live Product Intelligence
+                </h3>
+                <div className="space-y-2">
+                  <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-green-200">CDW Live Pricing:</span>
+                      <span className="text-green-300 font-semibold">
+                        {realPricingData.realDataCount}/{realPricingData.totalProducts} products ({Math.round((realPricingData.realDataCount / realPricingData.totalProducts) * 100)}%)
+                      </span>
+                    </div>
+                    <div className="text-xs text-green-300/70 mt-1">
+                      Last updated: {realPricingData.lastUpdated?.toLocaleTimeString()}
+                    </div>
+                  </div>
+                  <div className="space-y-1 max-h-32 overflow-y-auto">
+                    {realPricingData.recommendations.slice(0, 3).map((product, index) => (
+                      <div key={index} className="bg-white/5 rounded p-2 text-sm">
+                        <div className="text-white/90 font-medium truncate">{product.name}</div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-white/60 text-xs">{product.manufacturer}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-white/80">{product.price}</span>
+                            {product.isRealData && (
+                              <span className="bg-green-500/30 text-green-200 px-1.5 py-0.5 rounded text-xs">LIVE</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {realPricingData.recommendations.length > 3 && (
+                      <div className="text-center text-white/60 text-xs py-1">
+                        +{realPricingData.recommendations.length - 3} more products
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Discovery Progress */}
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
               <h3 className="text-lg font-semibold text-white mb-3">Discovery Progress</h3>
@@ -877,8 +939,8 @@ const IntegratorDiscoveryAssistant = () => {
                       <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
                         <div className="flex items-center gap-2 text-sm text-green-700">
                           <Database className="w-4 h-4" />
-                          <span>Pricing updated with live data from {realPricingData.cameras.length + realPricingData.controllers.length + realPricingData.nvrs.length} products</span>
-                          <span className="text-xs text-green-600">• Last updated: {realPricingData.lastUpdated.toLocaleTimeString()}</span>
+                          <span>Live CDW pricing: {realPricingData.realDataCount}/{realPricingData.totalProducts} products ({Math.round((realPricingData.realDataCount / realPricingData.totalProducts) * 100)}% live data)</span>
+                          <span className="text-xs text-green-600">• Updated: {realPricingData.lastUpdated.toLocaleTimeString()}</span>
                         </div>
                       </div>
                     )}
