@@ -96,9 +96,8 @@ export default function HarvesterDashboard() {
     setLoading(true)
     console.log('🔄 loadOverview: Starting API call...')
 
-    const apiUrl = `${process.env.NEXT_PUBLIC_HARVESTER_API_URL || 'http://localhost:8000'}/api/v1/harvester/stats`
+    const apiUrl = '/api/admin/harvester?view=overview'
     console.log('🔗 API URL:', apiUrl)
-    console.log('🌐 Environment variable NEXT_PUBLIC_HARVESTER_API_URL:', process.env.NEXT_PUBLIC_HARVESTER_API_URL)
 
     try {
       console.log('📡 Making fetch request to:', apiUrl)
@@ -110,42 +109,17 @@ export default function HarvesterDashboard() {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
 
-      const data = await response.json()
-      console.log('📦 Raw API response data:', data)
+      const result = await response.json()
+      console.log('📦 Raw API response:', result)
 
-      // Transform API response to match dashboard expectations
-      const transformedData = {
-        totalProducts: data.total_products || 0,
-        productsWithPricing: Math.floor((data.total_products || 0) * 0.75), // Estimate 75% have pricing
-        pricingCoverage: 75, // Estimate 75% coverage
-        manufacturerCounts: data.manufacturers ?
-          data.manufacturers.reduce((acc: any, mfg: any) => {
-            acc[mfg.name] = mfg.count;
-            return acc;
-          }, {}) : {},
-        recentPriceChanges: [], // Mock empty for now
-        socialIntelligence: {
-          redditPosts: 0,
-          youtubeVideos: 0,
-          recentReddit: [],
-          recentYoutube: []
-        },
-        productCatalog: {
-          adaptersCount: data.manufacturers?.length || 0,
-          documentsCount: data.total_documents || 0,
-          manufacturerCounts: data.manufacturers ?
-            data.manufacturers.reduce((acc: any, mfg: any) => {
-              acc[mfg.name] = mfg.count;
-              return acc;
-            }, {}) : {},
-          recentDocuments: []
-        },
-        lastUpdated: data.last_harvest || new Date().toISOString()
+      if (result.success && result.data) {
+        console.log('🔄 Using data from internal Next.js API:', result.data)
+        setStats(result.data)
+        console.log('✅ Successfully set stats state')
+      } else {
+        console.error('❌ API response indicates failure:', result)
+        throw new Error(result.message || 'Failed to load overview data')
       }
-
-      console.log('🔄 Transformed data for dashboard:', transformedData)
-      setStats(transformedData)
-      console.log('✅ Successfully set stats state')
     } catch (error) {
       console.error('❌ Failed to load overview - Full error details:', error)
       console.error('❌ Error name:', error.name)
