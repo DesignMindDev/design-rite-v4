@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, FileText, Shield, Building2, Users, Calendar, DollarSign, CheckCircle, AlertTriangle, Download, Briefcase, ArrowLeft, ExternalLink, Database, GitBranch, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
+import { productIntelligenceAPI, type ProductData } from '../../lib/product-intelligence';
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -39,6 +40,14 @@ const IntegratorDiscoveryAssistant = () => {
     userInteractions: 0
   });
 
+  const [realPricingData, setRealPricingData] = useState({
+    cameras: [],
+    controllers: [],
+    nvrs: [],
+    lastUpdated: null,
+    isLoading: false
+  });
+
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -48,6 +57,87 @@ const IntegratorDiscoveryAssistant = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Fetch real pricing data from harvester API
+  const fetchRealPricingData = async () => {
+    setRealPricingData(prev => ({ ...prev, isLoading: true }));
+
+    try {
+      // Fetch cameras
+      const cameraResults = await productIntelligenceAPI.searchProducts('camera', 10);
+      const controllerResults = await productIntelligenceAPI.searchProducts('controller', 5);
+      const nvrResults = await productIntelligenceAPI.searchProducts('nvr', 5);
+
+      setRealPricingData({
+        cameras: cameraResults.products || [],
+        controllers: controllerResults.products || [],
+        nvrs: nvrResults.products || [],
+        lastUpdated: new Date(),
+        isLoading: false
+      });
+    } catch (error) {
+      console.error('Failed to fetch real pricing data:', error);
+      setRealPricingData(prev => ({ ...prev, isLoading: false }));
+    }
+  };
+
+  // Calculate package pricing based on real data
+  const calculatePackagePricing = () => {
+    const { cameras, controllers, nvrs } = realPricingData;
+
+    if (cameras.length === 0) {
+      // Return default pricing if no data available
+      return {
+        essential: 285000,
+        professional: 425000,
+        enterprise: 580000
+      };
+    }
+
+    // Calculate based on real pricing data
+    const avgCameraPrice = cameras.reduce((sum, camera) =>
+      sum + (camera.pricing?.street_price || camera.pricing?.msrp || 500), 0
+    ) / cameras.length;
+
+    const avgControllerPrice = controllers.length > 0 ?
+      controllers.reduce((sum, controller) =>
+        sum + (controller.pricing?.street_price || controller.pricing?.msrp || 2000), 0
+      ) / controllers.length : 2000;
+
+    const avgNvrPrice = nvrs.length > 0 ?
+      nvrs.reduce((sum, nvr) =>
+        sum + (nvr.pricing?.street_price || nvr.pricing?.msrp || 3000), 0
+      ) / nvrs.length : 3000;
+
+    // Calculate package totals with real pricing
+    const essential = Math.round(
+      (avgCameraPrice * 16) + // 16 cameras
+      (avgControllerPrice * 2) + // 2 controllers
+      (avgNvrPrice * 1) + // 1 NVR
+      (15000) // Installation & misc
+    );
+
+    const professional = Math.round(
+      (avgCameraPrice * 32) + // 32 cameras
+      (avgControllerPrice * 4) + // 4 controllers
+      (avgNvrPrice * 2) + // 2 NVRs
+      (25000) // Installation & analytics
+    );
+
+    const enterprise = Math.round(
+      (avgCameraPrice * 48) + // 48 cameras
+      (avgControllerPrice * 6) + // 6 controllers
+      (avgNvrPrice * 3) + // 3 NVRs
+      (50000) // Installation & enterprise features
+    );
+
+    return { essential, professional, enterprise };
+  };
+
+  // Fetch pricing data on component mount
+  useEffect(() => {
+    fetchRealPricingData();
+  }, []);
 
   // Demo scenarios for quick start
   const demoScenarios = [
@@ -271,9 +361,13 @@ const IntegratorDiscoveryAssistant = () => {
       documentsGenerated: ['Executive_Summary', 'SOW', 'BOM', 'Implementation_Plan', 'Service_Plan']
     }));
 
+    const pricingStatus = realPricingData.lastUpdated ?
+      `\n\n🔥 **LIVE PRICING ACTIVE** - Proposal includes real-time pricing from ${realPricingData.cameras.length + realPricingData.controllers.length + realPricingData.nvrs.length} harvested products (CDW, manufacturer data)` :
+      '';
+
     const docMessage = {
       role: 'assistant',
-      content: "📋 **PROFESSIONAL DOCUMENTS GENERATED!**\n\n✅ Executive Summary\n✅ Statement of Work (SOW)\n✅ Bill of Materials (3-Tier Pricing)\n✅ Implementation Plan & Timeline\n✅ Service & Maintenance Plan\n\nAll documents are customized based on your specific requirements and include detailed specifications, pricing, and timelines. Click 'View Documents' below to see the complete professional package.",
+      content: `📋 **PROFESSIONAL DOCUMENTS GENERATED!**\n\n✅ Executive Summary\n✅ Statement of Work (SOW)\n✅ Bill of Materials (3-Tier Pricing)\n✅ Implementation Plan & Timeline\n✅ Service & Maintenance Plan\n\nAll documents are customized based on your specific requirements and include detailed specifications, pricing, and timelines. Click 'View Documents' below to see the complete professional package.${pricingStatus}`,
       timestamp: new Date()
     };
 
@@ -779,12 +873,24 @@ const IntegratorDiscoveryAssistant = () => {
                   {/* Bill of Materials */}
                   <div className="border-l-4 border-purple-500 pl-6">
                     <h3 className="text-2xl font-bold text-purple-600 mb-4">💰 Bill of Materials</h3>
+                    {realPricingData.lastUpdated && (
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                        <div className="flex items-center gap-2 text-sm text-green-700">
+                          <Database className="w-4 h-4" />
+                          <span>Pricing updated with live data from {realPricingData.cameras.length + realPricingData.controllers.length + realPricingData.nvrs.length} products</span>
+                          <span className="text-xs text-green-600">• Last updated: {realPricingData.lastUpdated.toLocaleTimeString()}</span>
+                        </div>
+                      </div>
+                    )}
                     <div className="bg-purple-50 p-6 rounded-lg">
                       <div className="grid md:grid-cols-3 gap-6">
                         <div className="bg-white p-4 rounded-lg border-2 border-gray-200">
                           <h4 className="font-bold text-gray-800 mb-3 text-center">Essential Package</h4>
                           <div className="text-center mb-4">
-                            <span className="text-3xl font-bold text-gray-800">$285,000</span>
+                            <span className="text-3xl font-bold text-gray-800">${calculatePackagePricing().essential.toLocaleString()}</span>
+                            {realPricingData.lastUpdated && (
+                              <div className="text-xs text-green-600 mt-1">Live pricing</div>
+                            )}
                           </div>
                           <ul className="text-sm space-y-2">
                             <li>• Basic access control (5 doors)</li>
@@ -800,7 +906,10 @@ const IntegratorDiscoveryAssistant = () => {
                           </div>
                           <h4 className="font-bold text-blue-600 mb-3 text-center">Professional Package</h4>
                           <div className="text-center mb-4">
-                            <span className="text-3xl font-bold text-blue-600">$425,000</span>
+                            <span className="text-3xl font-bold text-blue-600">${calculatePackagePricing().professional.toLocaleString()}</span>
+                            {realPricingData.lastUpdated && (
+                              <div className="text-xs text-green-600 mt-1">Live pricing</div>
+                            )}
                           </div>
                           <ul className="text-sm space-y-2">
                             <li>• Advanced access control (15 doors)</li>
@@ -815,7 +924,10 @@ const IntegratorDiscoveryAssistant = () => {
                         <div className="bg-white p-4 rounded-lg border-2 border-purple-500">
                           <h4 className="font-bold text-purple-600 mb-3 text-center">Enterprise Package</h4>
                           <div className="text-center mb-4">
-                            <span className="text-3xl font-bold text-purple-600">$580,000</span>
+                            <span className="text-3xl font-bold text-purple-600">${calculatePackagePricing().enterprise.toLocaleString()}</span>
+                            {realPricingData.lastUpdated && (
+                              <div className="text-xs text-green-600 mt-1">Live pricing</div>
+                            )}
                           </div>
                           <ul className="text-sm space-y-2">
                             <li>• Enterprise access control (25+ doors)</li>
