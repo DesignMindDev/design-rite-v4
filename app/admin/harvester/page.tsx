@@ -140,34 +140,23 @@ export default function HarvesterDashboard() {
         limit: '25'
       })
 
-      if (searchTerm) params.append('query', searchTerm)
+      if (searchTerm) params.append('search', searchTerm)
       if (selectedManufacturer) params.append('manufacturer', selectedManufacturer)
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_HARVESTER_API_URL || 'http://localhost:8000'}/api/v1/products/search?${params}`)
+      // Use internal Next.js API instead of external harvester API
+      const response = await fetch(`/api/admin/harvester?view=products&${params}`)
       const data = await response.json()
 
-      // Transform API response to match dashboard expectations
-      const transformedProducts = data.products ? data.products.map((product: any) => ({
-        id: product.id || Math.random().toString(),
-        manufacturer: product.manufacturer || 'Unknown',
-        model: product.model || 'N/A',
-        name: product.description || product.name || 'No description',
-        category: 'Security Camera', // Default category
-        msrp: product.pricing?.msrp || 0,
-        dealer_cost: product.pricing?.dealer_cost || 0,
-        map_price: product.pricing?.map_price || 0,
-        street_price: product.pricing?.street_price || 0,
-        in_stock: true,
-        discontinued: false,
-        price_updated_at: product.last_updated || new Date().toISOString(),
-        created_at: product.last_updated || new Date().toISOString()
-      })) : []
-
-      setProducts(transformedProducts)
-      setTotalPages(Math.ceil((data.total || 0) / 25))
+      if (data.success) {
+        setProducts(data.data.products || [])
+        setTotalPages(data.data.pagination?.totalPages || 1)
+      } else {
+        console.error('Products API error:', data.error)
+        setProducts([])
+        setTotalPages(1)
+      }
     } catch (error) {
       console.error('Failed to load products:', error)
-      // Set mock data on error
       setProducts([])
       setTotalPages(1)
     } finally {
