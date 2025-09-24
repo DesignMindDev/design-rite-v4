@@ -43,6 +43,26 @@ interface BlogPost {
   published: boolean
 }
 
+interface TeamCode {
+  id: string
+  code: string
+  memberName: string
+  role: string
+  isActive: boolean
+  createdAt: string
+  lastUsed?: string
+  usageCount: number
+}
+
+interface ActivityLog {
+  timestamp: string
+  memberName: string
+  code: string
+  action: string
+  ipAddress?: string
+  userAgent?: string
+}
+
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
@@ -51,7 +71,9 @@ export default function AdminPage() {
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({ logoPath: '', footerLogoPath: '', demoVideoUrl: '' })
   const [videos, setVideos] = useState<VideoContent[]>([])
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
-  const [activeTab, setActiveTab] = useState<'team' | 'logos' | 'videos' | 'blog'>('team')
+  const [teamCodes, setTeamCodes] = useState<TeamCode[]>([])
+  const [teamActivity, setTeamActivity] = useState<ActivityLog[]>([])
+  const [activeTab, setActiveTab] = useState<'team' | 'logos' | 'videos' | 'blog' | 'team-codes' | 'activity'>('team')
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null)
   const [newMember, setNewMember] = useState<Partial<TeamMember>>({})
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
@@ -194,12 +216,20 @@ export default function AdminPage() {
       })
 
       if (response.ok) {
+        const result = await response.json()
+        console.log('Team member saved successfully:', result)
         loadTeamMembers()
         setEditingMember(null)
         setNewMember({})
+        alert(`Team member ${member.id ? 'updated' : 'added'} successfully!`)
+      } else {
+        const errorData = await response.json()
+        console.error('Failed to save team member:', errorData)
+        alert(`Failed to save team member: ${errorData.error || response.statusText}`)
       }
     } catch (error) {
       console.error('Failed to save team member:', error)
+      alert(`Failed to save team member: ${error.message}`)
     }
   }
 
@@ -212,9 +242,15 @@ export default function AdminPage() {
 
         if (response.ok) {
           loadTeamMembers()
+          alert('Team member deleted successfully!')
+        } else {
+          const errorData = await response.json()
+          console.error('Failed to delete team member:', errorData)
+          alert(`Failed to delete team member: ${errorData.error || response.statusText}`)
         }
       } catch (error) {
         console.error('Failed to delete team member:', error)
+        alert(`Failed to delete team member: ${error.message}`)
       }
     }
   }
@@ -471,7 +507,6 @@ export default function AdminPage() {
                 <button
                   onClick={() => saveTeamMember({
                     ...newMember,
-                    id: Date.now().toString(),
                     imagePath: newMember.imagePath || `/team/placeholder.jpg`
                   } as TeamMember)}
                   disabled={!newMember.name || !newMember.role}
