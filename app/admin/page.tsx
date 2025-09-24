@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import * as auth from '@/lib/auth'
 
 interface TeamMember {
   id: string
@@ -44,6 +45,7 @@ interface BlogPost {
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   const [password, setPassword] = useState('')
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({ logoPath: '', footerLogoPath: '', demoVideoUrl: '' })
@@ -72,19 +74,24 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    const authStatus = localStorage.getItem('adminAuth')
-    if (authStatus === 'authenticated') {
-      setIsAuthenticated(true)
-      loadTeamMembers()
-      loadSiteSettings()
-      loadBlogPosts()
+    // Only check authentication after component mounts (client-side only)
+    setIsMounted(true)
+
+    const checkAuth = () => {
+      if (auth.isAuthenticated()) {
+        setIsAuthenticated(true)
+        loadTeamMembers()
+        loadSiteSettings()
+        loadBlogPosts()
+      }
     }
+
+    checkAuth()
   }, [])
 
   const handleLogin = async () => {
-    if (password === 'ProcessM@ker2025') {
+    if (auth.authenticate(password)) {
       setIsAuthenticated(true)
-      localStorage.setItem('adminAuth', 'authenticated')
       loadTeamMembers()
       loadSiteSettings()
       loadBlogPosts()
@@ -95,7 +102,7 @@ export default function AdminPage() {
 
   const handleLogout = () => {
     setIsAuthenticated(false)
-    localStorage.removeItem('adminAuth')
+    auth.logout()
   }
 
   const loadTeamMembers = async () => {
@@ -210,6 +217,12 @@ export default function AdminPage() {
         console.error('Failed to delete team member:', error)
       }
     }
+  }
+
+  if (!isMounted) {
+    return <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] flex items-center justify-center">
+      <div className="text-white">Loading...</div>
+    </div>
   }
 
   if (!isAuthenticated) {

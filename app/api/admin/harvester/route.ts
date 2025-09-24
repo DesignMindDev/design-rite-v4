@@ -41,6 +41,8 @@ export async function GET(request: Request) {
         return await getManufacturersData(searchParams)
       case 'publications':
         return await getPublicationsData(searchParams)
+      case 'scheduler':
+        return await getSchedulerData()
       default:
         return NextResponse.json({ error: 'Invalid view' }, { status: 400 })
     }
@@ -364,6 +366,14 @@ export async function POST(request: Request) {
         return await triggerHarvest(manufacturer)
       case 'update_pricing':
         return await updatePricing()
+      case 'schedule_harvest':
+        return await scheduleHarvest(body)
+      case 'update_schedule':
+        return await updateSchedule(body)
+      case 'delete_schedule':
+        return await deleteSchedule(body.scheduleId)
+      case 'add_adapter':
+        return await addAdapter(body)
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
     }
@@ -561,6 +571,173 @@ async function updatePricing() {
     message: 'Pricing update requested',
     instructions: 'Connect to distributor APIs for real-time pricing'
   })
+}
+
+// Simple in-memory scheduler (in production, use a database table)
+let schedules: any[] = [
+  {
+    id: 1,
+    name: 'Daily Reddit Harvest',
+    type: 'reddit',
+    schedule: '0 9 * * *', // 9 AM daily
+    enabled: true,
+    lastRun: null,
+    nextRun: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 2,
+    name: 'Weekly YouTube Harvest',
+    type: 'youtube',
+    schedule: '0 10 * * 1', // 10 AM every Monday
+    enabled: true,
+    lastRun: null,
+    nextRun: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date().toISOString()
+  }
+]
+
+async function getSchedulerData() {
+  try {
+    // Get recent harvest activities from price_uploads table
+    const { data: recentActivities, error: activitiesError } = await supabase
+      .from('price_uploads')
+      .select('*')
+      .order('upload_date', { ascending: false })
+      .limit(10)
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        schedules,
+        recentActivities: recentActivities || [],
+        stats: {
+          totalSchedules: schedules.length,
+          activeSchedules: schedules.filter(s => s.enabled).length,
+          lastActivity: recentActivities?.[0]?.upload_date || null
+        }
+      }
+    })
+  } catch (error) {
+    console.error('Scheduler data error:', error)
+    return NextResponse.json({ error: 'Failed to fetch scheduler data' }, { status: 500 })
+  }
+}
+
+async function scheduleHarvest(body: any) {
+  try {
+    const { name, type, schedule, enabled = true } = body
+
+    const newSchedule = {
+      id: Math.max(...schedules.map(s => s.id), 0) + 1,
+      name,
+      type,
+      schedule,
+      enabled,
+      lastRun: null,
+      nextRun: calculateNextRun(schedule),
+      created_at: new Date().toISOString()
+    }
+
+    schedules.push(newSchedule)
+
+    return NextResponse.json({
+      success: true,
+      message: 'Harvest schedule created successfully',
+      schedule: newSchedule
+    })
+  } catch (error) {
+    console.error('Schedule harvest error:', error)
+    return NextResponse.json({ error: 'Failed to create schedule' }, { status: 500 })
+  }
+}
+
+async function updateSchedule(body: any) {
+  try {
+    const { scheduleId, name, type, schedule, enabled } = body
+
+    const scheduleIndex = schedules.findIndex(s => s.id === scheduleId)
+    if (scheduleIndex === -1) {
+      return NextResponse.json({ error: 'Schedule not found' }, { status: 404 })
+    }
+
+    schedules[scheduleIndex] = {
+      ...schedules[scheduleIndex],
+      name: name || schedules[scheduleIndex].name,
+      type: type || schedules[scheduleIndex].type,
+      schedule: schedule || schedules[scheduleIndex].schedule,
+      enabled: enabled !== undefined ? enabled : schedules[scheduleIndex].enabled,
+      nextRun: schedule ? calculateNextRun(schedule) : schedules[scheduleIndex].nextRun
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Schedule updated successfully',
+      schedule: schedules[scheduleIndex]
+    })
+  } catch (error) {
+    console.error('Update schedule error:', error)
+    return NextResponse.json({ error: 'Failed to update schedule' }, { status: 500 })
+  }
+}
+
+async function deleteSchedule(scheduleId: number) {
+  try {
+    const scheduleIndex = schedules.findIndex(s => s.id === scheduleId)
+    if (scheduleIndex === -1) {
+      return NextResponse.json({ error: 'Schedule not found' }, { status: 404 })
+    }
+
+    schedules.splice(scheduleIndex, 1)
+
+    return NextResponse.json({
+      success: true,
+      message: 'Schedule deleted successfully'
+    })
+  } catch (error) {
+    console.error('Delete schedule error:', error)
+    return NextResponse.json({ error: 'Failed to delete schedule' }, { status: 500 })
+  }
+}
+
+// Helper function to calculate next run time (simplified)
+function calculateNextRun(cronExpression: string): string {
+  // This is a simplified version - in production use a proper cron parser like 'node-cron'
+  const now = new Date()
+  now.setHours(now.getHours() + 1) // Next hour as default
+  return now.toISOString()
+}
+
+async function addAdapter(body: any) {
+  try {
+    const { name, baseUrl, notes } = body
+
+    // Create slug from name
+    const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+
+    const { data, error } = await supabase
+      .from('adapters')
+      .insert([{
+        name: name,
+        slug: slug,
+        base_url: baseUrl,
+        enabled: true,
+        notes: notes || null
+      }])
+      .select()
+      .single()
+
+    if (error) throw error
+
+    return NextResponse.json({
+      success: true,
+      message: 'Adapter added successfully',
+      adapter: data
+    })
+  } catch (error) {
+    console.error('Add adapter error:', error)
+    return NextResponse.json({ error: 'Failed to add adapter' }, { status: 500 })
+  }
 }
 
 async function getManufacturersData(searchParams: URLSearchParams) {

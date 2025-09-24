@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Database, TrendingUp, Package, RefreshCw, DollarSign, AlertCircle, CheckCircle, Activity, BarChart3, Search, Filter, ExternalLink, Eye, MessageSquare, Play, Building2, FileText } from 'lucide-react'
+import Link from 'next/link'
+import { Database, TrendingUp, Package, RefreshCw, DollarSign, AlertCircle, CheckCircle, Activity, BarChart3, Search, Filter, ExternalLink, Eye, MessageSquare, Play, Building2, FileText, Clock, Plus, Trash2, Edit, Power } from 'lucide-react'
+import * as auth from '@/lib/auth'
 
 interface HarvesterStats {
   totalProducts: number
@@ -42,6 +44,7 @@ interface Product {
 
 export default function HarvesterDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   const [password, setPassword] = useState('')
   const [activeTab, setActiveTab] = useState('overview')
   const [stats, setStats] = useState<HarvesterStats | null>(null)
@@ -50,6 +53,8 @@ export default function HarvesterDashboard() {
   const [youtubeVideos, setYoutubeVideos] = useState<any[]>([])
   const [manufacturers, setManufacturers] = useState<any[]>([])
   const [publications, setPublications] = useState<any[]>([])
+  const [schedules, setSchedules] = useState<any[]>([])
+  const [showScheduleForm, setShowScheduleForm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedManufacturer, setSelectedManufacturer] = useState('')
@@ -58,13 +63,32 @@ export default function HarvesterDashboard() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
-  // Simple authentication
+  // Check authentication on page load (client-side only)
+  useEffect(() => {
+    setIsMounted(true)
+
+    const checkAuth = () => {
+      if (auth.isAuthenticated()) {
+        setIsAuthenticated(true)
+      }
+    }
+
+    checkAuth()
+  }, [])
+
+  // Handle authentication
   const handleAuth = () => {
-    if (password === 'ProcessM@ker2025') {
+    if (auth.authenticate(password)) {
       setIsAuthenticated(true)
     } else {
       alert('Invalid password')
     }
+  }
+
+  // Handle logout
+  const handleLogout = () => {
+    setIsAuthenticated(false)
+    auth.logout()
   }
 
   // Load overview data
@@ -206,6 +230,97 @@ export default function HarvesterDashboard() {
     }
   }
 
+  // Load Scheduler data
+  const loadScheduler = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch(`/api/admin/harvester?view=scheduler`)
+      const data = await response.json()
+      if (data.success) {
+        setSchedules(data.data.schedules)
+      }
+    } catch (error) {
+      console.error('Failed to load scheduler:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Create new schedule
+  const createSchedule = async (scheduleData: any) => {
+    try {
+      const response = await fetch('/api/admin/harvester', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'schedule_harvest',
+          ...scheduleData
+        })
+      })
+      const data = await response.json()
+      if (data.success) {
+        setShowScheduleForm(false)
+        loadScheduler()
+        alert('Schedule created successfully!')
+      } else {
+        alert(data.error || 'Failed to create schedule')
+      }
+    } catch (error) {
+      console.error('Failed to create schedule:', error)
+      alert('Failed to create schedule')
+    }
+  }
+
+  // Toggle schedule
+  const toggleSchedule = async (scheduleId: number, enabled: boolean) => {
+    try {
+      const response = await fetch('/api/admin/harvester', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_schedule',
+          scheduleId,
+          enabled
+        })
+      })
+      const data = await response.json()
+      if (data.success) {
+        loadScheduler()
+      } else {
+        alert(data.error || 'Failed to update schedule')
+      }
+    } catch (error) {
+      console.error('Failed to toggle schedule:', error)
+      alert('Failed to update schedule')
+    }
+  }
+
+  // Delete schedule
+  const deleteSchedule = async (scheduleId: number) => {
+    if (!confirm('Are you sure you want to delete this schedule?')) return
+
+    try {
+      const response = await fetch('/api/admin/harvester', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete_schedule',
+          scheduleId
+        })
+      })
+      const data = await response.json()
+      if (data.success) {
+        loadScheduler()
+        alert('Schedule deleted successfully!')
+      } else {
+        alert(data.error || 'Failed to delete schedule')
+      }
+    } catch (error) {
+      console.error('Failed to delete schedule:', error)
+      alert('Failed to delete schedule')
+    }
+  }
+
   // Trigger harvest
   const triggerHarvest = async (manufacturer?: string) => {
     try {
@@ -243,8 +358,18 @@ export default function HarvesterDashboard() {
       loadManufacturers()
     } else if (isAuthenticated && activeTab === 'publications') {
       loadPublications()
+    } else if (isAuthenticated && activeTab === 'scheduler') {
+      loadScheduler()
     }
   }, [isAuthenticated, activeTab, page, searchTerm, selectedManufacturer, selectedSubreddit, selectedChannel])
+
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen dr-bg-charcoal dr-text-pearl flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    )
+  }
 
   if (!isAuthenticated) {
     return (
@@ -281,15 +406,32 @@ export default function HarvesterDashboard() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <Database className="w-8 h-8 dr-text-violet" />
-            <h1 className="dr-heading-lg dr-text-pearl">Product Harvester Dashboard</h1>
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex items-center gap-3">
+              <Database className="w-8 h-8 dr-text-violet" />
+              <h1 className="dr-heading-lg dr-text-pearl">Product Harvester Dashboard</h1>
+            </div>
+            <div className="flex items-center gap-4">
+              <Link
+                href="/admin"
+                className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all flex items-center gap-2"
+              >
+                <span>🏠</span>
+                Main Admin
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
           </div>
           <p className="text-gray-300">Monitor your web harvesting operations and product database</p>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex space-x-1 mb-8">
+        <div className="flex flex-wrap gap-2 mb-8 overflow-x-auto">
           {[
             { id: 'overview', label: 'Overview', icon: BarChart3 },
             { id: 'products', label: 'Products', icon: Package },
@@ -297,8 +439,8 @@ export default function HarvesterDashboard() {
             { id: 'youtube', label: 'YouTube Videos', icon: Play },
             { id: 'manufacturers', label: 'Manufacturers', icon: Building2 },
             { id: 'publications', label: 'Publications', icon: FileText },
-            { id: 'pricing', label: 'Pricing', icon: DollarSign },
-            { id: 'operations', label: 'Operations', icon: Activity }
+            { id: 'scheduler', label: 'Scheduler', icon: Clock },
+            { id: 'pricing', label: 'Pricing', icon: DollarSign }
           ].map(tab => (
             <button
               key={tab.id}
@@ -310,7 +452,7 @@ export default function HarvesterDashboard() {
                 setSelectedSubreddit('')
                 setSelectedChannel('')
               }}
-              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
+              className={`flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all whitespace-nowrap text-sm sm:text-base ${
                 activeTab === tab.id
                   ? 'dr-bg-violet dr-text-pearl'
                   : 'bg-gray-800/40 text-gray-300 hover:bg-gray-700/40'
@@ -921,7 +1063,7 @@ export default function HarvesterDashboard() {
 
             {/* Manufacturers Table */}
             <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl overflow-hidden">
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto min-w-full">
                 <table className="w-full">
                   <thead className="bg-gray-700/50">
                     <tr>
@@ -985,9 +1127,10 @@ export default function HarvesterDashboard() {
               </div>
 
               {/* Pagination */}
-              <div className="flex items-center justify-between p-6 bg-gray-700/30">
-                <div className="text-gray-300">
-                  Showing {((page - 1) * 25) + 1} to {Math.min(page * 25, totalPages * 25)} of {totalPages * 25} manufacturers
+              <div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 bg-gray-700/30 gap-4">
+                <div className="text-gray-300 text-sm text-center sm:text-left">
+                  <span className="hidden sm:inline">Showing {((page - 1) * 25) + 1} to {Math.min(page * 25, totalPages * 25)} of {totalPages * 25} manufacturers</span>
+                  <span className="sm:hidden">{totalPages * 25} total manufacturers</span>
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -1073,10 +1216,11 @@ export default function HarvesterDashboard() {
             </div>
 
             {/* Pagination */}
-            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6">
-              <div className="flex items-center justify-between">
-                <div className="text-gray-300">
-                  Showing {((page - 1) * 25) + 1} to {Math.min(page * 25, totalPages * 25)} of {totalPages * 25} publications
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-gray-300 text-sm text-center sm:text-left">
+                  <span className="hidden sm:inline">Showing {((page - 1) * 25) + 1} to {Math.min(page * 25, totalPages * 25)} of {totalPages * 25} publications</span>
+                  <span className="sm:hidden">{totalPages * 25} total publications</span>
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -1102,14 +1246,168 @@ export default function HarvesterDashboard() {
           </div>
         )}
 
+        {/* Scheduler Tab */}
+        {activeTab === 'scheduler' && (
+          <div className="space-y-6">
+            {/* Header with Add Schedule Button */}
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="dr-subheading dr-text-pearl mb-2">Automated Harvest Scheduler</h2>
+                  <p className="text-gray-400">Schedule automated harvesting of Reddit, YouTube, and manufacturer data</p>
+                </div>
+                <button
+                  onClick={() => setShowScheduleForm(!showScheduleForm)}
+                  className="flex items-center gap-2 px-4 py-2 dr-bg-violet dr-text-pearl rounded-lg hover:shadow-lg transition-all"
+                >
+                  <Plus className="w-5 h-5" />
+                  Add Schedule
+                </button>
+              </div>
+            </div>
+
+            {/* Add Schedule Form */}
+            {showScheduleForm && (
+              <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6">
+                <h3 className="dr-text-pearl font-semibold mb-4">Create New Schedule</h3>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    const formData = new FormData(e.target as HTMLFormElement)
+                    createSchedule({
+                      name: formData.get('name'),
+                      type: formData.get('type'),
+                      schedule: formData.get('schedule'),
+                      enabled: true
+                    })
+                  }}
+                  className="space-y-4"
+                >
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-gray-300 mb-2">Schedule Name</label>
+                      <input
+                        name="name"
+                        required
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
+                        placeholder="e.g., Daily Reddit Harvest"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-300 mb-2">Harvest Type</label>
+                      <select
+                        name="type"
+                        required
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl focus:outline-none focus:dr-border-violet"
+                      >
+                        <option value="">Select Type</option>
+                        <option value="reddit">Reddit Posts</option>
+                        <option value="youtube">YouTube Videos</option>
+                        <option value="manufacturers">Manufacturers</option>
+                        <option value="all">All Sources</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-gray-300 mb-2">Cron Schedule</label>
+                    <select
+                      name="schedule"
+                      required
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl focus:outline-none focus:dr-border-violet"
+                    >
+                      <option value="">Select Schedule</option>
+                      <option value="0 */6 * * *">Every 6 hours</option>
+                      <option value="0 9 * * *">Daily at 9 AM</option>
+                      <option value="0 9 * * 1">Weekly on Monday at 9 AM</option>
+                      <option value="0 9 1 * *">Monthly on 1st at 9 AM</option>
+                    </select>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      type="submit"
+                      className="px-4 py-2 dr-bg-violet dr-text-pearl rounded-lg hover:shadow-lg transition-all"
+                    >
+                      Create Schedule
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowScheduleForm(false)}
+                      className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-all"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {/* Schedules List */}
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl overflow-hidden">
+              <div className="p-6 border-b border-gray-700/50">
+                <h3 className="dr-text-pearl font-semibold">Active Schedules</h3>
+              </div>
+
+              <div className="divide-y divide-gray-700/50">
+                {schedules.map((schedule) => (
+                  <div key={schedule.id} className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-3 h-3 rounded-full ${schedule.enabled ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                        <div>
+                          <h4 className="dr-text-pearl font-medium">{schedule.name}</h4>
+                          <div className="flex items-center gap-4 text-sm text-gray-400 mt-1">
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-4 h-4" />
+                              {schedule.schedule}
+                            </span>
+                            <span className="capitalize">{schedule.type}</span>
+                            <span>Next: {new Date(schedule.nextRun).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => toggleSchedule(schedule.id, !schedule.enabled)}
+                          className={`p-2 rounded-lg transition-colors ${
+                            schedule.enabled
+                              ? 'bg-green-600/20 text-green-400 hover:bg-green-600/30'
+                              : 'bg-gray-600/20 text-gray-400 hover:bg-gray-600/30'
+                          }`}
+                          title={schedule.enabled ? 'Disable' : 'Enable'}
+                        >
+                          <Power className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => deleteSchedule(schedule.id)}
+                          className="p-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {schedules.length === 0 && (
+                  <div className="p-12 text-center">
+                    <Clock className="w-16 h-16 dr-text-violet mx-auto mb-4 opacity-50" />
+                    <h3 className="dr-subheading dr-text-pearl mb-2">No Schedules</h3>
+                    <p className="text-gray-400">Create your first automated harvest schedule</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Other tabs placeholder */}
-        {(activeTab === 'pricing' || activeTab === 'operations') && (
+        {activeTab === 'pricing' && (
           <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-12 text-center">
-            <Activity className="w-16 h-16 dr-text-violet mx-auto mb-4 opacity-50" />
+            <DollarSign className="w-16 h-16 dr-text-violet mx-auto mb-4 opacity-50" />
             <h3 className="dr-subheading dr-text-pearl mb-2">Coming Soon</h3>
-            <p className="text-gray-400">
-              {activeTab === 'pricing' ? 'Advanced pricing analytics and trends' : 'Detailed harvest operations and scheduling'}
-            </p>
+            <p className="text-gray-400">Advanced pricing analytics and trends</p>
           </div>
         )}
       </div>
