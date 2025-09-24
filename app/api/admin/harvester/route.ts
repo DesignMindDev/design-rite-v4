@@ -15,9 +15,19 @@ export async function GET(request: Request) {
   try {
     // Check if Supabase is configured
     if (!supabase) {
+      console.error('Supabase configuration missing:', {
+        supabaseUrl: supabaseUrl ? 'present' : 'missing',
+        supabaseServiceKey: supabaseServiceKey ? 'present' : 'missing',
+        env: process.env.NODE_ENV
+      })
       return NextResponse.json({
         error: 'Database not configured',
-        message: 'Supabase environment variables are missing'
+        message: 'Supabase environment variables are missing',
+        debug: {
+          supabaseUrl: supabaseUrl ? 'present' : 'missing',
+          supabaseServiceKey: supabaseServiceKey ? 'present' : 'missing',
+          env: process.env.NODE_ENV
+        }
       }, { status: 500 })
     }
 
