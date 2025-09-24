@@ -1,5 +1,6 @@
 // app/api/discovery-assistant/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { aiEngine } from '@/lib/ai-engine';
 
 // Anthropic Configuration - UPDATED TO LATEST MODEL
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
@@ -8,9 +9,23 @@ const CLAUDE_MODEL = 'claude-3-5-sonnet-20241022'; // CRITICAL: Updated model
 
 // Health check endpoint (GET)
 export async function GET() {
+  // Get AI provider status from the engine
+  const providerStatus = aiEngine.getProviderStatus();
+  const enabledProviders = providerStatus.filter(p => p.provider.enabled && (p.provider.api_key && p.provider.api_key !== '' && (p.provider.api_key !== 'configured_from_env' || !!process.env.ANTHROPIC_API_KEY)));
+
   return NextResponse.json({
     service: 'Discovery Assistant API',
     status: 'healthy',
+    ai_engine: {
+      providers_available: enabledProviders.length,
+      enabled_providers: enabledProviders.map(p => ({
+        name: p.provider.name,
+        type: p.provider.provider_type,
+        priority: p.provider.priority,
+        last_health: p.lastHealthCheck?.status || 'unknown'
+      }))
+    },
+    // Legacy fields for backwards compatibility
     claude_configured: !!ANTHROPIC_API_KEY,
     model: CLAUDE_MODEL,
     timestamp: new Date().toISOString()
@@ -42,23 +57,31 @@ export async function POST(request: NextRequest) {
 
     // Build conversation context
     const context = buildConversationContext(sessionData, conversationHistory, isTeamMember);
-    
-    try {
-      // Call Claude API with proper context
-      console.log('Attempting Claude API call...');
-      const claudeResponse = await callClaudeAPI(message, context);
-      
-      return NextResponse.json({
-        success: true,
-        message: { content: claudeResponse },
-        provider: 'claude',
-        timestamp: new Date().toISOString()
-      });
 
-    } catch (claudeError) {
-      console.error('Claude API error details:', claudeError.message);
-      console.error('Full error:', claudeError);
-      
+    try {
+      // Use multi-AI engine with automatic failover
+      console.log('🤖 Using Multi-AI Engine with automatic failover...');
+      const aiResponse = await aiEngine.generateResponse(`${context}\n\nCurrent message: ${message}`);
+
+      if (aiResponse.success) {
+        console.log(`✅ AI Response successful using ${aiResponse.provider_used} in ${aiResponse.response_time_ms}ms`);
+        return NextResponse.json({
+          success: true,
+          message: { content: aiResponse.content },
+          provider: aiResponse.provider_used,
+          response_time_ms: aiResponse.response_time_ms,
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        console.log(`❌ All AI providers failed: ${aiResponse.error}`);
+        // Fallback to intelligent responses when all AI providers fail
+        return generateFallbackResponse(message, sessionData, isTeamMember);
+      }
+
+    } catch (engineError) {
+      console.error('Multi-AI Engine error:', engineError.message);
+      console.error('Full error:', engineError);
+
       // Intelligent fallback instead of generic error
       return generateFallbackResponse(message, sessionData, isTeamMember);
     }
