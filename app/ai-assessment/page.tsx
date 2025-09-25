@@ -331,20 +331,25 @@ const IntegratorDiscoveryAssistant = () => {
   };
 
   const acceptAssumptions = () => {
+    // Preserve existing handoff context if it exists
+    const hasHandoffData = sessionData.companyName || sessionData.currentPhase === 'detailed_analysis';
+
     const acceptedMessage = {
       role: 'assistant',
-      content: `✅ **Excellent! I've locked in these assumptions for your project:**\n\nWith these parameters set, I can now provide much more targeted recommendations and skip the basic discovery questions. This should reduce our discovery time by 60-70%!\n\n**Next, let's dive into the specifics of your facility and requirements.** What's the primary focus for your security system - access control, surveillance, intrusion detection, or a comprehensive solution?`,
+      content: hasHandoffData
+        ? `✅ **Perfect! I've locked in these assumptions for your security estimate project:**\n\nWith your initial estimate data and these standard assumptions, I can now provide much more targeted recommendations and skip the basic discovery questions. This should reduce our discovery time by 60-70%!\n\n**Building on your security estimate, let's dive deeper into the specifics.** Based on your ${sessionData.facilityType || 'facility'}, what's the primary focus for expanding your security system - access control, surveillance, intrusion detection, or a comprehensive integrated solution?`
+        : `✅ **Excellent! I've locked in these assumptions for your project:**\n\nWith these parameters set, I can now provide much more targeted recommendations and skip the basic discovery questions. This should reduce our discovery time by 60-70%!\n\n**Next, let's dive into the specifics of your facility and requirements.** What's the primary focus for your security system - access control, surveillance, intrusion detection, or a comprehensive solution?`,
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, acceptedMessage]);
     setShowAssumptions(false);
 
-    // Update session data to reflect assumptions accepted
+    // Update session data to reflect assumptions accepted, preserving existing context
     setSessionData(prev => ({
       ...prev,
-      currentPhase: 'detailed_requirements',
-      qualificationScore: prev.qualificationScore + 20
+      currentPhase: hasHandoffData ? 'detailed_analysis' : 'detailed_requirements',
+      qualificationScore: Math.max(prev.qualificationScore + 20, 35) // Boost score but maintain handoff scoring
     }));
   };
 
