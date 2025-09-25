@@ -47,6 +47,20 @@ const IntegratorDiscoveryAssistant = () => {
     totalProducts: 0
   });
 
+  const [showAssumptions, setShowAssumptions] = useState(false);
+  const [assumptions, setAssumptions] = useState({
+    timeline: '4-6 months implementation',
+    budget: 'Mid-range enterprise solution',
+    compliance: 'Standard security requirements',
+    maintenance: '3-year warranty + annual service',
+    integration: 'New system with existing infrastructure',
+    training: 'Basic operator training included',
+    monitoring: '24/7 professional monitoring',
+    coverage: 'Comprehensive facility coverage',
+    scalability: 'Room for 25% expansion',
+    backup: 'Redundant power and connectivity'
+  });
+
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -304,6 +318,43 @@ const IntegratorDiscoveryAssistant = () => {
     }));
   };
 
+  // Handle assumptions workflow
+  const presentAssumptions = () => {
+    const assumptionsMessage = {
+      role: 'assistant',
+      content: `🎯 **Let's streamline the discovery process with standard assumptions!**\n\nI've prepared typical security system assumptions to accelerate our assessment. Please review and modify any that don't fit your project:\n\n**📋 Current Assumptions:**\n• **Timeline:** ${assumptions.timeline}\n• **Budget:** ${assumptions.budget}\n• **Compliance:** ${assumptions.compliance}\n• **Maintenance:** ${assumptions.maintenance}\n• **Integration:** ${assumptions.integration}\n• **Training:** ${assumptions.training}\n• **Monitoring:** ${assumptions.monitoring}\n• **Coverage:** ${assumptions.coverage}\n• **Scalability:** ${assumptions.scalability}\n• **Backup:** ${assumptions.backup}\n\n**What would you like to do?**\n✅ Accept these assumptions and proceed\n✏️ Modify specific assumptions\n💬 Tell me about your project requirements`,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, assumptionsMessage]);
+    setShowAssumptions(true);
+  };
+
+  const acceptAssumptions = () => {
+    const acceptedMessage = {
+      role: 'assistant',
+      content: `✅ **Excellent! I've locked in these assumptions for your project:**\n\nWith these parameters set, I can now provide much more targeted recommendations and skip the basic discovery questions. This should reduce our discovery time by 60-70%!\n\n**Next, let's dive into the specifics of your facility and requirements.** What's the primary focus for your security system - access control, surveillance, intrusion detection, or a comprehensive solution?`,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, acceptedMessage]);
+    setShowAssumptions(false);
+
+    // Update session data to reflect assumptions accepted
+    setSessionData(prev => ({
+      ...prev,
+      currentPhase: 'detailed_requirements',
+      qualificationScore: prev.qualificationScore + 20
+    }));
+  };
+
+  const updateAssumption = (key, value) => {
+    setAssumptions(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
   // Call Claude API for intelligent discovery assistance
   const callClaudeAPI = async (userMessage) => {
     try {
@@ -488,7 +539,29 @@ const IntegratorDiscoveryAssistant = () => {
                 ))}
               </div>
               <div className="text-center mt-4">
-                <p className="text-white/60 text-sm">Or start a custom conversation below</p>
+                <p className="text-white/60 text-sm">Or choose a quick start option:</p>
+                <div className="mt-3 flex gap-3 justify-center flex-wrap">
+                  <button
+                    onClick={presentAssumptions}
+                    className="bg-green-600/80 hover:bg-green-500/80 text-white font-semibold py-2 px-4 rounded-lg transition-all hover:scale-105 flex items-center gap-2"
+                  >
+                    ⚡ Use Standard Assumptions
+                  </button>
+                  <button
+                    onClick={() => {
+                      const customMessage = {
+                        role: 'assistant',
+                        content: "Perfect! Let's start with a custom discovery conversation. Tell me about your security project - what type of facility are you working with and what are your main security concerns?",
+                        timestamp: new Date()
+                      };
+                      setMessages(prev => [...prev, customMessage]);
+                      setSelectedScenario('custom');
+                    }}
+                    className="bg-blue-600/80 hover:bg-blue-500/80 text-white font-semibold py-2 px-4 rounded-lg transition-all hover:scale-105 flex items-center gap-2"
+                  >
+                    💬 Custom Conversation
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -513,6 +586,44 @@ const IntegratorDiscoveryAssistant = () => {
                     </div>
                   </div>
                 ))}
+
+                {/* Assumptions Review Interface */}
+                {showAssumptions && (
+                  <div className="bg-green-900/20 border border-green-500/30 rounded-xl p-6">
+                    <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                      🎯 Review & Modify Assumptions
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                      {Object.entries(assumptions).map(([key, value]) => (
+                        <div key={key} className="bg-white/10 rounded-lg p-3">
+                          <label className="block text-white/70 text-sm font-medium mb-1 capitalize">
+                            {key.replace(/([A-Z])/g, ' $1').trim()}
+                          </label>
+                          <input
+                            type="text"
+                            value={value}
+                            onChange={(e) => updateAssumption(key, e.target.value)}
+                            className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-green-400 transition-colors"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex gap-3 justify-center">
+                      <button
+                        onClick={acceptAssumptions}
+                        className="bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-6 rounded-lg transition-all hover:scale-105"
+                      >
+                        ✅ Accept & Continue
+                      </button>
+                      <button
+                        onClick={() => setShowAssumptions(false)}
+                        className="bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-lg transition-all hover:scale-105"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {isTyping && (
                   <div className="flex gap-3 justify-start">

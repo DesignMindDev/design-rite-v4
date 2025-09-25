@@ -101,7 +101,7 @@ const EstimateOptionsPage = () => {
               </div>
               <div>
                 <h2 className="text-2xl font-bold dr-text-violet">AI Discovery Assistant</h2>
-                <p className="text-gray-300">Conversational AI-powered assessment</p>
+                <p className="text-gray-300">Thorough AI-powered assessment • Allow 15 minutes</p>
               </div>
             </div>
 
@@ -130,13 +130,17 @@ const EstimateOptionsPage = () => {
             <div className="mb-8">
               <h3 className="font-semibold mb-4 dr-text-pearl">What you'll get:</h3>
               <ul className="space-y-2 text-gray-300 text-sm">
-                <li>• Intelligent discovery conversation</li>
-                <li>• Custom security recommendations</li>
-                <li>• Professional proposal documents</li>
-                <li>• Compliance framework mapping</li>
-                <li>• Real product recommendations with pricing</li>
-                <li>• Implementation timeline and phasing</li>
+                <li>• Comprehensive AI-guided discovery conversation</li>
+                <li>• Detailed security system recommendations</li>
+                <li>• Professional proposal documents with specifications</li>
+                <li>• Complete compliance framework mapping</li>
+                <li>• Real product recommendations with accurate pricing</li>
+                <li>• Detailed implementation timeline and project phasing</li>
+                <li>• Thorough risk assessment and mitigation strategies</li>
               </ul>
+              <p className="text-yellow-300 text-sm mt-4 font-medium">
+                ⏱️ Allow 15-20 minutes for a comprehensive, accurate proposal document
+              </p>
             </div>
 
             <Link
@@ -148,7 +152,7 @@ const EstimateOptionsPage = () => {
             </Link>
 
             <p className="text-xs text-gray-400 mt-4 text-center">
-              Interactive experience • Comprehensive results
+              Comprehensive discovery • Professional-grade proposal • 15-20 minutes
             </p>
           </div>
         </div>
@@ -169,7 +173,7 @@ const EstimateOptionsPage = () => {
                 <tr className="border-b border-gray-700/30">
                   <td className="py-4 pr-8">Time to Complete</td>
                   <td className="text-center py-4 px-4">5 minutes</td>
-                  <td className="text-center py-4 pl-4">15-30 minutes</td>
+                  <td className="text-center py-4 pl-4">15-20 minutes</td>
                 </tr>
                 <tr className="border-b border-gray-700/30">
                   <td className="py-4 pr-8">Real Pricing Data</td>

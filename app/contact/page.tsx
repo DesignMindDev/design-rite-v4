@@ -76,7 +76,7 @@ Sent from Design-Rite Contact Form
 
   const handleEmailGateSuccess = () => {
     setShowEmailGate(false);
-    window.location.href = '/ai-assessment';
+    window.location.href = '/estimate-options';
   };
 
   return (

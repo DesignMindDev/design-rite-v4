@@ -14,7 +14,7 @@ export default function SolutionsPage() {
     e.preventDefault();
     if (isAuthenticated) {
       extendSession();
-      window.location.href = '/ai-assessment';
+      window.location.href = '/estimate-options';
     } else {
       setShowEmailGate(true);
     }

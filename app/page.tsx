@@ -247,14 +247,13 @@ export default function HomePage() {
               {stormItems.map((item, index) => (
                 <div
                   key={index}
-                  className={`absolute top-0 left-0 transform -translate-x-1/4 -translate-y-full popup-item ${
+                  className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full popup-item ${
                     index === activeStormItem ? 'opacity-100' : 'opacity-0'
                   }`}
                   style={{
                     animationDelay: `${item.delay}s`,
-                    top: '-180px',
-                    left: '100px',
-                    width: '320px'
+                    top: '-220px',
+                    width: '300px'
                   }}
                 >
                   <div className="bg-red-900/90 border-2 border-red-500/60 rounded-xl p-6 backdrop-blur-sm shadow-2xl">
