@@ -734,6 +734,63 @@ export default function AdminPage() {
 
         {activeTab === 'blog' && (
           <div className="space-y-8">
+            {/* Blog Topic Ideas */}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+              <h2 className="text-2xl font-bold mb-6">📝 Blog Content Ideas</h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { category: "Problem-Focused", color: "red", ideas: [
+                    "The 3 AM Email: When Clients Change Everything",
+                    "Death by a Thousand Assumptions",
+                    "The Compliance Nightmare: FERPA, HIPAA & You",
+                    "When Your BOM Becomes Your Enemy"
+                  ]},
+                  { category: "Solution-Focused", color: "green", ideas: [
+                    "5 Signs Your Security Estimate is Dead Wrong",
+                    "The AI Advantage: From Days to Minutes",
+                    "Compliance Made Simple: Templates That Actually Work",
+                    "Virtual Site Walks: The Future is Here"
+                  ]},
+                  { category: "Industry-Specific", color: "blue", ideas: [
+                    "School Security: Beyond the Buzzwords",
+                    "Healthcare Security: Patient Privacy First",
+                    "Enterprise vs. SMB: Two Different Worlds"
+                  ]},
+                  { category: "Behind-the-Scenes", color: "purple", ideas: [
+                    "Building Design-Rite: A Sales Engineer's Perspective",
+                    "Real Talk: 3,000+ Products Later",
+                    "Customer Spotlight: From Chaos to Calm"
+                  ]},
+                  { category: "Actionable Tips", color: "yellow", ideas: [
+                    "The Ultimate RFP Response Checklist",
+                    "Pricing Intelligence: Reading Between the Lines",
+                    "10 Questions Every Security Assessment Must Ask"
+                  ]}
+                ].map((section) => (
+                  <div key={section.category} className={`bg-${section.color}-600/10 border border-${section.color}-600/20 rounded-lg p-4`}>
+                    <h3 className={`text-${section.color}-400 font-bold mb-3 text-sm uppercase tracking-wider`}>{section.category}</h3>
+                    <ul className="space-y-2">
+                      {section.ideas.map((idea, index) => (
+                        <li key={index} className="text-gray-300 text-sm leading-relaxed hover:text-white transition-colors cursor-pointer"
+                            onClick={() => setNewPost({...newPost, title: idea})}>
+                          • {idea}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 p-4 bg-gray-700/30 rounded-lg">
+                <h3 className="text-white font-semibold mb-2">💡 Pro Tips:</h3>
+                <ul className="text-gray-300 text-sm space-y-1">
+                  <li>• <strong>Frequency:</strong> 2-3 posts/month for consistent engagement</li>
+                  <li>• <strong>Length:</strong> 800-1200 words for SEO optimization</li>
+                  <li>• <strong>Style:</strong> Keep the emotional, relatable tone from "Tuesday Morning Storm"</li>
+                  <li>• <strong>CTAs:</strong> Always include links to Security Estimate and AI Assessment</li>
+                </ul>
+              </div>
+            </div>
+
             {/* Create New Blog Post */}
             <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
               <h2 className="text-2xl font-bold mb-6">Create New Blog Post</h2>
