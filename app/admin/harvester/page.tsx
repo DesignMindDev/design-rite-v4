@@ -757,6 +757,8 @@ export default function HarvesterDashboard() {
                       <th className="text-left p-4 font-semibold dr-text-pearl">Category</th>
                       <th className="text-right p-4 font-semibold dr-text-pearl">MSRP</th>
                       <th className="text-right p-4 font-semibold dr-text-pearl">Dealer Cost</th>
+                      <th className="text-right p-4 font-semibold dr-text-pearl">MAP Price</th>
+                      <th className="text-right p-4 font-semibold dr-text-pearl">Street Price</th>
                       <th className="text-right p-4 font-semibold dr-text-pearl">Margin %</th>
                       <th className="text-center p-4 font-semibold dr-text-pearl">Status</th>
                     </tr>
@@ -786,6 +788,20 @@ export default function HarvesterDashboard() {
                           <td className="p-4 text-right">
                             {product.dealer_cost ? (
                               <span className="font-semibold text-green-400">${product.dealer_cost.toLocaleString()}</span>
+                            ) : (
+                              <span className="text-gray-400">N/A</span>
+                            )}
+                          </td>
+                          <td className="p-4 text-right">
+                            {product.map_price ? (
+                              <span className="font-semibold text-blue-400">${product.map_price.toLocaleString()}</span>
+                            ) : (
+                              <span className="text-gray-400">N/A</span>
+                            )}
+                          </td>
+                          <td className="p-4 text-right">
+                            {product.street_price ? (
+                              <span className="font-semibold text-purple-400">${product.street_price.toLocaleString()}</span>
                             ) : (
                               <span className="text-gray-400">N/A</span>
                             )}
