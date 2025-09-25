@@ -71,86 +71,85 @@ const SecurityEstimateForm = () => {
       let totalCost = 0;
       const breakdown = {};
 
-    // Surveillance calculation
-    if (formData.surveillance.enabled) {
-      const cameraCount = parseInt(formData.surveillance.cameras) || 0;
-      const level = formData.surveillance.coverage;
-      const cameraCost = cameraCount * pricing.surveillance[level].camera;
-      const installCost = cameraCount * pricing.surveillance[level].installation;
-      const softwareCost = pricing.surveillance[level].software * Math.ceil(cameraCount / 16);
+      // Surveillance calculation
+      if (formData.surveillance.enabled) {
+        const cameraCount = parseInt(formData.surveillance.cameras) || 0;
+        const level = formData.surveillance.coverage;
+        const cameraCost = cameraCount * pricing.surveillance[level].camera;
+        const installCost = cameraCount * pricing.surveillance[level].installation;
+        const softwareCost = pricing.surveillance[level].software * Math.ceil(cameraCount / 16);
 
-      breakdown.surveillance = {
-        equipment: cameraCost,
-        installation: installCost,
-        software: softwareCost,
-        total: cameraCost + installCost + softwareCost
-      };
-      totalCost += breakdown.surveillance.total;
-    }
+        breakdown.surveillance = {
+          equipment: cameraCost,
+          installation: installCost,
+          software: softwareCost,
+          total: cameraCost + installCost + softwareCost
+        };
+        totalCost += breakdown.surveillance.total;
+      }
 
-    // Access Control calculation
-    if (formData.accessControl.enabled) {
-      const doorCount = parseInt(formData.accessControl.doors) || 0;
-      const readerCount = parseInt(formData.accessControl.cardReaders) || doorCount;
-      const level = formData.accessControl.level;
+      // Access Control calculation
+      if (formData.accessControl.enabled) {
+        const doorCount = parseInt(formData.accessControl.doors) || 0;
+        const readerCount = parseInt(formData.accessControl.cardReaders) || doorCount;
+        const level = formData.accessControl.level;
 
-      const doorCost = doorCount * pricing.accessControl[level].door;
-      const readerCost = readerCount * pricing.accessControl[level].reader;
-      const softwareCost = pricing.accessControl[level].software;
+        const doorCost = doorCount * pricing.accessControl[level].door;
+        const readerCost = readerCount * pricing.accessControl[level].reader;
+        const softwareCost = pricing.accessControl[level].software;
 
-      breakdown.accessControl = {
-        doors: doorCost,
-        readers: readerCost,
-        software: softwareCost,
-        total: doorCost + readerCost + softwareCost
-      };
-      totalCost += breakdown.accessControl.total;
-    }
+        breakdown.accessControl = {
+          doors: doorCost,
+          readers: readerCost,
+          software: softwareCost,
+          total: doorCost + readerCost + softwareCost
+        };
+        totalCost += breakdown.accessControl.total;
+      }
 
-    // Intrusion calculation
-    if (formData.intrusion.enabled) {
-      const zoneCount = parseInt(formData.intrusion.zones) || 0;
-      const sensorCount = parseInt(formData.intrusion.sensors) || 0;
+      // Intrusion calculation
+      if (formData.intrusion.enabled) {
+        const zoneCount = parseInt(formData.intrusion.zones) || 0;
+        const sensorCount = parseInt(formData.intrusion.sensors) || 0;
 
-      const zoneCost = zoneCount * pricing.intrusion.zone;
-      const sensorCost = sensorCount * pricing.intrusion.sensor;
-      const panelCost = pricing.intrusion.panel;
-      const monthlyCost = formData.intrusion.monitoring ? pricing.intrusion.monitoring : 0;
+        const zoneCost = zoneCount * pricing.intrusion.zone;
+        const sensorCost = sensorCount * pricing.intrusion.sensor;
+        const panelCost = pricing.intrusion.panel;
+        const monthlyCost = formData.intrusion.monitoring ? pricing.intrusion.monitoring : 0;
 
-      breakdown.intrusion = {
-        zones: zoneCost,
-        sensors: sensorCost,
-        panel: panelCost,
-        monthlyMonitoring: monthlyCost,
-        total: zoneCost + sensorCost + panelCost
-      };
-      totalCost += breakdown.intrusion.total;
-    }
+        breakdown.intrusion = {
+          zones: zoneCost,
+          sensors: sensorCost,
+          panel: panelCost,
+          monthlyMonitoring: monthlyCost,
+          total: zoneCost + sensorCost + panelCost
+        };
+        totalCost += breakdown.intrusion.total;
+      }
 
-    // Fire system calculation
-    if (formData.fire.enabled) {
-      const detectorCount = parseInt(formData.fire.detectors) || 0;
-      const coverage = formData.fire.coverage;
+      // Fire system calculation
+      if (formData.fire.enabled) {
+        const detectorCount = parseInt(formData.fire.detectors) || 0;
+        const coverage = formData.fire.coverage;
 
-      let multiplier = 1;
-      if (coverage === 'enhanced') multiplier = 1.4;
-      if (coverage === 'premium') multiplier = 1.8;
+        let multiplier = 1;
+        if (coverage === 'enhanced') multiplier = 1.4;
+        if (coverage === 'premium') multiplier = 1.8;
 
-      const detectorCost = detectorCount * pricing.fire.detector * multiplier;
-      const panelCost = pricing.fire.panel;
-      const notificationCost = Math.ceil(detectorCount / 10) * pricing.fire.notification;
+        const detectorCost = detectorCount * pricing.fire.detector * multiplier;
+        const panelCost = pricing.fire.panel;
+        const notificationCost = Math.ceil(detectorCount / 10) * pricing.fire.notification;
 
-      breakdown.fire = {
-        detectors: detectorCost,
-        panel: panelCost,
-        notification: notificationCost,
-        total: detectorCost + panelCost + notificationCost
-      };
-      totalCost += breakdown.fire.total;
-    }
+        breakdown.fire = {
+          detectors: detectorCost,
+          panel: panelCost,
+          notification: notificationCost,
+          total: detectorCost + panelCost + notificationCost
+        };
+        totalCost += breakdown.fire.total;
+      }
 
-    setEstimate({ breakdown, totalCost });
-
+      setEstimate({ breakdown, totalCost });
     } catch (error) {
       console.error('Calculation error:', error);
       // Fallback to basic calculation if AI fails

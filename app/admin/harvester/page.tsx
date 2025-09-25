@@ -369,6 +369,8 @@ export default function HarvesterDashboard() {
       console.error('Harvest failed:', error)
       const errorMessage = error.message || 'Failed to start harvest'
       alert(`Harvest failed: ${errorMessage}`)
+    } finally {
+      setLoading(false)
     }
   }
 

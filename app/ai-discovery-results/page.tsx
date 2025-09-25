@@ -28,8 +28,12 @@ export default function DiscoveryResultsPage() {
   const [results, setResults] = useState<AssessmentResults | null>(null)
   const [discoveryData, setDiscoveryData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    // Mark as client-side to prevent hydration issues
+    setIsClient(true)
+
     // Load assessment results from session storage
     const storedResults = sessionStorage.getItem('assessmentResults')
     const storedDiscoveryData = sessionStorage.getItem('discoveryAssessmentData')
@@ -294,7 +298,7 @@ export default function DiscoveryResultsPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/60">Generated:</span>
-                  <span className="text-white">{new Date().toLocaleDateString()}</span>
+                  <span className="text-white">{isClient ? new Date().toLocaleDateString() : '...'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/60">Contact:</span>
