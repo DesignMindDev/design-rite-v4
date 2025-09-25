@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Database, TrendingUp, Package, RefreshCw, DollarSign, AlertCircle, CheckCircle, Activity, BarChart3, Search, Filter, ExternalLink, Eye, MessageSquare, Play, Building2, FileText, Clock, Plus, Trash2, Edit, Power } from 'lucide-react'
 import * as auth from '@/lib/auth'
+import harvesterClient from '@/lib/harvester-client'
 
 interface HarvesterStats {
   totalProducts: number
@@ -355,21 +356,19 @@ export default function HarvesterDashboard() {
 
   // Trigger harvest
   const triggerHarvest = async (manufacturer?: string) => {
+    setLoading(true)
     try {
-      const response = await fetch('/api/admin/harvester', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'trigger_harvest',
-          manufacturer
-        })
-      })
-      const data = await response.json()
-      alert(data.message)
-      if (data.success) loadOverview()
-    } catch (error) {
-      console.error('Failed to trigger harvest:', error)
-      alert('Failed to trigger harvest')
+      // Use new harvester client with authentication
+      const result = await harvesterClient.triggerCDWHarvest(manufacturer)
+
+      console.log('Harvest success:', result)
+      alert(`Harvest started successfully!\n\nJob ID: ${result.job_id}\nStatus: ${result.status}\n\n${result.message}`)
+
+      loadOverview() // Refresh data
+    } catch (error: any) {
+      console.error('Harvest failed:', error)
+      const errorMessage = error.message || 'Failed to start harvest'
+      alert(`Harvest failed: ${errorMessage}`)
     }
   }
 

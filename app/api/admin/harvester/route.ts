@@ -394,29 +394,23 @@ export async function POST(request: Request) {
 }
 
 async function triggerHarvest(manufacturer?: string) {
-  // Log harvest trigger request
-  const { data, error } = await supabase
-    .from('price_uploads')
-    .insert([{
-      filename: `Manual trigger - ${manufacturer || 'all'}`,
-      distributor_name: 'System',
-      status: 'triggered',
-      total_rows: 0,
-      rows_processed: 0
-    }])
-    .select()
-    .single()
+  try {
+    // Skip database logging for now to avoid Supabase table issues
+    // Just return success with instructions for manual execution
+    return NextResponse.json({
+      success: true,
+      message: `Harvest request received for ${manufacturer || 'all manufacturers'}`,
+      instructions: `To complete the harvest, run this command in your terminal:\n\ncd C:\\Users\\dkozi\\lowvolt-spec-harvester\npython harvest_cdw.py${manufacturer ? ' ' + manufacturer : ''}\n\nThis will update your database with the latest CDW pricing and proper model numbers.`
+    })
 
-  if (error) throw error
-
-  // In production, this would trigger your Python harvester
-  // For now, return success with instructions
-  return NextResponse.json({
-    success: true,
-    message: `Harvest triggered for ${manufacturer || 'all manufacturers'}`,
-    harvestId: data.id,
-    instructions: 'Run your Python harvester script to process this request'
-  })
+  } catch (error) {
+    console.error('Trigger harvest error:', error)
+    return NextResponse.json({
+      success: false,
+      message: `Failed to trigger harvest for ${manufacturer || 'all manufacturers'}`,
+      error: error.message || 'Unknown error'
+    }, { status: 500 })
+  }
 }
 
 async function getRedditData(searchParams: URLSearchParams) {
