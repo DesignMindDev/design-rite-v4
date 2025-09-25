@@ -136,6 +136,16 @@ export default function UnifiedNavigation() {
                 </div>
               </Link>
 
+              <Link href="/ai-discovery" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                  🚀
+                </div>
+                <div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">AI Discovery Assistant</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Structured form-based security assessment</div>
+                </div>
+              </Link>
+
               <Link href="/ai-security-assessment" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🧠
@@ -388,6 +398,7 @@ export default function UnifiedNavigation() {
             <div>
               <div className="text-gray-400 dr-ui uppercase tracking-wider mb-2">Platform</div>
               <Link href="/estimate-options" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">📊 Security Estimate</Link>
+              <Link href="/ai-discovery" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🚀 AI Discovery Assistant</Link>
               <Link href="/ai-security-assessment" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🧠 AI Security Assessment</Link>
               <Link href="/compliance-analyst" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">✅ Compliance Tools</Link>
               <Link href="/professional-proposals" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">📋 Proposal Generator</Link>
