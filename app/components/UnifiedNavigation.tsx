@@ -264,23 +264,23 @@ export default function UnifiedNavigation() {
                 </div>
               </Link>
 
-              <Link href="/compliance/ferpa" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+              <Link href="/compliance-check" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🎓
                 </div>
                 <div>
-                  <div className="font-semibold dr-ui dr-text-pearl mb-1">FERPA Compliance</div>
-                  <div className="dr-ui text-gray-400 leading-tight">Educational records protection</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">FERPA Compliance Check</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Quick educational compliance assessment</div>
                 </div>
               </Link>
 
-              <Link href="/compliance/hipaa" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+              <Link href="/compliance-check" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🏥
                 </div>
                 <div>
-                  <div className="font-semibold dr-ui dr-text-pearl mb-1">HIPAA Compliance</div>
-                  <div className="dr-ui text-gray-400 leading-tight">Healthcare data protection</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">HIPAA Compliance Check</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Healthcare compliance assessment</div>
                 </div>
               </Link>
 
@@ -409,8 +409,8 @@ export default function UnifiedNavigation() {
             <div className="border-t border-white/10 pt-2">
               <div className="text-gray-400 dr-ui uppercase tracking-wider mb-2">Compliance</div>
               <Link href="/compliance" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">📋 Compliance Overview</Link>
-              <Link href="/compliance/ferpa" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🎓 FERPA Compliance</Link>
-              <Link href="/compliance/hipaa" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🏥 HIPAA Compliance</Link>
+              <Link href="/compliance-check" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🎓 FERPA Check</Link>
+              <Link href="/compliance-check" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🏥 HIPAA Check</Link>
               <Link href="/compliance/general-security" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🔒 Security Frameworks</Link>
             </div>
 
