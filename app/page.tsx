@@ -32,7 +32,7 @@ export default function HomePage() {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveStormItem((prev) => (prev + 1) % stormItems.length)
-    }, 4000) // Slower timing for better readability
+    }, 5000) // Even slower timing for better readability
     return () => clearInterval(interval)
   }, [])
 
@@ -247,13 +247,14 @@ export default function HomePage() {
               {stormItems.map((item, index) => (
                 <div
                   key={index}
-                  className={`absolute top-0 left-0 transform -translate-x-1/2 -translate-y-full popup-item ${
+                  className={`absolute top-0 left-0 transform -translate-x-1/4 -translate-y-full popup-item ${
                     index === activeStormItem ? 'opacity-100' : 'opacity-0'
                   }`}
                   style={{
                     animationDelay: `${item.delay}s`,
                     top: '-180px',
-                    width: '350px'
+                    left: '100px',
+                    width: '320px'
                   }}
                 >
                   <div className="bg-red-900/90 border-2 border-red-500/60 rounded-xl p-6 backdrop-blur-sm shadow-2xl">
