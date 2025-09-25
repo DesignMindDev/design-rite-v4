@@ -157,6 +157,40 @@ const IntegratorDiscoveryAssistant = () => {
     fetchRealPricingData();
   }, []);
 
+  // Check for handoff data from security estimate form
+  useEffect(() => {
+    const handoffData = sessionStorage.getItem('estimateHandoff');
+    if (handoffData) {
+      try {
+        const data = JSON.parse(handoffData);
+
+        // Update session data with handoff info
+        setSessionData(prev => ({
+          ...prev,
+          companyName: data.contactInfo?.companyName || '',
+          facilityType: 'Mixed Use Facility',
+          currentPhase: 'detailed_analysis'
+        }));
+
+        // Create a welcome message with the estimate context
+        const welcomeMessage = {
+          role: 'assistant',
+          content: `🎯 **Welcome back! I see you've completed a security estimate.**\n\n**Here's what I received from your estimate:**\n• **Facility Size:** ${data.facilitySize?.toLocaleString()} sq ft\n• **Estimated Investment:** $${data.estimate?.toLocaleString()}\n• **Selected Systems:** ${data.selectedSystems?.join(', ')}\n• **Contact:** ${data.contactInfo?.name} (${data.contactInfo?.email})\n\n**Let me help you develop this into a comprehensive security plan!** I can now provide detailed recommendations, compliance analysis, and implementation planning based on your initial estimate.\n\nWhat specific aspects would you like to dive deeper into?`,
+          timestamp: new Date()
+        };
+
+        // Replace the initial message with the handoff context message
+        setMessages([welcomeMessage]);
+
+        // Clear the handoff data so it doesn't persist
+        sessionStorage.removeItem('estimateHandoff');
+
+      } catch (error) {
+        console.error('Error parsing handoff data:', error);
+      }
+    }
+  }, []);
+
   // Demo scenarios for quick start
   const demoScenarios = [
     {

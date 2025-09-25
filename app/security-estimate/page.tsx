@@ -352,7 +352,8 @@ const SecurityEstimateForm = () => {
                   <select
                     value={formData.surveillance.coverage}
                     onChange={(e) => handleInputChange('surveillance', 'coverage', e.target.value)}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl focus:outline-none focus:dr-border-violet"
+                    className="w-full px-4 py-3 bg-gray-800 border border-white/20 rounded-xl dr-text-pearl focus:outline-none focus:dr-border-violet"
+                    style={{ backgroundColor: '#374151', color: '#f4f4f5' }}
                   >
                     <option value="basic">Basic (1080p HD)</option>
                     <option value="standard">Standard (4K Ultra HD)</option>
@@ -402,7 +403,8 @@ const SecurityEstimateForm = () => {
                   <select
                     value={formData.accessControl.level}
                     onChange={(e) => handleInputChange('accessControl', 'level', e.target.value)}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl focus:outline-none focus:dr-border-violet"
+                    className="w-full px-4 py-3 bg-gray-800 border border-white/20 rounded-xl dr-text-pearl focus:outline-none focus:dr-border-violet"
+                    style={{ backgroundColor: '#374151', color: '#f4f4f5' }}
                   >
                     <option value="standard">Standard (Basic Card Access)</option>
                     <option value="enterprise">Enterprise (Biometric + Multi-Factor)</option>
@@ -488,7 +490,8 @@ const SecurityEstimateForm = () => {
                   <select
                     value={formData.fire.coverage}
                     onChange={(e) => handleInputChange('fire', 'coverage', e.target.value)}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl focus:outline-none focus:dr-border-violet"
+                    className="w-full px-4 py-3 bg-gray-800 border border-white/20 rounded-xl dr-text-pearl focus:outline-none focus:dr-border-violet"
+                    style={{ backgroundColor: '#374151', color: '#f4f4f5' }}
                   >
                     <option value="code-minimum">Code Minimum (Basic Compliance)</option>
                     <option value="enhanced">Enhanced (Above Code)</option>
