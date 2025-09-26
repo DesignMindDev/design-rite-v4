@@ -48,7 +48,9 @@ export default function HomePage() {
     window.location.href = '/watch-demo'
   }
 
-  const redirectToEstimate = () => {
+  const redirectToEstimate = (e: React.MouseEvent) => {
+    e.preventDefault();
+
     if (isAuthenticated) {
       extendSession();
       window.location.href = '/estimate-options';
@@ -201,12 +203,12 @@ export default function HomePage() {
               >
                 🚀 Try Security Estimate
               </button>
-              <button
-                onClick={redirectToWaitlist}
-                className="bg-white/10 dr-text-pearl px-8 py-4 rounded-xl dr-ui font-semibold border border-white/20 hover:bg-white/20 transition-all"
+              <Link
+                href="/waitlist"
+                className="bg-white/10 dr-text-pearl px-8 py-4 rounded-xl dr-ui font-semibold border border-white/20 hover:bg-white/20 transition-all text-center"
               >
                 Join Waitlist
-              </button>
+              </Link>
             </div>
             <div className="flex gap-12">
               <div>
@@ -394,12 +396,12 @@ export default function HomePage() {
             >
               🚀 Try Security Estimate Now
             </button>
-            <button
-              onClick={redirectToWaitlist}
-              className="bg-white/10 dr-text-pearl px-8 py-4 rounded-xl dr-ui font-semibold border border-white/20 hover:bg-white/20 transition-all"
+            <Link
+              href="/waitlist"
+              className="bg-white/10 dr-text-pearl px-8 py-4 rounded-xl dr-ui font-semibold border border-white/20 hover:bg-white/20 transition-all text-center"
             >
               📝 Join Waitlist
-            </button>
+            </Link>
           </div>
 
           <div className="mt-8 text-gray-400 dr-ui">

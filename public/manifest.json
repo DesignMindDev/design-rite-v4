@@ -1,0 +1,48 @@
+{
+  "name": "Design-Rite - AI-Powered Security Design Platform",
+  "short_name": "Design-Rite",
+  "description": "Transform security system design from days to minutes with AI-powered assessments, automated proposals, and comprehensive documentation.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1f2937",
+  "theme_color": "#8b5cf6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "lang": "en-US",
+  "scope": "/",
+  "shortcuts": [
+    {
+      "name": "Security Estimate",
+      "short_name": "Estimate",
+      "description": "Quick security system estimation",
+      "url": "/estimate-options",
+      "icons": [{ "src": "/favicon-32x32.png", "sizes": "32x32" }]
+    },
+    {
+      "name": "AI Assistant",
+      "short_name": "AI",
+      "description": "AI-powered security assessment",
+      "url": "/ai-discovery",
+      "icons": [{ "src": "/favicon-32x32.png", "sizes": "32x32" }]
+    }
+  ]
+}
