@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Bot, Upload, MessageSquare, Zap, RefreshCw, Download, ArrowLeft, Sparkles, FileText, Database } from 'lucide-react'
+import { Bot, Upload, MessageSquare, Zap, RefreshCw, Download, ArrowLeft, Sparkles, FileText, Database, Settings, ChevronDown } from 'lucide-react'
 
 interface Message {
   id: string
@@ -20,16 +20,84 @@ interface AssessmentData {
   [key: string]: any
 }
 
+interface AIProvider {
+  id: string
+  name: string
+  description: string
+  endpoint?: string
+  model?: string
+  available: boolean
+}
+
 export default function AIAssistantPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [assessmentData, setAssessmentData] = useState<AssessmentData | null>(null)
   const [hasUploadedFile, setHasUploadedFile] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const [selectedProvider, setSelectedProvider] = useState('simulated')
+  const [apiKey, setApiKey] = useState('')
+  const [showSessions, setShowSessions] = useState(false)
+  const [userHash, setUserHash] = useState('')
+  const [sessionId, setSessionId] = useState('')
+  const [sessionName, setSessionName] = useState('')
+  const [previousSessions, setPreviousSessions] = useState<any[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const aiProviders: AIProvider[] = [
+    {
+      id: 'simulated',
+      name: 'Simulated Responses',
+      description: 'Pre-programmed responses for demo purposes',
+      available: true
+    },
+    {
+      id: 'openai-gpt4',
+      name: 'OpenAI GPT-4',
+      description: 'Latest GPT-4 model for advanced reasoning',
+      endpoint: '/api/ai/openai',
+      model: 'gpt-4',
+      available: true
+    },
+    {
+      id: 'openai-gpt35',
+      name: 'OpenAI GPT-3.5 Turbo',
+      description: 'Fast and cost-effective GPT-3.5',
+      endpoint: '/api/ai/openai',
+      model: 'gpt-3.5-turbo',
+      available: true
+    },
+    {
+      id: 'claude-3-opus',
+      name: 'Claude 3 Opus',
+      description: 'Anthropic\'s most powerful model',
+      endpoint: '/api/ai/claude',
+      model: 'claude-3-opus-20240229',
+      available: true
+    },
+    {
+      id: 'claude-3-sonnet',
+      name: 'Claude 3 Sonnet',
+      description: 'Balanced performance and speed',
+      endpoint: '/api/ai/claude',
+      model: 'claude-3-sonnet-20240229',
+      available: true
+    },
+    {
+      id: 'existing-endpoint',
+      name: 'Existing AI Assessment',
+      description: 'Your current /api/ai-assessment endpoint',
+      endpoint: '/api/ai-assessment',
+      available: true
+    }
+  ]
+
   useEffect(() => {
+    // Initialize user hash and session
+    initializeSession()
+
     // Check for existing assessment data from previous tools
     const quickEstimateData = sessionStorage.getItem('quickEstimateData')
     const aiDiscoveryData = sessionStorage.getItem('aiDiscoveryData')
@@ -46,6 +114,186 @@ export default function AIAssistantPage() {
       addInitialMessage()
     }
   }, [])
+
+  const generateUserHash = () => {
+    // Create a persistent user hash based on browser fingerprint
+    const fingerprint = [
+      navigator.userAgent,
+      navigator.language,
+      screen.width + 'x' + screen.height,
+      new Date().getTimezoneOffset(),
+      navigator.platform
+    ].join('|')
+
+    // Simple hash function
+    let hash = 0
+    for (let i = 0; i < fingerprint.length; i++) {
+      const char = fingerprint.charCodeAt(i)
+      hash = ((hash << 5) - hash) + char
+      hash = hash & hash // Convert to 32-bit integer
+    }
+    return Math.abs(hash).toString(36)
+  }
+
+  const generateSessionId = () => {
+    return `ai_session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  }
+
+  const initializeSession = async () => {
+    // Get or create user hash
+    let hash = localStorage.getItem('ai_user_hash')
+    if (!hash) {
+      hash = generateUserHash()
+      localStorage.setItem('ai_user_hash', hash)
+    }
+    setUserHash(hash)
+
+    // Check for existing session or create new one
+    const existingSessionId = sessionStorage.getItem('ai_current_session')
+    if (existingSessionId) {
+      setSessionId(existingSessionId)
+      await loadSession(existingSessionId, hash)
+    } else {
+      await createNewSession(hash)
+    }
+
+    // Load previous sessions
+    await loadPreviousSessions(hash)
+  }
+
+  const createNewSession = async (hash: string) => {
+    const newSessionId = generateSessionId()
+    const newSessionName = `Session ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`
+
+    setSessionId(newSessionId)
+    setSessionName(newSessionName)
+    sessionStorage.setItem('ai_current_session', newSessionId)
+
+    // Create session in database
+    try {
+      await fetch('/api/ai/logging', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create_session',
+          data: {
+            sessionId: newSessionId,
+            userHash: hash,
+            sessionName: newSessionName,
+            aiProvider: selectedProvider,
+            assessmentData
+          }
+        })
+      })
+    } catch (error) {
+      console.error('Failed to create session:', error)
+    }
+  }
+
+  const loadSession = async (sessionId: string, hash: string) => {
+    try {
+      const response = await fetch('/api/ai/logging', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'get_session',
+          data: { sessionId, userHash: hash }
+        })
+      })
+
+      if (response.ok) {
+        const { session, conversations } = await response.json()
+        setSessionName(session.session_name)
+        setSelectedProvider(session.ai_provider)
+
+        if (session.assessment_data) {
+          setAssessmentData(session.assessment_data)
+        }
+
+        // Restore conversation history
+        const restoredMessages = conversations.map((conv: any) => [
+          {
+            id: `${conv.id}_user`,
+            role: 'user' as const,
+            content: conv.user_message,
+            timestamp: new Date(conv.timestamp)
+          },
+          {
+            id: `${conv.id}_assistant`,
+            role: 'assistant' as const,
+            content: conv.ai_response,
+            timestamp: new Date(conv.timestamp)
+          }
+        ]).flat()
+
+        setMessages(restoredMessages)
+      }
+    } catch (error) {
+      console.error('Failed to load session:', error)
+    }
+  }
+
+  const loadPreviousSessions = async (hash: string) => {
+    try {
+      const response = await fetch('/api/ai/logging', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'get_sessions',
+          data: { userHash: hash, limit: 10 }
+        })
+      })
+
+      if (response.ok) {
+        const { sessions } = await response.json()
+        setPreviousSessions(sessions || [])
+      }
+    } catch (error) {
+      console.error('Failed to load previous sessions:', error)
+    }
+  }
+
+  const logConversation = async (userMessage: string, aiResponse: string) => {
+    try {
+      await fetch('/api/ai/logging', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'log_conversation',
+          data: {
+            sessionId,
+            userHash,
+            userMessage,
+            aiResponse,
+            aiProvider: selectedProvider,
+            timestamp: new Date().toISOString(),
+            assessmentData,
+            metadata: { hasUploadedFile }
+          }
+        })
+      })
+    } catch (error) {
+      console.error('Failed to log conversation:', error)
+    }
+  }
+
+  const switchToSession = async (targetSessionId: string) => {
+    setSessionId(targetSessionId)
+    sessionStorage.setItem('ai_current_session', targetSessionId)
+    setMessages([])
+    await loadSession(targetSessionId, userHash)
+    setShowSessions(false)
+  }
+
+  const startNewSession = async () => {
+    await createNewSession(userHash)
+    setMessages([])
+    setAssessmentData(null)
+    setHasUploadedFile(false)
+    addInitialMessage()
+    await loadPreviousSessions(userHash)
+    setShowSessions(false)
+  }
 
   useEffect(() => {
     scrollToBottom()
@@ -136,20 +384,85 @@ Some suggestions:
     }
 
     setMessages(prev => [...prev, userMessage])
+    const currentInput = inputValue
     setInputValue('')
     setIsLoading(true)
 
-    // Simulate AI response with real-world refinement scenarios
-    setTimeout(() => {
-      const aiResponse: Message = {
+    try {
+      let aiResponse: Message
+
+      if (selectedProvider === 'simulated') {
+        // Simulate AI response with real-world refinement scenarios
+        setTimeout(() => {
+          const response: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: generateAIResponse(currentInput),
+            timestamp: new Date()
+          }
+          setMessages(prev => [...prev, response])
+          setIsLoading(false)
+        }, 1500)
+        return
+      }
+
+      // Use real AI provider
+      const selectedProviderConfig = aiProviders.find(p => p.id === selectedProvider)
+      if (!selectedProviderConfig?.endpoint) {
+        throw new Error('Provider configuration not found')
+      }
+
+      const response = await fetch(selectedProviderConfig.endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: currentInput,
+          model: selectedProviderConfig.model,
+          apiKey: apiKey,
+          context: {
+            assessmentData,
+            conversationHistory: messages.slice(-5), // Last 5 messages for context
+            systemPrompt: `You are a security system refinement assistant. Help users improve their security assessments through natural conversation. Focus on practical, actionable recommendations for surveillance, access control, intrusion detection, and compliance requirements. Be specific with equipment suggestions and pricing when possible.`
+          }
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} ${response.statusText}`)
+      }
+
+      const data = await response.json()
+
+      aiResponse = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: generateAIResponse(inputValue),
+        content: data.message || data.content || 'I apologize, but I encountered an issue processing your request.',
         timestamp: new Date()
       }
+
       setMessages(prev => [...prev, aiResponse])
+
+      // Log the conversation
+      await logConversation(currentInput, aiResponse.content)
+    } catch (error) {
+      console.error('AI Provider Error:', error)
+
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `⚠️ AI Provider Error: ${error instanceof Error ? error.message : 'Unknown error'}\n\nFalling back to simulated response:\n\n${generateAIResponse(currentInput)}`,
+        timestamp: new Date()
+      }
+
+      setMessages(prev => [...prev, errorResponse])
+
+      // Log the error response
+      await logConversation(currentInput, errorResponse.content)
+    } finally {
       setIsLoading(false)
-    }, 1500)
+    }
   }
 
   const generateAIResponse = (userInput: string): string => {
@@ -405,9 +718,112 @@ Date: ${new Date().toLocaleDateString()}
               <Download className="w-4 h-4 dr-text-violet" />
               <span>Export Results</span>
             </div>
+            <div className="flex items-center gap-2 text-gray-300">
+              <Settings className="w-4 h-4 dr-text-violet" />
+              <button
+                onClick={() => setShowSettings(!showSettings)}
+                className="hover:text-white transition-colors"
+              >
+                AI Settings
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* AI Settings Panel */}
+      {showSettings && (
+        <div className="border-b border-gray-800 bg-gray-900/50">
+          <div className="max-w-7xl mx-auto px-6 py-6">
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl border p-6">
+              <h3 className="text-xl font-bold dr-text-violet mb-4 flex items-center gap-2">
+                <Settings className="w-5 h-5" />
+                AI Provider Selection
+              </h3>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Provider Selection */}
+                <div>
+                  <label className="block text-sm font-medium dr-text-pearl mb-3">
+                    Choose AI Provider:
+                  </label>
+                  <div className="space-y-2">
+                    {aiProviders.map((provider) => (
+                      <label key={provider.id} className="flex items-start gap-3 p-3 bg-gray-700/50 rounded-lg hover:bg-gray-700/70 transition-colors cursor-pointer">
+                        <input
+                          type="radio"
+                          name="aiProvider"
+                          value={provider.id}
+                          checked={selectedProvider === provider.id}
+                          onChange={(e) => setSelectedProvider(e.target.value)}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-white">{provider.name}</span>
+                            {!provider.available && (
+                              <span className="text-xs bg-red-600 text-white px-2 py-1 rounded">Coming Soon</span>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-400 mt-1">{provider.description}</p>
+                          {provider.model && (
+                            <p className="text-xs text-purple-400 mt-1">Model: {provider.model}</p>
+                          )}
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* API Configuration */}
+                <div>
+                  <label className="block text-sm font-medium dr-text-pearl mb-3">
+                    API Key (if required):
+                  </label>
+                  <input
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="Enter API key for external providers..."
+                    className="w-full px-4 py-3 bg-gray-800/60 border border-gray-600/50 rounded-lg dr-text-pearl placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-400 mt-2">
+                    Required for OpenAI and Claude. Not needed for simulated or existing endpoint.
+                  </p>
+
+                  {/* Provider Info */}
+                  <div className="mt-4 p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg">
+                    <h4 className="font-medium text-purple-300 mb-2">Current Selection:</h4>
+                    {(() => {
+                      const current = aiProviders.find(p => p.id === selectedProvider)
+                      return (
+                        <div className="text-sm text-gray-300">
+                          <p><strong>{current?.name}</strong></p>
+                          <p>{current?.description}</p>
+                          {current?.endpoint && (
+                            <p className="text-xs text-purple-400 mt-1">Endpoint: {current.endpoint}</p>
+                          )}
+                        </div>
+                      )
+                    })()}
+                  </div>
+
+                  {/* Test Button */}
+                  <button
+                    onClick={() => {
+                      setInputValue("Test message: Please introduce yourself and explain how you can help with security assessments.")
+                      setShowSettings(false)
+                    }}
+                    className="w-full mt-4 px-4 py-2 dr-bg-violet hover:bg-purple-700 dr-text-pearl rounded-lg transition-colors"
+                  >
+                    Test Selected Provider
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid lg:grid-cols-12 gap-8">
