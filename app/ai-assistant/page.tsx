@@ -226,6 +226,130 @@ Could you provide a bit more detail about your specific goals? This will help me
     }
   }
 
+  const handleExportProposal = () => {
+    // Create a mock updated proposal
+    const proposalContent = `# Updated Security Assessment Proposal
+
+## Project Summary
+${assessmentData?.projectType || 'Security Assessment'}
+${assessmentData?.facilitySize ? `Facility Size: ${assessmentData.facilitySize}` : ''}
+${assessmentData?.budget ? `Budget Range: ${assessmentData.budget}` : ''}
+
+## AI-Enhanced Recommendations
+Based on our conversation, the following refinements have been made:
+
+${messages.filter(m => m.role === 'user').map((msg, i) => `${i + 1}. ${msg.content}`).join('\n')}
+
+## Updated Pricing
+- Real-time pricing integration maintained
+- Recommendations optimized based on conversation
+- Professional-grade specifications
+
+## Next Steps
+1. Review updated specifications
+2. Schedule installation consultation
+3. Finalize contract and timeline
+
+Generated with AI Assistant Refinement
+Date: ${new Date().toLocaleDateString()}
+`
+
+    const blob = new Blob([proposalContent], { type: 'text/markdown' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `Updated_Security_Proposal_${new Date().toISOString().split('T')[0]}.md`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const handleExportBOM = () => {
+    // Create a mock BOM
+    const bomContent = `# Detailed Bill of Materials (BOM)
+
+## Security System Components
+
+### Surveillance System
+- 4K IP Cameras (8x) - $1,200 each
+- Network Video Recorder - $800
+- Storage Array (8TB) - $600
+- Network Infrastructure - $1,500
+
+### Access Control
+- Card Readers (4x) - $400 each
+- Access Control Panel - $1,200
+- Key Cards (50x) - $5 each
+
+### Installation & Configuration
+- Professional Installation - $3,500
+- System Configuration - $1,200
+- Training & Documentation - $800
+
+Total Investment: $15,400
+
+Generated with AI Assistant Refinement
+Date: ${new Date().toLocaleDateString()}
+`
+
+    const blob = new Blob([bomContent], { type: 'text/markdown' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `Security_BOM_${new Date().toISOString().split('T')[0]}.md`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const handleExportImplementation = () => {
+    // Create a mock implementation plan
+    const implementationContent = `# Implementation Plan
+
+## Phase 1: Site Survey & Planning (Week 1)
+- Conduct detailed site assessment
+- Finalize equipment specifications
+- Create installation timeline
+- Obtain necessary permits
+
+## Phase 2: Equipment Procurement (Week 2-3)
+- Order security equipment
+- Coordinate delivery scheduling
+- Prepare installation materials
+- Schedule contractor resources
+
+## Phase 3: Installation (Week 4-5)
+- Install surveillance cameras
+- Configure network infrastructure
+- Set up access control system
+- Test all components
+
+## Phase 4: Configuration & Testing (Week 6)
+- System configuration and optimization
+- User training and documentation
+- Final testing and sign-off
+- Warranty and support activation
+
+Total Timeline: 6 weeks
+Project Manager: Assigned upon contract signing
+
+Generated with AI Assistant Refinement
+Date: ${new Date().toLocaleDateString()}
+`
+
+    const blob = new Blob([implementationContent], { type: 'text/markdown' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `Implementation_Plan_${new Date().toISOString().split('T')[0]}.md`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="min-h-screen dr-bg-charcoal dr-text-pearl">
       {/* Header Navigation */}
@@ -457,13 +581,22 @@ Could you provide a bit more detail about your specific goals? This will help me
                 Export Results
               </h3>
               <div className="space-y-3">
-                <button className="w-full px-4 py-2 dr-bg-violet hover:bg-purple-700 dr-text-pearl rounded-lg transition-colors">
+                <button
+                  onClick={handleExportProposal}
+                  className="w-full px-4 py-2 dr-bg-violet hover:bg-purple-700 dr-text-pearl rounded-lg transition-colors"
+                >
                   📄 Updated Proposal
                 </button>
-                <button className="w-full px-4 py-2 border border-gray-600/50 text-gray-300 rounded-lg hover:bg-gray-700/50 transition-colors">
+                <button
+                  onClick={handleExportBOM}
+                  className="w-full px-4 py-2 border border-gray-600/50 text-gray-300 rounded-lg hover:bg-gray-700/50 transition-colors"
+                >
                   📊 Detailed BOM
                 </button>
-                <button className="w-full px-4 py-2 border border-gray-600/50 text-gray-300 rounded-lg hover:bg-gray-700/50 transition-colors">
+                <button
+                  onClick={handleExportImplementation}
+                  className="w-full px-4 py-2 border border-gray-600/50 text-gray-300 rounded-lg hover:bg-gray-700/50 transition-colors"
+                >
                   📋 Implementation Plan
                 </button>
               </div>
