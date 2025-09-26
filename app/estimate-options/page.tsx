@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Calculator, MessageSquare, Clock, FileText, Zap, Users, ArrowRight } from 'lucide-react';
+import { Calculator, MessageSquare, Clock, FileText, Zap, Users, ArrowLeft, ArrowRight, Bot, Sparkles, RefreshCw } from 'lucide-react';
 
 const EstimateOptionsPage = () => {
   return (
@@ -24,27 +24,53 @@ const EstimateOptionsPage = () => {
       </nav>
 
       <div className="max-w-7xl mx-auto px-6 py-16">
-        {/* Header */}
+        {/* Header with Back Button */}
+        <div className="flex items-center gap-4 mb-8">
+          <Link href="/" className="flex items-center gap-2 text-gray-400 hover:dr-text-violet transition-colors">
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back to Home</span>
+          </Link>
+        </div>
+
         <div className="text-center mb-16">
-          <h1 className="dr-heading-xl mb-6">Get Your Security System Estimate</h1>
+          <h1 className="dr-heading-xl mb-6">Choose Your Security Assessment Approach</h1>
           <p className="text-xl text-gray-300 max-w-4xl mx-auto mb-8">
-            Choose the approach that works best for you. Both methods provide professional-grade estimates
-            backed by real pricing data and industry expertise.
+            Three progressive approaches to security system estimation and refinement. Start simple and enhance
+            as needed, or jump directly to the most advanced AI-powered conversation-driven refinement.
           </p>
         </div>
 
-        {/* Options Grid */}
-        <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+        {/* Progressive AI Workflow */}
+        <div className="flex items-center justify-center gap-4 mb-8">
+          <div className="flex items-center gap-2 text-gray-400 text-sm">
+            <span className="text-purple-400">★</span>
+            <span>Quick</span>
+          </div>
+          <ArrowRight className="w-4 h-4 text-gray-500" />
+          <div className="flex items-center gap-2 text-gray-400 text-sm">
+            <span className="text-purple-400">★★</span>
+            <span>Comprehensive</span>
+          </div>
+          <ArrowRight className="w-4 h-4 text-gray-500" />
+          <div className="flex items-center gap-2 text-gray-400 text-sm">
+            <span className="text-purple-400">★★★</span>
+            <span>AI-Enhanced</span>
+          </div>
+        </div>
 
-          {/* Quick Security Estimate */}
-          <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-8 border hover:shadow-2xl hover:shadow-purple-600/20 transition-all group">
+        {/* 3-Column Options Grid */}
+        <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+
+          {/* Column 1: Quick Security Estimate */}
+          <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6 border hover:shadow-2xl hover:shadow-purple-600/20 transition-all group relative">
+            <div className="absolute top-4 right-4 text-purple-400 text-xs font-bold">★ QUICK</div>
             <div className="flex items-center mb-6">
-              <div className="p-3 dr-bg-violet rounded-xl mr-4">
-                <Calculator className="w-8 h-8 dr-text-pearl" />
+              <div className="p-3 dr-bg-violet rounded-xl mr-3">
+                <Calculator className="w-6 h-6 dr-text-pearl" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold dr-text-violet">Quick Security Estimate</h2>
-                <p className="text-gray-300">Self-guided form with instant results</p>
+                <h2 className="text-xl font-bold dr-text-violet">Quick Security Estimate</h2>
+                <p className="text-gray-300 text-sm">Self-guided form with instant results</p>
               </div>
             </div>
 
@@ -76,8 +102,11 @@ const EstimateOptionsPage = () => {
                 <li>• Equipment and installation cost breakdown</li>
                 <li>• Real-time pricing from 3,000+ security products</li>
                 <li>• Professional PDF estimate summary</li>
-                <li>• Next steps and consultation options</li>
+                <li>• Option to upgrade to AI Discovery or AI Assistant refinement</li>
               </ul>
+              <p className="text-blue-300 text-sm mt-4 font-medium">
+                💡 Perfect starting point - can enhance later with AI tools
+              </p>
             </div>
 
             <Link
@@ -93,15 +122,16 @@ const EstimateOptionsPage = () => {
             </p>
           </div>
 
-          {/* AI Discovery Assistant */}
-          <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-8 border hover:shadow-2xl hover:shadow-purple-600/20 transition-all group">
+          {/* Column 2: AI Discovery Assistant */}
+          <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6 border hover:shadow-2xl hover:shadow-purple-600/20 transition-all group relative">
+            <div className="absolute top-4 right-4 text-purple-400 text-xs font-bold">★★ COMPREHENSIVE</div>
             <div className="flex items-center mb-6">
-              <div className="p-3 dr-bg-violet rounded-xl mr-4">
-                <MessageSquare className="w-8 h-8 dr-text-pearl" />
+              <div className="p-3 dr-bg-violet rounded-xl mr-3">
+                <MessageSquare className="w-6 h-6 dr-text-pearl" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold dr-text-violet">AI Discovery Assistant</h2>
-                <p className="text-gray-300">Thorough AI-powered assessment • Allow 15 minutes</p>
+                <h2 className="text-xl font-bold dr-text-violet">AI Discovery Assistant</h2>
+                <p className="text-gray-300 text-sm">Thorough AI-powered assessment • 15-20 minutes</p>
               </div>
             </div>
 
@@ -144,78 +174,173 @@ const EstimateOptionsPage = () => {
             </div>
 
             <Link
-              href="/ai-assessment"
-              className="w-full flex items-center justify-center dr-bg-violet hover:bg-purple-700 dr-text-pearl font-bold py-4 px-6 rounded-xl text-lg transition-all group-hover:scale-105"
+              href="/ai-discovery"
+              className="w-full flex items-center justify-center dr-bg-violet hover:bg-purple-700 dr-text-pearl font-bold py-3 px-4 rounded-xl text-sm transition-all group-hover:scale-105"
             >
-              Start AI Assessment
-              <ArrowRight className="w-5 h-5 ml-2" />
+              Start AI Discovery
+              <ArrowRight className="w-4 h-4 ml-2" />
             </Link>
 
             <p className="text-xs text-gray-400 mt-4 text-center">
-              Comprehensive discovery • Professional-grade proposal • 15-20 minutes
+              Comprehensive discovery • Professional-grade proposal
+            </p>
+          </div>
+
+          {/* Column 3: AI Assistant Refinement */}
+          <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6 border hover:shadow-2xl hover:shadow-purple-600/20 transition-all group relative">
+            <div className="absolute top-4 right-4 text-purple-400 text-xs font-bold">★★★ AI-ENHANCED</div>
+            <div className="flex items-center mb-6">
+              <div className="p-3 dr-bg-violet rounded-xl mr-3">
+                <Bot className="w-6 h-6 dr-text-pearl" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold dr-text-violet">AI Assistant Refinement</h2>
+                <p className="text-gray-300 text-sm">Enhance any assessment with AI • 5-10 minutes</p>
+              </div>
+            </div>
+
+            <div className="mb-8">
+              <h3 className="font-semibold mb-4 dr-text-pearl">Perfect for:</h3>
+              <ul className="space-y-2 text-gray-300">
+                <li className="flex items-center">
+                  <Sparkles className="w-4 h-4 dr-text-violet mr-2" />
+                  <span>Refining existing proposals</span>
+                </li>
+                <li className="flex items-center">
+                  <RefreshCw className="w-4 h-4 dr-text-violet mr-2" />
+                  <span>Adding specific requirements</span>
+                </li>
+                <li className="flex items-center">
+                  <MessageSquare className="w-4 h-4 dr-text-violet mr-2" />
+                  <span>Natural language improvements</span>
+                </li>
+                <li className="flex items-center">
+                  <Users className="w-4 h-4 dr-text-violet mr-2" />
+                  <span>Client-requested changes</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="mb-8">
+              <h3 className="font-semibold mb-4 dr-text-pearl">What you'll get:</h3>
+              <ul className="space-y-2 text-gray-300 text-sm">
+                <li>• AI-powered chat interface for conversational refinements</li>
+                <li>• Natural language specification adjustments and optimizations</li>
+                <li>• Real-time pricing updates as changes are discussed</li>
+                <li>• Enhanced proposals with AI insights and recommendations</li>
+                <li>• Iterative improvement suggestions based on best practices</li>
+                <li>• Professional output maintained throughout refinement process</li>
+              </ul>
+              <p className="text-green-300 text-sm mt-4 font-medium">
+                💬 Example: "Add more cameras to parking" → AI updates entire proposal instantly
+              </p>
+            </div>
+
+            <Link
+              href="/ai-assistant"
+              className="w-full flex items-center justify-center dr-bg-violet hover:bg-purple-700 dr-text-pearl font-bold py-3 px-4 rounded-xl text-sm transition-all group-hover:scale-105"
+            >
+              Start AI Assistant
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Link>
+
+            <p className="text-xs text-gray-400 mt-4 text-center">
+              AI-powered refinement • Upload existing assessments • Natural language interface
+            </p>
+            <p className="text-xs text-gray-500 mt-1 text-center italic">
+              *Accepts: PDF, DOC, DOCX, TXT files up to 10MB
             </p>
           </div>
         </div>
 
-        {/* Comparison Table */}
+        {/* Enhanced 3-Column Comparison Table */}
         <div className="mt-16 bg-gray-800/40 rounded-2xl p-8 border border-gray-600/30">
-          <h2 className="text-2xl font-bold mb-8 text-center dr-text-violet">Feature Comparison</h2>
+          <h2 className="text-2xl font-bold mb-8 text-center dr-text-violet">Complete Feature Comparison</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-600/30">
-                  <th className="text-left py-4 pr-8 font-semibold">Feature</th>
-                  <th className="text-center py-4 px-4 font-semibold">Quick Estimate</th>
-                  <th className="text-center py-4 pl-4 font-semibold">AI Assistant</th>
+                  <th className="text-left py-4 pr-6 font-semibold">Feature</th>
+                  <th className="text-center py-4 px-3 font-semibold">Quick Estimate<br/><span className="text-xs text-purple-400">★</span></th>
+                  <th className="text-center py-4 px-3 font-semibold">AI Discovery<br/><span className="text-xs text-purple-400">★★</span></th>
+                  <th className="text-center py-4 pl-3 font-semibold">AI Assistant<br/><span className="text-xs text-purple-400">★★★</span></th>
                 </tr>
               </thead>
               <tbody className="text-gray-300">
                 <tr className="border-b border-gray-700/30">
-                  <td className="py-4 pr-8">Time to Complete</td>
-                  <td className="text-center py-4 px-4">5 minutes</td>
-                  <td className="text-center py-4 pl-4">15-20 minutes</td>
+                  <td className="py-3 pr-6">Time to Complete</td>
+                  <td className="text-center py-3 px-3">5 minutes</td>
+                  <td className="text-center py-3 px-3">15-20 minutes</td>
+                  <td className="text-center py-3 pl-3">5-10 minutes</td>
                 </tr>
                 <tr className="border-b border-gray-700/30">
-                  <td className="py-4 pr-8">Real Pricing Data</td>
-                  <td className="text-center py-4 px-4">✅</td>
-                  <td className="text-center py-4 pl-4">✅</td>
+                  <td className="py-3 pr-6">Real Pricing Data</td>
+                  <td className="text-center py-3 px-3">✅</td>
+                  <td className="text-center py-3 px-3">✅</td>
+                  <td className="text-center py-3 pl-3">✅</td>
                 </tr>
                 <tr className="border-b border-gray-700/30">
-                  <td className="py-4 pr-8">Custom Recommendations</td>
-                  <td className="text-center py-4 px-4">Basic</td>
-                  <td className="text-center py-4 pl-4">Advanced</td>
+                  <td className="py-3 pr-6">Custom Recommendations</td>
+                  <td className="text-center py-3 px-3">Basic</td>
+                  <td className="text-center py-3 px-3">Advanced</td>
+                  <td className="text-center py-3 pl-3">AI-Enhanced</td>
                 </tr>
                 <tr className="border-b border-gray-700/30">
-                  <td className="py-4 pr-8">Proposal Documents</td>
-                  <td className="text-center py-4 px-4">Summary</td>
-                  <td className="text-center py-4 pl-4">Full Package</td>
+                  <td className="py-3 pr-6">Proposal Documents</td>
+                  <td className="text-center py-3 px-3">Summary</td>
+                  <td className="text-center py-3 px-3">Full Package</td>
+                  <td className="text-center py-3 pl-3">Enhanced</td>
                 </tr>
                 <tr className="border-b border-gray-700/30">
-                  <td className="py-4 pr-8">Compliance Analysis</td>
-                  <td className="text-center py-4 px-4">—</td>
-                  <td className="text-center py-4 pl-4">✅</td>
+                  <td className="py-3 pr-6">Compliance Analysis</td>
+                  <td className="text-center py-3 px-3">—</td>
+                  <td className="text-center py-3 px-3">✅</td>
+                  <td className="text-center py-3 pl-3">✅</td>
+                </tr>
+                <tr className="border-b border-gray-700/30">
+                  <td className="py-3 pr-6">Natural Language Input</td>
+                  <td className="text-center py-3 px-3">—</td>
+                  <td className="text-center py-3 px-3">—</td>
+                  <td className="text-center py-3 pl-3">✅</td>
+                </tr>
+                <tr className="border-b border-gray-700/30">
+                  <td className="py-3 pr-6">Iterative Refinement</td>
+                  <td className="text-center py-3 px-3">—</td>
+                  <td className="text-center py-3 px-3">—</td>
+                  <td className="text-center py-3 pl-3">✅</td>
                 </tr>
                 <tr>
-                  <td className="py-4 pr-8">Account Required</td>
-                  <td className="text-center py-4 px-4">No</td>
-                  <td className="text-center py-4 pl-4">Optional</td>
+                  <td className="py-3 pr-6">Starting Point</td>
+                  <td className="text-center py-3 px-3">From Scratch</td>
+                  <td className="text-center py-3 px-3">From Scratch</td>
+                  <td className="text-center py-3 pl-3">Any Assessment</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* Call to Action */}
-        <div className="mt-16 text-center">
-          <p className="text-gray-300 mb-6">
-            Not sure which option is right for you?
+        {/* Progressive Workflow CTA */}
+        <div className="mt-16 bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-2xl p-8 border border-purple-500/30 text-center">
+          <h3 className="text-2xl font-bold mb-4 text-white">🚀 Recommended Workflow</h3>
+          <p className="text-gray-300 mb-6 max-w-4xl mx-auto">
+            Start with Quick Estimate for immediate results, upgrade to AI Discovery for comprehensive proposals,
+            then use AI Assistant to refine and perfect your assessment based on client feedback.
           </p>
-          <Link
-            href="/contact"
-            className="bg-gray-700 hover:bg-gray-600 dr-text-pearl font-semibold py-3 px-8 rounded-xl transition-all"
-          >
-            Speak with an Expert
-          </Link>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link
+              href="/security-estimate"
+              className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-xl transition-all"
+            >
+              Start with Quick Estimate
+            </Link>
+            <Link
+              href="/contact"
+              className="bg-gray-700 hover:bg-gray-600 dr-text-pearl font-semibold py-3 px-6 rounded-xl transition-all"
+            >
+              Speak with an Expert
+            </Link>
+          </div>
         </div>
       </div>
     </div>

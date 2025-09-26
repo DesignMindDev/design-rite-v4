@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Download, FileText, Shield, Building2, Users, Calendar, DollarSign, CheckCircle, AlertTriangle, ExternalLink, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Download, FileText, Shield, Building2, Users, Calendar, DollarSign, CheckCircle, AlertTriangle, ExternalLink, RefreshCw, Bot, Sparkles } from 'lucide-react'
 
 interface AssessmentResults {
   success: boolean
@@ -69,6 +69,22 @@ export default function DiscoveryResultsPage() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+  }
+
+  const handoffToAIAssistant = () => {
+    // Prepare combined data for AI Assistant
+    const combinedData = {
+      ...discoveryData,
+      assessmentResults: results,
+      source: 'AI Discovery',
+      handoffTimestamp: new Date().toISOString()
+    }
+
+    // Store in session storage for AI Assistant
+    sessionStorage.setItem('aiDiscoveryData', JSON.stringify(combinedData))
+
+    // Navigate to AI Assistant
+    window.location.href = '/ai-assistant'
   }
 
   if (loading) {
@@ -228,6 +244,14 @@ export default function DiscoveryResultsPage() {
                 Next Steps
               </h3>
               <div className="space-y-3">
+                <button
+                  onClick={handoffToAIAssistant}
+                  className="w-full bg-gradient-to-r from-violet-600 to-purple-600 text-white px-4 py-3 rounded-lg hover:from-violet-700 hover:to-purple-700 transition-all flex items-center gap-2 shadow-lg"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  ★★★ Refine with AI Assistant
+                </button>
+
                 <button
                   onClick={downloadAssessment}
                   className="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"

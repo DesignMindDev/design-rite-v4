@@ -213,19 +213,22 @@ const SecurityEstimateForm = () => {
   const handoffToAiAssistant = () => {
     // Prepare handoff data
     const handoffData = {
-      source: 'security-estimate',
+      source: 'Quick Security Estimate',
       facilitySize,
       contactInfo,
       selectedSystems: Object.keys(formData).filter(key => formData[key].enabled),
-      estimate: estimate?.totalCost,
+      formData,
+      estimate,
+      aiRecommendations,
+      realPricingData,
       timestamp: new Date().toISOString()
     };
 
     // Store in sessionStorage for the AI Assistant
-    sessionStorage.setItem('estimateHandoff', JSON.stringify(handoffData));
+    sessionStorage.setItem('quickEstimateData', JSON.stringify(handoffData));
 
     // Navigate to AI Assistant with context
-    window.location.href = '/ai-assessment?source=estimate&context=detailed-analysis';
+    window.location.href = '/ai-assistant';
   };
 
   return (
@@ -610,12 +613,12 @@ const SecurityEstimateForm = () => {
                   <div className="space-y-3">
                     <button
                       onClick={() => handoffToAiAssistant()}
-                      className="w-full text-center bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 dr-text-pearl font-semibold py-3 px-6 rounded-xl transition-all"
+                      className="w-full text-center bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 dr-text-pearl font-semibold py-3 px-6 rounded-xl transition-all"
                     >
-                      🤖 Continue with AI Discovery
+                      ★★★ Refine with AI Assistant
                     </button>
                     <p className="text-xs text-gray-400 text-center">
-                      Get detailed requirements analysis, compliance mapping, and professional proposals
+                      Chat with AI to refine your assessment, adjust specs, and optimize pricing
                     </p>
                   </div>
                 </div>
