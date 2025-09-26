@@ -323,16 +323,41 @@ What would you like to work on today?`,
   }
 
   const addWelcomeMessage = (source: string, data: AssessmentData) => {
+    // Handle different data structures based on source
+    let overview = ''
+
+    if (source === 'Quick Estimate') {
+      // Security estimate data structure
+      const facilitySize = data.facilitySize ? `${data.facilitySize} sq ft` : ''
+      const selectedSystems = data.selectedSystems || []
+      const estimate = data.estimate
+      const contactInfo = data.contactInfo
+
+      overview = `**Current Assessment Overview:**
+${facilitySize ? `• Facility Size: ${facilitySize}` : ''}
+${contactInfo?.company ? `• Company: ${contactInfo.company}` : ''}
+${selectedSystems.length ? `• Selected Systems: ${selectedSystems.join(', ').replace(/([A-Z])/g, ' $1').trim()}` : ''}
+${estimate?.totalCost ? `• Estimated Cost: ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(estimate.totalCost)}` : ''}`
+    } else {
+      // AI Discovery data structure
+      const facilityInfo = data.squareFootage ? `${data.squareFootage} sq ft` : (data.facilitySize || '')
+      const facilityType = data.facilityType || data.projectType || ''
+      const budget = data.budgetRange || data.budget || ''
+      const securityConcerns = data.securityConcerns || data.securityNeeds || []
+
+      overview = `**Current Assessment Overview:**
+${facilityType ? `• Facility Type: ${facilityType}` : ''}
+${facilityInfo ? `• Facility Size: ${facilityInfo}` : ''}
+${budget ? `• Budget Range: ${budget.replace(/-/g, ' - ').replace(/k/g, 'K').replace(/m/g, 'M')}` : ''}
+${securityConcerns.length ? `• Security Concerns: ${securityConcerns.join(', ')}` : ''}`
+    }
+
     const welcomeMessage: Message = {
       id: '1',
       role: 'assistant',
       content: `🎉 Perfect! I've loaded your ${source} data and I'm ready to help refine it.
 
-**Current Assessment Overview:**
-${data.projectType ? `• Project Type: ${data.projectType}` : ''}
-${data.facilitySize ? `• Facility Size: ${data.facilitySize}` : ''}
-${data.budget ? `• Budget Range: ${data.budget}` : ''}
-${data.securityNeeds?.length ? `• Security Needs: ${data.securityNeeds.join(', ')}` : ''}
+${overview}
 
 What would you like to refine or improve? For example:
 - "Add more cameras to the parking area"

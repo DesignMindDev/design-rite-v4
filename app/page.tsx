@@ -15,14 +15,14 @@ export default function HomePage() {
 
   const stormItems = [
     { icon: "☕", text: "Morning coffee, client calls with urgent changes", delay: 0, type: "problem" },
-    { icon: "🚀", text: "Design-Rite auto-generates BOMs from incomplete drawings", delay: 1, type: "solution" },
+    { icon: "🚀", text: "Design-Rite analyzes imported CAD files and auto-generates complete BOMs", delay: 1, type: "solution" },
     { icon: "📞", text: "SOW edits and BOM revisions pile up", delay: 2, type: "problem" },
     { icon: "⚡", text: "Our AI creates professional proposals in 5 minutes", delay: 3, type: "solution" },
     { icon: "📑", text: "Another RFI, another clarification needed", delay: 4, type: "problem" },
     { icon: "🎯", text: "Smart compliance templates handle CJIS, FERPA, HIPAA", delay: 5, type: "solution" },
     { icon: "📝", text: "Leadership wants it yesterday, client wants it cheaper", delay: 6, type: "problem" },
     { icon: "🏆", text: "Virtual site walks eliminate travel and guesswork", delay: 7, type: "solution" },
-    { icon: "🧩", text: "Scoping incomplete drawings with half the info", delay: 8, type: "problem" },
+    { icon: "🧩", text: "Analyzing incomplete CAD files with missing device counts", delay: 8, type: "problem" },
     { icon: "✨", text: "Real-time pricing from 3,000+ security products", delay: 9, type: "solution" }
   ]
 
@@ -191,7 +191,7 @@ export default function HomePage() {
               <span className="block dr-text-violet mt-2">We calm the chaos</span>
             </h1>
             <p className="dr-body text-gray-300 mb-10 leading-relaxed">
-              Stop juggling incomplete drawings, endless revisions, and impossible deadlines.
+              Stop juggling incomplete CAD imports, endless revisions, and impossible deadlines.
               Our platform turns your chaotic Tuesday into a productive win.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
@@ -323,7 +323,7 @@ export default function HomePage() {
             <div className="bg-red-900/20 border border-red-500/30 rounded-2xl p-8">
               <h3 className="dr-subheading font-bold text-red-300 mb-6">😤 Your Tuesday Morning</h3>
               <div className="space-y-3 text-red-200 text-left">
-                <div className="dr-ui font-medium">📐 Scoping incomplete drawings</div>
+                <div className="dr-ui font-medium">📐 Analyzing incomplete CAD imports</div>
                 <div className="dr-ui font-medium">💰 Estimating with half the info</div>
                 <div className="dr-ui font-medium">⚡ Writing proposals faster than engineering can review</div>
                 <div className="dr-ui font-medium">🔥 Leadership wants it yesterday, client wants it cheaper</div>
