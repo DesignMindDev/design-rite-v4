@@ -24,4 +24,56 @@ export async function POST(request: NextRequest) {
 
     const fullPrompt = `${systemPrompt}
 
-${conversationText ? `Previous conversation:\n${conversationText}\n\n` : ''}Human: ${message}
+${conversationText ? `Previous conversation:\n${conversationText}\n\n` : ''}Human: ${message}\n\nAssistant:`
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 1000,
+        temperature: 0.7,
+        messages: [{
+          role: 'user',
+          content: fullPrompt
+        }]
+      })
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      return NextResponse.json(
+        { error: `Claude API Error: ${errorData.error?.message || response.statusText}` },
+        { status: response.status }
+      )
+    }
+
+    const data = await response.json()
+    const aiMessage = data.content?.[0]?.text
+
+    if (!aiMessage) {
+      return NextResponse.json(
+        { error: 'No response from Claude' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      message: aiMessage,
+      provider: 'Claude',
+      model,
+      usage: data.usage
+    })
+
+  } catch (error) {
+    console.error('Claude API Error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
