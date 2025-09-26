@@ -174,7 +174,7 @@ export default function HomePage() {
             </div>
             <h1 className="dr-heading-xl dr-text-pearl leading-tight mb-8 pb-2">
               Caught in the daily storm?
-              <span className="block dr-text-violet mt-2">We'll calm the chaos</span>
+              <span className="block dr-text-violet mt-2">We calm the chaos</span>
             </h1>
             <p className="dr-body text-gray-300 mb-10 leading-relaxed">
               Stop juggling incomplete drawings, endless revisions, and impossible deadlines.
