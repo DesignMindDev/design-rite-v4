@@ -23,6 +23,22 @@ const SecurityEstimateForm = () => {
   const [aiRecommendations, setAiRecommendations] = useState(null);
   const [realPricingData, setRealPricingData] = useState([]);
 
+  // AI Enhancement Companies Database
+  const aiCompanies = {
+    facial_recognition: [
+      { name: 'Face First', specialty: 'Retail & Commercial Facial Recognition', integration: 'Camera overlay' },
+      { name: 'Oosto', specialty: 'Real-time Face Recognition Platform', integration: 'VMS integration' }
+    ],
+    behavioral_analytics: [
+      { name: 'iProTech', specialty: 'Behavioral Pattern Analysis', integration: 'Video analytics server' },
+      { name: 'Skylla', specialty: 'AI-powered Security Analytics', integration: 'Cloud or on-premise' }
+    ],
+    smart_access: [
+      { name: 'Alcatraz AI', specialty: 'Facial Authentication for Access', integration: 'Door controller replacement' },
+      { name: 'Verkada', specialty: 'AI-enabled Access Control', integration: 'Unified platform' }
+    ]
+  };
+
   // Pricing matrices (based on real-world security system costs)
   const pricing = {
     surveillance: {
@@ -316,7 +332,7 @@ const SecurityEstimateForm = () => {
                 value={facilitySize}
                 onChange={(e) => setFacilitySize(e.target.value)}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
-                placeholder="25,000"
+                placeholder="Square footage"
               />
             </div>
           </div>
@@ -346,7 +362,7 @@ const SecurityEstimateForm = () => {
                     value={formData.surveillance.cameras}
                     onChange={(e) => handleInputChange('surveillance', 'cameras', e.target.value)}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
-                    placeholder="16"
+                    placeholder="Number of cameras"
                   />
                 </div>
                 <div>
@@ -387,7 +403,7 @@ const SecurityEstimateForm = () => {
                     value={formData.accessControl.doors}
                     onChange={(e) => handleInputChange('accessControl', 'doors', e.target.value)}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
-                    placeholder="8"
+                    placeholder="Number of doors"
                   />
                 </div>
                 <div>
@@ -397,7 +413,7 @@ const SecurityEstimateForm = () => {
                     value={formData.accessControl.cardReaders}
                     onChange={(e) => handleInputChange('accessControl', 'cardReaders', e.target.value)}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
-                    placeholder="8"
+                    placeholder="Number of readers"
                   />
                 </div>
                 <div>
@@ -437,7 +453,7 @@ const SecurityEstimateForm = () => {
                     value={formData.intrusion.zones}
                     onChange={(e) => handleInputChange('intrusion', 'zones', e.target.value)}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
-                    placeholder="12"
+                    placeholder="Number of zones"
                   />
                 </div>
                 <div>
@@ -447,7 +463,7 @@ const SecurityEstimateForm = () => {
                     value={formData.intrusion.sensors}
                     onChange={(e) => handleInputChange('intrusion', 'sensors', e.target.value)}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
-                    placeholder="24"
+                    placeholder="Number of sensors"
                   />
                 </div>
                 <div className="flex items-center pt-8">
@@ -484,7 +500,7 @@ const SecurityEstimateForm = () => {
                     value={formData.fire.detectors}
                     onChange={(e) => handleInputChange('fire', 'detectors', e.target.value)}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
-                    placeholder="30"
+                    placeholder="Number of detectors"
                   />
                 </div>
                 <div>
@@ -576,6 +592,40 @@ const SecurityEstimateForm = () => {
                 * Professional estimate includes equipment, installation, and initial configuration.
                 Final pricing may vary based on site conditions, specific requirements, and local regulations.
               </p>
+            </div>
+
+            {/* AI Enhancement Planning Section */}
+            <div className="mt-8 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-2xl p-6 border border-blue-500/20">
+              <h3 className="font-bold text-xl mb-4 text-blue-300">🧠 AI Enhancement Opportunities</h3>
+              <p className="text-sm text-gray-300 mb-4">
+                Future-ready AI integrations to consider after your foundational systems are deployed:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-black/20 rounded-lg p-4">
+                  <h4 className="font-semibold text-blue-300 mb-2">Video Analytics</h4>
+                  <ul className="text-sm space-y-1 text-gray-300">
+                    <li>• Facial recognition (Face First, Oosto)</li>
+                    <li>• Behavioral analytics (iProTech, Skylla)</li>
+                    <li>• License plate recognition</li>
+                    <li>• People counting & crowd detection</li>
+                  </ul>
+                </div>
+                <div className="bg-black/20 rounded-lg p-4">
+                  <h4 className="font-semibold text-blue-300 mb-2">Smart Integration</h4>
+                  <ul className="text-sm space-y-1 text-gray-300">
+                    <li>• AI-powered access decisions</li>
+                    <li>• Predictive threat detection</li>
+                    <li>• Automated incident response</li>
+                    <li>• Business intelligence integration</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                <p className="text-xs text-yellow-300">
+                  <strong>Planning Note:</strong> AI enhancements work best when added to proven, stable security infrastructures.
+                  We recommend deploying core systems first, then evaluating AI additions based on operational needs and ROI.
+                </p>
+              </div>
             </div>
 
             <div className="mt-10 bg-purple-600/20 rounded-2xl p-6 border border-purple-500/30">

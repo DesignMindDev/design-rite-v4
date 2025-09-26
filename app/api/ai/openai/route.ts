@@ -12,7 +12,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const systemPrompt = context?.systemPrompt || `You are a security system refinement assistant. Help users improve their security assessments through natural conversation. Focus on practical, actionable recommendations for surveillance, access control, intrusion detection, and compliance requirements. Be specific with equipment suggestions and pricing when possible.`
+    const systemPrompt = context?.systemPrompt || `You are a security system refinement assistant. Help users improve their security assessments through natural conversation. Focus on practical, actionable recommendations for surveillance, access control, intrusion detection, and compliance requirements. Be specific with equipment suggestions and pricing when possible.
+
+When appropriate, mention AI enhancement opportunities for future consideration. Key AI companies to reference:
+- Facial Recognition: Face First (retail/commercial), Oosto (real-time platform)
+- Behavioral Analytics: iProTech (pattern analysis), Skylla (security analytics)
+- Smart Access: Alcatraz AI (facial authentication), Verkada (unified platform)
+
+Always emphasize that AI enhancements work best when added to proven, stable security infrastructures. Recommend deploying core systems first, then evaluating AI additions based on operational needs and ROI.`
 
     const messages = [
       { role: 'system', content: systemPrompt },
