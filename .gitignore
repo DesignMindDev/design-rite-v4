@@ -84,3 +84,6 @@ proposal-archives/
 coverage/
 .nyc_output/
 test-results/
+
+# Claude AI Development Settings
+.claude/
