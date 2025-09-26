@@ -43,6 +43,8 @@ export default function AIAssistantPage() {
   const [sessionId, setSessionId] = useState('')
   const [sessionName, setSessionName] = useState('')
   const [previousSessions, setPreviousSessions] = useState<any[]>([])
+  const [showPrintPreview, setShowPrintPreview] = useState(false)
+  const [previewContent, setPreviewContent] = useState({ title: '', content: '', filename: '' })
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -592,15 +594,13 @@ Generated with AI Assistant Refinement
 Date: ${new Date().toLocaleDateString()}
 `
 
-    const blob = new Blob([proposalContent], { type: 'text/markdown' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `Updated_Security_Proposal_${new Date().toISOString().split('T')[0]}.md`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+    // Show preview instead of direct download
+    setPreviewContent({
+      title: 'Updated Security Assessment Proposal',
+      content: proposalContent,
+      filename: `Updated_Security_Proposal_${new Date().toISOString().split('T')[0]}.md`
+    })
+    setShowPrintPreview(true)
   }
 
   const handleExportBOM = () => {
@@ -631,15 +631,13 @@ Generated with AI Assistant Refinement
 Date: ${new Date().toLocaleDateString()}
 `
 
-    const blob = new Blob([bomContent], { type: 'text/markdown' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `Security_BOM_${new Date().toISOString().split('T')[0]}.md`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+    // Show preview instead of direct download
+    setPreviewContent({
+      title: 'Detailed Bill of Materials (BOM)',
+      content: bomContent,
+      filename: `Security_BOM_${new Date().toISOString().split('T')[0]}.md`
+    })
+    setShowPrintPreview(true)
   }
 
   const handleExportImplementation = () => {
@@ -677,15 +675,59 @@ Generated with AI Assistant Refinement
 Date: ${new Date().toLocaleDateString()}
 `
 
-    const blob = new Blob([implementationContent], { type: 'text/markdown' })
+    // Show preview instead of direct download
+    setPreviewContent({
+      title: 'Implementation Plan',
+      content: implementationContent,
+      filename: `Implementation_Plan_${new Date().toISOString().split('T')[0]}.md`
+    })
+    setShowPrintPreview(true)
+  }
+
+  const handleDownloadFromPreview = () => {
+    const blob = new Blob([previewContent.content], { type: 'text/markdown' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `Implementation_Plan_${new Date().toISOString().split('T')[0]}.md`
+    a.download = previewContent.filename
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+    setShowPrintPreview(false)
+  }
+
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank')
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>${previewContent.title}</title>
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                line-height: 1.6;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+              }
+              h1, h2, h3 { color: #333; }
+              pre { background: #f5f5f5; padding: 15px; border-radius: 5px; }
+              table { border-collapse: collapse; width: 100%; }
+              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+              th { background-color: #f2f2f2; }
+            </style>
+          </head>
+          <body>
+            <pre style="white-space: pre-wrap; font-family: inherit;">${previewContent.content}</pre>
+          </body>
+        </html>
+      `)
+      printWindow.document.close()
+      printWindow.print()
+      printWindow.close()
+    }
   }
 
   return (
@@ -1026,25 +1068,87 @@ Date: ${new Date().toLocaleDateString()}
                   onClick={handleExportProposal}
                   className="w-full px-4 py-2 dr-bg-violet hover:bg-purple-700 dr-text-pearl rounded-lg transition-colors"
                 >
-                  📄 Updated Proposal
+                  📄 Preview Proposal
                 </button>
                 <button
                   onClick={handleExportBOM}
                   className="w-full px-4 py-2 border border-gray-600/50 text-gray-300 rounded-lg hover:bg-gray-700/50 transition-colors"
                 >
-                  📊 Detailed BOM
+                  📊 Preview BOM
                 </button>
                 <button
                   onClick={handleExportImplementation}
                   className="w-full px-4 py-2 border border-gray-600/50 text-gray-300 rounded-lg hover:bg-gray-700/50 transition-colors"
                 >
-                  📋 Implementation Plan
+                  📋 Preview Implementation Plan
                 </button>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Print Preview Modal */}
+      {showPrintPreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">{previewContent.title}</h2>
+              <button
+                onClick={() => setShowPrintPreview(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-auto p-6 bg-gray-50">
+              <div className="bg-white shadow-sm rounded-lg p-8 mx-auto max-w-3xl" style={{ minHeight: '11in' }}>
+                <pre className="whitespace-pre-wrap text-sm text-gray-800 leading-relaxed font-mono">
+                  {previewContent.content}
+                </pre>
+              </div>
+            </div>
+
+            {/* Footer Actions */}
+            <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
+              <div className="text-sm text-gray-500">
+                File: {previewContent.filename}
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setShowPrintPreview(false)}
+                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePrint}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  </svg>
+                  Print
+                </button>
+                <button
+                  onClick={handleDownloadFromPreview}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Download
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
