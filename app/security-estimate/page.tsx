@@ -328,9 +328,14 @@ const SecurityEstimateForm = () => {
             <div>
               <label className="block text-sm font-medium mb-2">Facility Size (sq ft)</label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={facilitySize}
-                onChange={(e) => setFacilitySize(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '')
+                  setFacilitySize(value)
+                }}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
                 placeholder="Square footage"
               />
@@ -358,9 +363,14 @@ const SecurityEstimateForm = () => {
                 <div>
                   <label className="block text-sm font-medium mb-2">Number of Cameras</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={formData.surveillance.cameras}
-                    onChange={(e) => handleInputChange('surveillance', 'cameras', e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '')
+                      handleInputChange('surveillance', 'cameras', value)
+                    }}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
                     placeholder="Number of cameras"
                   />
@@ -399,9 +409,14 @@ const SecurityEstimateForm = () => {
                 <div>
                   <label className="block text-sm font-medium mb-2">Number of Controlled Doors</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={formData.accessControl.doors}
-                    onChange={(e) => handleInputChange('accessControl', 'doors', e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '')
+                      handleInputChange('accessControl', 'doors', value)
+                    }}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
                     placeholder="Number of doors"
                   />
@@ -409,9 +424,14 @@ const SecurityEstimateForm = () => {
                 <div>
                   <label className="block text-sm font-medium mb-2">Card Readers</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={formData.accessControl.cardReaders}
-                    onChange={(e) => handleInputChange('accessControl', 'cardReaders', e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '')
+                      handleInputChange('accessControl', 'cardReaders', value)
+                    }}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
                     placeholder="Number of readers"
                   />
@@ -449,9 +469,14 @@ const SecurityEstimateForm = () => {
                 <div>
                   <label className="block text-sm font-medium mb-2">Detection Zones</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={formData.intrusion.zones}
-                    onChange={(e) => handleInputChange('intrusion', 'zones', e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '')
+                      handleInputChange('intrusion', 'zones', value)
+                    }}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
                     placeholder="Number of zones"
                   />
@@ -459,9 +484,14 @@ const SecurityEstimateForm = () => {
                 <div>
                   <label className="block text-sm font-medium mb-2">Sensors/Devices</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={formData.intrusion.sensors}
-                    onChange={(e) => handleInputChange('intrusion', 'sensors', e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '')
+                      handleInputChange('intrusion', 'sensors', value)
+                    }}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
                     placeholder="Number of sensors"
                   />
@@ -496,9 +526,14 @@ const SecurityEstimateForm = () => {
                 <div>
                   <label className="block text-sm font-medium mb-2">Smoke/Heat Detectors</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={formData.fire.detectors}
-                    onChange={(e) => handleInputChange('fire', 'detectors', e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '')
+                      handleInputChange('fire', 'detectors', value)
+                    }}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
                     placeholder="Number of detectors"
                   />

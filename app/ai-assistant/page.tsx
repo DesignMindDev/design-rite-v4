@@ -499,7 +499,7 @@ Some suggestions:
       return `🎥 Great! I've updated your surveillance system recommendations:
 
 **Added to Assessment:**
-• 4x Additional 4K IP cameras for enhanced coverage
+• 4x Additional IP cameras (2MP/4MP options) for enhanced coverage
 • Upgraded storage to accommodate extra streams
 • Enhanced analytics package for motion detection
 
@@ -610,7 +610,7 @@ Date: ${new Date().toLocaleDateString()}
 ## Security System Components
 
 ### Surveillance System
-- 4K IP Cameras (8x) - $1,200 each
+- IP Security Cameras (8x) - $800-$1,200 each (NDAA Compliant)
 - Network Video Recorder - $800
 - Storage Array (8TB) - $600
 - Network Infrastructure - $1,500

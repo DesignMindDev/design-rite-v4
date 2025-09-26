@@ -220,9 +220,14 @@ export default function CostEstimator() {
                 <div>
                   <label className="block text-sm font-medium mb-2">Square Footage *</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={formData.squareFootage}
-                    onChange={(e) => updateFormData('squareFootage', e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '')
+                      updateFormData('squareFootage', value)
+                    }}
                     className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50"
                     placeholder="10000"
                   />
@@ -259,20 +264,28 @@ export default function CostEstimator() {
                     <div>
                       <label className="block text-sm font-medium mb-2">Indoor Cameras</label>
                       <input
-                        type="number"
-                        min="0"
-                        value={formData.camerasIndoor}
-                        onChange={(e) => updateFormData('camerasIndoor', parseInt(e.target.value) || 0)}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        value={formData.camerasIndoor > 0 ? formData.camerasIndoor.toString() : ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '')
+                          updateFormData('camerasIndoor', value === '' ? 0 : parseInt(value))
+                        }}
                         className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2">Outdoor Cameras</label>
                       <input
-                        type="number"
-                        min="0"
-                        value={formData.camerasOutdoor}
-                        onChange={(e) => updateFormData('camerasOutdoor', parseInt(e.target.value) || 0)}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        value={formData.camerasOutdoor > 0 ? formData.camerasOutdoor.toString() : ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '')
+                          updateFormData('camerasOutdoor', value === '' ? 0 : parseInt(value))
+                        }}
                         className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white"
                       />
                     </div>
@@ -285,20 +298,28 @@ export default function CostEstimator() {
                     <div>
                       <label className="block text-sm font-medium mb-2">Access Control Doors</label>
                       <input
-                        type="number"
-                        min="0"
-                        value={formData.accessControlDoors}
-                        onChange={(e) => updateFormData('accessControlDoors', parseInt(e.target.value) || 0)}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        value={formData.accessControlDoors > 0 ? formData.accessControlDoors.toString() : ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '')
+                          updateFormData('accessControlDoors', value === '' ? 0 : parseInt(value))
+                        }}
                         className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2">Motion Sensors</label>
                       <input
-                        type="number"
-                        min="0"
-                        value={formData.motionSensors}
-                        onChange={(e) => updateFormData('motionSensors', parseInt(e.target.value) || 0)}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        value={formData.motionSensors > 0 ? formData.motionSensors.toString() : ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '')
+                          updateFormData('motionSensors', value === '' ? 0 : parseInt(value))
+                        }}
                         className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white"
                       />
                     </div>

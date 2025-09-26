@@ -257,10 +257,15 @@ export default function AIProvidersAdmin() {
                   className="w-full px-4 py-3 bg-black/30 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none"
                 />
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder="Priority (1=highest)"
                   value={newProvider.priority || ''}
-                  onChange={(e) => setNewProvider({...newProvider, priority: parseInt(e.target.value)})}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '')
+                    setNewProvider({...newProvider, priority: value === '' ? 0 : parseInt(value)})
+                  }}
                   className="w-full px-4 py-3 bg-black/30 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none"
                 />
                 <div className="flex items-center gap-4">
@@ -392,9 +397,14 @@ export default function AIProvidersAdmin() {
               <div>
                 <label className="block text-white font-semibold mb-2">Health Check Interval (minutes)</label>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={data.settings.health_check_interval_minutes}
-                  onChange={(e) => setData({...data, settings: {...data.settings, health_check_interval_minutes: parseInt(e.target.value)}})}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '')
+                    setData({...data, settings: {...data.settings, health_check_interval_minutes: value === '' ? 0 : parseInt(value)}})
+                  }}
                   className="w-full px-4 py-3 bg-black/30 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none"
                 />
               </div>
@@ -457,9 +467,14 @@ export default function AIProvidersAdmin() {
               <div>
                 <label className="block text-white font-semibold mb-2">Priority</label>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={editingProvider.priority}
-                  onChange={(e) => setEditingProvider({...editingProvider, priority: parseInt(e.target.value)})}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '')
+                    setEditingProvider({...editingProvider, priority: value === '' ? 0 : parseInt(value)})
+                  }}
                   className="w-full px-4 py-3 bg-black/30 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:outline-none"
                 />
               </div>

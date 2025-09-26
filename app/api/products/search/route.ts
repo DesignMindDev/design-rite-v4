@@ -14,7 +14,8 @@ export async function GET(request: Request) {
     const minPrice = searchParams.get('min_price')
     const maxPrice = searchParams.get('max_price')
     const limit = parseInt(searchParams.get('limit') || '20')
-    const ndaaCompliant = searchParams.get('ndaa_compliant') === 'true'
+    // Default to NDAA compliant unless explicitly requested otherwise
+    const ndaaCompliant = searchParams.get('ndaa_compliant') !== 'false'
 
     console.log('🔍 Product search request:', { query, manufacturer, category, ndaaCompliant })
 

@@ -293,9 +293,14 @@ export default function AIDiscoveryPage() {
               <div>
                 <label className="block text-white/90 font-medium mb-2">Total Square Footage *</label>
                 <input
-                  type="number"
-                  value={data.squareFootage || ''}
-                  onChange={(e) => updateData('squareFootage', parseInt(e.target.value) || 0)}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={data.squareFootage > 0 ? data.squareFootage.toString() : ''}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '')
+                    updateData('squareFootage', value === '' ? 0 : parseInt(value))
+                  }}
                   placeholder="e.g., 25000"
                   className={`w-full px-4 py-3 bg-white/10 border rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-purple-400 transition-colors ${
                     errors.squareFootage ? 'border-red-400' : 'border-white/30'
@@ -307,11 +312,15 @@ export default function AIDiscoveryPage() {
               <div>
                 <label className="block text-white/90 font-medium mb-2">Number of Buildings</label>
                 <input
-                  type="number"
-                  value={data.buildingCount}
-                  onChange={(e) => updateData('buildingCount', parseInt(e.target.value) || 1)}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={data.buildingCount > 0 ? data.buildingCount.toString() : ''}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '')
+                    updateData('buildingCount', value === '' ? 1 : Math.max(1, parseInt(value)))
+                  }}
                   placeholder="1"
-                  min="1"
                   className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-purple-400 transition-colors"
                 />
               </div>
@@ -319,11 +328,15 @@ export default function AIDiscoveryPage() {
               <div>
                 <label className="block text-white/90 font-medium mb-2">Number of Floors</label>
                 <input
-                  type="number"
-                  value={data.floorCount}
-                  onChange={(e) => updateData('floorCount', parseInt(e.target.value) || 1)}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={data.floorCount > 0 ? data.floorCount.toString() : ''}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '')
+                    updateData('floorCount', value === '' ? 1 : Math.max(1, parseInt(value)))
+                  }}
                   placeholder="1"
-                  min="1"
                   className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-purple-400 transition-colors"
                 />
               </div>
@@ -331,9 +344,14 @@ export default function AIDiscoveryPage() {
               <div>
                 <label className="block text-white/90 font-medium mb-2">Peak Occupancy</label>
                 <input
-                  type="number"
-                  value={data.occupancy || ''}
-                  onChange={(e) => updateData('occupancy', parseInt(e.target.value) || 0)}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={data.occupancy > 0 ? data.occupancy.toString() : ''}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '')
+                    updateData('occupancy', value === '' ? 0 : parseInt(value))
+                  }}
                   placeholder="e.g., 150"
                   className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-purple-400 transition-colors"
                 />

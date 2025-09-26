@@ -9,6 +9,7 @@ export interface ProductFilters {
   priceMin?: number;
   priceMax?: number;
   complianceRequired?: string[];
+  ndaaCompliant?: boolean;
 }
 
 export interface SystemRequirements {
@@ -86,8 +87,9 @@ export class ProductIntelligenceAPI {
     if (filters.manufacturer) searchParams.append('manufacturer', filters.manufacturer);
     if (filters.priceMin) searchParams.append('price_min', filters.priceMin.toString());
     if (filters.priceMax) searchParams.append('price_max', filters.priceMax.toString());
+    if (filters.ndaaCompliant !== undefined) searchParams.append('ndaa_compliant', filters.ndaaCompliant.toString());
 
-    const response = await fetch(`${this.baseURL}/api/v1/products/search?${searchParams}`);
+    const response = await fetch(`/api/products/search?${searchParams}`);
 
     if (!response.ok) {
       throw new Error(`Product search failed: ${response.statusText}`);

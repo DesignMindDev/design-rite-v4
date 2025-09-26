@@ -32,6 +32,7 @@ export default function PricingIntelligencePage() {
   const [pricingData, setPricingData] = useState<PricingData[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [isLoadingPricing, setIsLoadingPricing] = useState(false)
+  const [ndaaCompliant, setNdaaCompliant] = useState(true)
   const [dashboardStats, setDashboardStats] = useState<DashboardStats>({
     totalProducts: 12847,
     avgPriceChange: -2.3,
@@ -61,8 +62,8 @@ export default function PricingIntelligencePage() {
     },
     {
       productId: 3,
-      model: 'DS-2CD2185FWD-I',
-      manufacturer: 'Hikvision',
+      model: 'M4308-PLE',
+      manufacturer: 'Axis Communications',
       currentPrice: 245.99,
       priceChange: -15.00,
       changePercentage: -5.7
@@ -74,7 +75,7 @@ export default function PricingIntelligencePage() {
 
     setIsSearching(true)
     try {
-      const results = await productIntelligenceAPI.searchProducts(searchQuery, {}, 10)
+      const results = await productIntelligenceAPI.searchProducts(searchQuery, { ndaaCompliant }, 10)
       setSearchResults(results.products)
     } catch (error) {
       console.error('Search failed:', error)
@@ -155,10 +156,22 @@ export default function PricingIntelligencePage() {
           <h1 className="dr-heading-xl font-black dr-text-pearl mb-4">
             Pricing Intelligence Dashboard
           </h1>
-          <p className="dr-body text-gray-300 max-w-2xl">
+          <p className="dr-body text-gray-300 max-w-2xl mb-4">
             Real-time security product pricing from manufacturers and distributors.
             Make data-driven decisions with live market intelligence.
           </p>
+
+          {/* NDAA Compliance Notice */}
+          <div className="bg-green-900/20 border border-green-600/30 rounded-xl p-4 max-w-2xl">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <span className="font-semibold text-green-300">NDAA Compliant by Default</span>
+            </div>
+            <p className="text-sm text-green-200">
+              We exclude Hikvision, Dahua, Hytera, ZTE, and Huawei products by default to ensure federal compliance.
+              Non-compliant products are only shown when explicitly requested.
+            </p>
+          </div>
         </div>
 
         {/* Quick Stats */}
@@ -250,6 +263,32 @@ export default function PricingIntelligencePage() {
                   <Search className="h-4 w-4" />
                 )}
               </Button>
+            </div>
+
+            {/* NDAA Compliance Toggle */}
+            <div className="mt-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <input
+                  id="ndaa-compliant"
+                  type="checkbox"
+                  checked={ndaaCompliant}
+                  onChange={(e) => setNdaaCompliant(e.target.checked)}
+                  className="w-4 h-4 text-violet-600 bg-gray-700 border-gray-600 rounded focus:ring-violet-500"
+                />
+                <label htmlFor="ndaa-compliant" className="text-sm dr-text-pearl">
+                  <span className="font-semibold">NDAA Compliant Only</span>
+                  <span className="text-gray-400 ml-2">
+                    (Excludes Hikvision, Dahua, Hytera, ZTE, Huawei)
+                  </span>
+                </label>
+              </div>
+              <div className="text-xs text-gray-500">
+                {ndaaCompliant ? (
+                  <span className="text-green-400">✓ Federal compliance enabled</span>
+                ) : (
+                  <span className="text-orange-400">⚠ Including banned manufacturers</span>
+                )}
+              </div>
             </div>
 
             {/* Search Results */}
