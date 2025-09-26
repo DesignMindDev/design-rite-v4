@@ -180,12 +180,12 @@ export default function ComplianceCheckPage() {
               >
                 🚀 Get Full Assessment
               </Link>
-              <Link
-                href="/estimate-options"
+              <button
+                onClick={handleTryDemo}
                 className="border-2 border-violet-400 text-violet-300 px-8 py-4 rounded-xl font-bold hover:bg-violet-800/30 transition-all text-center"
               >
                 📊 Security Estimate Only
-              </Link>
+              </button>
             </div>
           </div>
 

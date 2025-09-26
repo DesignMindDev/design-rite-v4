@@ -3,11 +3,15 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import UnifiedNavigation from './components/UnifiedNavigation';
+import EmailGate from './components/EmailGate';
+import { useAuthCache } from './hooks/useAuthCache';
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeStormItem, setActiveStormItem] = useState(0)
   const [isCalm, setIsCalm] = useState(false)
+  const [showEmailGate, setShowEmailGate] = useState(false)
+  const { isAuthenticated, extendSession } = useAuthCache()
 
   const stormItems = [
     { icon: "☕", text: "Morning coffee, client calls with urgent changes", delay: 0, type: "problem" },
@@ -45,8 +49,18 @@ export default function HomePage() {
   }
 
   const redirectToEstimate = () => {
-    window.location.href = '/estimate-options'
+    if (isAuthenticated) {
+      extendSession();
+      window.location.href = '/estimate-options';
+    } else {
+      setShowEmailGate(true);
+    }
   }
+
+  const handleEmailGateSuccess = () => {
+    setShowEmailGate(false);
+    window.location.href = '/estimate-options';
+  };
 
   const calmTheStorm = () => {
     setIsCalm(true)
@@ -414,7 +428,7 @@ export default function HomePage() {
             <div>
               <h3 className="dr-text-pearl dr-ui font-bold mb-4">Platform</h3>
               <ul className="space-y-2">
-                <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/estimate-options">Security Estimate</Link></li>
+                <li><button onClick={redirectToEstimate} className="text-gray-300 hover:dr-text-violet dr-ui transition-colors">Security Estimate</button></li>
                 <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/waitlist">Join Waitlist</Link></li>
                 <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/watch-demo">Demo</Link></li>
               </ul>
@@ -442,6 +456,14 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* Email Gate */}
+      {showEmailGate && (
+        <EmailGate
+          onSuccess={handleEmailGateSuccess}
+          onClose={() => setShowEmailGate(false)}
+        />
+      )}
     </div>
   )
 }
