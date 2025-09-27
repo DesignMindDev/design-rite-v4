@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Upload, Image as ImageIcon, MessageSquare, Sparkles, FileText, Eye, Download, Trash2, Tag, Send, Bot, User, Search, Globe, TrendingUp, BookOpen, ExternalLink } from 'lucide-react'
+import { Upload, Image as ImageIcon, MessageSquare, Sparkles, FileText, Eye, Download, Trash2, Tag, Send, Bot, User, Search, Globe, TrendingUp, BookOpen, ExternalLink, MapPin, Satellite, Layers } from 'lucide-react'
 import * as auth from '../../lib/auth'
 
 interface Asset {
@@ -91,7 +91,7 @@ Ready to create something amazing? Upload your first asset! 📸✨`,
   ])
   const [currentMessage, setCurrentMessage] = useState('')
   const [contentDrafts, setContentDrafts] = useState<ContentDraft[]>([])
-  const [activeTab, setActiveTab] = useState<'assets' | 'chat' | 'content' | 'research'>('assets')
+  const [activeTab, setActiveTab] = useState<'assets' | 'chat' | 'content' | 'research' | 'planner'>('assets')
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
 
@@ -103,8 +103,63 @@ Ready to create something amazing? Upload your first asset! 📸✨`,
   const [isSearching, setIsSearching] = useState(false)
   const [availableProviders, setAvailableProviders] = useState(['anthropic', 'openai', 'google'])
 
+  // Site Planner State
+  const [siteAddress, setSiteAddress] = useState('')
+  const [isLoadingMap, setIsLoadingMap] = useState(false)
+  const [mapLoaded, setMapLoaded] = useState(false)
+  const [selectedDeviceType, setSelectedDeviceType] = useState<'camera' | 'sensor' | 'access' | 'network'>('camera')
+  const [placedDevices, setPlacedDevices] = useState<Array<{
+    id: string
+    type: 'camera' | 'sensor' | 'access' | 'network'
+    lat: number
+    lng: number
+    name: string
+    specs?: string
+  }>>([])
+  const [activeLayers, setActiveLayers] = useState<string[]>(['cameras', 'sensors', 'access', 'network'])
+
   const fileInputRef = useRef<HTMLInputElement>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
+
+  // Site Planner Functions
+  const handleMapClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!mapLoaded) return
+
+    // Get click position relative to the map container
+    const rect = event.currentTarget.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
+
+    // Convert to mock lat/lng (would be real coordinates with Google Maps)
+    const lat = 40.7128 + (y / rect.height - 0.5) * 0.01
+    const lng = -74.0060 + (x / rect.width - 0.5) * 0.01
+
+    // Generate device name
+    const deviceCount = placedDevices.filter(d => d.type === selectedDeviceType).length + 1
+    const deviceName = `${selectedDeviceType.charAt(0).toUpperCase() + selectedDeviceType.slice(1)} ${deviceCount}`
+
+    // Add new device
+    const newDevice = {
+      id: Date.now().toString(),
+      type: selectedDeviceType,
+      lat,
+      lng,
+      name: deviceName,
+      specs: getDeviceSpecs(selectedDeviceType)
+    }
+
+    setPlacedDevices(prev => [...prev, newDevice])
+  }
+
+  const getDeviceSpecs = (deviceType: string): string => {
+    const specs = {
+      camera: '4K Ultra HD, Night Vision, 30m Range',
+      sensor: 'PIR Motion Detection, 12m Range, Pet Immune',
+      access: 'RFID/PIN, Biometric, Network Connected',
+      network: 'PoE Switch, 24-Port, Managed, 1Gbps'
+    }
+    return specs[deviceType as keyof typeof specs] || 'Standard Device'
+  }
 
   useEffect(() => {
     setIsMounted(true)
@@ -666,6 +721,17 @@ What type of content would be most valuable for your goals right now? I'm here t
             <Search className="w-4 h-4" />
             Research Assistant ({researchQueries.length})
           </button>
+          <button
+            onClick={() => setActiveTab('planner')}
+            className={`flex items-center gap-2 py-3 px-6 rounded-lg font-semibold transition-all ${
+              activeTab === 'planner'
+                ? 'bg-purple-600 text-white'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <MapPin className="w-4 h-4" />
+            Site Planner ({placedDevices.length})
+          </button>
         </div>
 
         {/* Hidden file input */}
@@ -1111,6 +1177,279 @@ What type of content would be most valuable for your goals right now? I'm here t
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Site Planner Content */}
+        {activeTab === 'planner' && (
+          <div className="space-y-8">
+            <div className="flex items-center gap-3 mb-6">
+              <MapPin className="w-6 h-6 text-purple-400" />
+              <div>
+                <h2 className="text-2xl font-bold text-white">Site Planner</h2>
+                <p className="text-gray-400">Satellite view with security device planning</p>
+              </div>
+            </div>
+
+            {/* Address Input Section */}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Site Location</h3>
+              <div className="flex gap-4">
+                <input
+                  type="text"
+                  value={siteAddress}
+                  onChange={(e) => setSiteAddress(e.target.value)}
+                  placeholder="Enter site address..."
+                  className="flex-1 bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none"
+                />
+                <button
+                  onClick={() => {
+                    setIsLoadingMap(true)
+                    // Simulate map loading
+                    setTimeout(() => {
+                      setIsLoadingMap(false)
+                      setMapLoaded(true)
+                    }, 1500)
+                  }}
+                  disabled={!siteAddress || isLoadingMap}
+                  className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {isLoadingMap ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      <Satellite className="w-4 h-4" />
+                      Load Satellite View
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Technology Layer Controls */}
+            {mapLoaded && (
+              <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <Layers className="w-5 h-5" />
+                  Technology Layers
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { id: 'cameras', name: 'Cameras', icon: '📹', color: 'bg-blue-600' },
+                    { id: 'sensors', name: 'Sensors', icon: '🔍', color: 'bg-green-600' },
+                    { id: 'access', name: 'Access Control', icon: '🚪', color: 'bg-orange-600' },
+                    { id: 'network', name: 'Network', icon: '📡', color: 'bg-purple-600' }
+                  ].map((layer) => (
+                    <button
+                      key={layer.id}
+                      onClick={() => {
+                        setActiveLayers(prev =>
+                          prev.includes(layer.id)
+                            ? prev.filter(l => l !== layer.id)
+                            : [...prev, layer.id]
+                        )
+                      }}
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        activeLayers.includes(layer.id)
+                          ? `${layer.color} border-white text-white`
+                          : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-gray-500'
+                      }`}
+                    >
+                      <div className="text-2xl mb-2">{layer.icon}</div>
+                      <div className="text-sm font-medium">{layer.name}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Device Placement Tools */}
+            {mapLoaded && (
+              <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Device Placement</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  {[
+                    { type: 'camera', name: 'Security Camera', icon: '📹' },
+                    { type: 'sensor', name: 'Motion Sensor', icon: '🔍' },
+                    { type: 'access', name: 'Access Point', icon: '🚪' },
+                    { type: 'network', name: 'Network Hub', icon: '📡' }
+                  ].map((device) => (
+                    <button
+                      key={device.type}
+                      onClick={() => setSelectedDeviceType(device.type as any)}
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        selectedDeviceType === device.type
+                          ? 'bg-purple-600 border-white text-white'
+                          : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-gray-500'
+                      }`}
+                    >
+                      <div className="text-2xl mb-2">{device.icon}</div>
+                      <div className="text-sm font-medium">{device.name}</div>
+                    </button>
+                  ))}
+                </div>
+                <p className="text-gray-400 text-sm">
+                  Select a device type, then click on the map to place it at that location.
+                </p>
+              </div>
+            )}
+
+            {/* Satellite Map Placeholder */}
+            {mapLoaded ? (
+              <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">
+                  Satellite View: {siteAddress}
+                </h3>
+                <div
+                  className="bg-gray-900 rounded-lg aspect-video relative border-2 border-dashed border-gray-600 cursor-crosshair overflow-hidden"
+                  onClick={handleMapClick}
+                >
+                  {/* Simulated Satellite Background */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-900/20 via-gray-800 to-blue-900/20"></div>
+
+                  {/* Grid overlay for satellite view feel */}
+                  <div className="absolute inset-0 opacity-10">
+                    <svg width="100%" height="100%">
+                      <defs>
+                        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="1"/>
+                        </pattern>
+                      </defs>
+                      <rect width="100%" height="100%" fill="url(#grid)" />
+                    </svg>
+                  </div>
+
+                  {/* Placed Devices on Map */}
+                  {placedDevices.map((device) => {
+                    const x = ((device.lng + 74.0060) / 0.01 + 0.5) * 100; // Convert back to percentage
+                    const y = ((device.lat - 40.7128) / 0.01 + 0.5) * 100;
+
+                    return (
+                      <div
+                        key={device.id}
+                        className={`absolute transform -translate-x-1/2 -translate-y-1/2 ${
+                          activeLayers.includes(device.type + 's') ? 'visible' : 'hidden'
+                        }`}
+                        style={{ left: `${x}%`, top: `${y}%` }}
+                      >
+                        <div className="group">
+                          <div className={`w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-xs ${
+                            device.type === 'camera' ? 'bg-blue-600' :
+                            device.type === 'sensor' ? 'bg-green-600' :
+                            device.type === 'access' ? 'bg-orange-600' :
+                            'bg-purple-600'
+                          }`}>
+                            {device.type === 'camera' && '📹'}
+                            {device.type === 'sensor' && '🔍'}
+                            {device.type === 'access' && '🚪'}
+                            {device.type === 'network' && '📡'}
+                          </div>
+
+                          {/* Device tooltip */}
+                          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded-lg px-2 py-1 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                            <div className="font-medium">{device.name}</div>
+                            <div className="text-gray-400">{device.specs}</div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Center info when no devices */}
+                  {placedDevices.length === 0 && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center">
+                        <Satellite className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                        <h4 className="text-xl font-semibold text-gray-300 mb-2">Interactive Satellite Map</h4>
+                        <p className="text-gray-400 mb-4">
+                          Click anywhere to place {selectedDeviceType} devices
+                        </p>
+                        <div className="bg-gray-800/80 rounded-lg p-4 max-w-md mx-auto">
+                          <p className="text-sm text-gray-300 mb-2">
+                            🗺️ Simulated satellite view
+                          </p>
+                          <p className="text-sm text-gray-300 mb-2">
+                            📍 Click to place {selectedDeviceType} devices
+                          </p>
+                          <p className="text-sm text-gray-300">
+                            🔄 Use layer controls to filter device types
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Map coordinates indicator */}
+                  <div className="absolute top-2 left-2 bg-gray-800/80 text-white text-xs px-2 py-1 rounded">
+                    {siteAddress || 'Satellite View'}
+                  </div>
+
+                  {/* Selected device type indicator */}
+                  <div className="absolute top-2 right-2 bg-purple-600/80 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+                    <span>Placing:</span>
+                    <span className="font-medium">
+                      {selectedDeviceType === 'camera' && '📹 Camera'}
+                      {selectedDeviceType === 'sensor' && '🔍 Sensor'}
+                      {selectedDeviceType === 'access' && '🚪 Access'}
+                      {selectedDeviceType === 'network' && '📡 Network'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Placed Devices List */}
+                {placedDevices.length > 0 && (
+                  <div className="mt-6">
+                    <h4 className="text-md font-semibold text-white mb-3">Placed Devices ({placedDevices.length})</h4>
+                    <div className="space-y-2">
+                      {placedDevices.map((device) => (
+                        <div key={device.id} className="bg-gray-700/50 rounded-lg p-3 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <span className="text-xl">
+                              {device.type === 'camera' && '📹'}
+                              {device.type === 'sensor' && '🔍'}
+                              {device.type === 'access' && '🚪'}
+                              {device.type === 'network' && '📡'}
+                            </span>
+                            <div>
+                              <p className="text-white font-medium">{device.name}</p>
+                              <p className="text-gray-400 text-sm">{device.specs}</p>
+                              <p className="text-gray-500 text-xs">
+                                Lat: {device.lat.toFixed(6)}, Lng: {device.lng.toFixed(6)}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setPlacedDevices(prev => prev.filter(d => d.id !== device.id))
+                            }}
+                            className="text-red-400 hover:text-red-300"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-12 text-center">
+                <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-300 mb-2">Ready to Plan Your Site</h3>
+                <p className="text-gray-400 mb-6">
+                  Enter a site address above to load the satellite view and start planning your security installation.
+                </p>
+                <div className="space-y-2 text-sm text-gray-400">
+                  <p>🛰️ <strong>High-resolution satellite imagery</strong> for precise planning</p>
+                  <p>📍 <strong>Drag-and-drop device placement</strong> with GPS coordinates</p>
+                  <p>🔧 <strong>Technology-specific layers</strong> for organized planning</p>
+                  <p>📊 <strong>Export to assessment engine</strong> for automated proposals</p>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
