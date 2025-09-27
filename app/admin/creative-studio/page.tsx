@@ -146,6 +146,10 @@ Ready to create something amazing? Upload your first asset! 📸✨`,
   }>>([])
   const [currentColor, setCurrentColor] = useState('#ff0000')
   const [currentStrokeWidth, setCurrentStrokeWidth] = useState(2)
+
+  // Undo/Redo functionality
+  const [drawingHistory, setDrawingHistory] = useState<Array<Array<any>>>([[]])
+  const [historyIndex, setHistoryIndex] = useState(0)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [showGrid, setShowGrid] = useState(true)
   const [showDeviceTree, setShowDeviceTree] = useState(false)
@@ -520,18 +524,46 @@ Tell me more about this image and what you'd like to accomplish with it. What st
     setCurrentMessage('')
     setIsGenerating(true)
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse = generateAIResponse(currentMessage)
+    try {
+      // Send to real AI provider API
+      const response = await fetch('/api/ai-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: currentMessage,
+          provider: selectedProvider,
+          chatHistory: chatMessages.slice(-10) // Send last 10 messages for context
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response')
+      }
+
+      const data = await response.json()
+
       const aiMessage: ChatMessage = {
         id: `ai_${Date.now()}`,
         role: 'assistant',
-        content: aiResponse,
+        content: data.response || 'Sorry, I encountered an error. Please try again.',
         timestamp: new Date()
       }
+
       setChatMessages(prev => [...prev, aiMessage])
+    } catch (error) {
+      console.error('AI Chat Error:', error)
+      const errorMessage: ChatMessage = {
+        id: `error_${Date.now()}`,
+        role: 'assistant',
+        content: 'I apologize, but I encountered an error. Please check your AI provider settings and try again.',
+        timestamp: new Date()
+      }
+      setChatMessages(prev => [...prev, errorMessage])
+    } finally {
       setIsGenerating(false)
-    }, 2000)
+    }
   }
 
   const performResearch = async () => {
@@ -828,7 +860,9 @@ What type of content would be most valuable for your goals right now? I'm here t
           strokeWidth: 2
         }
 
-        setDrawings(prev => [...prev, newDevice])
+        const newDrawings = [...drawings, newDevice]
+        setDrawings(newDrawings)
+        saveToHistory(newDrawings)
 
         // Also add to placed devices for layer management
         const placedDevice = {
@@ -943,6 +977,9 @@ What type of content would be most valuable for your goals right now? I'm here t
 
     if (e.touches.length === 0) {
       // All touches ended
+      if (isDrawing) {
+        saveToHistory(drawings)
+      }
       setIsDrawing(false)
       setIsPanning(false)
       setIsMultiTouch(false)
@@ -951,6 +988,36 @@ What type of content would be most valuable for your goals right now? I'm here t
       setIsMultiTouch(false)
       setIsPanning(false)
     }
+  }
+
+  // Undo/Redo functions
+  const saveToHistory = (newDrawings: any[]) => {
+    const newHistory = drawingHistory.slice(0, historyIndex + 1)
+    newHistory.push([...newDrawings])
+    setDrawingHistory(newHistory)
+    setHistoryIndex(newHistory.length - 1)
+  }
+
+  const undo = () => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1
+      setHistoryIndex(newIndex)
+      setDrawings([...drawingHistory[newIndex]])
+    }
+  }
+
+  const redo = () => {
+    if (historyIndex < drawingHistory.length - 1) {
+      const newIndex = historyIndex + 1
+      setHistoryIndex(newIndex)
+      setDrawings([...drawingHistory[newIndex]])
+    }
+  }
+
+  const clearCanvas = () => {
+    const newDrawings: any[] = []
+    setDrawings(newDrawings)
+    saveToHistory(newDrawings)
   }
 
   if (!isMounted) {
@@ -1936,6 +2003,38 @@ What type of content would be most valuable for your goals right now? I'm here t
                       </button>
                     </div>
                   </div>
+                  <div className="mt-3 pt-3 border-t border-gray-600/50">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={undo}
+                        disabled={historyIndex <= 0}
+                        className={`px-3 py-1 rounded text-xs transition-all touch-manipulation ${
+                          historyIndex <= 0
+                            ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                            : 'bg-orange-600/20 text-orange-400 hover:bg-orange-600/40'
+                        }`}
+                      >
+                        ↶ Undo
+                      </button>
+                      <button
+                        onClick={redo}
+                        disabled={historyIndex >= drawingHistory.length - 1}
+                        className={`px-3 py-1 rounded text-xs transition-all touch-manipulation ${
+                          historyIndex >= drawingHistory.length - 1
+                            ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                            : 'bg-orange-600/20 text-orange-400 hover:bg-orange-600/40'
+                        }`}
+                      >
+                        ↷ Redo
+                      </button>
+                      <button
+                        onClick={clearCanvas}
+                        className="px-3 py-1 bg-red-600/20 text-red-400 rounded text-xs hover:bg-red-600/40 transition-all touch-manipulation"
+                      >
+                        🗑️ Clear
+                      </button>
+                    </div>
+                  </div>
                   <div className="mt-2 text-xs text-gray-400">
                     💡 Use two fingers to pinch-zoom, two-finger drag to pan
                   </div>
@@ -2296,8 +2395,18 @@ What type of content would be most valuable for your goals right now? I'm here t
                         })
                       }
                     }}
-                    onMouseUp={() => setIsDrawing(false)}
-                    onMouseLeave={() => setIsDrawing(false)}
+                    onMouseUp={() => {
+                      if (isDrawing) {
+                        setIsDrawing(false)
+                        saveToHistory(drawings)
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      if (isDrawing) {
+                        setIsDrawing(false)
+                        saveToHistory(drawings)
+                      }
+                    }}
                     onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
