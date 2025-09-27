@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from 'next'
 import './globals.css'
 import ChatAssistant from './components/ChatAssistant'
+import HelpSearchSidebar from './components/HelpSearchSidebar'
 
 export const metadata: Metadata = {
   title: 'Design-Rite™ - AI-Powered Security Design Platform',
@@ -87,6 +88,7 @@ export default function RootLayout({
       <body className="font-inter antialiased">
         {children}
         <ChatAssistant />
+        <HelpSearchSidebar />
       </body>
     </html>
   )
