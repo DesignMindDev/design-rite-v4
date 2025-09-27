@@ -1,3 +1,5 @@
+'use client';
+
 // components/ChatAssistant.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, X, Send, Minimize2 } from 'lucide-react';

@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { createClient } from '@supabase/supabase-js';
 
-// You'll need to add your Assistant ID to your environment variables
-const ASSISTANT_ID = process.env.OPENAI_ASSISTANT_ID || 'asst-your-assistant-id';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+// OpenAI Assistant ID
+const ASSISTANT_ID = process.env.OPENAI_ASSISTANT_ID || 'asst_bqlPjRKyztWpplupYhCimIzS';
 
 export async function POST(request: Request) {
   try {
@@ -92,6 +97,9 @@ export async function POST(request: Request) {
 
     console.log('Assistant response:', response.substring(0, 100) + '...');
 
+    // Log conversation to Supabase
+    await logChatConversation(threadId, message, response, 'openai_assistant');
+
     return NextResponse.json({
       response: response,
       threadId: threadId,
@@ -131,4 +139,30 @@ export async function GET() {
     assistant_id: ASSISTANT_ID,
     timestamp: new Date().toISOString()
   });
+}
+
+// Helper function to log chat conversations to Supabase
+async function logChatConversation(threadId: string, userMessage: string, assistantResponse: string, provider: string) {
+  try {
+    const { data, error } = await supabase
+      .from('chatbot_conversations')
+      .insert([
+        {
+          thread_id: threadId,
+          user_message: userMessage,
+          assistant_response: assistantResponse,
+          provider: provider,
+          assistant_id: ASSISTANT_ID,
+          created_at: new Date().toISOString()
+        }
+      ]);
+
+    if (error) {
+      console.error('Error logging chat conversation:', error);
+    } else {
+      console.log('✅ Chat conversation logged to Supabase');
+    }
+  } catch (error) {
+    console.error('Failed to log chat conversation:', error);
+  }
 }

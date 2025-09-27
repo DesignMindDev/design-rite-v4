@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-// You'll need to add your Assistant ID to your environment variables
-const ASSISTANT_ID = process.env.OPENAI_ASSISTANT_ID || 'asst-your-assistant-id';
+// OpenAI Assistant ID
+const ASSISTANT_ID = process.env.OPENAI_ASSISTANT_ID || 'asst_bqlPjRKyztWpplupYhCimIzS';
 
 export async function POST() {
   try {
