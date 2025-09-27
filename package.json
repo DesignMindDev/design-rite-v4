@@ -66,15 +66,16 @@
     "react-day-picker": "8.10.1",
     "react-dom": "^18",
     "react-hook-form": "^7.54.1",
+    "react-pdf": "^10.1.0",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.0",
     "sonner": "latest",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5",
     "vaul": "^0.9.6",
     "ws": "latest",
-    "zod": "^3.23.8",
-    "typescript": "^5"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^22",

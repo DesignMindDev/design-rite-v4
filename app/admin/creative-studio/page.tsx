@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Upload, Image as ImageIcon, MessageSquare, Sparkles, FileText, Eye, Download, Trash2, Tag, Send, Bot, User, Search, Globe, TrendingUp, BookOpen, ExternalLink, MapPin, Satellite, Layers } from 'lucide-react'
+import { Upload, Image as ImageIcon, MessageSquare, Sparkles, FileText, Eye, Download, Trash2, Tag, Send, Bot, User, Search, Globe, TrendingUp, BookOpen, ExternalLink, MapPin, Satellite, Layers, PenTool, Square, Circle, Type, Move, Ruler, Grid, Save } from 'lucide-react'
 import * as auth from '../../lib/auth'
 
 interface Asset {
@@ -91,7 +91,7 @@ Ready to create something amazing? Upload your first asset! 📸✨`,
   ])
   const [currentMessage, setCurrentMessage] = useState('')
   const [contentDrafts, setContentDrafts] = useState<ContentDraft[]>([])
-  const [activeTab, setActiveTab] = useState<'assets' | 'chat' | 'content' | 'research' | 'planner'>('assets')
+  const [activeTab, setActiveTab] = useState<'assets' | 'chat' | 'content' | 'research' | 'planner' | 'designer'>('assets')
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
 
@@ -117,6 +117,30 @@ Ready to create something amazing? Upload your first asset! 📸✨`,
     specs?: string
   }>>([])
   const [activeLayers, setActiveLayers] = useState<string[]>(['cameras', 'sensors', 'access', 'network'])
+
+  // Floor Plan Designer State
+  const [uploadedPDF, setUploadedPDF] = useState<File | null>(null)
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null)
+  const [isBlankCanvas, setIsBlankCanvas] = useState(false)
+  const [selectedTool, setSelectedTool] = useState<'pen' | 'rectangle' | 'circle' | 'text' | 'move' | 'device'>('pen')
+  const [isDrawing, setIsDrawing] = useState(false)
+  const [drawings, setDrawings] = useState<Array<{
+    id: string
+    type: 'pen' | 'rectangle' | 'circle' | 'text' | 'device'
+    points?: number[]
+    x?: number
+    y?: number
+    width?: number
+    height?: number
+    text?: string
+    deviceType?: string
+    color: string
+    strokeWidth: number
+  }>>([])
+  const [currentColor, setCurrentColor] = useState('#ff0000')
+  const [currentStrokeWidth, setCurrentStrokeWidth] = useState(2)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [showGrid, setShowGrid] = useState(true)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
@@ -173,6 +197,42 @@ Ready to create something amazing? Upload your first asset! 📸✨`,
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chatMessages])
+
+  // Canvas drawing effect
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    // Set canvas size
+    const rect = canvas.getBoundingClientRect()
+    canvas.width = rect.width
+    canvas.height = rect.height
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    // Draw all drawings
+    drawings.forEach(drawing => {
+      ctx.strokeStyle = drawing.color
+      ctx.lineWidth = drawing.strokeWidth
+      ctx.lineCap = 'round'
+      ctx.lineJoin = 'round'
+
+      if (drawing.type === 'pen' && drawing.points && drawing.points.length >= 4) {
+        ctx.beginPath()
+        ctx.moveTo(drawing.points[0], drawing.points[1])
+
+        for (let i = 2; i < drawing.points.length; i += 2) {
+          ctx.lineTo(drawing.points[i], drawing.points[i + 1])
+        }
+
+        ctx.stroke()
+      }
+    })
+  }, [drawings])
 
   const handleLogin = async () => {
     if (auth.authenticate(password)) {
@@ -731,6 +791,17 @@ What type of content would be most valuable for your goals right now? I'm here t
           >
             <MapPin className="w-4 h-4" />
             Site Planner ({placedDevices.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('designer')}
+            className={`flex items-center gap-2 py-3 px-6 rounded-lg font-semibold transition-all ${
+              activeTab === 'designer'
+                ? 'bg-purple-600 text-white'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <PenTool className="w-4 h-4" />
+            Floor Plan Designer ({drawings.length})
           </button>
         </div>
 
@@ -1450,6 +1521,273 @@ What type of content would be most valuable for your goals right now? I'm here t
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Floor Plan Designer Content */}
+        {activeTab === 'designer' && (
+          <div className="space-y-8">
+            <div className="flex items-center gap-3 mb-6">
+              <PenTool className="w-6 h-6 text-purple-400" />
+              <div>
+                <h2 className="text-2xl font-bold text-white">Floor Plan Designer</h2>
+                <p className="text-gray-400">Upload PDFs and create annotated floor plans</p>
+              </div>
+            </div>
+
+            {/* Mode Selection */}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Start Your Design</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button
+                  onClick={() => {
+                    setIsBlankCanvas(false)
+                    fileInputRef.current?.click()
+                  }}
+                  className="p-6 border-2 border-dashed border-gray-600 hover:border-purple-500 rounded-lg transition-colors group"
+                >
+                  <Upload className="w-12 h-12 text-gray-400 group-hover:text-purple-400 mx-auto mb-4" />
+                  <h4 className="text-lg font-semibold text-white mb-2">Upload Floor Plan</h4>
+                  <p className="text-gray-400 text-sm">
+                    Upload existing PDFs, blueprints, or floor plans to annotate
+                  </p>
+                </button>
+                <button
+                  onClick={() => {
+                    setIsBlankCanvas(true)
+                    setUploadedPDF(null)
+                    setPdfUrl(null)
+                  }}
+                  className={`p-6 border-2 rounded-lg transition-colors group ${
+                    isBlankCanvas
+                      ? 'border-purple-500 bg-purple-600/20'
+                      : 'border-gray-600 hover:border-purple-500'
+                  }`}
+                >
+                  <Grid className="w-12 h-12 text-gray-400 group-hover:text-purple-400 mx-auto mb-4" />
+                  <h4 className="text-lg font-semibold text-white mb-2">Blank Canvas</h4>
+                  <p className="text-gray-400 text-sm">
+                    Start from scratch with a blank grid canvas for new designs
+                  </p>
+                </button>
+              </div>
+            </div>
+
+            {/* Drawing Tools */}
+            {(uploadedPDF || isBlankCanvas) && (
+              <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <PenTool className="w-5 h-5" />
+                  Drawing Tools
+                </h3>
+
+                {/* Tool Selection */}
+                <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
+                  {[
+                    { tool: 'pen', name: 'Pen', icon: PenTool },
+                    { tool: 'rectangle', name: 'Rectangle', icon: Square },
+                    { tool: 'circle', name: 'Circle', icon: Circle },
+                    { tool: 'text', name: 'Text', icon: Type },
+                    { tool: 'move', name: 'Move', icon: Move },
+                    { tool: 'device', name: 'Device', icon: MapPin }
+                  ].map(({ tool, name, icon: Icon }) => (
+                    <button
+                      key={tool}
+                      onClick={() => setSelectedTool(tool as any)}
+                      className={`p-3 rounded-lg border-2 transition-all flex flex-col items-center gap-2 ${
+                        selectedTool === tool
+                          ? 'bg-purple-600 border-white text-white'
+                          : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-gray-500'
+                      }`}
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span className="text-xs font-medium">{name}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Tool Properties */}
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-gray-400">Color:</label>
+                    <input
+                      type="color"
+                      value={currentColor}
+                      onChange={(e) => setCurrentColor(e.target.value)}
+                      className="w-8 h-8 rounded border border-gray-600"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-gray-400">Width:</label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="10"
+                      value={currentStrokeWidth}
+                      onChange={(e) => setCurrentStrokeWidth(parseInt(e.target.value))}
+                      className="w-20"
+                    />
+                    <span className="text-sm text-gray-400 w-8">{currentStrokeWidth}px</span>
+                  </div>
+                  <button
+                    onClick={() => setShowGrid(!showGrid)}
+                    className={`px-3 py-1 rounded text-sm ${
+                      showGrid
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-gray-700 text-gray-300'
+                    }`}
+                  >
+                    Grid: {showGrid ? 'On' : 'Off'}
+                  </button>
+                  <button
+                    onClick={() => setDrawings([])}
+                    className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+                  >
+                    Clear All
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Canvas Area */}
+            {(uploadedPDF || isBlankCanvas) && (
+              <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-white">
+                    {isBlankCanvas ? 'Design Canvas' : (uploadedPDF?.name || 'Floor Plan')}
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <button className="px-3 py-1 bg-purple-600 text-white rounded text-sm hover:bg-purple-700 flex items-center gap-1">
+                      <Save className="w-4 h-4" />
+                      Export
+                    </button>
+                    <span className="text-sm text-gray-400">
+                      Tool: {selectedTool} | Drawings: {drawings.length}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="relative bg-white rounded-lg" style={{ aspectRatio: '4/3', minHeight: '600px' }}>
+                  {/* Grid Background */}
+                  {showGrid && (
+                    <div className="absolute inset-0 opacity-20">
+                      <svg width="100%" height="100%">
+                        <defs>
+                          <pattern id="designGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ccc" strokeWidth="1"/>
+                          </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#designGrid)" />
+                      </svg>
+                    </div>
+                  )}
+
+                  {/* PDF Background */}
+                  {uploadedPDF && pdfUrl && (
+                    <div className="absolute inset-0">
+                      <div className="text-center p-8">
+                        <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-600">PDF: {uploadedPDF.name}</p>
+                        <p className="text-sm text-gray-500">PDF rendering will be implemented here</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Drawing Canvas */}
+                  <canvas
+                    ref={canvasRef}
+                    className="absolute inset-0 w-full h-full cursor-crosshair"
+                    onMouseDown={(e) => {
+                      if (selectedTool === 'pen') {
+                        setIsDrawing(true)
+                        // Start new drawing
+                        const rect = e.currentTarget.getBoundingClientRect()
+                        const x = e.clientX - rect.left
+                        const y = e.clientY - rect.top
+
+                        const newDrawing = {
+                          id: Date.now().toString(),
+                          type: 'pen' as const,
+                          points: [x, y],
+                          color: currentColor,
+                          strokeWidth: currentStrokeWidth
+                        }
+                        setDrawings(prev => [...prev, newDrawing])
+                      }
+                    }}
+                    onMouseMove={(e) => {
+                      if (isDrawing && selectedTool === 'pen') {
+                        const rect = e.currentTarget.getBoundingClientRect()
+                        const x = e.clientX - rect.left
+                        const y = e.clientY - rect.top
+
+                        setDrawings(prev => {
+                          const newDrawings = [...prev]
+                          const lastDrawing = newDrawings[newDrawings.length - 1]
+                          if (lastDrawing && lastDrawing.points) {
+                            lastDrawing.points.push(x, y)
+                          }
+                          return newDrawings
+                        })
+                      }
+                    }}
+                    onMouseUp={() => setIsDrawing(false)}
+                    onMouseLeave={() => setIsDrawing(false)}
+                  />
+
+                  {/* Instruction Overlay */}
+                  {drawings.length === 0 && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="text-center">
+                        <PenTool className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                        <h4 className="text-xl font-semibold text-gray-600 mb-2">Start Drawing</h4>
+                        <p className="text-gray-500">
+                          {selectedTool === 'pen' && 'Click and drag to draw'}
+                          {selectedTool === 'rectangle' && 'Click and drag to create rectangles'}
+                          {selectedTool === 'circle' && 'Click and drag to create circles'}
+                          {selectedTool === 'text' && 'Click to add text'}
+                          {selectedTool === 'device' && 'Click to place security devices'}
+                          {selectedTool === 'move' && 'Click and drag to move elements'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Default State */}
+            {!uploadedPDF && !isBlankCanvas && (
+              <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-12 text-center">
+                <PenTool className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-300 mb-2">Ready to Design Floor Plans</h3>
+                <p className="text-gray-400 mb-6">
+                  Upload existing floor plans or start with a blank canvas to create annotated security designs.
+                </p>
+                <div className="space-y-2 text-sm text-gray-400">
+                  <p>📋 <strong>Upload PDF floor plans</strong> and add security annotations</p>
+                  <p>🎨 <strong>Drawing tools</strong> for markups, measurements, and notes</p>
+                  <p>📍 <strong>Device placement</strong> with specifications and coverage areas</p>
+                  <p>💾 <strong>Export annotated plans</strong> for proposals and documentation</p>
+                </div>
+              </div>
+            )}
+
+            {/* Hidden file input for PDF upload */}
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) {
+                  setUploadedPDF(file)
+                  setPdfUrl(URL.createObjectURL(file))
+                  setIsBlankCanvas(false)
+                }
+              }}
+              className="hidden"
+              ref={fileInputRef}
+            />
           </div>
         )}
       </div>
