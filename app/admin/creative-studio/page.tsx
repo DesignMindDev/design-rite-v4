@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Upload, Image as ImageIcon, MessageSquare, Sparkles, FileText, Eye, Download, Trash2, Tag, Send, Bot, User } from 'lucide-react'
+import { Upload, Image as ImageIcon, MessageSquare, Sparkles, FileText, Eye, Download, Trash2, Tag, Send, Bot, User, Search, Globe, TrendingUp, BookOpen, ExternalLink } from 'lucide-react'
 import * as auth from '../../lib/auth'
 
 interface Asset {
@@ -33,6 +33,28 @@ interface ContentDraft {
   assetIds: string[]
   status: 'draft' | 'review' | 'approved'
   createdAt: string
+}
+
+interface SearchResult {
+  id: string
+  title: string
+  snippet: string
+  url: string
+  source: string
+  publishedDate?: string
+  relevanceScore: number
+  searchProvider: 'perplexity' | 'tavily' | 'google' | 'bing'
+}
+
+interface ResearchQuery {
+  id: string
+  query: string
+  category: 'industry-trends' | 'competitive-analysis' | 'technical-research' | 'content-ideas' | 'market-analysis'
+  aiProvider: string
+  results: SearchResult[]
+  synthesis?: string
+  createdAt: string
+  status: 'searching' | 'analyzing' | 'complete'
 }
 
 export default function CreativeStudioPage() {
@@ -69,9 +91,17 @@ Ready to create something amazing? Upload your first asset! 📸✨`,
   ])
   const [currentMessage, setCurrentMessage] = useState('')
   const [contentDrafts, setContentDrafts] = useState<ContentDraft[]>([])
-  const [activeTab, setActiveTab] = useState<'assets' | 'chat' | 'content'>('assets')
+  const [activeTab, setActiveTab] = useState<'assets' | 'chat' | 'content' | 'research'>('assets')
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
+
+  // Research Assistant State
+  const [researchQueries, setResearchQueries] = useState<ResearchQuery[]>([])
+  const [currentQuery, setCurrentQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<ResearchQuery['category']>('industry-trends')
+  const [selectedProvider, setSelectedProvider] = useState('anthropic')
+  const [isSearching, setIsSearching] = useState(false)
+  const [availableProviders, setAvailableProviders] = useState(['anthropic', 'openai', 'google'])
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
@@ -257,6 +287,177 @@ Tell me more about this image and what you'd like to accomplish with it. What st
       setChatMessages(prev => [...prev, aiMessage])
       setIsGenerating(false)
     }, 2000)
+  }
+
+  const performResearch = async () => {
+    if (!currentQuery.trim()) return
+
+    setIsSearching(true)
+
+    const newQuery: ResearchQuery = {
+      id: `research_${Date.now()}`,
+      query: currentQuery,
+      category: selectedCategory,
+      aiProvider: selectedProvider,
+      results: [],
+      createdAt: new Date().toISOString(),
+      status: 'searching'
+    }
+
+    setResearchQueries(prev => [newQuery, ...prev])
+    setCurrentQuery('')
+
+    // Simulate external search API call
+    setTimeout(async () => {
+      const mockResults: SearchResult[] = generateMockSearchResults(currentQuery, selectedCategory)
+
+      // Update with search results
+      setResearchQueries(prev => prev.map(q =>
+        q.id === newQuery.id
+          ? { ...q, results: mockResults, status: 'analyzing' }
+          : q
+      ))
+
+      // Simulate AI synthesis
+      setTimeout(() => {
+        const synthesis = generateAISynthesis(mockResults, selectedCategory, selectedProvider)
+        setResearchQueries(prev => prev.map(q =>
+          q.id === newQuery.id
+            ? { ...q, synthesis, status: 'complete' }
+            : q
+        ))
+        setIsSearching(false)
+      }, 3000)
+    }, 2000)
+  }
+
+  const generateMockSearchResults = (query: string, category: string): SearchResult[] => {
+    const baseResults = [
+      {
+        id: '1',
+        title: 'AI Revolution in Physical Security: 2024 Trends Report',
+        snippet: 'Comprehensive analysis of how artificial intelligence is transforming physical security systems, including smart cameras, access control, and predictive analytics.',
+        url: 'https://securityindustry.org/ai-trends-2024',
+        source: 'Security Industry Association',
+        publishedDate: '2024-01-15',
+        relevanceScore: 0.95,
+        searchProvider: 'perplexity' as const
+      },
+      {
+        id: '2',
+        title: 'Smart Building Security Integration: Best Practices',
+        snippet: 'Expert insights on integrating security systems with smart building technologies, IoT sensors, and centralized management platforms.',
+        url: 'https://smartbuildings.com/security-integration',
+        source: 'Smart Buildings Magazine',
+        publishedDate: '2024-01-10',
+        relevanceScore: 0.88,
+        searchProvider: 'google' as const
+      },
+      {
+        id: '3',
+        title: 'Competitive Analysis: Top Security System Providers 2024',
+        snippet: 'Market analysis comparing leading security system providers, their technology offerings, pricing strategies, and market positioning.',
+        url: 'https://marketresearch.com/security-providers-2024',
+        source: 'Market Research Inc',
+        publishedDate: '2024-01-08',
+        relevanceScore: 0.82,
+        searchProvider: 'tavily' as const
+      }
+    ]
+
+    // Customize results based on category
+    if (category === 'competitive-analysis') {
+      return baseResults.map(r => ({
+        ...r,
+        title: r.title.replace('AI Revolution', 'Competitive Landscape'),
+        snippet: r.snippet.replace('artificial intelligence', 'competitor strategies')
+      }))
+    }
+
+    if (category === 'technical-research') {
+      return baseResults.map(r => ({
+        ...r,
+        title: r.title.replace('Trends Report', 'Technical Specifications'),
+        snippet: r.snippet.replace('transforming', 'technical implementation of')
+      }))
+    }
+
+    return baseResults
+  }
+
+  const generateAISynthesis = (results: SearchResult[], category: string, provider: string): string => {
+    const providerStyles = {
+      anthropic: `🧠 **Claude Analysis** | Based on ${results.length} sources, here's what I found:
+
+**Key Insights:**
+• AI-powered security systems are becoming mainstream, with 67% of enterprises planning implementation
+• Smart camera technology now includes real-time behavioral analysis and threat prediction
+• Integration with IoT ecosystems is creating comprehensive security orchestration platforms
+
+**Strategic Implications for Design-Rite:**
+• **Opportunity**: Position as AI-native security design platform
+• **Competitive Edge**: Emphasize intelligent system design vs. traditional approaches
+• **Market Trend**: Customers increasingly expect AI-powered recommendations
+
+**Content Opportunities:**
+• "Why Traditional Security Design is Dead: The AI Revolution"
+• Customer case studies featuring AI-enhanced installations
+• Technical deep-dives on intelligent camera placement algorithms
+
+**Next Steps:**
+Ready to turn these insights into compelling content? I can help you create targeted materials that position Design-Rite at the forefront of this trend!`,
+
+      openai: `✨ **GPT Creative Synthesis** | Transforming research into creative opportunities:
+
+**Narrative Threads Discovered:**
+• The "Security Renaissance" - old systems being reimagined with AI
+• "From Reactive to Predictive" - shift in security thinking
+• "The Connected Building" - everything talks to everything
+
+**Content Angles:**
+🎯 **Blog Series**: "The Future is Now: AI Security Stories"
+🎯 **Social Campaign**: Before/After AI implementation showcases
+🎯 **Case Studies**: "How [Company] Went from Blind Spots to Total Awareness"
+
+**Messaging Framework:**
+- **Problem**: Traditional security = playing catch-up with threats
+- **Solution**: AI-powered design = staying ahead of threats
+- **Proof**: Real customer transformations and ROI data
+
+**Creative Hooks:**
+• "What if your security system could think?"
+• "The day our cameras started predicting break-ins"
+• "From 20/20 hindsight to 20/20 foresight"
+
+Ready to craft some breakthrough content around these themes?`,
+
+      google: `📊 **Bard Research Summary** | Data-driven insights from multiple sources:
+
+**Market Data Points:**
+• 73% increase in AI security system deployments (2023-2024)
+• $2.8B projected market size by 2025
+• ROI averages 340% within 18 months of implementation
+
+**Technology Trends:**
+• Edge AI processing reducing cloud dependencies
+• Behavioral analytics becoming standard in enterprise
+• Integration APIs enabling security ecosystem orchestration
+
+**Competitive Landscape:**
+• Traditional players adding AI as feature bolt-ons
+• New entrants building AI-first platforms
+• Design-Rite opportunity: AI-powered design process differentiation
+
+**Customer Pain Points Identified:**
+• Complexity of integrating multiple AI-enabled systems
+• Lack of expertise in optimal AI camera/sensor placement
+• Difficulty quantifying AI security ROI before implementation
+
+**Actionable Intelligence:**
+Focus content on solving the "AI integration complexity" problem. Position Design-Rite as the expert guide that makes AI security simple and effective.`
+    }
+
+    return providerStyles[provider as keyof typeof providerStyles] || providerStyles.anthropic
   }
 
   const generateAIResponse = (userInput: string): string => {
@@ -453,6 +654,17 @@ What type of content would be most valuable for your goals right now? I'm here t
           >
             <FileText className="w-4 h-4" />
             Content Drafts ({contentDrafts.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('research')}
+            className={`flex items-center gap-2 py-3 px-6 rounded-lg font-semibold transition-all ${
+              activeTab === 'research'
+                ? 'bg-purple-600 text-white'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <Search className="w-4 h-4" />
+            Research Assistant ({researchQueries.length})
           </button>
         </div>
 
@@ -673,6 +885,229 @@ What type of content would be most valuable for your goals right now? I'm here t
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'research' && (
+          <div className="space-y-6">
+
+            {/* Research Control Panel */}
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <Search className="w-6 h-6 text-purple-400" />
+                <div>
+                  <h2 className="text-2xl font-bold text-white">Research Assistant</h2>
+                  <p className="text-gray-400">Search external sources and get AI-powered insights</p>
+                </div>
+              </div>
+
+              {/* Search Form */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Category Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Research Category</label>
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value as ResearchQuery['category'])}
+                      className="w-full p-3 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                      <option value="industry-trends">🔥 Industry Trends</option>
+                      <option value="competitive-analysis">🏢 Competitive Analysis</option>
+                      <option value="technical-research">⚙️ Technical Research</option>
+                      <option value="content-ideas">💡 Content Ideas</option>
+                      <option value="market-analysis">📊 Market Analysis</option>
+                    </select>
+                  </div>
+
+                  {/* AI Provider Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">AI Analysis Provider</label>
+                    <select
+                      value={selectedProvider}
+                      onChange={(e) => setSelectedProvider(e.target.value)}
+                      className="w-full p-3 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                      <option value="anthropic">🧠 Claude (Deep Analysis)</option>
+                      <option value="openai">✨ GPT (Creative Synthesis)</option>
+                      <option value="google">📊 Bard (Data-Driven)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Search Input */}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={currentQuery}
+                    onChange={(e) => setCurrentQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && performResearch()}
+                    placeholder="What would you like to research? (e.g., 'latest AI camera technologies', 'competitor pricing strategies')"
+                    className="flex-1 p-3 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    disabled={isSearching}
+                  />
+                  <button
+                    onClick={performResearch}
+                    disabled={!currentQuery.trim() || isSearching}
+                    className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {isSearching ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Researching...
+                      </>
+                    ) : (
+                      <>
+                        <Globe className="w-4 h-4" />
+                        Research
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Quick Search Suggestions */}
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-sm text-gray-400">Quick searches:</span>
+                  {[
+                    'AI security trends 2024',
+                    'smart building integration',
+                    'competitor analysis',
+                    'IoT sensor technologies',
+                    'cybersecurity in physical access'
+                  ].map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      onClick={() => setCurrentQuery(suggestion)}
+                      className="text-xs bg-purple-600/20 text-purple-300 px-2 py-1 rounded hover:bg-purple-600/30 transition-colors"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Research Results */}
+            <div className="space-y-4">
+              {researchQueries.map((query) => (
+                <div key={query.id} className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+
+                  {/* Query Header */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-white mb-1">{query.query}</h3>
+                      <div className="flex items-center gap-4 text-sm text-gray-400">
+                        <span className="flex items-center gap-1">
+                          <TrendingUp className="w-3 h-3" />
+                          {query.category.replace('-', ' ')}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Bot className="w-3 h-3" />
+                          {query.aiProvider}
+                        </span>
+                        <span>{new Date(query.createdAt).toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      query.status === 'searching' ? 'bg-yellow-600/20 text-yellow-300' :
+                      query.status === 'analyzing' ? 'bg-blue-600/20 text-blue-300' :
+                      'bg-green-600/20 text-green-300'
+                    }`}>
+                      {query.status === 'searching' && '🔍 Searching...'}
+                      {query.status === 'analyzing' && '🧠 Analyzing...'}
+                      {query.status === 'complete' && '✅ Complete'}
+                    </div>
+                  </div>
+
+                  {/* Search Results */}
+                  {query.results.length > 0 && (
+                    <div className="mb-6">
+                      <h4 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+                        <BookOpen className="w-4 h-4" />
+                        External Sources ({query.results.length})
+                      </h4>
+                      <div className="space-y-2">
+                        {query.results.map((result) => (
+                          <div key={result.id} className="bg-gray-700/30 rounded-lg p-3 hover:bg-gray-700/50 transition-colors">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <h5 className="text-white font-medium mb-1">{result.title}</h5>
+                                <p className="text-gray-300 text-sm mb-2">{result.snippet}</p>
+                                <div className="flex items-center gap-3 text-xs text-gray-400">
+                                  <span>{result.source}</span>
+                                  <span>•</span>
+                                  <span>{result.publishedDate}</span>
+                                  <span>•</span>
+                                  <span className={`px-2 py-0.5 rounded ${
+                                    result.searchProvider === 'perplexity' ? 'bg-orange-600/20 text-orange-300' :
+                                    result.searchProvider === 'google' ? 'bg-blue-600/20 text-blue-300' :
+                                    result.searchProvider === 'tavily' ? 'bg-green-600/20 text-green-300' :
+                                    'bg-purple-600/20 text-purple-300'
+                                  }`}>
+                                    {result.searchProvider}
+                                  </span>
+                                </div>
+                              </div>
+                              <a
+                                href={result.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-purple-400 hover:text-purple-300 transition-colors ml-3"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </a>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AI Synthesis */}
+                  {query.synthesis && (
+                    <div className="bg-gray-700/30 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-purple-400" />
+                        AI-Powered Synthesis
+                      </h4>
+                      <div className="text-gray-200 text-sm whitespace-pre-wrap leading-relaxed">
+                        {query.synthesis}
+                      </div>
+                    </div>
+                  )}
+
+                  {query.status === 'searching' && (
+                    <div className="bg-gray-700/30 rounded-lg p-4 flex items-center gap-3">
+                      <div className="w-5 h-5 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-gray-300">Searching external sources...</span>
+                    </div>
+                  )}
+
+                  {query.status === 'analyzing' && (
+                    <div className="bg-gray-700/30 rounded-lg p-4 flex items-center gap-3">
+                      <Sparkles className="w-5 h-5 text-purple-400 animate-pulse" />
+                      <span className="text-gray-300">AI is analyzing research findings...</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {researchQueries.length === 0 && (
+                <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-12 text-center">
+                  <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-300 mb-2">No research queries yet</h3>
+                  <p className="text-gray-400 mb-6">
+                    Start exploring external content to enhance your creative projects!
+                  </p>
+                  <div className="space-y-2 text-sm text-gray-400">
+                    <p>💡 <strong>Pro tip:</strong> Different AI providers excel at different analysis types:</p>
+                    <p>🧠 <strong>Claude:</strong> Deep analysis, strategic insights, detailed summaries</p>
+                    <p>✨ <strong>GPT:</strong> Creative angles, storytelling opportunities, content ideas</p>
+                    <p>📊 <strong>Bard:</strong> Data-driven insights, market trends, technical specifications</p>
+                  </div>
                 </div>
               )}
             </div>
