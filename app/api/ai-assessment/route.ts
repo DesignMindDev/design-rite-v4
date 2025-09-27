@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getEnhancedRecommendations } from '../../../lib/unified-product-intelligence';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 export async function GET() {
   return NextResponse.json({
@@ -46,6 +51,48 @@ export async function POST(request: Request) {
       error: 'Server error',
       details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
+  }
+}
+
+// Helper function to save assessment data to Supabase
+async function saveAssessmentToSupabase(data: any, assessmentContent: string, processingTimeMs: number) {
+  try {
+    const assessmentRecord = {
+      company_name: data.companyName || data.company || 'Unknown',
+      facility_type: data.facilityType || null,
+      square_footage: data.squareFootage || data.facilitySize || null,
+      current_security: data.currentSystems ? data.currentSystems.join(', ') : null,
+      security_concerns: data.securityConcerns ? data.securityConcerns.join(', ') : null,
+      budget: data.budgetRange || data.budget || null,
+      timeline: data.timeline || null,
+      contact_info: {
+        name: data.contactName || data.name,
+        email: data.contactEmail || data.email,
+        projectName: data.projectName
+      },
+      assessment_content: assessmentContent,
+      technical_specifications: JSON.stringify(data),
+      status: 'completed',
+      ai_model_used: 'claude-3-sonnet',
+      processing_time_ms: processingTimeMs
+    };
+
+    const { data: result, error } = await supabase
+      .from('assessments')
+      .insert([assessmentRecord])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving assessment to Supabase:', error);
+      return null;
+    }
+
+    console.log('✅ Assessment saved to Supabase:', result.id);
+    return result;
+  } catch (error) {
+    console.error('Failed to save assessment:', error);
+    return null;
   }
 }
 
@@ -96,6 +143,7 @@ async function handleRecommendationGeneration(sessionData: any) {
 
 // Enhanced assessment generation that includes real product data
 async function handleAssessmentGeneration(sessionData: any) {
+  const startTime = Date.now();
   try {
     console.log('Generating assessment with integrated product intelligence...');
 
@@ -111,6 +159,11 @@ async function handleAssessmentGeneration(sessionData: any) {
     const totalBudget = calculateTotalBudget(recommendations);
     const assessment = generateAssessmentText(sessionData, recommendations, totalBudget);
 
+    const processingTime = Date.now() - startTime;
+
+    // Save assessment to Supabase
+    const savedAssessment = await saveAssessmentToSupabase(sessionData, assessment, processingTime);
+
     return NextResponse.json({
       success: true,
       assessment: assessment,
@@ -120,7 +173,8 @@ async function handleAssessmentGeneration(sessionData: any) {
         breakdown: getSystemBreakdown(recommendations),
         realDataPercentage: Math.round((recommendationData.realDataCount / recommendations.length) * 100)
       },
-      provider: 'unified_intelligence'
+      provider: 'unified_intelligence',
+      assessmentId: savedAssessment?.id || null
     });
 
   } catch (error) {
@@ -186,6 +240,7 @@ function getSystemBreakdown(recommendations: any[]) {
 
 // NEW: Handle discovery form data and generate comprehensive assessment
 async function handleDiscoveryAssessmentGeneration(discoveryData: any) {
+  const startTime = Date.now();
   try {
     console.log('Generating discovery-based assessment...');
 
@@ -212,6 +267,11 @@ async function handleDiscoveryAssessmentGeneration(discoveryData: any) {
 
     const totalBudget = calculateTotalBudget(recommendations);
     const assessment = generateDiscoveryAssessmentText(discoveryData, recommendations, totalBudget);
+
+    const processingTime = Date.now() - startTime;
+
+    // Save discovery assessment to Supabase
+    const savedAssessment = await saveAssessmentToSupabase(discoveryData, assessment, processingTime);
 
     // Store assessment data for future reference
     const assessmentData = {
@@ -242,7 +302,8 @@ async function handleDiscoveryAssessmentGeneration(discoveryData: any) {
         primaryConcerns: discoveryData?.securityConcerns?.slice(0, 3)
       },
       sessionId: assessmentData.sessionId,
-      provider: 'discovery_intelligence'
+      provider: 'discovery_intelligence',
+      assessmentId: savedAssessment?.id || null
     });
 
   } catch (error) {

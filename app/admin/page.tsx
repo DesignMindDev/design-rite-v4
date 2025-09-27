@@ -395,6 +395,13 @@ export default function AdminPage() {
               <span>🗄️</span>
               Product Harvester
             </Link>
+            <Link
+              href="/admin/assessments"
+              className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-600/30 transition-all flex items-center gap-2"
+            >
+              <span>📊</span>
+              Assessment Logs
+            </Link>
             <button
               onClick={handleLogout}
               className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
