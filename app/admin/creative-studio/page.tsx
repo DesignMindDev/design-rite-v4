@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Upload, Image as ImageIcon, MessageSquare, Sparkles, FileText, Eye, Download, Trash2, Tag, Send, Bot, User } from 'lucide-react'
-import * as auth from '@/lib/auth'
+import * as auth from '../../lib/auth'
 
 interface Asset {
   id: string

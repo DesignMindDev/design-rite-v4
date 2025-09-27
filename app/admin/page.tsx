@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import * as auth from '@/lib/auth'
+import * as auth from '../lib/auth'
 
 interface TeamMember {
   id: string

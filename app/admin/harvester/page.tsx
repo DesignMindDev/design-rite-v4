@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Database, TrendingUp, Package, RefreshCw, DollarSign, AlertCircle, CheckCircle, Activity, BarChart3, Search, Filter, ExternalLink, Eye, MessageSquare, Play, Building2, FileText, Clock, Plus, Trash2, Edit, Power } from 'lucide-react'
-import * as auth from '@/lib/auth'
-import harvesterClient from '@/lib/harvester-client'
+import * as auth from '../../lib/auth'
+import harvesterClient from '../../../lib/harvester-client'
 
 interface HarvesterStats {
   totalProducts: number
