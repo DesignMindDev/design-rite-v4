@@ -415,16 +415,13 @@ export default function HelpSearchSidebar() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/general-ai-chat', {
+      const response = await fetch('/api/ai-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: chatInput.trim(),
-          provider: selectedProvider,
-          context: {
-            pathname,
-            previousMessages: chatMessages.slice(-5) // Send last 5 messages for context
-          }
+          provider: selectedProvider === 'auto' ? 'anthropic' : selectedProvider,
+          chatHistory: chatMessages.slice(-5) // Send last 5 messages for context
         })
       });
 
@@ -537,17 +534,17 @@ export default function HelpSearchSidebar() {
       )}
 
       {/* Help Sidebar */}
-      <div className={`fixed top-0 right-0 h-full w-96 bg-white shadow-2xl transform transition-transform duration-300 z-50 ${
+      <div className={`fixed top-0 right-0 h-full w-96 bg-gray-800/60 backdrop-blur-xl border-l border-purple-600/20 shadow-2xl transform transition-transform duration-300 z-50 ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
       }`}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="bg-purple-600 text-white p-4">
+          <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold">AI Assistant</h2>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-white hover:text-gray-200 text-xl"
+                className="hover:bg-white/20 p-1 rounded transition-colors text-xl"
               >
                 ✕
               </button>
@@ -556,14 +553,14 @@ export default function HelpSearchSidebar() {
           </div>
 
           {/* Tab Navigation */}
-          <div className="border-b border-gray-200">
+          <div className="border-b border-gray-600/30">
             <div className="flex">
               <button
                 onClick={() => setActiveTab('help')}
                 className={`flex-1 px-4 py-3 text-sm font-medium ${
                   activeTab === 'help'
-                    ? 'text-purple-600 border-b-2 border-purple-600 bg-purple-50'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'text-purple-400 border-b-2 border-purple-500 bg-purple-600/20'
+                    : 'text-gray-400 hover:text-white'
                 }`}
               >
                 🔍 Help & Search
@@ -572,8 +569,8 @@ export default function HelpSearchSidebar() {
                 onClick={() => setActiveTab('chat')}
                 className={`flex-1 px-4 py-3 text-sm font-medium ${
                   activeTab === 'chat'
-                    ? 'text-purple-600 border-b-2 border-purple-600 bg-purple-50'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'text-purple-400 border-b-2 border-purple-500 bg-purple-600/20'
+                    : 'text-gray-400 hover:text-white'
                 }`}
               >
                 💬 AI Chat
@@ -583,7 +580,7 @@ export default function HelpSearchSidebar() {
 
           {/* Search Input - Help Tab Only */}
           {activeTab === 'help' && (
-            <div className="p-4 border-b">
+            <div className="p-4 border-b border-gray-600/30">
               <div className="relative">
                 <input
                   ref={searchInputRef}
@@ -591,7 +588,7 @@ export default function HelpSearchSidebar() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search help, products, actions..."
-                  className="w-full p-3 border border-gray-300 rounded-lg pl-10 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full p-3 bg-gray-700/50 border border-gray-600/50 rounded-lg pl-10 text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</span>
               </div>
@@ -600,13 +597,13 @@ export default function HelpSearchSidebar() {
 
           {/* AI Chat Interface - Chat Tab Only */}
           {activeTab === 'chat' && (
-            <div className="p-4 border-b">
+            <div className="p-4 border-b border-gray-600/30">
               {/* Provider Selection */}
               <div className="flex gap-2 mb-4">
                 <select
                   value={selectedProvider}
                   onChange={(e) => setSelectedProvider(e.target.value as 'openai' | 'claude' | 'auto')}
-                  className="flex-1 p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="flex-1 p-2 bg-gray-700/50 border border-gray-600/50 rounded text-sm text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
                   <option value="auto">🎯 Auto (Best Available)</option>
                   <option value="openai">🤖 OpenAI GPT-4</option>
@@ -614,14 +611,14 @@ export default function HelpSearchSidebar() {
                 </select>
                 <button
                   onClick={clearChat}
-                  className="px-3 py-2 text-gray-500 hover:text-red-600 transition-colors"
+                  className="px-3 py-2 text-gray-400 hover:text-red-400 transition-colors"
                   title="Clear Chat"
                 >
                   🗑️
                 </button>
                 <button
                   onClick={exportChat}
-                  className="px-3 py-2 text-gray-500 hover:text-purple-600 transition-colors"
+                  className="px-3 py-2 text-gray-400 hover:text-purple-400 transition-colors"
                   title="Export Chat"
                   disabled={chatMessages.length === 0}
                 >
@@ -637,13 +634,13 @@ export default function HelpSearchSidebar() {
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   placeholder="Ask AI anything (no restrictions)..."
-                  className="w-full p-3 border border-gray-300 rounded-lg pr-12 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full p-3 bg-gray-700/50 border border-gray-600/50 rounded-lg pr-12 text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   disabled={isLoading}
                 />
                 <button
                   onClick={sendChatMessage}
                   disabled={!chatInput.trim() || isLoading}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-600 hover:text-purple-700 disabled:text-gray-300"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-400 hover:text-purple-300 disabled:text-gray-500"
                 >
                   {isLoading ? '⏳' : '🚀'}
                 </button>
@@ -655,11 +652,11 @@ export default function HelpSearchSidebar() {
           <div className="flex-1 overflow-y-auto">
             {/* AI Chat Messages */}
             {activeTab === 'chat' && (
-              <div className="p-4 space-y-4 h-full">
+              <div className="p-4 space-y-4 h-full bg-gray-900/50">
                 {chatMessages.length === 0 ? (
-                  <div className="text-center text-gray-500 py-8">
+                  <div className="text-center text-gray-400 py-8">
                     <div className="text-4xl mb-4">🤖</div>
-                    <h3 className="font-semibold mb-2">General AI Assistant</h3>
+                    <h3 className="font-semibold mb-2 text-white">General AI Assistant</h3>
                     <p className="text-sm">Ask me anything! No restrictions, no branding constraints.</p>
                     <div className="text-xs mt-4 space-y-1">
                       <p>💡 Get coding help</p>
@@ -676,10 +673,10 @@ export default function HelpSearchSidebar() {
                         className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`max-w-[80%] p-3 rounded-lg ${
+                          className={`max-w-[80%] p-3 rounded-xl ${
                             message.role === 'user'
                               ? 'bg-purple-600 text-white'
-                              : 'bg-gray-100 text-gray-900'
+                              : 'bg-gray-700/60 text-white shadow-md border border-gray-600/30'
                           }`}
                         >
                           <div className="text-sm mb-1">
@@ -700,12 +697,12 @@ export default function HelpSearchSidebar() {
                     ))}
                     {isLoading && (
                       <div className="flex justify-start">
-                        <div className="bg-gray-100 text-gray-900 p-3 rounded-lg">
+                        <div className="bg-gray-700/60 text-white shadow-md p-3 rounded-xl border border-gray-600/30">
                           <div className="text-sm font-medium mb-1">AI is thinking...</div>
                           <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                            <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                            <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                           </div>
                         </div>
                       </div>
@@ -721,19 +718,19 @@ export default function HelpSearchSidebar() {
                 {/* Search Results */}
                 {searchQuery && filteredItems.length > 0 && (
               <div className="p-4">
-                <h3 className="font-semibold text-gray-700 mb-3">Search Results</h3>
+                <h3 className="font-semibold text-white mb-3">Search Results</h3>
                 <div className="space-y-2">
                   {filteredItems.map(item => (
                     <div
                       key={item.id}
                       onClick={() => handleItemClick(item)}
-                      className="p-3 border border-gray-200 rounded-lg hover:bg-purple-50 cursor-pointer transition-colors"
+                      className="p-3 border border-gray-600/30 rounded-lg hover:bg-purple-600/20 cursor-pointer transition-colors"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{item.title}</h4>
-                          <p className="text-sm text-gray-600 mt-1">{item.description}</p>
-                          <span className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded mt-2">
+                          <h4 className="font-medium text-white">{item.title}</h4>
+                          <p className="text-sm text-gray-300 mt-1">{item.description}</p>
+                          <span className="inline-block bg-purple-600/20 text-purple-300 text-xs px-2 py-1 rounded mt-2">
                             {item.category}
                           </span>
                         </div>
@@ -747,7 +744,7 @@ export default function HelpSearchSidebar() {
 
             {/* No Results */}
             {searchQuery && filteredItems.length === 0 && (
-              <div className="p-4 text-center text-gray-500">
+              <div className="p-4 text-center text-gray-400">
                 <p>No results found for "{searchQuery}"</p>
                 <p className="text-sm mt-2">Try searching for: estimate, assessment, pricing, compliance, ai chat, examples</p>
               </div>
@@ -756,19 +753,19 @@ export default function HelpSearchSidebar() {
             {/* Context Suggestions */}
             {!searchQuery && contextSuggestions.length > 0 && (
               <div className="p-4">
-                <h3 className="font-semibold text-gray-700 mb-3">Suggestions for this page</h3>
+                <h3 className="font-semibold text-white mb-3">Suggestions for this page</h3>
                 <div className="space-y-2">
                   {contextSuggestions.map((suggestion, index) => (
                     <div
                       key={index}
                       onClick={suggestion.action}
-                      className="p-3 border border-gray-200 rounded-lg hover:bg-purple-50 cursor-pointer transition-colors"
+                      className="p-3 border border-gray-600/30 rounded-lg hover:bg-purple-600/20 cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <span className="text-xl">{suggestion.icon}</span>
                         <div>
-                          <h4 className="font-medium text-gray-900">{suggestion.title}</h4>
-                          <p className="text-sm text-gray-600">{suggestion.description}</p>
+                          <h4 className="font-medium text-white">{suggestion.title}</h4>
+                          <p className="text-sm text-gray-300">{suggestion.description}</p>
                         </div>
                       </div>
                     </div>
@@ -779,14 +776,14 @@ export default function HelpSearchSidebar() {
 
             {/* Recent Searches */}
             {!searchQuery && recentSearches.length > 0 && (
-              <div className="p-4 border-t">
-                <h3 className="font-semibold text-gray-700 mb-3">Recent Searches</h3>
+              <div className="p-4 border-t border-gray-600/30">
+                <h3 className="font-semibold text-white mb-3">Recent Searches</h3>
                 <div className="space-y-1">
                   {recentSearches.map((search, index) => (
                     <div
                       key={index}
                       onClick={() => setSearchQuery(search)}
-                      className="p-2 text-sm text-gray-600 hover:bg-gray-100 rounded cursor-pointer flex items-center gap-2"
+                      className="p-2 text-sm text-gray-300 hover:bg-gray-700/50 rounded cursor-pointer flex items-center gap-2"
                     >
                       <span className="text-gray-400">🕐</span>
                       {search}
@@ -798,8 +795,8 @@ export default function HelpSearchSidebar() {
 
             {/* Quick Actions */}
             {!searchQuery && (
-              <div className="p-4 border-t">
-                <h3 className="font-semibold text-gray-700 mb-3">Quick Actions</h3>
+              <div className="p-4 border-t border-gray-600/30">
+                <h3 className="font-semibold text-white mb-3">Quick Actions</h3>
                 <div className="space-y-2">
                   <button
                     onClick={() => window.location.href = '/estimate-options'}
@@ -833,11 +830,11 @@ export default function HelpSearchSidebar() {
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t bg-gray-50 text-center text-sm text-gray-500">
+          <div className="p-4 border-t border-gray-600/30 bg-gray-800/60 text-center text-sm text-gray-400">
             {activeTab === 'help' ? (
-              <p>Press <kbd className="bg-gray-200 px-1 rounded">Ctrl+K</kbd> for help</p>
+              <p>Press <kbd className="bg-gray-700 text-gray-300 px-1 rounded">Ctrl+K</kbd> for help</p>
             ) : (
-              <p>Press <kbd className="bg-gray-200 px-1 rounded">Ctrl+Shift+K</kbd> for AI chat | <kbd className="bg-gray-200 px-1 rounded">Enter</kbd> to send</p>
+              <p>Press <kbd className="bg-gray-700 text-gray-300 px-1 rounded">Ctrl+Shift+K</kbd> for AI chat | <kbd className="bg-gray-700 text-gray-300 px-1 rounded">Enter</kbd> to send</p>
             )}
           </div>
         </div>
