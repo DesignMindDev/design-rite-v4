@@ -150,7 +150,7 @@ const ChatAssistant: React.FC = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className={`fixed bottom-6 right-6 w-96 bg-white rounded-2xl shadow-2xl z-50 transition-all ${
+        <div className={`fixed bottom-6 right-6 w-96 bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl shadow-2xl z-50 transition-all ${
           isMinimized ? 'h-14' : 'h-[600px]'
         }`}>
           {/* Header */}
@@ -181,7 +181,7 @@ const ChatAssistant: React.FC = () => {
           {!isMinimized && (
             <>
               {/* Messages Area */}
-              <div className="h-[450px] overflow-y-auto p-4 space-y-4 bg-gray-50">
+              <div className="h-[450px] overflow-y-auto p-4 space-y-4 bg-gray-900/50">
                 {messages.map((message, index) => (
                   <div
                     key={index}
@@ -191,7 +191,7 @@ const ChatAssistant: React.FC = () => {
                       className={`max-w-[80%] p-3 rounded-xl ${
                         message.role === 'user'
                           ? 'bg-purple-600 text-white'
-                          : 'bg-white text-gray-800 shadow-md'
+                          : 'bg-gray-700/60 text-white shadow-md border border-gray-600/30'
                       }`}
                     >
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
@@ -203,11 +203,11 @@ const ChatAssistant: React.FC = () => {
                 ))}
                 {isLoading && (
                   <div className="flex justify-start">
-                    <div className="bg-white text-gray-800 shadow-md max-w-[80%] p-3 rounded-xl">
+                    <div className="bg-gray-700/60 text-white shadow-md max-w-[80%] p-3 rounded-xl border border-gray-600/30">
                       <div className="flex space-x-2">
-                        <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce"></div>
-                        <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                        <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
+                        <div className="h-2 w-2 bg-purple-400 rounded-full animate-bounce"></div>
+                        <div className="h-2 w-2 bg-purple-400 rounded-full animate-bounce delay-100"></div>
+                        <div className="h-2 w-2 bg-purple-400 rounded-full animate-bounce delay-200"></div>
                       </div>
                     </div>
                   </div>
@@ -216,7 +216,7 @@ const ChatAssistant: React.FC = () => {
               </div>
 
               {/* Input Area */}
-              <div className="p-4 border-t bg-white rounded-b-2xl">
+              <div className="p-4 border-t border-gray-600/30 bg-gray-800/60 rounded-b-2xl">
                 <div className="flex space-x-2">
                   <input
                     type="text"
@@ -224,7 +224,7 @@ const ChatAssistant: React.FC = () => {
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Ask about our security solutions..."
-                    className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
+                    className="flex-1 p-2 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     disabled={isLoading}
                   />
                   <button

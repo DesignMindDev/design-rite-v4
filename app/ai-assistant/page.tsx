@@ -36,7 +36,7 @@ export default function AIAssistantPage() {
   const [assessmentData, setAssessmentData] = useState<AssessmentData | null>(null)
   const [hasUploadedFile, setHasUploadedFile] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
-  const [selectedProvider, setSelectedProvider] = useState('simulated')
+  const [selectedProvider, setSelectedProvider] = useState('assessment-assistant')
   const [apiKey, setApiKey] = useState('')
   const [showSessions, setShowSessions] = useState(false)
   const [userHash, setUserHash] = useState('')
@@ -48,43 +48,19 @@ export default function AIAssistantPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const aiProviders: AIProvider[] = [
+  const [aiProviders, setAiProviders] = useState<AIProvider[]>([
     {
-      id: 'simulated',
-      name: 'Simulated Responses',
-      description: 'Pre-programmed responses for demo purposes',
-      available: true
-    },
-    {
-      id: 'openai-gpt4',
-      name: 'OpenAI GPT-4',
-      description: 'Latest GPT-4 model for advanced reasoning',
-      endpoint: '/api/ai/openai',
+      id: 'assessment-assistant',
+      name: 'Assessment Assistant',
+      description: 'Specialized security assessment and discovery assistant',
+      endpoint: '/api/ai/assistant',
       model: 'gpt-4',
       available: true
     },
     {
-      id: 'openai-gpt35',
-      name: 'OpenAI GPT-3.5 Turbo',
-      description: 'Fast and cost-effective GPT-3.5',
-      endpoint: '/api/ai/openai',
-      model: 'gpt-3.5-turbo',
-      available: true
-    },
-    {
-      id: 'claude-3-opus',
-      name: 'Claude 3 Opus',
-      description: 'Anthropic\'s most powerful model',
-      endpoint: '/api/ai/claude',
-      model: 'claude-3-opus-20240229',
-      available: true
-    },
-    {
-      id: 'claude-3-sonnet',
-      name: 'Claude 3 Sonnet',
-      description: 'Balanced performance and speed',
-      endpoint: '/api/ai/claude',
-      model: 'claude-3-sonnet-20240229',
+      id: 'simulated',
+      name: 'Simulated Responses',
+      description: 'Pre-programmed responses for demo purposes',
       available: true
     },
     {
@@ -94,11 +70,14 @@ export default function AIAssistantPage() {
       endpoint: '/api/ai-assessment',
       available: true
     }
-  ]
+  ])
 
   useEffect(() => {
     // Initialize user hash and session
     initializeSession()
+
+    // Load AI providers from the AI Providers system
+    loadAIProviders()
 
     // Check for existing assessment data from previous tools
     const quickEstimateData = sessionStorage.getItem('quickEstimateData')
@@ -116,6 +95,38 @@ export default function AIAssistantPage() {
       addInitialMessage()
     }
   }, [])
+
+  const loadAIProviders = async () => {
+    try {
+      const response = await fetch('/api/admin/ai-providers')
+      if (response.ok) {
+        const data = await response.json()
+        const assessmentProviders = data.providers.filter((p: any) =>
+          p.use_case === 'assessment' && p.enabled
+        ).map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          description: p.description || `${p.provider_type} provider for security assessments`,
+          endpoint: '/api/ai/assistant',
+          model: p.model,
+          available: true
+        }))
+
+        // Update the providers list with real ones
+        setAiProviders(prev => [
+          ...assessmentProviders,
+          ...prev.filter(p => p.id === 'simulated' || p.id === 'existing-endpoint')
+        ])
+
+        // If assessment providers are available, set the first one as default
+        if (assessmentProviders.length > 0) {
+          setSelectedProvider(assessmentProviders[0].id)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load AI providers:', error)
+    }
+  }
 
   const generateUserHash = () => {
     // Create a persistent user hash based on browser fingerprint
@@ -171,7 +182,7 @@ export default function AIAssistantPage() {
     setSessionName(newSessionName)
     sessionStorage.setItem('ai_current_session', newSessionId)
 
-    // Create session in database
+    // Create assessment session in database (for assessment data only)
     try {
       await fetch('/api/ai/logging', {
         method: 'POST',
@@ -183,7 +194,23 @@ export default function AIAssistantPage() {
             userHash: hash,
             sessionName: newSessionName,
             aiProvider: selectedProvider,
-            assessmentData
+            assessmentData // Only assessment data goes here
+          }
+        })
+      })
+
+      // Create separate chat session (for chat messages only)
+      await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create_chat_session',
+          data: {
+            sessionId: `chat_${newSessionId}`,
+            userHash: hash,
+            sessionName: `Chat - ${newSessionName}`,
+            aiProvider: selectedProvider,
+            assessmentReference: newSessionId // Link to assessment session
           }
         })
       })
@@ -257,19 +284,21 @@ export default function AIAssistantPage() {
 
   const logConversation = async (userMessage: string, aiResponse: string) => {
     try {
-      await fetch('/api/ai/logging', {
+      // Save chat message separately (without assessment data)
+      await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'log_conversation',
+          action: 'save_chat_message',
           data: {
-            sessionId,
+            sessionId: `chat_${sessionId}`, // Use separate chat session ID
             userHash,
             userMessage,
             aiResponse,
             aiProvider: selectedProvider,
+            threadId: null, // Will be set when using OpenAI threads
+            assistantId: null, // Will be set when using OpenAI assistants
             timestamp: new Date().toISOString(),
-            assessmentData,
             metadata: { hasUploadedFile }
           }
         })
@@ -446,12 +475,10 @@ Some suggestions:
         },
         body: JSON.stringify({
           message: currentInput,
-          model: selectedProviderConfig.model,
-          apiKey: apiKey,
           context: {
             assessmentData,
             conversationHistory: messages.slice(-5), // Last 5 messages for context
-            systemPrompt: `You are a security system refinement assistant. Help users improve their security assessments through natural conversation. Focus on practical, actionable recommendations for surveillance, access control, intrusion detection, and compliance requirements. Be specific with equipment suggestions and pricing when possible.`
+            provider: selectedProvider
           }
         })
       })
@@ -461,6 +488,10 @@ Some suggestions:
       }
 
       const data = await response.json()
+
+      if (!data.success && data.error) {
+        throw new Error(data.error)
+      }
 
       aiResponse = {
         id: (Date.now() + 1).toString(),

@@ -272,20 +272,23 @@ export default function AIDiscoveryPage() {
                 <select
                   value={data.facilityType}
                   onChange={(e) => updateData('facilityType', e.target.value)}
-                  className={`w-full px-4 py-3 bg-white/10 border rounded-lg text-white focus:outline-none focus:border-purple-400 transition-colors ${
+                  className={`w-full px-4 py-3 bg-gray-800/80 border rounded-lg text-white focus:outline-none focus:border-purple-400 transition-colors ${
                     errors.facilityType ? 'border-red-400' : 'border-white/30'
                   }`}
+                  style={{
+                    colorScheme: 'dark'
+                  }}
                 >
-                  <option value="">Select facility type...</option>
-                  <option value="office">Office Building</option>
-                  <option value="warehouse">Warehouse/Distribution</option>
-                  <option value="retail">Retail Store</option>
-                  <option value="healthcare">Healthcare Facility</option>
-                  <option value="education">Educational Institution</option>
-                  <option value="government">Government Building</option>
-                  <option value="manufacturing">Manufacturing Plant</option>
-                  <option value="mixed">Mixed Use Facility</option>
-                  <option value="other">Other</option>
+                  <option value="" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Select facility type...</option>
+                  <option value="office" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Office Building</option>
+                  <option value="warehouse" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Warehouse/Distribution</option>
+                  <option value="retail" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Retail Store</option>
+                  <option value="healthcare" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Healthcare Facility</option>
+                  <option value="education" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Educational Institution</option>
+                  <option value="government" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Government Building</option>
+                  <option value="manufacturing" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Manufacturing Plant</option>
+                  <option value="mixed" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Mixed Use Facility</option>
+                  <option value="other" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Other</option>
                 </select>
                 {errors.facilityType && <p className="text-red-400 text-sm mt-1">{errors.facilityType}</p>}
               </div>
@@ -362,15 +365,18 @@ export default function AIDiscoveryPage() {
                 <select
                   value={data.operatingHours}
                   onChange={(e) => updateData('operatingHours', e.target.value)}
-                  className={`w-full px-4 py-3 bg-white/10 border rounded-lg text-white focus:outline-none focus:border-purple-400 transition-colors ${
+                  className={`w-full px-4 py-3 bg-gray-800/80 border rounded-lg text-white focus:outline-none focus:border-purple-400 transition-colors ${
                     errors.operatingHours ? 'border-red-400' : 'border-white/30'
                   }`}
+                  style={{
+                    colorScheme: 'dark'
+                  }}
                 >
-                  <option value="">Select operating hours...</option>
-                  <option value="business">Business Hours (8 AM - 6 PM)</option>
-                  <option value="extended">Extended Hours (6 AM - 10 PM)</option>
-                  <option value="24-7">24/7 Operations</option>
-                  <option value="variable">Variable/Seasonal Hours</option>
+                  <option value="" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Select operating hours...</option>
+                  <option value="business" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Business Hours (8 AM - 6 PM)</option>
+                  <option value="extended" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Extended Hours (6 AM - 10 PM)</option>
+                  <option value="24-7" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>24/7 Operations</option>
+                  <option value="variable" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Variable/Seasonal Hours</option>
                 </select>
                 {errors.operatingHours && <p className="text-red-400 text-sm mt-1">{errors.operatingHours}</p>}
               </div>
@@ -449,17 +455,20 @@ export default function AIDiscoveryPage() {
                   <select
                     value={data.budgetRange}
                     onChange={(e) => updateData('budgetRange', e.target.value)}
-                    className={`w-full px-4 py-3 bg-white/10 border rounded-lg text-white focus:outline-none focus:border-purple-400 transition-colors ${
+                    className={`w-full px-4 py-3 bg-gray-800/80 border rounded-lg text-white focus:outline-none focus:border-purple-400 transition-colors ${
                       errors.budgetRange ? 'border-red-400' : 'border-white/30'
                     }`}
+                    style={{
+                      colorScheme: 'dark'
+                    }}
                   >
-                    <option value="">Select budget range...</option>
-                    <option value="under-50k">Under $50,000</option>
-                    <option value="50k-100k">$50,000 - $100,000</option>
-                    <option value="100k-250k">$100,000 - $250,000</option>
-                    <option value="250k-500k">$250,000 - $500,000</option>
-                    <option value="500k-1m">$500,000 - $1,000,000</option>
-                    <option value="over-1m">Over $1,000,000</option>
+                    <option value="" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Select budget range...</option>
+                    <option value="under-50k" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Under $50,000</option>
+                    <option value="50k-100k" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>$50,000 - $100,000</option>
+                    <option value="100k-250k" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>$100,000 - $250,000</option>
+                    <option value="250k-500k" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>$250,000 - $500,000</option>
+                    <option value="500k-1m" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>$500,000 - $1,000,000</option>
+                    <option value="over-1m" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Over $1,000,000</option>
                   </select>
                   {errors.budgetRange && <p className="text-red-400 text-sm mt-1">{errors.budgetRange}</p>}
                 </div>
@@ -469,16 +478,19 @@ export default function AIDiscoveryPage() {
                   <select
                     value={data.timeline}
                     onChange={(e) => updateData('timeline', e.target.value)}
-                    className={`w-full px-4 py-3 bg-white/10 border rounded-lg text-white focus:outline-none focus:border-purple-400 transition-colors ${
+                    className={`w-full px-4 py-3 bg-gray-800/80 border rounded-lg text-white focus:outline-none focus:border-purple-400 transition-colors ${
                       errors.timeline ? 'border-red-400' : 'border-white/30'
                     }`}
+                    style={{
+                      colorScheme: 'dark'
+                    }}
                   >
-                    <option value="">Select timeline...</option>
-                    <option value="immediate">Immediate (ASAP)</option>
-                    <option value="30-days">Within 30 days</option>
-                    <option value="90-days">Within 90 days</option>
-                    <option value="6-months">Within 6 months</option>
-                    <option value="planning">Still in planning phase</option>
+                    <option value="" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Select timeline...</option>
+                    <option value="immediate" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Immediate (ASAP)</option>
+                    <option value="30-days" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Within 30 days</option>
+                    <option value="90-days" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Within 90 days</option>
+                    <option value="6-months" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Within 6 months</option>
+                    <option value="planning" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Still in planning phase</option>
                   </select>
                   {errors.timeline && <p className="text-red-400 text-sm mt-1">{errors.timeline}</p>}
                 </div>
@@ -657,13 +669,16 @@ export default function AIDiscoveryPage() {
                   <select
                     value={data.maintenancePreference}
                     onChange={(e) => updateData('maintenancePreference', e.target.value)}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white focus:outline-none focus:border-purple-400 transition-colors"
+                    className="w-full px-4 py-3 bg-gray-800/80 border border-white/30 rounded-lg text-white focus:outline-none focus:border-purple-400 transition-colors"
+                    style={{
+                      colorScheme: 'dark'
+                    }}
                   >
-                    <option value="">Select preference...</option>
-                    <option value="in-house">In-House Maintenance</option>
-                    <option value="vendor-contract">Vendor Service Contract</option>
-                    <option value="hybrid">Hybrid Approach</option>
-                    <option value="as-needed">As-Needed Service</option>
+                    <option value="" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Select preference...</option>
+                    <option value="in-house" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>In-House Maintenance</option>
+                    <option value="vendor-contract" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Vendor Service Contract</option>
+                    <option value="hybrid" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Hybrid Approach</option>
+                    <option value="as-needed" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>As-Needed Service</option>
                   </select>
                 </div>
 
@@ -672,14 +687,17 @@ export default function AIDiscoveryPage() {
                   <select
                     value={data.monitoringNeeds}
                     onChange={(e) => updateData('monitoringNeeds', e.target.value)}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white focus:outline-none focus:border-purple-400 transition-colors"
+                    className="w-full px-4 py-3 bg-gray-800/80 border border-white/30 rounded-lg text-white focus:outline-none focus:border-purple-400 transition-colors"
+                    style={{
+                      colorScheme: 'dark'
+                    }}
                   >
-                    <option value="">Select monitoring...</option>
-                    <option value="self-monitored">Self-Monitored</option>
-                    <option value="central-station">Central Station Monitoring</option>
-                    <option value="guard-service">Guard Service Integration</option>
-                    <option value="hybrid-monitoring">Hybrid Monitoring</option>
-                    <option value="no-monitoring">No External Monitoring</option>
+                    <option value="" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Select monitoring...</option>
+                    <option value="self-monitored" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Self-Monitored</option>
+                    <option value="central-station" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Central Station Monitoring</option>
+                    <option value="guard-service" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Guard Service Integration</option>
+                    <option value="hybrid-monitoring" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Hybrid Monitoring</option>
+                    <option value="no-monitoring" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>No External Monitoring</option>
                   </select>
                 </div>
               </div>

@@ -388,34 +388,106 @@ export default function AdminPage() {
             Admin Dashboard
           </h1>
           <div className="flex items-center gap-4">
-            <Link
-              href="/admin/harvester"
-              className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all flex items-center gap-2"
-            >
-              <span>🗄️</span>
-              Product Harvester
-            </Link>
-            <Link
-              href="/admin/assessments"
-              className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-600/30 transition-all flex items-center gap-2"
-            >
-              <span>📊</span>
-              Assessment Logs
-            </Link>
-            <Link
-              href="/admin/chatbot"
-              className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all flex items-center gap-2"
-            >
-              <span>🤖</span>
-              Chatbot Analytics
-            </Link>
-            <Link
-              href="/admin/ai-assistant"
-              className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-indigo-600/30 transition-all flex items-center gap-2"
-            >
-              <span>✨</span>
-              AI Assistant
-            </Link>
+            {/* AI Management Dropdown */}
+            <div className="relative group">
+              <button className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all flex items-center gap-2">
+                <span>🤖</span>
+                AI Management
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div className="absolute right-0 mt-2 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="py-2">
+                  <Link href="/admin/ai-providers" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-purple-600/20 transition-colors">
+                    <span>🧠</span>
+                    <span>AI Providers</span>
+                  </Link>
+                  <Link href="/admin/ai-assistant" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-purple-600/20 transition-colors">
+                    <span>✨</span>
+                    <span>AI Assistant</span>
+                  </Link>
+                  <Link href="/admin/chatbot" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-purple-600/20 transition-colors">
+                    <span>🤖</span>
+                    <span>Chatbot Analytics</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Data & Harvesting Dropdown */}
+            <div className="relative group">
+              <button className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-600/30 transition-all flex items-center gap-2">
+                <span>🗄️</span>
+                Data & Harvesting
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div className="absolute right-0 mt-2 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="py-2">
+                  <Link href="/admin/harvester" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-blue-600/20 transition-colors">
+                    <span>🗄️</span>
+                    <span>Product Harvester</span>
+                  </Link>
+                  <Link href="/admin/assessments" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-blue-600/20 transition-colors">
+                    <span>📊</span>
+                    <span>Assessment Logs</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Marketing & Content Dropdown */}
+            <div className="relative group">
+              <button className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-green-600/30 transition-all flex items-center gap-2">
+                <span>📈</span>
+                Marketing & Content
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div className="absolute right-0 mt-2 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="py-2">
+                  <button onClick={() => setActiveTab('team')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                    <span>👥</span>
+                    <span>Team Management</span>
+                  </button>
+                  <button onClick={() => setActiveTab('blog')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                    <span>📝</span>
+                    <span>Blog Management</span>
+                  </button>
+                  <button onClick={() => setActiveTab('logos')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                    <span>🎨</span>
+                    <span>Logo Management</span>
+                  </button>
+                  <button onClick={() => setActiveTab('videos')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                    <span>🎥</span>
+                    <span>Video Management</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* About Us Dropdown */}
+            <div className="relative group">
+              <button className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-indigo-600/30 transition-all flex items-center gap-2">
+                <span>ℹ️</span>
+                About Us
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div className="absolute right-0 mt-2 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="py-2">
+                  <Link href="/admin/careers" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-indigo-600/20 transition-colors">
+                    <span>💼</span>
+                    <span>Careers</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
             <button
               onClick={handleLogout}
               className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
@@ -506,8 +578,13 @@ export default function AdminPage() {
                 <textarea
                   placeholder="Description"
                   value={newMember.description || ''}
-                  onChange={(e) => setNewMember(prev => ({ ...prev, description: e.target.value }))}
-                  className="md:col-span-2 px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600 h-24 resize-none"
+                  onChange={(e) => {
+                    setNewMember(prev => ({ ...prev, description: e.target.value }))
+                    // Auto-resize textarea
+                    e.target.style.height = 'auto'
+                    e.target.style.height = Math.max(96, e.target.scrollHeight) + 'px'
+                  }}
+                  className="md:col-span-2 px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600 min-h-[96px] resize-none overflow-hidden"
                 />
                 <div className="md:col-span-2">
                   <input
@@ -543,53 +620,134 @@ export default function AdminPage() {
               <h2 className="text-2xl font-bold mb-6">Current Team Members</h2>
               <div className="grid gap-6">
                 {teamMembers.map((member) => (
-                  <div key={member.id} className="bg-gray-700/50 rounded-lg p-4 flex items-center gap-4">
-                    <div className="relative w-16 h-16 flex-shrink-0">
-                      {member.imagePath ? (
-                        <Image
-                          src={member.imagePath}
-                          alt={member.name}
-                          width={64}
-                          height={64}
-                          className="rounded-lg object-cover"
+                  <div key={member.id} className="bg-gray-700/50 rounded-lg p-4">
+                    {editingMember?.id === member.id ? (
+                      /* Edit Mode */
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <input
+                          type="text"
+                          placeholder="Name"
+                          value={editingMember.name || ''}
+                          onChange={(e) => setEditingMember(prev => prev ? ({ ...prev, name: e.target.value }) : null)}
+                          className="px-4 py-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-purple-600"
                         />
-                      ) : (
-                        <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-bold">
-                          {member.initials}
+                        <input
+                          type="text"
+                          placeholder="Role"
+                          value={editingMember.role || ''}
+                          onChange={(e) => setEditingMember(prev => prev ? ({ ...prev, role: e.target.value }) : null)}
+                          className="px-4 py-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-purple-600"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Initials"
+                          value={editingMember.initials || ''}
+                          onChange={(e) => setEditingMember(prev => prev ? ({ ...prev, initials: e.target.value }) : null)}
+                          className="px-4 py-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-purple-600"
+                        />
+                        <input
+                          type="url"
+                          placeholder="Website URL (optional)"
+                          value={editingMember.href || ''}
+                          onChange={(e) => setEditingMember(prev => prev ? ({ ...prev, href: e.target.value }) : null)}
+                          className="px-4 py-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-purple-600"
+                        />
+                        <textarea
+                          placeholder="Description"
+                          value={editingMember.description || ''}
+                          onChange={(e) => {
+                            setEditingMember(prev => prev ? ({ ...prev, description: e.target.value }) : null)
+                            // Auto-resize textarea
+                            e.target.style.height = 'auto'
+                            e.target.style.height = Math.max(96, e.target.scrollHeight) + 'px'
+                          }}
+                          className="md:col-span-2 px-4 py-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-purple-600 min-h-[96px] resize-none overflow-hidden"
+                        />
+                        <div className="md:col-span-2 flex gap-2">
+                          <button
+                            onClick={() => {
+                              saveTeamMember(editingMember)
+                              setEditingMember(null)
+                            }}
+                            className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+                          >
+                            Save Changes
+                          </button>
+                          <button
+                            onClick={() => setEditingMember(null)}
+                            className="bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-700 transition-colors"
+                          >
+                            Cancel
+                          </button>
                         </div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold">{member.name}</h3>
-                      <p className="text-purple-400">{member.role}</p>
-                      <p className="text-gray-400 text-sm">{member.description}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0]
-                          if (file) {
-                            await handlePhotoUpload(file, member.id)
-                          }
-                        }}
-                        className="hidden"
-                        id={`photo-${member.id}`}
-                      />
-                      <label
-                        htmlFor={`photo-${member.id}`}
-                        className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors cursor-pointer"
-                      >
-                        Upload Photo
-                      </label>
-                      <button
-                        onClick={() => deleteTeamMember(member.id)}
-                        className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors"
-                      >
-                        Delete
-                      </button>
-                    </div>
+                      </div>
+                    ) : (
+                      /* View Mode */
+                      <div className="flex items-start gap-4">
+                        <div className="relative w-16 h-16 flex-shrink-0">
+                          {member.imagePath ? (
+                            <Image
+                              src={member.imagePath}
+                              alt={member.name}
+                              width={64}
+                              height={64}
+                              className="rounded-lg object-cover"
+                            />
+                          ) : (
+                            <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-bold">
+                              {member.initials}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-lg font-semibold">{member.name}</h3>
+                          <p className="text-purple-400">{member.role}</p>
+                          <p className="text-gray-400 text-sm mt-1 whitespace-pre-wrap break-words">{member.description}</p>
+                          {member.href && (
+                            <a
+                              href={member.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-400 hover:text-blue-300 text-sm mt-1 inline-block"
+                            >
+                              🔗 Website
+                            </a>
+                          )}
+                        </div>
+                        <div className="flex gap-2 flex-shrink-0">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0]
+                              if (file) {
+                                await handlePhotoUpload(file, member.id)
+                              }
+                            }}
+                            className="hidden"
+                            id={`photo-${member.id}`}
+                          />
+                          <label
+                            htmlFor={`photo-${member.id}`}
+                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors cursor-pointer"
+                          >
+                            Upload Photo
+                          </label>
+                          <button
+                            onClick={() => setEditingMember(member)}
+                            className="bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700 transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => deleteTeamMember(member.id)}
+                            className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

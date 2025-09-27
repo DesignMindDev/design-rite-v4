@@ -162,7 +162,7 @@ export default function CareerAdminDashboard() {
     withdrawn: 'bg-gray-600'
   }
 
-  const positions = [...new Set(applications.map(app => app.position_applied))]
+  const positions = applications && Array.isArray(applications) ? [...new Set(applications.map(app => app.position_applied))] : []
 
   if (!isAuthenticated) {
     return (
@@ -195,9 +195,20 @@ export default function CareerAdminDashboard() {
       {/* Header */}
       <header className="bg-black/95 border-b border-purple-600/20 py-6">
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Career Applications Dashboard</h1>
-            <p className="text-gray-400 mt-1">Manage and review job applications</p>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/admin"
+              className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to Admin
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold text-white">Career Applications Dashboard</h1>
+              <p className="text-gray-400 mt-1">Manage and review job applications</p>
+            </div>
           </div>
           <div className="flex gap-4">
             <button

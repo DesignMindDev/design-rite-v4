@@ -43,11 +43,10 @@ async function logConversation(data: any) {
     aiResponse,
     aiProvider,
     timestamp,
-    assessmentData,
     metadata
   } = data
 
-  // Log the conversation entry
+  // Log the conversation entry (WITHOUT assessment data)
   const { error: logError } = await supabase
     .from('ai_conversations')
     .insert({
@@ -57,7 +56,6 @@ async function logConversation(data: any) {
       ai_response: aiResponse,
       ai_provider: aiProvider,
       timestamp: timestamp || new Date().toISOString(),
-      assessment_data: assessmentData,
       metadata: metadata || {}
     })
 
