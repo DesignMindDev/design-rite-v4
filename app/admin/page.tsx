@@ -411,6 +411,10 @@ export default function AdminPage() {
                     <span>🤖</span>
                     <span>Chatbot Analytics</span>
                   </Link>
+                  <Link href="/admin/creative-studio" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-purple-600/20 transition-colors">
+                    <span>🎨</span>
+                    <span>Creative Studio</span>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -453,10 +457,10 @@ export default function AdminPage() {
                     <span>👥</span>
                     <span>Team Management</span>
                   </button>
-                  <button onClick={() => setActiveTab('blog')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
-                    <span>📝</span>
-                    <span>Blog Management</span>
-                  </button>
+                  <Link href="/admin/creative-studio" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                    <span>🎨</span>
+                    <span>Creative Studio</span>
+                  </Link>
                   <button onClick={() => setActiveTab('logos')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
                     <span>🎨</span>
                     <span>Logo Management</span>

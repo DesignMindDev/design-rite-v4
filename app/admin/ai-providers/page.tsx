@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Shield, Brain, CheckCircle, AlertCircle, Settings, Plus, Edit, Trash2, Play, Activity, Server, Zap, MessageSquare, Bot, Code, Search, Database } from 'lucide-react'
+import Link from 'next/link'
+import { Shield, Brain, CheckCircle, AlertCircle, Settings, Plus, Edit, Trash2, Play, Activity, Server, Zap, MessageSquare, Bot, Code, Search, Database, Palette, FileText, Share2, Eye } from 'lucide-react'
 
 interface AIProvider {
   id: string
@@ -14,7 +15,7 @@ interface AIProvider {
   enabled: boolean
   max_tokens: number
   timeout_seconds: number
-  use_case: 'general' | 'chatbot' | 'assessment' | 'search' | 'analysis'
+  use_case: 'general' | 'chatbot' | 'assessment' | 'search' | 'analysis' | 'creative-vision' | 'creative-writing' | 'creative-social'
   description?: string
   created_at: string
   updated_at: string
@@ -171,6 +172,9 @@ export default function AIProvidersAdmin() {
       case 'assessment': return <CheckCircle className="w-4 h-4" />
       case 'search': return <Search className="w-4 h-4" />
       case 'analysis': return <Database className="w-4 h-4" />
+      case 'creative-vision': return <Eye className="w-4 h-4" />
+      case 'creative-writing': return <FileText className="w-4 h-4" />
+      case 'creative-social': return <Share2 className="w-4 h-4" />
       default: return <Bot className="w-4 h-4" />
     }
   }
@@ -181,6 +185,9 @@ export default function AIProvidersAdmin() {
       case 'assessment': return 'bg-green-500/20 text-green-400'
       case 'search': return 'bg-yellow-500/20 text-yellow-400'
       case 'analysis': return 'bg-purple-500/20 text-purple-400'
+      case 'creative-vision': return 'bg-pink-500/20 text-pink-400'
+      case 'creative-writing': return 'bg-orange-500/20 text-orange-400'
+      case 'creative-social': return 'bg-cyan-500/20 text-cyan-400'
       default: return 'bg-gray-500/20 text-gray-400'
     }
   }

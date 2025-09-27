@@ -16,7 +16,7 @@ interface AIProvider {
   enabled: boolean
   max_tokens: number
   timeout_seconds: number
-  use_case: 'general' | 'chatbot' | 'assessment' | 'search' | 'analysis'
+  use_case: 'general' | 'chatbot' | 'assessment' | 'search' | 'analysis' | 'creative-vision' | 'creative-writing' | 'creative-social'
   description?: string
   created_at: string
   updated_at: string
