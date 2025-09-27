@@ -381,8 +381,10 @@ export default function UnifiedNavigation() {
 
         {/* Mobile Menu Button */}
         <button
-          className="lg:hidden dr-text-pearl text-2xl p-2"
+          className="lg:hidden dr-text-pearl text-2xl p-2 touch-manipulation active:bg-white/10 rounded transition-colors"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
+          type="button"
+          aria-label="Toggle mobile menu"
         >
           ☰
         </button>
@@ -391,13 +393,19 @@ export default function UnifiedNavigation() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
+        <div className="lg:hidden bg-black/95 backdrop-blur-sm border-t border-white/10 relative z-[1010]">
           <div className="px-6 py-4 space-y-4">
 
             {/* Platform Section */}
             <div>
               <div className="text-gray-400 dr-ui uppercase tracking-wider mb-2">Platform</div>
-              <button onClick={handleAIAssessmentClick} className="block text-white/80 hover:dr-text-pearl py-2 pl-4 text-left">📊 Security Estimate</button>
+              <button
+                onClick={handleAIAssessmentClick}
+                className="block text-white/80 hover:dr-text-pearl py-2 pl-4 text-left w-full touch-manipulation active:bg-violet-600/10 transition-colors"
+                type="button"
+              >
+                📊 Security Estimate
+              </button>
               <Link href="/ai-discovery" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🚀 AI Discovery Assistant</Link>
               <Link href="/ai-security-assessment" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🧠 AI Security Assessment</Link>
               <Link href="/compliance-analyst" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">✅ Compliance Tools</Link>
@@ -444,7 +452,11 @@ export default function UnifiedNavigation() {
             {/* Sign In and CTA */}
             <div className="pt-4 border-t border-white/10">
               <Link href="/login" className="block text-white/80 hover:dr-text-pearl py-2">👤 Sign In</Link>
-              <button onClick={handleAIAssessmentClick} className="block w-full text-left dr-bg-violet dr-text-pearl px-4 py-2 rounded-lg mt-2">
+              <button
+                onClick={handleAIAssessmentClick}
+                className="block w-full text-left dr-bg-violet dr-text-pearl px-4 py-2 rounded-lg mt-2 touch-manipulation active:bg-purple-800 transition-colors"
+                type="button"
+              >
                 🚀 Try AI Assessment
               </button>
             </div>
