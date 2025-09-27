@@ -1,6 +1,6 @@
 // app/api/discovery-assistant/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { aiEngine } from '@/lib/ai-engine';
+import { aiEngine } from '../../../lib/ai-engine';
 
 // Anthropic Configuration - UPDATED TO LATEST MODEL
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
