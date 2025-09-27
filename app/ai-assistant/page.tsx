@@ -732,68 +732,22 @@ Date: ${new Date().toLocaleDateString()}
 
   return (
     <div className="min-h-screen dr-bg-charcoal dr-text-pearl">
-      {/* Header Navigation */}
-      <nav className="border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex justify-between items-center">
-            <Link href="/" className="text-2xl font-bold dr-text-violet">
-              Design-Rite
-            </Link>
-            <div className="flex space-x-6">
-              <Link href="/" className="hover:dr-text-violet transition-colors">Home</Link>
-              <Link href="/solutions" className="hover:dr-text-violet transition-colors">Solutions</Link>
-              <Link href="/contact" className="hover:dr-text-violet transition-colors">Contact</Link>
-            </div>
+      {/* Header */}
+      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 text-center">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+          <Link href="/estimate-options" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Back to Options</span>
+          </Link>
+          <div className="flex-1 text-center">
+            <span className="font-bold text-lg">🤖 AI ASSISTANT REFINEMENT</span>
+            <span className="ml-2">★★★ Intelligent Conversation-Driven Improvements</span>
           </div>
-        </div>
-      </nav>
-
-      {/* Page Header */}
-      <div className="border-b border-gray-800 bg-gradient-to-r from-purple-900/30 to-blue-900/30">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center gap-4 mb-6">
-            <Link href="/estimate-options" className="flex items-center gap-2 text-gray-400 hover:dr-text-violet transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-              <span>Back to Options</span>
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-4 mb-6">
-            <div className="p-3 dr-bg-violet rounded-xl">
-              <Bot className="w-8 h-8 dr-text-pearl" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold dr-text-violet">AI Assistant Refinement</h1>
-              <p className="text-gray-300 text-lg">★★★ AI-ENHANCED • Intelligent conversation-driven improvements</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-            <div className="flex items-center gap-2 text-gray-300">
-              <Sparkles className="w-4 h-4 dr-text-violet" />
-              <span>Smart Refinements</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-300">
-              <RefreshCw className="w-4 h-4 dr-text-violet" />
-              <span>Real-time Updates</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-300">
-              <Upload className="w-4 h-4 dr-text-violet" />
-              <span>Upload Existing</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-300">
-              <Download className="w-4 h-4 dr-text-violet" />
-              <span>Export Results</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-300">
-              <Settings className="w-4 h-4 dr-text-violet" />
-              <button
-                onClick={() => setShowSettings(!showSettings)}
-                className="hover:text-white transition-colors"
-              >
-                AI Settings
-              </button>
-            </div>
+          <div className="text-sm">
+            <Settings
+              className="w-5 h-5 cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => setShowSettings(!showSettings)}
+            />
           </div>
         </div>
       </div>
