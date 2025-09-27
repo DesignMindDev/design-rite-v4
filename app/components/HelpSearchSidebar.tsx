@@ -22,12 +22,18 @@ interface ContextSuggestion {
 
 export default function HelpSearchSidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'help' | 'chat'>('help');
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredItems, setFilteredItems] = useState<HelpItem[]>([]);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [contextSuggestions, setContextSuggestions] = useState<ContextSuggestion[]>([]);
+  const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string, timestamp: Date, provider?: string}>>([]);
+  const [chatInput, setChatInput] = useState('');
+  const [selectedProvider, setSelectedProvider] = useState<'openai' | 'claude' | 'auto'>('auto');
+  const [isLoading, setIsLoading] = useState(false);
   const pathname = usePathname();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const chatInputRef = useRef<HTMLInputElement>(null);
 
   // Help items database
   const helpItems: HelpItem[] = [
@@ -65,6 +71,118 @@ export default function HelpSearchSidebar() {
       category: 'Compliance',
       tags: ['ferpa', 'hipaa', 'cjis', 'compliance', 'regulations'],
       url: '/help/compliance'
+    },
+
+    // AI Chat Capabilities
+    {
+      id: 'ai-chat-overview',
+      title: 'AI Chat Assistant',
+      description: 'Direct chat with AI providers (OpenAI, Claude) without restrictions',
+      category: 'AI Tools',
+      tags: ['ai', 'chat', 'openai', 'claude', 'unrestricted'],
+      url: '/help/ai-chat'
+    },
+    {
+      id: 'ai-provider-selection',
+      title: 'AI Provider Selection',
+      description: 'How to choose between OpenAI, Claude, or Auto mode for optimal results',
+      category: 'AI Tools',
+      tags: ['providers', 'openai', 'claude', 'auto', 'optimization'],
+      url: '/help/ai-providers'
+    },
+    {
+      id: 'ai-creation-examples',
+      title: 'AI Creation Examples',
+      description: 'Code generation, content writing, analysis, and creative tasks',
+      category: 'AI Tools',
+      tags: ['examples', 'code', 'creative', 'analysis', 'generation'],
+      action: () => {
+        setActiveTab('chat');
+        setChatInput('Show me examples of different AI creation tasks I can perform');
+        setTimeout(() => sendChatMessage(), 100);
+      }
+    },
+    {
+      id: 'ai-analytics',
+      title: 'AI Performance Analytics',
+      description: 'Track and optimize AI provider performance for different task types',
+      category: 'AI Tools',
+      tags: ['analytics', 'performance', 'optimization', 'metrics'],
+      url: '/help/ai-analytics'
+    },
+
+    // AI Creation Task Examples
+    {
+      id: 'ai-code-generation',
+      title: 'Code Generation Example',
+      description: 'Generate React components, API endpoints, or automation scripts',
+      category: 'AI Examples',
+      tags: ['code', 'react', 'api', 'javascript', 'typescript'],
+      action: () => {
+        setActiveTab('chat');
+        setChatInput('Create a React component for a security camera product card with props for name, price, manufacturer, and an image URL. Include hover effects and a "Add to Estimate" button.');
+        setTimeout(() => sendChatMessage(), 100);
+      }
+    },
+    {
+      id: 'ai-content-writing',
+      title: 'Content Writing Example',
+      description: 'Create marketing copy, proposals, or technical documentation',
+      category: 'AI Examples',
+      tags: ['content', 'marketing', 'proposals', 'writing', 'documentation'],
+      action: () => {
+        setActiveTab('chat');
+        setChatInput('Write compelling marketing copy for a security system proposal targeting a retail store. Include pain points about theft, vandalism, and employee safety. Use persuasive language that emphasizes ROI and peace of mind.');
+        setTimeout(() => sendChatMessage(), 100);
+      }
+    },
+    {
+      id: 'ai-data-analysis',
+      title: 'Data Analysis Example',
+      description: 'Analyze security requirements, cost breakdowns, or performance metrics',
+      category: 'AI Examples',
+      tags: ['analysis', 'data', 'metrics', 'requirements', 'performance'],
+      action: () => {
+        setActiveTab('chat');
+        setChatInput('Analyze this security system cost breakdown and suggest optimizations: 20 IP cameras ($4,000), NVR system ($1,200), access control ($2,500), installation labor ($3,000). Total: $10,700. How can we reduce costs while maintaining effectiveness?');
+        setTimeout(() => sendChatMessage(), 100);
+      }
+    },
+    {
+      id: 'ai-creative-brainstorm',
+      title: 'Creative Brainstorming Example',
+      description: 'Generate ideas for marketing campaigns, product names, or solutions',
+      category: 'AI Examples',
+      tags: ['creative', 'brainstorm', 'ideas', 'marketing', 'solutions'],
+      action: () => {
+        setActiveTab('chat');
+        setChatInput('Brainstorm 10 creative names for a new AI-powered security assessment feature. The tool analyzes building layouts and recommends optimal camera placement. Think of names that convey intelligence, precision, and security expertise.');
+        setTimeout(() => sendChatMessage(), 100);
+      }
+    },
+    {
+      id: 'ai-technical-explanation',
+      title: 'Technical Explanation Example',
+      description: 'Explain complex security concepts or troubleshoot technical issues',
+      category: 'AI Examples',
+      tags: ['technical', 'explanation', 'troubleshooting', 'security', 'concepts'],
+      action: () => {
+        setActiveTab('chat');
+        setChatInput('Explain the differences between IP cameras and analog cameras for a non-technical client. Include pros/cons, cost implications, and which scenarios favor each technology. Make it simple but comprehensive.');
+        setTimeout(() => sendChatMessage(), 100);
+      }
+    },
+    {
+      id: 'ai-proposal-generation',
+      title: 'Proposal Generation Example',
+      description: 'Create detailed security proposals with technical specifications',
+      category: 'AI Examples',
+      tags: ['proposal', 'specifications', 'technical', 'detailed', 'professional'],
+      action: () => {
+        setActiveTab('chat');
+        setChatInput('Generate a professional security proposal executive summary for a 50,000 sq ft warehouse. Include current vulnerabilities, proposed solution overview, key benefits, timeline, and investment summary. Make it compelling for C-level decision makers.');
+        setTimeout(() => sendChatMessage(), 100);
+      }
     },
 
     // Creative Studio Help
@@ -242,11 +360,20 @@ export default function HelpSearchSidebar() {
     setFilteredItems(filtered);
   }, [searchQuery]);
 
-  // Load recent searches from localStorage
+  // Load recent searches and chat history from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('helpSearchHistory');
     if (saved) {
       setRecentSearches(JSON.parse(saved));
+    }
+
+    const savedChats = localStorage.getItem('aiChatHistory');
+    if (savedChats) {
+      const parsed = JSON.parse(savedChats);
+      setChatMessages(parsed.map((msg: any) => ({
+        ...msg,
+        timestamp: new Date(msg.timestamp)
+      })));
     }
   }, []);
 
@@ -272,6 +399,89 @@ export default function HelpSearchSidebar() {
     setIsOpen(false);
   };
 
+  // Send AI chat message
+  const sendChatMessage = async () => {
+    if (!chatInput.trim() || isLoading) return;
+
+    const userMessage = {
+      role: 'user' as const,
+      content: chatInput.trim(),
+      timestamp: new Date()
+    };
+
+    const newMessages = [...chatMessages, userMessage];
+    setChatMessages(newMessages);
+    setChatInput('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/general-ai-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: chatInput.trim(),
+          provider: selectedProvider,
+          context: {
+            pathname,
+            previousMessages: chatMessages.slice(-5) // Send last 5 messages for context
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
+      }
+
+      const data = await response.json();
+
+      const assistantMessage = {
+        role: 'assistant' as const,
+        content: data.response,
+        timestamp: new Date(),
+        provider: data.provider
+      };
+
+      const finalMessages = [...newMessages, assistantMessage];
+      setChatMessages(finalMessages);
+
+      // Save to localStorage
+      localStorage.setItem('aiChatHistory', JSON.stringify(finalMessages));
+
+    } catch (error) {
+      console.error('AI chat error:', error);
+      const errorMessage = {
+        role: 'assistant' as const,
+        content: 'Sorry, I encountered an error. Please try again.',
+        timestamp: new Date(),
+        provider: 'error'
+      };
+      setChatMessages([...newMessages, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Clear chat history
+  const clearChat = () => {
+    setChatMessages([]);
+    localStorage.removeItem('aiChatHistory');
+  };
+
+  // Export chat history
+  const exportChat = () => {
+    const chatText = chatMessages.map(msg =>
+      `[${msg.timestamp.toLocaleTimeString()}] ${msg.role.toUpperCase()}${msg.provider ? ` (${msg.provider})` : ''}: ${msg.content}`
+    ).join('\n\n');
+
+    const blob = new Blob([chatText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ai-chat-${new Date().toISOString().split('T')[0]}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -279,18 +489,33 @@ export default function HelpSearchSidebar() {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         setIsOpen(true);
+        setActiveTab('help');
         setTimeout(() => searchInputRef.current?.focus(), 100);
+      }
+
+      // Ctrl/Cmd + Shift + K to open AI chat
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'K') {
+        e.preventDefault();
+        setIsOpen(true);
+        setActiveTab('chat');
+        setTimeout(() => chatInputRef.current?.focus(), 100);
       }
 
       // Escape to close
       if (e.key === 'Escape' && isOpen) {
         setIsOpen(false);
       }
+
+      // Enter to send chat message (when chat input is focused)
+      if (e.key === 'Enter' && activeTab === 'chat' && document.activeElement === chatInputRef.current) {
+        e.preventDefault();
+        sendChatMessage();
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
+  }, [isOpen, activeTab, chatInput, chatMessages, selectedProvider, isLoading]);
 
   return (
     <>
@@ -298,11 +523,11 @@ export default function HelpSearchSidebar() {
       <button
         onClick={() => setIsOpen(true)}
         className="fixed top-1/2 right-0 transform -translate-y-1/2 bg-purple-600 text-white p-3 rounded-l-lg shadow-lg hover:bg-purple-700 transition-all z-40 group"
-        title="Help & Search (Ctrl+K)"
+        title="Help & AI Chat (Ctrl+K / Ctrl+Shift+K)"
       >
         <div className="flex items-center gap-2">
-          <span className="text-lg">❓</span>
-          <span className="hidden group-hover:block text-sm whitespace-nowrap pr-1">Help</span>
+          <span className="text-lg">🤖</span>
+          <span className="hidden group-hover:block text-sm whitespace-nowrap pr-1">AI Assistant</span>
         </div>
       </button>
 
@@ -319,7 +544,7 @@ export default function HelpSearchSidebar() {
           {/* Header */}
           <div className="bg-purple-600 text-white p-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">Help & Search</h2>
+              <h2 className="text-xl font-bold">AI Assistant</h2>
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-white hover:text-gray-200 text-xl"
@@ -327,28 +552,174 @@ export default function HelpSearchSidebar() {
                 ✕
               </button>
             </div>
-            <p className="text-purple-100 text-sm mt-1">Find answers, products, and quick actions</p>
+            <p className="text-purple-100 text-sm mt-1">Help, search, and unrestricted AI chat</p>
           </div>
 
-          {/* Search Input */}
-          <div className="p-4 border-b">
-            <div className="relative">
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search help, products, actions..."
-                className="w-full p-3 border border-gray-300 rounded-lg pl-10 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</span>
+          {/* Tab Navigation */}
+          <div className="border-b border-gray-200">
+            <div className="flex">
+              <button
+                onClick={() => setActiveTab('help')}
+                className={`flex-1 px-4 py-3 text-sm font-medium ${
+                  activeTab === 'help'
+                    ? 'text-purple-600 border-b-2 border-purple-600 bg-purple-50'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                🔍 Help & Search
+              </button>
+              <button
+                onClick={() => setActiveTab('chat')}
+                className={`flex-1 px-4 py-3 text-sm font-medium ${
+                  activeTab === 'chat'
+                    ? 'text-purple-600 border-b-2 border-purple-600 bg-purple-50'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                💬 AI Chat
+              </button>
             </div>
           </div>
 
+          {/* Search Input - Help Tab Only */}
+          {activeTab === 'help' && (
+            <div className="p-4 border-b">
+              <div className="relative">
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search help, products, actions..."
+                  className="w-full p-3 border border-gray-300 rounded-lg pl-10 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</span>
+              </div>
+            </div>
+          )}
+
+          {/* AI Chat Interface - Chat Tab Only */}
+          {activeTab === 'chat' && (
+            <div className="p-4 border-b">
+              {/* Provider Selection */}
+              <div className="flex gap-2 mb-4">
+                <select
+                  value={selectedProvider}
+                  onChange={(e) => setSelectedProvider(e.target.value as 'openai' | 'claude' | 'auto')}
+                  className="flex-1 p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                >
+                  <option value="auto">🎯 Auto (Best Available)</option>
+                  <option value="openai">🤖 OpenAI GPT-4</option>
+                  <option value="claude">🧠 Claude Sonnet</option>
+                </select>
+                <button
+                  onClick={clearChat}
+                  className="px-3 py-2 text-gray-500 hover:text-red-600 transition-colors"
+                  title="Clear Chat"
+                >
+                  🗑️
+                </button>
+                <button
+                  onClick={exportChat}
+                  className="px-3 py-2 text-gray-500 hover:text-purple-600 transition-colors"
+                  title="Export Chat"
+                  disabled={chatMessages.length === 0}
+                >
+                  💾
+                </button>
+              </div>
+
+              {/* Chat Input */}
+              <div className="relative">
+                <input
+                  ref={chatInputRef}
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Ask AI anything (no restrictions)..."
+                  className="w-full p-3 border border-gray-300 rounded-lg pr-12 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  disabled={isLoading}
+                />
+                <button
+                  onClick={sendChatMessage}
+                  disabled={!chatInput.trim() || isLoading}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-600 hover:text-purple-700 disabled:text-gray-300"
+                >
+                  {isLoading ? '⏳' : '🚀'}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Content Area */}
           <div className="flex-1 overflow-y-auto">
-            {/* Search Results */}
-            {searchQuery && filteredItems.length > 0 && (
+            {/* AI Chat Messages */}
+            {activeTab === 'chat' && (
+              <div className="p-4 space-y-4 h-full">
+                {chatMessages.length === 0 ? (
+                  <div className="text-center text-gray-500 py-8">
+                    <div className="text-4xl mb-4">🤖</div>
+                    <h3 className="font-semibold mb-2">General AI Assistant</h3>
+                    <p className="text-sm">Ask me anything! No restrictions, no branding constraints.</p>
+                    <div className="text-xs mt-4 space-y-1">
+                      <p>💡 Get coding help</p>
+                      <p>✍️ Write content</p>
+                      <p>🧠 Brainstorm ideas</p>
+                      <p>📊 Analyze data</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {chatMessages.map((message, index) => (
+                      <div
+                        key={index}
+                        className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div
+                          className={`max-w-[80%] p-3 rounded-lg ${
+                            message.role === 'user'
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-gray-100 text-gray-900'
+                          }`}
+                        >
+                          <div className="text-sm mb-1">
+                            {message.role === 'user' ? (
+                              <span className="font-medium">You</span>
+                            ) : (
+                              <span className="font-medium">
+                                AI {message.provider && message.provider !== 'error' && `(${message.provider})`}
+                              </span>
+                            )}
+                            <span className="text-xs opacity-70 ml-2">
+                              {message.timestamp.toLocaleTimeString()}
+                            </span>
+                          </div>
+                          <div className="whitespace-pre-wrap">{message.content}</div>
+                        </div>
+                      </div>
+                    ))}
+                    {isLoading && (
+                      <div className="flex justify-start">
+                        <div className="bg-gray-100 text-gray-900 p-3 rounded-lg">
+                          <div className="text-sm font-medium mb-1">AI is thinking...</div>
+                          <div className="flex space-x-1">
+                            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Help Content - Help Tab Only */}
+            {activeTab === 'help' && (
+              <>
+                {/* Search Results */}
+                {searchQuery && filteredItems.length > 0 && (
               <div className="p-4">
                 <h3 className="font-semibold text-gray-700 mb-3">Search Results</h3>
                 <div className="space-y-2">
@@ -378,7 +749,7 @@ export default function HelpSearchSidebar() {
             {searchQuery && filteredItems.length === 0 && (
               <div className="p-4 text-center text-gray-500">
                 <p>No results found for "{searchQuery}"</p>
-                <p className="text-sm mt-2">Try searching for: estimate, assessment, pricing, compliance</p>
+                <p className="text-sm mt-2">Try searching for: estimate, assessment, pricing, compliance, ai chat, examples</p>
               </div>
             )}
 
@@ -448,14 +819,26 @@ export default function HelpSearchSidebar() {
                   >
                     📋 Check Compliance
                   </button>
+                  <button
+                    onClick={() => setActiveTab('chat')}
+                    className="w-full p-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-left"
+                  >
+                    🤖 Open AI Chat
+                  </button>
                 </div>
               </div>
+            )}
+              </>
             )}
           </div>
 
           {/* Footer */}
           <div className="p-4 border-t bg-gray-50 text-center text-sm text-gray-500">
-            <p>Press <kbd className="bg-gray-200 px-1 rounded">Ctrl+K</kbd> to open help anywhere</p>
+            {activeTab === 'help' ? (
+              <p>Press <kbd className="bg-gray-200 px-1 rounded">Ctrl+K</kbd> for help</p>
+            ) : (
+              <p>Press <kbd className="bg-gray-200 px-1 rounded">Ctrl+Shift+K</kbd> for AI chat | <kbd className="bg-gray-200 px-1 rounded">Enter</kbd> to send</p>
+            )}
           </div>
         </div>
       </div>
