@@ -116,7 +116,14 @@ Ready to create something amazing? Upload your first asset! 📸✨`,
     name: string
     specs?: string
   }>>([])
-  const [activeLayers, setActiveLayers] = useState<string[]>(['cameras', 'sensors', 'access', 'network'])
+  const [activeLayers, setActiveLayers] = useState<string[]>([
+    'security-cameras',
+    'detection-sensors',
+    'access-control',
+    'intercoms',
+    'network-infrastructure',
+    'fire-safety'
+  ])
 
   // Floor Plan Designer State
   const [uploadedPDF, setUploadedPDF] = useState<File | null>(null)
@@ -141,9 +148,73 @@ Ready to create something amazing? Upload your first asset! 📸✨`,
   const [currentStrokeWidth, setCurrentStrokeWidth] = useState(2)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [showGrid, setShowGrid] = useState(true)
+  const [showDeviceTree, setShowDeviceTree] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
+
+      icon: '📹',
+      color: '#3B82F6',
+      devices: [
+        { id: 'cam_4k', name: '4K Ultra HD Camera', icon: '🔴', specs: '4K@30fps, Night Vision, 100ft IR' },
+        { id: 'cam_ptz', name: 'PTZ Camera', icon: '🔄', specs: '360° Pan/Tilt, 30x Zoom, Auto-Track' },
+        { id: 'cam_bullet', name: 'Bullet Camera', icon: '📹', specs: '1080p, Weatherproof IP67, WDR' },
+        { id: 'cam_dome', name: 'Dome Camera', icon: '⚪', specs: 'Vandal Resistant, 180° View, IR Cut' },
+        { id: 'cam_thermal', name: 'Thermal Camera', icon: '🌡️', specs: 'Heat Detection, 1000ft Range, Analytics' }
+      ]
+    },
+    'Detection Sensors': {
+      icon: '🔍',
+      color: '#10B981',
+      devices: [
+        { id: 'pir_motion', name: 'PIR Motion Sensor', icon: '👋', specs: '40ft Range, Pet Immune, Dual Tech' },
+        { id: 'glass_break', name: 'Glass Break Sensor', icon: '💥', specs: '25ft Radius, Audio Detection, Wireless' },
+        { id: 'smoke_det', name: 'Smoke Detector', icon: '💨', specs: 'Photoelectric, Interconnected, Battery Backup' },
+        { id: 'door_mag', name: 'Door/Window Contact', icon: '🚪', specs: 'Magnetic, Wireless, Tamper Detection' },
+        { id: 'beam_break', name: 'Beam Break Sensor', icon: '📡', specs: '500ft Range, Dual Beam, Weather Resistant' }
+      ]
+    },
+    'Access Control': {
+      icon: '🚪',
+      color: '#F59E0B',
+      devices: [
+        { id: 'card_reader', name: 'Card Reader', icon: '💳', specs: '13.56MHz, Proximity, Multi-Format' },
+        { id: 'biometric', name: 'Biometric Scanner', icon: '👆', specs: 'Fingerprint, 1000 Users, IP65' },
+        { id: 'keypad', name: 'Keypad', icon: '🔢', specs: '6-Digit Code, Backlit, Weather Resistant' },
+        { id: 'electric_lock', name: 'Electric Lock', icon: '🔒', specs: '12/24VDC, Fail Safe/Secure, 1200lbs' },
+        { id: 'exit_button', name: 'Exit Button', icon: '🚶', specs: 'Push to Exit, NO/NC, Vandal Resistant' }
+      ]
+    },
+    'Intercoms': {
+      icon: '📞',
+      color: '#8B5CF6',
+      devices: [
+        { id: 'video_intercom', name: 'Video Intercom', icon: '📺', specs: '7" Display, 2-Way Audio, Door Release' },
+        { id: 'audio_intercom', name: 'Audio Intercom', icon: '🔊', specs: 'Hands-Free, Weather Resistant, PoE' },
+        { id: 'call_station', name: 'Call Station', icon: '📱', specs: 'Directory, Speed Dial, Stainless Steel' }
+      ]
+    },
+    'Network Infrastructure': {
+      icon: '📡',
+      color: '#6366F1',
+      devices: [
+        { id: 'poe_switch', name: 'PoE Switch', icon: '🔌', specs: '24-Port, 802.3at+, Managed, Rack Mount' },
+        { id: 'wireless_ap', name: 'Wireless Access Point', icon: '📶', specs: 'Wi-Fi 6, 2.4/5GHz, PoE+, Indoor/Outdoor' },
+        { id: 'nvr', name: 'Network Video Recorder', icon: '💾', specs: '32CH, 4K Recording, 8TB Storage, RAID' },
+        { id: 'fiber_convert', name: 'Fiber Converter', icon: '🌐', specs: 'Copper to Fiber, SFP+, Gigabit, DIN Rail' }
+      ]
+    },
+    'Fire Safety': {
+      icon: '🔥',
+      color: '#EF4444',
+      devices: [
+        { id: 'fire_panel', name: 'Fire Alarm Panel', icon: '🚨', specs: 'Addressable, 250 Points, Networking' },
+        { id: 'pull_station', name: 'Manual Pull Station', icon: '🆘', specs: 'Dual Action, Weather Resistant, ADA' },
+        { id: 'horn_strobe', name: 'Horn/Strobe', icon: '🔊', specs: '110dB, Multi-Candela, Weatherproof' },
+        { id: 'heat_detector', name: 'Heat Detector', icon: '🌡️', specs: '135°F Fixed, Rate of Rise, Wireless' }
+      ]
+    }
+  }
 
   // Site Planner Functions
   const handleMapClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -230,9 +301,55 @@ Ready to create something amazing? Upload your first asset! 📸✨`,
         }
 
         ctx.stroke()
+      } else if (drawing.type === 'device' && drawing.x !== undefined && drawing.y !== undefined) {
+        // Check if this device's layer is active
+        const deviceCategory = (drawing as any).category
+        const layerKey = deviceCategory ? deviceCategory.toLowerCase().replace(/\s+/g, '-') : ''
+
+        if (!activeLayers.includes(layerKey)) {
+          return // Skip rendering if layer is not active
+        }
+
+        // Render device as a rounded rectangle with icon and label
+        const deviceX = drawing.x
+        const deviceY = drawing.y
+        const deviceWidth = drawing.width || 40
+        const deviceHeight = drawing.height || 40
+
+        // Draw device background
+        ctx.fillStyle = drawing.color || '#3B82F6'
+        ctx.globalAlpha = 0.2
+        ctx.beginPath()
+        ctx.roundRect(deviceX - deviceWidth/2, deviceY - deviceHeight/2, deviceWidth, deviceHeight, 8)
+        ctx.fill()
+
+        // Draw device border
+        ctx.globalAlpha = 1
+        ctx.strokeStyle = drawing.color || '#3B82F6'
+        ctx.lineWidth = 2
+        ctx.stroke()
+
+        // Draw device icon (simplified text rendering)
+        ctx.fillStyle = drawing.color || '#3B82F6'
+        ctx.font = '20px Arial'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+
+        const deviceIcon = (drawing as any).deviceIcon || '📹'
+        ctx.fillText(deviceIcon, deviceX, deviceY)
+
+        // Draw device label below
+        ctx.font = '10px Arial'
+        ctx.fillStyle = '#333'
+        const deviceName = (drawing as any).deviceName || 'Device'
+        const truncatedName = deviceName.length > 12 ? deviceName.substring(0, 12) + '...' : deviceName
+        ctx.fillText(truncatedName, deviceX, deviceY + deviceHeight/2 + 12)
+
+        // Reset globalAlpha
+        ctx.globalAlpha = 1
       }
     })
-  }, [drawings])
+  }, [drawings, activeLayers])
 
   const handleLogin = async () => {
     if (auth.authenticate(password)) {
@@ -660,6 +777,166 @@ What type of content would be most valuable for your goals right now? I'm here t
     const files = e.dataTransfer.files
     if (files) {
       handleFileUpload(files)
+    }
+  }
+
+  // Canvas-specific drag and drop handlers for device placement
+  const handleCanvasDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'copy'
+  }
+
+  const handleCanvasDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+
+    try {
+      const deviceData = JSON.parse(e.dataTransfer.getData('application/json'))
+
+      if (deviceData.type === 'device') {
+        const rect = e.currentTarget.getBoundingClientRect()
+        const x = e.clientX - rect.left
+        const y = e.clientY - rect.top
+
+        // Add device to drawings as a placed element
+        const newDevice = {
+          id: Date.now().toString(),
+          type: 'device' as const,
+          x,
+          y,
+          width: 40,
+          height: 40,
+          deviceType: deviceData.deviceId,
+          deviceName: deviceData.deviceName,
+          deviceIcon: deviceData.deviceIcon,
+          deviceSpecs: deviceData.deviceSpecs,
+          categoryColor: deviceData.categoryColor,
+          category: deviceData.category,
+          color: deviceData.categoryColor,
+          strokeWidth: 2
+        }
+
+        setDrawings(prev => [...prev, newDevice])
+
+        // Also add to placed devices for layer management
+        const placedDevice = {
+          id: newDevice.id,
+          type: deviceData.deviceId,
+          lat: y, // Using canvas coordinates as lat/lng equivalent
+          lng: x,
+          name: deviceData.deviceName,
+          specs: deviceData.deviceSpecs
+        }
+
+        setPlacedDevices(prev => [...prev, placedDevice])
+      }
+    } catch (error) {
+      console.error('Error parsing dropped device data:', error)
+    }
+  }
+
+  // Touch event handlers for iPad Pro optimization
+  const getEventPosition = (e: TouchEvent | MouseEvent) => {
+    if ('touches' in e && e.touches.length > 0) {
+      return {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      }
+    } else if ('clientX' in e) {
+      return {
+        x: e.clientX,
+        y: e.clientY
+      }
+    }
+    return { x: 0, y: 0 }
+  }
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault()
+
+    if (e.touches.length === 2) {
+      // Two finger gesture - prepare for pinch/zoom or pan
+      setIsMultiTouch(true)
+      setIsPanning(true)
+      setLastPanPosition({
+        x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+        y: (e.touches[0].clientY + e.touches[1].clientY) / 2
+      })
+    } else if (e.touches.length === 1 && selectedTool === 'pen') {
+      // Single touch drawing
+      setIsDrawing(true)
+      const rect = e.currentTarget.getBoundingClientRect()
+      const touch = e.touches[0]
+      const x = (touch.clientX - rect.left - canvasOffset.x) / canvasScale
+      const y = (touch.clientY - rect.top - canvasOffset.y) / canvasScale
+
+      const newDrawing = {
+        id: Date.now().toString(),
+        type: 'pen' as const,
+        points: [x, y],
+        color: currentColor,
+        strokeWidth: currentStrokeWidth
+      }
+      setDrawings(prev => [...prev, newDrawing])
+    }
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    e.preventDefault()
+
+    if (e.touches.length === 2 && isMultiTouch) {
+      // Handle pinch-to-zoom and two-finger pan
+      const currentDistance = Math.sqrt(
+        Math.pow(e.touches[1].clientX - e.touches[0].clientX, 2) +
+        Math.pow(e.touches[1].clientY - e.touches[0].clientY, 2)
+      )
+
+      // Pan with two fingers
+      const currentCenter = {
+        x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+        y: (e.touches[0].clientY + e.touches[1].clientY) / 2
+      }
+
+      if (isPanning) {
+        const deltaX = currentCenter.x - lastPanPosition.x
+        const deltaY = currentCenter.y - lastPanPosition.y
+
+        setCanvasOffset(prev => ({
+          x: prev.x + deltaX,
+          y: prev.y + deltaY
+        }))
+
+        setLastPanPosition(currentCenter)
+      }
+    } else if (e.touches.length === 1 && isDrawing && selectedTool === 'pen') {
+      // Continue drawing with single touch
+      const rect = e.currentTarget.getBoundingClientRect()
+      const touch = e.touches[0]
+      const x = (touch.clientX - rect.left - canvasOffset.x) / canvasScale
+      const y = (touch.clientY - rect.top - canvasOffset.y) / canvasScale
+
+      setDrawings(prev => {
+        const newDrawings = [...prev]
+        const lastDrawing = newDrawings[newDrawings.length - 1]
+        if (lastDrawing && lastDrawing.points) {
+          lastDrawing.points.push(x, y)
+        }
+        return newDrawings
+      })
+    }
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    e.preventDefault()
+
+    if (e.touches.length === 0) {
+      // All touches ended
+      setIsDrawing(false)
+      setIsPanning(false)
+      setIsMultiTouch(false)
+    } else if (e.touches.length === 1 && isMultiTouch) {
+      // Went from multi-touch to single touch
+      setIsMultiTouch(false)
+      setIsPanning(false)
     }
   }
 
@@ -1573,78 +1850,344 @@ What type of content would be most valuable for your goals right now? I'm here t
               </div>
             </div>
 
-            {/* Drawing Tools */}
+            {/* Mobile-First Control Panel */}
             {(uploadedPDF || isBlankCanvas) && (
               <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <PenTool className="w-5 h-5" />
-                  Drawing Tools
-                </h3>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                    <PenTool className="w-5 h-5" />
+                    CAD Tools
+                  </h3>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setShowFloatingToolbar(!showFloatingToolbar)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        showFloatingToolbar
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      }`}
+                    >
+                      🎯 Floating Tools
+                    </button>
+                    <button
+                      onClick={() => setShowDeviceTree(!showDeviceTree)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        showDeviceTree
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      }`}
+                    >
+                      📚 Device Library
+                    </button>
+                  </div>
+                </div>
 
-                {/* Tool Selection */}
-                <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
+                {/* iPad Pro Zoom & Pan Controls */}
+                <div className="bg-gray-700/30 rounded-lg p-4 mb-6">
+                  <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                    🔍 Touch Controls
+                  </h4>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setCanvasScale(prev => Math.max(0.1, prev - 0.2))}
+                        className="w-10 h-10 bg-gray-600 hover:bg-gray-500 text-white rounded-lg flex items-center justify-center text-lg font-bold transition-all touch-manipulation"
+                      >
+                        −
+                      </button>
+                      <div className="px-3 py-1 bg-gray-800 rounded text-sm text-gray-300 min-w-[60px] text-center">
+                        {Math.round(canvasScale * 100)}%
+                      </div>
+                      <button
+                        onClick={() => setCanvasScale(prev => Math.min(3, prev + 0.2))}
+                        className="w-10 h-10 bg-gray-600 hover:bg-gray-500 text-white rounded-lg flex items-center justify-center text-lg font-bold transition-all touch-manipulation"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setCanvasScale(1)
+                          setCanvasOffset({ x: 0, y: 0 })
+                        }}
+                        className="px-3 py-1 bg-blue-600/20 text-blue-400 rounded text-xs hover:bg-blue-600/40 transition-all touch-manipulation"
+                      >
+                        Reset View
+                      </button>
+                      <button
+                        onClick={() => setCanvasScale(0.5)}
+                        className="px-3 py-1 bg-green-600/20 text-green-400 rounded text-xs hover:bg-green-600/40 transition-all touch-manipulation"
+                      >
+                        Fit to Screen
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-xs text-gray-400">
+                    💡 Use two fingers to pinch-zoom, two-finger drag to pan
+                  </div>
+                </div>
+
+                {/* Quick Access Toolbar */}
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-4 mb-6">
                   {[
-                    { tool: 'pen', name: 'Pen', icon: PenTool },
-                    { tool: 'rectangle', name: 'Rectangle', icon: Square },
-                    { tool: 'circle', name: 'Circle', icon: Circle },
-                    { tool: 'text', name: 'Text', icon: Type },
-                    { tool: 'move', name: 'Move', icon: Move },
-                    { tool: 'device', name: 'Device', icon: MapPin }
-                  ].map(({ tool, name, icon: Icon }) => (
+                    { tool: 'pen', name: 'Draw', icon: PenTool, desc: 'Freehand drawing' },
+                    { tool: 'rectangle', name: 'Room', icon: Square, desc: 'Create rooms' },
+                    { tool: 'circle', name: 'Zone', icon: Circle, desc: 'Coverage zones' },
+                    { tool: 'text', name: 'Label', icon: Type, desc: 'Add text' },
+                    { tool: 'move', name: 'Select', icon: Move, desc: 'Move objects' },
+                    { tool: 'device', name: 'Device', icon: MapPin, desc: 'Place devices' }
+                  ].map(({ tool, name, icon: Icon, desc }) => (
                     <button
                       key={tool}
                       onClick={() => setSelectedTool(tool as any)}
-                      className={`p-3 rounded-lg border-2 transition-all flex flex-col items-center gap-2 ${
+                      className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 touch-manipulation ${
                         selectedTool === tool
-                          ? 'bg-purple-600 border-white text-white'
-                          : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-gray-500'
+                          ? 'bg-purple-600 border-purple-400 text-white shadow-lg'
+                          : 'bg-gray-700/50 border-gray-600 text-gray-300 hover:border-purple-500 hover:bg-gray-600/50'
                       }`}
                     >
-                      <Icon className="w-5 h-5" />
-                      <span className="text-xs font-medium">{name}</span>
+                      <Icon className="w-6 h-6" />
+                      <span className="text-sm font-semibold">{name}</span>
+                      <span className="text-xs opacity-75">{desc}</span>
                     </button>
                   ))}
                 </div>
 
-                {/* Tool Properties */}
-                <div className="flex flex-wrap items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm text-gray-400">Color:</label>
+                {/* iPad Pro Optimized Controls */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-gray-700/30 rounded-lg p-4">
+                    <label className="text-sm font-medium text-gray-300 mb-2 block">Color</label>
                     <input
                       type="color"
                       value={currentColor}
                       onChange={(e) => setCurrentColor(e.target.value)}
-                      className="w-8 h-8 rounded border border-gray-600"
+                      className="w-full h-12 rounded-lg border-2 border-gray-600 cursor-pointer"
                     />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm text-gray-400">Width:</label>
+                  <div className="bg-gray-700/30 rounded-lg p-4">
+                    <label className="text-sm font-medium text-gray-300 mb-2 block">
+                      Width: {currentStrokeWidth}px
+                    </label>
                     <input
                       type="range"
                       min="1"
-                      max="10"
+                      max="15"
                       value={currentStrokeWidth}
                       onChange={(e) => setCurrentStrokeWidth(parseInt(e.target.value))}
-                      className="w-20"
+                      className="w-full h-6 bg-gray-600 rounded-lg appearance-none cursor-pointer"
                     />
-                    <span className="text-sm text-gray-400 w-8">{currentStrokeWidth}px</span>
                   </div>
                   <button
                     onClick={() => setShowGrid(!showGrid)}
-                    className={`px-3 py-1 rounded text-sm ${
+                    className={`bg-gray-700/30 rounded-lg p-4 transition-all touch-manipulation ${
                       showGrid
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-700 text-gray-300'
+                        ? 'bg-purple-600/50 border-2 border-purple-400'
+                        : 'hover:bg-gray-600/50'
                     }`}
                   >
-                    Grid: {showGrid ? 'On' : 'Off'}
+                    <Grid className="w-6 h-6 mx-auto mb-1" />
+                    <span className="text-sm font-medium">Grid</span>
                   </button>
                   <button
                     onClick={() => setDrawings([])}
-                    className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+                    className="bg-red-600/20 hover:bg-red-600/40 rounded-lg p-4 transition-all touch-manipulation border-2 border-red-600/50"
                   >
-                    Clear All
+                    <Trash2 className="w-6 h-6 mx-auto mb-1 text-red-400" />
+                    <span className="text-sm font-medium text-red-400">Clear</span>
                   </button>
+                </div>
+              </div>
+            )}
+
+            {/* Floating Toolbar */}
+            {showFloatingToolbar && (uploadedPDF || isBlankCanvas) && (
+              <div
+                className="fixed bg-gray-800/95 backdrop-blur-xl border border-purple-600/30 rounded-2xl p-4 shadow-2xl z-50"
+                style={{ left: toolbarPosition.x, top: toolbarPosition.y }}
+                onMouseDown={(e) => {
+                  const startX = e.clientX - toolbarPosition.x
+                  const startY = e.clientY - toolbarPosition.y
+
+                  const handleMouseMove = (e: MouseEvent) => {
+                    setToolbarPosition({
+                      x: e.clientX - startX,
+                      y: e.clientY - startY
+                    })
+                  }
+
+                  const handleMouseUp = () => {
+                    document.removeEventListener('mousemove', handleMouseMove)
+                    document.removeEventListener('mouseup', handleMouseUp)
+                  }
+
+                  document.addEventListener('mousemove', handleMouseMove)
+                  document.addEventListener('mouseup', handleMouseUp)
+                }}
+              >
+                <div className="flex items-center gap-2 mb-4 cursor-move">
+                  <PenTool className="w-4 h-4 text-purple-400" />
+                  <span className="text-sm font-semibold text-white">Quick Tools</span>
+                  <button
+                    onClick={() => setShowFloatingToolbar(false)}
+                    className="ml-auto text-gray-400 hover:text-white"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { tool: 'pen', icon: PenTool, label: 'Draw' },
+                    { tool: 'rectangle', icon: Square, label: 'Room' },
+                    { tool: 'circle', icon: Circle, label: 'Zone' },
+                    { tool: 'text', icon: Type, label: 'Text' },
+                    { tool: 'move', icon: Move, label: 'Move' },
+                    { tool: 'device', icon: MapPin, label: 'Device' }
+                  ].map(({ tool, icon: Icon, label }) => (
+                    <button
+                      key={tool}
+                      onClick={() => setSelectedTool(tool as any)}
+                      className={`p-3 rounded-lg border-2 transition-all flex flex-col items-center gap-1 ${
+                        selectedTool === tool
+                          ? 'bg-purple-600 border-purple-400 text-white'
+                          : 'bg-gray-700/50 border-gray-600 text-gray-300 hover:border-purple-500'
+                      }`}
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span className="text-xs font-medium">{label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Device Tree Sidebar */}
+            {showDeviceTree && (uploadedPDF || isBlankCanvas) && (
+              <div className="fixed right-0 top-0 h-full w-96 bg-gray-800/95 backdrop-blur-xl border-l border-purple-600/30 z-40 overflow-y-auto">
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                      📚 Device Library
+                    </h3>
+                    <button
+                      onClick={() => setShowDeviceTree(false)}
+                      className="text-gray-400 hover:text-white"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Technology Layer Management */}
+                  <div className="bg-gray-700/50 rounded-lg p-4 mb-6">
+                    <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                      🔧 Layer Controls
+                    </h4>
+                    <div className="space-y-2">
+                      {Object.entries(deviceLibrary).map(([category, data]) => {
+                        const layerKey = category.toLowerCase().replace(/\s+/g, '-')
+                        const isActive = activeLayers.includes(layerKey)
+
+                        return (
+                          <div key={category} className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-3 h-3 rounded-full"
+                                style={{ backgroundColor: data.color }}
+                              />
+                              <span className="text-sm text-gray-300">{category}</span>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setActiveLayers(prev =>
+                                  isActive
+                                    ? prev.filter(layer => layer !== layerKey)
+                                    : [...prev, layerKey]
+                                )
+                              }}
+                              className={`w-10 h-5 rounded-full relative transition-all ${
+                                isActive ? 'bg-purple-600' : 'bg-gray-600'
+                              }`}
+                            >
+                              <div
+                                className={`w-3 h-3 bg-white rounded-full absolute top-1 transition-all ${
+                                  isActive ? 'left-6' : 'left-1'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-gray-600/50">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setActiveLayers(Object.keys(deviceLibrary).map(cat => cat.toLowerCase().replace(/\s+/g, '-')))}
+                          className="px-3 py-1 bg-purple-600/20 text-purple-400 rounded text-xs hover:bg-purple-600/40 transition-all"
+                        >
+                          Show All
+                        </button>
+                        <button
+                          onClick={() => setActiveLayers([])}
+                          className="px-3 py-1 bg-gray-600/20 text-gray-400 rounded text-xs hover:bg-gray-600/40 transition-all"
+                        >
+                          Hide All
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    {Object.entries(deviceLibrary).map(([category, data]) => (
+                      <div key={category} className="bg-gray-700/30 rounded-lg overflow-hidden">
+                        <button
+                          onClick={() => setSelectedDeviceCategory(
+                            selectedDeviceCategory === category ? null : category
+                          )}
+                          className="w-full p-4 text-left flex items-center justify-between hover:bg-gray-600/30 transition-all"
+                          style={{ borderLeftColor: data.color, borderLeftWidth: '4px' }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl">{data.icon}</span>
+                            <span className="font-semibold text-white">{category}</span>
+                          </div>
+                          <span className="text-gray-400">
+                            {selectedDeviceCategory === category ? '▼' : '▶'}
+                          </span>
+                        </button>
+
+                        {selectedDeviceCategory === category && (
+                          <div className="p-2 space-y-2">
+                            {data.devices.map((device) => (
+                              <button
+                                key={device.id}
+                                className="w-full p-3 bg-gray-600/20 hover:bg-gray-600/40 rounded-lg text-left transition-all border-2 border-transparent hover:border-purple-500/50"
+                                onDragStart={(e) => {
+                                  e.dataTransfer.setData('application/json', JSON.stringify({
+                                    type: 'device',
+                                    deviceId: device.id,
+                                    deviceName: device.name,
+                                    deviceIcon: device.icon,
+                                    deviceSpecs: device.specs,
+                                    categoryColor: deviceLibrary[category].color,
+                                    category: category
+                                  }))
+                                }}
+                                draggable
+                              >
+                                <div className="flex items-start gap-3">
+                                  <span className="text-xl">{device.icon}</span>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="font-medium text-white">{device.name}</div>
+                                    <div className="text-xs text-gray-400 mt-1">{device.specs}</div>
+                                  </div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -1667,7 +2210,12 @@ What type of content would be most valuable for your goals right now? I'm here t
                   </div>
                 </div>
 
-                <div className="relative bg-white rounded-lg" style={{ aspectRatio: '4/3', minHeight: '600px' }}>
+                <div
+                  className="relative bg-white rounded-lg"
+                  style={{ aspectRatio: '4/3', minHeight: '600px' }}
+                  onDragOver={handleCanvasDragOver}
+                  onDrop={handleCanvasDrop}
+                >
                   {/* Grid Background */}
                   {showGrid && (
                     <div className="absolute inset-0 opacity-20">
@@ -1696,14 +2244,18 @@ What type of content would be most valuable for your goals right now? I'm here t
                   {/* Drawing Canvas */}
                   <canvas
                     ref={canvasRef}
-                    className="absolute inset-0 w-full h-full cursor-crosshair"
+                    className="absolute inset-0 w-full h-full cursor-crosshair touch-none"
+                    style={{
+                      transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${canvasScale})`,
+                      transformOrigin: '0 0'
+                    }}
                     onMouseDown={(e) => {
                       if (selectedTool === 'pen') {
                         setIsDrawing(true)
                         // Start new drawing
                         const rect = e.currentTarget.getBoundingClientRect()
-                        const x = e.clientX - rect.left
-                        const y = e.clientY - rect.top
+                        const x = (e.clientX - rect.left - canvasOffset.x) / canvasScale
+                        const y = (e.clientY - rect.top - canvasOffset.y) / canvasScale
 
                         const newDrawing = {
                           id: Date.now().toString(),
@@ -1718,8 +2270,8 @@ What type of content would be most valuable for your goals right now? I'm here t
                     onMouseMove={(e) => {
                       if (isDrawing && selectedTool === 'pen') {
                         const rect = e.currentTarget.getBoundingClientRect()
-                        const x = e.clientX - rect.left
-                        const y = e.clientY - rect.top
+                        const x = (e.clientX - rect.left - canvasOffset.x) / canvasScale
+                        const y = (e.clientY - rect.top - canvasOffset.y) / canvasScale
 
                         setDrawings(prev => {
                           const newDrawings = [...prev]
@@ -1733,6 +2285,9 @@ What type of content would be most valuable for your goals right now? I'm here t
                     }}
                     onMouseUp={() => setIsDrawing(false)}
                     onMouseLeave={() => setIsDrawing(false)}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
                   />
 
                   {/* Instruction Overlay */}
