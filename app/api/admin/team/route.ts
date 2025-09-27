@@ -90,17 +90,42 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const newMember: TeamMember = await request.json()
+    const body = await request.json()
+
+    // Validation
+    if (!body.name || body.name.trim().length === 0) {
+      return NextResponse.json({ error: 'Name is required' }, { status: 400 })
+    }
+
+    if (!body.role || body.role.trim().length === 0) {
+      return NextResponse.json({ error: 'Role is required' }, { status: 400 })
+    }
+
     const teamMembers = loadTeamData()
 
-    // Generate ID if not provided
-    if (!newMember.id) {
-      newMember.id = Date.now().toString()
+    // Generate initials from name if not provided
+    const generateInitials = (name: string): string => {
+      return name
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase())
+        .join('')
+        .substring(0, 2)
+    }
+
+    const newMember: TeamMember = {
+      id: Date.now().toString(),
+      name: body.name.trim(),
+      role: body.role.trim(),
+      description: body.description?.trim() || '',
+      imagePath: body.imagePath || `/team/placeholder.jpg`,
+      initials: body.initials || generateInitials(body.name.trim()),
+      ...(body.href && { href: body.href.trim() })
     }
 
     teamMembers.push(newMember)
     saveTeamData(teamMembers)
 
+    console.log('Team member added successfully:', newMember)
     return NextResponse.json({ success: true, member: newMember })
   } catch (error) {
     console.error('Error adding team member:', error)
@@ -125,5 +150,31 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error('Error updating team member:', error)
     return NextResponse.json({ error: 'Failed to update team member' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+
+    if (!id) {
+      return NextResponse.json({ error: 'Team member ID is required' }, { status: 400 })
+    }
+
+    const teamMembers = loadTeamData()
+    const index = teamMembers.findIndex(member => member.id === id)
+
+    if (index === -1) {
+      return NextResponse.json({ error: 'Team member not found' }, { status: 404 })
+    }
+
+    teamMembers.splice(index, 1)
+    saveTeamData(teamMembers)
+
+    return NextResponse.json({ success: true, message: 'Team member deleted successfully' })
+  } catch (error) {
+    console.error('Error deleting team member:', error)
+    return NextResponse.json({ error: 'Failed to delete team member' }, { status: 500 })
   }
 }

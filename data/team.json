@@ -16,6 +16,14 @@
     "initials": "PL"
   },
   {
+    "id": "5",
+    "name": "Daniel Kozich II",
+    "role": "Senior Market Analyst",
+    "description": "Strategic market analysis and business intelligence for Design-Rite's growth initiatives. Expertise in competitive research, market trends, and data-driven insights that guide product development and market expansion strategies.",
+    "imagePath": "/team/placeholder.jpg",
+    "initials": "DK"
+  },
+  {
     "id": "3",
     "name": "Munnyman Communications",
     "role": "Development Team",
