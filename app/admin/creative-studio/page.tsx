@@ -149,10 +149,23 @@ Ready to create something amazing? Upload your first asset! 📸✨`,
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [showGrid, setShowGrid] = useState(true)
   const [showDeviceTree, setShowDeviceTree] = useState(false)
+  const [showFloatingToolbar, setShowFloatingToolbar] = useState(false)
+  const [toolbarPosition, setToolbarPosition] = useState({ x: 20, y: 100 })
+  const [selectedDeviceCategory, setSelectedDeviceCategory] = useState<string | null>(null)
+
+  // Touch and gesture optimization for iPad Pro
+  const [canvasScale, setCanvasScale] = useState(1)
+  const [canvasOffset, setCanvasOffset] = useState({ x: 0, y: 0 })
+  const [isPanning, setIsPanning] = useState(false)
+  const [lastPanPosition, setLastPanPosition] = useState({ x: 0, y: 0 })
+  const [isMultiTouch, setIsMultiTouch] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
 
+  // Low Voltage Device Library
+  const deviceLibrary = {
+    'Security Cameras': {
       icon: '📹',
       color: '#3B82F6',
       devices: [
