@@ -75,7 +75,7 @@ const EmailGate = ({ isOpen, onClose, onSuccess }: EmailGateProps) => {
         body: JSON.stringify({
           email,
           company,
-          source: 'ai_assessment_demo',
+          source: 'platform_access_gate',
           timestamp: new Date().toISOString()
         }),
       });

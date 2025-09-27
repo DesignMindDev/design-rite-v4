@@ -45,7 +45,7 @@ export default function UnifiedNavigation() {
     // Check if user is already authenticated
     if (isAuthenticated) {
       extendSession();
-      window.location.href = '/ai-assessment';
+      window.location.href = '/estimate-options';
     } else {
       setShowEmailGate(true);
     }
@@ -53,7 +53,7 @@ export default function UnifiedNavigation() {
 
   const handleEmailGateSuccess = () => {
     setShowEmailGate(false);
-    window.location.href = '/ai-assessment';
+    window.location.href = '/estimate-options';
   };
 
   const redirectToWaitlist = () => {
