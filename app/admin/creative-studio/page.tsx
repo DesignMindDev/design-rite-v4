@@ -1404,31 +1404,55 @@ What type of content would be most valuable for your goals right now? I'm here t
                   {/* Category Selection */}
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Research Category</label>
-                    <select
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value as ResearchQuery['category'])}
-                      className="w-full p-3 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    >
-                      <option value="industry-trends">🔥 Industry Trends</option>
-                      <option value="competitive-analysis">🏢 Competitive Analysis</option>
-                      <option value="technical-research">⚙️ Technical Research</option>
-                      <option value="content-ideas">💡 Content Ideas</option>
-                      <option value="market-analysis">📊 Market Analysis</option>
-                    </select>
+                    <div className="relative">
+                      <select
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value as ResearchQuery['category'])}
+                        className="w-full p-3 pr-10 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
+                        style={{
+                          WebkitAppearance: 'none',
+                          MozAppearance: 'none',
+                          appearance: 'none'
+                        }}
+                      >
+                        <option value="industry-trends" className="bg-gray-800 text-white">🔥 Industry Trends</option>
+                        <option value="competitive-analysis" className="bg-gray-800 text-white">🏢 Competitive Analysis</option>
+                        <option value="technical-research" className="bg-gray-800 text-white">⚙️ Technical Research</option>
+                        <option value="content-ideas" className="bg-gray-800 text-white">💡 Content Ideas</option>
+                        <option value="market-analysis" className="bg-gray-800 text-white">📊 Market Analysis</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
                   </div>
 
                   {/* AI Provider Selection */}
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">AI Analysis Provider</label>
-                    <select
-                      value={selectedProvider}
-                      onChange={(e) => setSelectedProvider(e.target.value)}
-                      className="w-full p-3 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    >
-                      <option value="anthropic">🧠 Claude (Deep Analysis)</option>
-                      <option value="openai">✨ GPT (Creative Synthesis)</option>
-                      <option value="google">📊 Bard (Data-Driven)</option>
-                    </select>
+                    <div className="relative">
+                      <select
+                        value={selectedProvider}
+                        onChange={(e) => setSelectedProvider(e.target.value)}
+                        className="w-full p-3 pr-10 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
+                        style={{
+                          WebkitAppearance: 'none',
+                          MozAppearance: 'none',
+                          appearance: 'none'
+                        }}
+                      >
+                        <option value="anthropic" className="bg-gray-800 text-white">🧠 Claude (Deep Analysis)</option>
+                        <option value="openai" className="bg-gray-800 text-white">✨ GPT (Creative Synthesis)</option>
+                        <option value="google" className="bg-gray-800 text-white">📊 Bard (Data-Driven)</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
