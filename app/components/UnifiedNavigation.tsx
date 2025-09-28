@@ -463,7 +463,7 @@ export default function UnifiedNavigation() {
                 className="block w-full text-left dr-bg-violet dr-text-pearl px-4 py-2 rounded-lg mt-2 touch-manipulation active:bg-purple-800 transition-colors"
                 type="button"
               >
-                🚀 Try AI Assessment
+                🚀 Try Platform
               </button>
             </div>
           </div>

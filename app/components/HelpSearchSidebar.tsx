@@ -548,29 +548,35 @@ export default function HelpSearchSidebar() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, activeTab, chatInput, chatMessages, selectedProvider, isLoading]);
 
+  // Only show help sidebar on admin pages
+  const isAdminPage = pathname?.startsWith('/admin')
+
   return (
     <>
-      {/* Help Toggle Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed top-1/2 right-0 transform -translate-y-1/2 bg-purple-600 text-white p-3 rounded-l-lg shadow-lg hover:bg-purple-700 transition-all z-40 group"
-        title="Help & AI Chat (Ctrl+K / Ctrl+Shift+K)"
-      >
-        <div className="flex items-center gap-2">
-          <span className="text-lg">🤖</span>
-          <span className="hidden group-hover:block text-sm whitespace-nowrap pr-1">AI Assistant</span>
-        </div>
-      </button>
+      {/* Help Toggle Button - Only on Admin Pages */}
+      {isAdminPage && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed top-1/2 right-0 transform -translate-y-1/2 bg-purple-600 text-white p-3 rounded-l-lg shadow-lg hover:bg-purple-700 transition-all z-40 group"
+          title="Help & AI Chat (Ctrl+K / Ctrl+Shift+K)"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-lg">🤖</span>
+            <span className="hidden group-hover:block text-sm whitespace-nowrap pr-1">AI Assistant</span>
+          </div>
+        </button>
+      )}
 
-      {/* Sidebar Overlay */}
-      {isOpen && (
+      {/* Sidebar Overlay - Only on Admin Pages */}
+      {isAdminPage && isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={() => setIsOpen(false)} />
       )}
 
-      {/* Help Sidebar */}
-      <div className={`fixed top-0 right-0 h-full w-96 bg-gray-800/60 backdrop-blur-xl border-l border-purple-600/20 shadow-2xl transform transition-transform duration-300 z-50 ${
-        isOpen ? 'translate-x-0' : 'translate-x-full'
-      }`}>
+      {/* Help Sidebar - Only on Admin Pages */}
+      {isAdminPage && (
+        <div className={`fixed top-0 right-0 h-full w-96 bg-gray-800/60 backdrop-blur-xl border-l border-purple-600/20 shadow-2xl transform transition-transform duration-300 z-50 ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}>
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-4">
@@ -872,7 +878,8 @@ export default function HelpSearchSidebar() {
             )}
           </div>
         </div>
-      </div>
+        </div>
+      )}
     </>
   );
 }
