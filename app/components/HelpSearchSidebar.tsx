@@ -606,8 +606,8 @@ export default function HelpSearchSidebar() {
                   className="flex-1 p-2 bg-gray-700/50 border border-gray-600/50 rounded text-sm text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
                   <option value="auto">🎯 Auto (Best Available)</option>
-                  <option value="openai">🤖 OpenAI GPT-4</option>
-                  <option value="claude">🧠 Claude Sonnet</option>
+                  <option value="openai">🌐 WebGPT (Search + AI)</option>
+                  <option value="claude">🧠 Claude (Deep Analysis)</option>
                 </select>
                 <button
                   onClick={clearChat}

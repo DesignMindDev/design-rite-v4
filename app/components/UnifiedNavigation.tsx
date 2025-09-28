@@ -146,7 +146,7 @@ export default function UnifiedNavigation() {
                 </div>
               </Link>
 
-              <Link href="/ai-security-assessment" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+              <button onClick={handleAIAssessmentClick} className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2 w-full text-left">
                 <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🧠
                 </div>
@@ -154,7 +154,7 @@ export default function UnifiedNavigation() {
                   <div className="font-semibold dr-ui dr-text-pearl mb-1">AI Security Assessment</div>
                   <div className="dr-ui text-gray-400 leading-tight">Professional security analysis with AI</div>
                 </div>
-              </Link>
+              </button>
 
               <Link href="/compliance-analyst" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
@@ -407,7 +407,13 @@ export default function UnifiedNavigation() {
                 📊 Security Estimate
               </button>
               <Link href="/ai-discovery" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🚀 AI Discovery Assistant</Link>
-              <Link href="/ai-security-assessment" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🧠 AI Security Assessment</Link>
+              <button
+                onClick={handleAIAssessmentClick}
+                className="block text-white/80 hover:dr-text-pearl py-2 pl-4 text-left w-full touch-manipulation active:bg-violet-600/10 transition-colors"
+                type="button"
+              >
+                🧠 AI Security Assessment
+              </button>
               <Link href="/compliance-analyst" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">✅ Compliance Tools</Link>
               <Link href="/professional-proposals" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">📋 Proposal Generator</Link>
               <Link href="/pricing-intelligence" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">💰 Pricing Intelligence</Link>
