@@ -30,6 +30,7 @@ export default function HelpSearchSidebar() {
   const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string, timestamp: Date, provider?: string}>>([]);
   const [chatInput, setChatInput] = useState('');
   const [selectedProvider, setSelectedProvider] = useState<'openai' | 'claude' | 'auto'>('auto');
+  const [chatThreadId, setChatThreadId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const pathname = usePathname();
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -415,15 +416,47 @@ export default function HelpSearchSidebar() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/ai-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: chatInput.trim(),
-          provider: selectedProvider === 'auto' ? 'anthropic' : selectedProvider,
-          chatHistory: chatMessages.slice(-5) // Send last 5 messages for context
-        })
-      });
+      let response;
+
+      // For paying subscribers, use unrestricted AI with full capabilities
+      if (selectedProvider === 'openai') {
+        // Use OpenAI Assistant API for premium users
+        if (!chatThreadId) {
+          // Initialize thread if needed
+          const initResponse = await fetch('/api/chat/init', { method: 'POST' });
+          const initData = await initResponse.json();
+          setChatThreadId(initData.threadId);
+
+          response = await fetch('/api/chat/message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: chatInput.trim(),
+              threadId: initData.threadId
+            })
+          });
+        } else {
+          response = await fetch('/api/chat/message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: chatInput.trim(),
+              threadId: chatThreadId
+            })
+          });
+        }
+      } else {
+        // Use premium Claude API for other providers
+        response = await fetch('/api/help-assistant', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: chatInput.trim(),
+            sessionId: Date.now().toString(),
+            conversationHistory: chatMessages.slice(-5)
+          })
+        });
+      }
 
       if (!response.ok) {
         throw new Error('Failed to get AI response');
@@ -461,6 +494,7 @@ export default function HelpSearchSidebar() {
   // Clear chat history
   const clearChat = () => {
     setChatMessages([]);
+    setChatThreadId(null); // Reset OpenAI thread
     localStorage.removeItem('aiChatHistory');
   };
 

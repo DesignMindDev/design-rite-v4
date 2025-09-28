@@ -16,7 +16,7 @@ const ChatAssistant: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "Hi! I'm your Design-Rite Security Advisor. How can I help you today?",
+      content: "Hi! I'm your Design-Rite advisor. I can help with platform questions and basic guidance. For unlimited AI assistance, please upgrade to premium features.",
       timestamp: new Date()
     }
   ]);
@@ -33,25 +33,7 @@ const ChatAssistant: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Initialize thread on first open
-  useEffect(() => {
-    if (isOpen && !threadId) {
-      initializeThread();
-    }
-  }, [isOpen]);
-
-  const initializeThread = async () => {
-    try {
-      const response = await fetch('/api/chat/init', {
-        method: 'POST',
-      });
-      const data = await response.json();
-      setThreadId(data.threadId);
-      console.log('Initialized thread:', data.threadId);
-    } catch (error) {
-      console.error('Failed to initialize chat:', error);
-    }
-  };
+  // Public chatbot uses simple help responses - no thread initialization needed
 
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
@@ -68,52 +50,31 @@ const ChatAssistant: React.FC = () => {
     setIsLoading(true);
 
     try {
-      if (threadId) {
-        // Use OpenAI Assistant API
-        const response = await fetch('/api/chat/message', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            message: currentInput,
-            threadId: threadId
-          }),
-        });
+      // Public chatbot now provides limited predefined responses
+      let responseContent = "I can help with basic Design-Rite platform questions. ";
 
-        const data = await response.json();
+      // Simple keyword matching for limited public responses
+      const lowerInput = currentInput.toLowerCase();
 
-        const assistantMessage: Message = {
-          role: 'assistant',
-          content: data.response,
-          timestamp: new Date()
-        };
-
-        setMessages(prev => [...prev, assistantMessage]);
+      if (lowerInput.includes('estimate') || lowerInput.includes('pricing')) {
+        responseContent += "For security estimates, try our Quick Security Estimate tool - it provides real pricing in 5 minutes. Want more detailed analysis? Upgrade to access our AI Discovery Assistant.";
+      } else if (lowerInput.includes('security') || lowerInput.includes('camera') || lowerInput.includes('access control')) {
+        responseContent += "I can provide basic security system information. For comprehensive security analysis and design recommendations, please upgrade to access our full AI capabilities.";
+      } else if (lowerInput.includes('compliance') || lowerInput.includes('ndaa') || lowerInput.includes('ferpa')) {
+        responseContent += "Our platform supports NDAA compliance and FERPA requirements. For detailed compliance analysis, upgrade to access our premium AI features.";
+      } else if (lowerInput.includes('help') || lowerInput.includes('how')) {
+        responseContent += "I can guide you through basic platform features. For advanced help and unlimited AI assistance, consider upgrading to premium.";
       } else {
-        // Fallback to help assistant API
-        const response = await fetch('/api/help-assistant', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            message: currentInput,
-            sessionId: Date.now().toString(),
-            conversationHistory: messages.slice(-5)
-          })
-        });
-
-        const data = await response.json();
-
-        const assistantMessage: Message = {
-          role: 'assistant',
-          content: data.response || 'I apologize, but I encountered an issue. Please try again.',
-          timestamp: new Date()
-        };
-
-        setMessages(prev => [...prev, assistantMessage]);
+        responseContent += "For detailed answers and unlimited AI assistance, please upgrade to our premium features. I can only provide basic platform guidance.";
       }
+
+      const assistantMessage: Message = {
+        role: 'assistant',
+        content: responseContent,
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Failed to send message:', error);
       const errorMessage: Message = {
