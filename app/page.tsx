@@ -201,7 +201,7 @@ export default function HomePage() {
                 onClick={redirectToEstimate}
                 className="dr-bg-violet dr-text-pearl px-8 py-4 rounded-xl dr-ui font-bold hover:shadow-xl transition-all"
               >
-                🚀 Try Security Estimate
+                🚀 Try Platform
               </button>
               <Link
                 href="/waitlist"
@@ -394,7 +394,7 @@ export default function HomePage() {
               onClick={redirectToEstimate}
               className="dr-bg-violet dr-text-pearl px-8 py-4 rounded-xl dr-ui font-bold hover:shadow-xl transition-all"
             >
-              🚀 Try Security Estimate Now
+              🚀 Try Platform
             </button>
             <Link
               href="/waitlist"
@@ -430,7 +430,7 @@ export default function HomePage() {
             <div>
               <h3 className="dr-text-pearl dr-ui font-bold mb-4">Platform</h3>
               <ul className="space-y-2">
-                <li><button onClick={redirectToEstimate} className="text-gray-300 hover:dr-text-violet dr-ui transition-colors">Security Estimate</button></li>
+                <li><button onClick={redirectToEstimate} className="text-gray-300 hover:dr-text-violet dr-ui transition-colors">Try Platform</button></li>
                 <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/waitlist">Join Waitlist</Link></li>
                 <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/watch-demo">Demo</Link></li>
               </ul>
