@@ -24,7 +24,7 @@ export default function LoginPage() {
 
   const handleEmailGateSuccess = () => {
     setShowEmailGate(false);
-    router.push('/ai-assessment');
+    router.push('/estimate-options');
   };
 
   return (

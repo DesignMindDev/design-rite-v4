@@ -240,11 +240,11 @@ const SecurityEstimateForm = () => {
       timestamp: new Date().toISOString()
     };
 
-    // Store in sessionStorage for the AI Assistant
+    // Store in sessionStorage for the AI Assessment
     sessionStorage.setItem('quickEstimateData', JSON.stringify(handoffData));
 
-    // Navigate to AI Assistant with context
-    window.location.href = '/ai-assistant';
+    // Navigate to AI Assessment with context
+    window.location.href = '/ai-assessment';
   };
 
   return (

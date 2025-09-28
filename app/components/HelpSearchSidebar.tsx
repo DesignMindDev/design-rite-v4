@@ -549,7 +549,7 @@ export default function HelpSearchSidebar() {
   }, [isOpen, activeTab, chatInput, chatMessages, selectedProvider, isLoading]);
 
   // Only show help sidebar on admin pages
-  const isAdminPage = pathname?.startsWith('/admin')
+  const isAdminPage = pathname?.startsWith('/admin');
 
   return (
     <>

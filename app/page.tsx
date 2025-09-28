@@ -50,21 +50,12 @@ export default function HomePage() {
 
   const redirectToEstimate = (e: React.MouseEvent) => {
     e.preventDefault();
-    console.log('redirectToEstimate clicked', { isAuthenticated });
 
-    try {
-      if (isAuthenticated) {
-        extendSession();
-        console.log('Authenticated user, redirecting to estimate-options');
-        window.location.href = '/estimate-options';
-      } else {
-        console.log('Not authenticated, showing email gate');
-        setShowEmailGate(true);
-      }
-    } catch (error) {
-      console.error('Error in redirectToEstimate:', error);
-      // Fallback: directly navigate to estimate-options
+    if (isAuthenticated) {
+      extendSession();
       window.location.href = '/estimate-options';
+    } else {
+      setShowEmailGate(true);
     }
   }
 
@@ -469,12 +460,11 @@ export default function HomePage() {
       </footer>
 
       {/* Email Gate */}
-      {showEmailGate && (
-        <EmailGate
-          onSuccess={handleEmailGateSuccess}
-          onClose={() => setShowEmailGate(false)}
-        />
-      )}
+      <EmailGate
+        isOpen={showEmailGate}
+        onSuccess={handleEmailGateSuccess}
+        onClose={() => setShowEmailGate(false)}
+      />
     </div>
   )
 }

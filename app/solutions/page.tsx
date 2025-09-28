@@ -22,7 +22,7 @@ export default function SolutionsPage() {
 
   const handleEmailGateSuccess = () => {
     setShowEmailGate(false);
-    window.location.href = '/ai-assessment';
+    window.location.href = '/estimate-options';
   };
 
   return (
