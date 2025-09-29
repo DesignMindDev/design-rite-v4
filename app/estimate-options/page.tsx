@@ -15,8 +15,8 @@ const EstimateOptionsPage = () => {
         if (user) {
           setIsAuthenticated(true);
         } else {
-          // Not authenticated - redirect to home page for auth
-          window.location.href = '/?auth=required';
+          // Not authenticated - stay on page but show message
+          setIsAuthenticated(false);
         }
       } catch (error) {
         console.error('Auth check failed:', error);
@@ -34,6 +34,31 @@ const EstimateOptionsPage = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
           <p className="text-gray-400">Verifying access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show auth required message if not authenticated
+  if (isAuthenticated === false) {
+    return (
+      <div className="min-h-screen dr-bg-charcoal dr-text-pearl flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-8">
+          <h1 className="text-3xl font-bold mb-4">Authentication Required</h1>
+          <p className="text-gray-400 mb-6">
+            Please sign in to access the security estimation platform.
+          </p>
+          <div className="space-y-4">
+            <Link
+              href="/"
+              className="block bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
+            >
+              Go Home & Sign In
+            </Link>
+            <p className="text-sm text-gray-500">
+              Click "Try Platform" in the header to authenticate
+            </p>
+          </div>
         </div>
       </div>
     );
