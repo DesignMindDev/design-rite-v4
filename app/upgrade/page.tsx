@@ -2,10 +2,7 @@
 
 import { useState } from 'react';
 import { useSupabaseAuth } from '../hooks/useSupabaseAuth';
-import { stripePlans, createSubscription } from '../../lib/stripe';
-import { loadStripe } from '@stripe/stripe-js';
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+import { stripePlans, createCheckoutSession } from '../../lib/stripe';
 
 export default function UpgradePage() {
   const { user, userCompany } = useSupabaseAuth();
@@ -23,30 +20,14 @@ export default function UpgradePage() {
     setError('');
 
     try {
-      const stripe = await stripePromise;
-      if (!stripe) {
-        throw new Error('Stripe failed to load');
-      }
+      // Create checkout session using our local API
+      const response = await createCheckoutSession(selectedPlan, user.email!);
 
-      // Create subscription
-      const response = await createSubscription(
-        user.email!,
-        user.user_metadata?.name || 'User',
-        selectedPlan,
-        '' // Payment method will be collected by Stripe Checkout
-      );
-
-      if (response.success) {
+      if (response.url) {
         // Redirect to Stripe Checkout
-        const { error } = await stripe.redirectToCheckout({
-          sessionId: response.sessionId
-        });
-
-        if (error) {
-          throw new Error(error.message);
-        }
+        window.location.href = response.url;
       } else {
-        throw new Error('Failed to create subscription');
+        throw new Error('No checkout URL received');
       }
     } catch (err) {
       console.error('Upgrade error:', err);

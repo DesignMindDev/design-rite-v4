@@ -5,51 +5,43 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 
 export default stripePromise;
 
-// Stripe configuration
+// Stripe configuration - Updated for local API routes
 export const stripeConfig = {
   publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
-  backendUrl: process.env.NEXT_PUBLIC_BACKEND_URL || 'https://design-rite-backend.onrender.com',
 };
 
-// Payment helpers
+// Payment helpers - Updated to use local Next.js API routes
+export const createCheckoutSession = async (planId: 'professional' | 'enterprise', userEmail: string) => {
+  const response = await fetch('/api/stripe/create-checkout', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      planId,
+      userEmail,
+      successUrl: `${window.location.origin}/dashboard?payment=success`,
+      cancelUrl: `${window.location.origin}/upgrade?payment=canceled`,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Failed to create checkout session');
+  }
+
+  return response.json();
+};
+
+// Legacy function kept for compatibility - redirects to Stripe Checkout
 export const createPaymentIntent = async (amount: number, currency = 'usd') => {
-  const response = await fetch(`${stripeConfig.backendUrl}/api/billing/create-payment-intent`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      amount,
-      currency,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to create payment intent');
-  }
-
-  return response.json();
+  // For subscriptions, redirect to createCheckoutSession instead
+  throw new Error('Use createCheckoutSession for subscription payments');
 };
 
-export const createSubscription = async (email: string, name: string, planType: 'professional' | 'enterprise', paymentMethodId: string) => {
-  const response = await fetch(`${stripeConfig.backendUrl}/api/billing/create-premium-subscription`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      email,
-      name,
-      planType,
-      paymentMethodId,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to create subscription');
-  }
-
-  return response.json();
+export const createSubscription = async (email: string, name: string, planType: 'professional' | 'enterprise') => {
+  // Use the new checkout session approach
+  return createCheckoutSession(planType, email);
 };
 
 // Plan configurations
