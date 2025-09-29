@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuthCache } from '../hooks/useAuthCache';
+import { authHelpers } from '../../lib/supabase';
 
 interface EmailGateProps {
   isOpen: boolean;
@@ -14,24 +14,20 @@ const EmailGate = ({ isOpen, onClose, onSuccess }: EmailGateProps) => {
   const [company, setCompany] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const { isAuthenticated, authData, saveAuthentication, extendSession } = useAuthCache();
 
   // Check if user is already authenticated when modal opens
   useEffect(() => {
-    if (isOpen && isAuthenticated && authData) {
-      // User is already authenticated, extend session and proceed
-      extendSession();
-      onSuccess();
-    }
-  }, [isOpen, isAuthenticated, authData, extendSession, onSuccess]);
-
-  // Pre-fill form with cached data if available
-  useEffect(() => {
-    if (authData && !email && !company) {
-      setEmail(authData.email);
-      setCompany(authData.company);
-    }
-  }, [authData, email, company]);
+    const checkAuth = async () => {
+      if (isOpen) {
+        const user = await authHelpers.getCurrentUser();
+        if (user) {
+          // User is already authenticated, proceed
+          onSuccess();
+        }
+      }
+    };
+    checkAuth();
+  }, [isOpen, onSuccess]);
 
   const validateBusinessEmail = (email: string): boolean => {
     const freeEmailDomains = [
@@ -69,6 +65,7 @@ const EmailGate = ({ isOpen, onClose, onSuccess }: EmailGateProps) => {
     }
 
     try {
+      // Log lead data first
       const response = await fetch('/api/log-lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -84,12 +81,20 @@ const EmailGate = ({ isOpen, onClose, onSuccess }: EmailGateProps) => {
         throw new Error('Failed to process request');
       }
 
-      // Save authentication to cache on successful submission
-      saveAuthentication(email.trim(), company.trim());
+      // Send magic link via Supabase
+      const { error: authError } = await authHelpers.signInWithMagicLink(email.trim(), company.trim());
+
+      if (authError) {
+        throw new Error(authError.message);
+      }
+
+      // Show success message for magic link
+      setError('');
+      alert('Check your email for a magic link to access the platform!');
       onSuccess();
     } catch (error) {
       console.error('Error submitting lead:', error);
-      setError('Something went wrong. Please try again.');
+      setError(error instanceof Error ? error.message : 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
