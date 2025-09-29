@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { authHelpers } from '@/lib/supabase';
 
-export default function AuthDebugPage() {
+function AuthDebugContent() {
   const [authState, setAuthState] = useState<any>(null);
   const [urlParams, setUrlParams] = useState<any>({});
   const searchParams = useSearchParams();
@@ -64,5 +64,17 @@ export default function AuthDebugPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthDebugPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-900 text-white p-8">
+        <h1 className="text-3xl font-bold mb-8">🔍 Loading Auth Debug...</h1>
+      </div>
+    }>
+      <AuthDebugContent />
+    </Suspense>
   );
 }
