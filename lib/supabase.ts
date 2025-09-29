@@ -42,10 +42,23 @@ export const authHelpers = {
 
   // Sign in with magic link (email only) - perfect for your current flow
   async signInWithMagicLink(email: string, company: string) {
+    // Determine the redirect URL - use production URL if available, otherwise current origin
+    const getRedirectUrl = () => {
+      if (typeof window === 'undefined') return ''
+
+      // If we're on localhost, but have a production URL, use that for mobile compatibility
+      if (window.location.hostname === 'localhost' && process.env.NEXT_PUBLIC_PRODUCTION_URL) {
+        return `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/estimate-options`
+      }
+
+      // Otherwise use current origin (works for both localhost desktop and production)
+      return `${window.location.origin}/estimate-options`
+    }
+
     return await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/estimate-options`,
+        emailRedirectTo: getRedirectUrl(),
         data: {
           company,
           plan: 'trial',
