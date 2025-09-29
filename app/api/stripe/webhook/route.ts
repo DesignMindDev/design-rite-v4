@@ -3,12 +3,23 @@ import { headers } from 'next/headers'
 import Stripe from 'stripe'
 import { supabase } from '@/lib/supabase'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-09-30.acacia',
-})
+// Initialize Stripe only if secret key is available
+const getStripe = () => {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('STRIPE_SECRET_KEY is not configured')
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2024-09-30.acacia',
+  })
+}
 
 // Webhook endpoint secret from Stripe dashboard
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
+const getWebhookSecret = () => {
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    throw new Error('STRIPE_WEBHOOK_SECRET is not configured')
+  }
+  return process.env.STRIPE_WEBHOOK_SECRET
+}
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -23,6 +34,10 @@ export async function POST(request: NextRequest) {
   let event: Stripe.Event
 
   try {
+    // Get Stripe instance and webhook secret
+    const stripe = getStripe()
+    const endpointSecret = getWebhookSecret()
+
     // Verify the webhook signature
     event = stripe.webhooks.constructEvent(body, signature, endpointSecret)
   } catch (err: any) {
@@ -65,7 +80,8 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
   const customerId = subscription.customer as string
 
   try {
-    // Get customer details from Stripe
+    // Get Stripe instance and customer details
+    const stripe = getStripe()
     const customer = await stripe.customers.retrieve(customerId) as Stripe.Customer
 
     if (!customer.email) {
