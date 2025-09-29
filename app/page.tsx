@@ -3,15 +3,11 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import UnifiedNavigation from './components/UnifiedNavigation';
-import EmailGate from './components/EmailGate';
-import { useAuthCache } from './hooks/useAuthCache';
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeStormItem, setActiveStormItem] = useState(0)
   const [isCalm, setIsCalm] = useState(false)
-  const [showEmailGate, setShowEmailGate] = useState(false)
-  const { isAuthenticated, extendSession } = useAuthCache()
 
   const stormItems = [
     { icon: "☕", text: "Morning coffee, client calls with urgent changes", delay: 0, type: "problem" },
@@ -48,21 +44,7 @@ export default function HomePage() {
     window.location.href = '/watch-demo'
   }
 
-  const redirectToEstimate = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    if (isAuthenticated) {
-      extendSession();
-      window.location.href = '/estimate-options';
-    } else {
-      setShowEmailGate(true);
-    }
-  }
-
-  const handleEmailGateSuccess = () => {
-    setShowEmailGate(false);
-    window.location.href = '/estimate-options';
-  };
+  // Removed Try Platform logic - now handled by UnifiedNavigation only
 
   const calmTheStorm = () => {
     setIsCalm(true)
@@ -197,12 +179,12 @@ export default function HomePage() {
               Our platform turns your chaotic Tuesday into a productive win.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <button
-                onClick={redirectToEstimate}
-                className="dr-bg-violet dr-text-pearl px-8 py-4 rounded-xl dr-ui font-bold hover:shadow-xl transition-all"
+              <Link
+                href="/estimate-options"
+                className="dr-bg-violet dr-text-pearl px-8 py-4 rounded-xl dr-ui font-bold hover:shadow-xl transition-all inline-block text-center"
               >
                 🚀 Try Platform
-              </button>
+              </Link>
               <Link
                 href="/waitlist"
                 className="bg-white/10 dr-text-pearl px-8 py-4 rounded-xl dr-ui font-semibold border border-white/20 hover:bg-white/20 transition-all text-center"
@@ -390,12 +372,12 @@ export default function HomePage() {
             Join 500+ Sales Engineers who've traded chaos for clarity.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={redirectToEstimate}
-              className="dr-bg-violet dr-text-pearl px-8 py-4 rounded-xl dr-ui font-bold hover:shadow-xl transition-all"
+            <Link
+              href="/estimate-options"
+              className="dr-bg-violet dr-text-pearl px-8 py-4 rounded-xl dr-ui font-bold hover:shadow-xl transition-all inline-block text-center"
             >
               🚀 Try Platform
-            </button>
+            </Link>
             <Link
               href="/waitlist"
               className="bg-white/10 dr-text-pearl px-8 py-4 rounded-xl dr-ui font-semibold border border-white/20 hover:bg-white/20 transition-all text-center"
@@ -430,7 +412,7 @@ export default function HomePage() {
             <div>
               <h3 className="dr-text-pearl dr-ui font-bold mb-4">Platform</h3>
               <ul className="space-y-2">
-                <li><button onClick={redirectToEstimate} className="text-gray-300 hover:dr-text-violet dr-ui transition-colors">Try Platform</button></li>
+                <li><Link href="/estimate-options" className="text-gray-300 hover:dr-text-violet dr-ui transition-colors">Try Platform</Link></li>
                 <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/waitlist">Join Waitlist</Link></li>
                 <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/watch-demo">Demo</Link></li>
               </ul>
@@ -460,11 +442,7 @@ export default function HomePage() {
       </footer>
 
       {/* Email Gate */}
-      <EmailGate
-        isOpen={showEmailGate}
-        onSuccess={handleEmailGateSuccess}
-        onClose={() => setShowEmailGate(false)}
-      />
+      {/* EmailGate removed - auth now handled by UnifiedNavigation only */}
     </div>
   )
 }

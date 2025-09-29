@@ -1,10 +1,43 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Calculator, MessageSquare, Clock, FileText, Zap, Users, ArrowLeft, ArrowRight, Bot, Sparkles, RefreshCw } from 'lucide-react';
+import { authHelpers } from '@/lib/supabase';
 
 const EstimateOptionsPage = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null = loading
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const user = await authHelpers.getCurrentUser();
+        if (user) {
+          setIsAuthenticated(true);
+        } else {
+          // Not authenticated - redirect to home page for auth
+          window.location.href = '/?auth=required';
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        window.location.href = '/?auth=required';
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  // Show loading while checking auth
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen dr-bg-charcoal dr-text-pearl flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Verifying access...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen dr-bg-charcoal dr-text-pearl">
       {/* Header Navigation */}

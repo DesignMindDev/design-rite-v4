@@ -53,7 +53,7 @@ export default function UnifiedNavigation() {
 
   const handleEmailGateSuccess = () => {
     setShowEmailGate(false);
-    window.location.href = '/estimate-options';
+    // Magic link will handle redirect to /estimate-options - don't redirect here!
   };
 
   const redirectToWaitlist = () => {
