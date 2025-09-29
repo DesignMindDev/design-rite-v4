@@ -58,11 +58,12 @@ const EmailGate = ({ isOpen, onClose, onSuccess }: EmailGateProps) => {
       return;
     }
 
-    if (!validateBusinessEmail(email.trim())) {
-      setError('Please use a business email address (not personal email like Gmail, Yahoo, etc.)');
-      setIsLoading(false);
-      return;
-    }
+    // Temporarily disabled for testing - re-enable in production
+    // if (!validateBusinessEmail(email.trim())) {
+    //   setError('Please use a business email address (not personal email like Gmail, Yahoo, etc.)');
+    //   setIsLoading(false);
+    //   return;
+    // }
 
     try {
       // Log lead data first
