@@ -48,7 +48,7 @@ export default function EnterpriseSecurityPage() {
         {/* Enterprise Features Grid */}
         <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 max-w-6xl mx-auto">
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">??</div>
+            <div className="text-4xl mb-4">🏢</div>
             <h3 className="text-xl font-bold text-white mb-4">Multi-Site Management</h3>
             <p className="text-gray-300">
               Centrally manage security assessments across all your facilities with 
@@ -57,7 +57,7 @@ export default function EnterpriseSecurityPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">??</div>
+            <div className="text-4xl mb-4">📊</div>
             <h3 className="text-xl font-bold text-white mb-4">Vendor Comparison</h3>
             <p className="text-gray-300">
               Evaluate and compare proposals from multiple security vendors with 
@@ -66,7 +66,7 @@ export default function EnterpriseSecurityPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">?</div>
+            <div className="text-4xl mb-4">📋</div>
             <h3 className="text-xl font-bold text-white mb-4">Compliance Reporting</h3>
             <p className="text-gray-300">
               Generate comprehensive compliance reports for regulatory requirements, 
@@ -75,7 +75,7 @@ export default function EnterpriseSecurityPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">??</div>
+            <div className="text-4xl mb-4">💰</div>
             <h3 className="text-xl font-bold text-white mb-4">Budget Planning</h3>
             <p className="text-gray-300">
               Plan security budgets with accurate cost projections, ROI analysis, 
@@ -84,7 +84,7 @@ export default function EnterpriseSecurityPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">??</div>
+            <div className="text-4xl mb-4">👥</div>
             <h3 className="text-xl font-bold text-white mb-4">Team Collaboration</h3>
             <p className="text-gray-300">
               Enable seamless collaboration between security teams, facilities management, 
@@ -93,7 +93,7 @@ export default function EnterpriseSecurityPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center hover:-translate-y-2 transition-all border border-white/20">
-            <div className="text-4xl mb-4">??</div>
+            <div className="text-4xl mb-4">🔒</div>
             <h3 className="text-xl font-bold text-white mb-4">Enterprise Security</h3>
             <p className="text-gray-300">
               SOC 2 compliant platform with enterprise-grade security, data encryption, 
