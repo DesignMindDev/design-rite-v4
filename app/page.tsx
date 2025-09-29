@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import UnifiedNavigation from './components/UnifiedNavigation';
+import EmailGate from './components/EmailGate';
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeStormItem, setActiveStormItem] = useState(0)
   const [isCalm, setIsCalm] = useState(false)
+  const [showEmailGate, setShowEmailGate] = useState(false)
 
   const stormItems = [
     { icon: "☕", text: "Morning coffee, client calls with urgent changes", delay: 0, type: "problem" },
@@ -44,7 +46,16 @@ export default function HomePage() {
     window.location.href = '/watch-demo'
   }
 
-  // Removed Try Platform logic - now handled by UnifiedNavigation only
+  // Try Platform logic - triggers EmailGate like UnifiedNavigation
+  const handleTryPlatformClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowEmailGate(true);
+  };
+
+  const handleEmailGateSuccess = () => {
+    setShowEmailGate(false);
+    // Magic link will handle redirect - don't redirect here
+  };
 
   const calmTheStorm = () => {
     setIsCalm(true)
@@ -179,12 +190,12 @@ export default function HomePage() {
               Our platform turns your chaotic Tuesday into a productive win.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <Link
-                href="/estimate-options"
-                className="dr-bg-violet dr-text-pearl px-8 py-4 rounded-xl dr-ui font-bold hover:shadow-xl transition-all inline-block text-center"
+              <button
+                onClick={handleTryPlatformClick}
+                className="dr-bg-violet dr-text-pearl px-8 py-4 rounded-xl dr-ui font-bold hover:shadow-xl transition-all"
               >
                 🚀 Try Platform
-              </Link>
+              </button>
               <Link
                 href="/waitlist"
                 className="bg-white/10 dr-text-pearl px-8 py-4 rounded-xl dr-ui font-semibold border border-white/20 hover:bg-white/20 transition-all text-center"
@@ -372,12 +383,12 @@ export default function HomePage() {
             Join 500+ Sales Engineers who've traded chaos for clarity.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/estimate-options"
-              className="dr-bg-violet dr-text-pearl px-8 py-4 rounded-xl dr-ui font-bold hover:shadow-xl transition-all inline-block text-center"
+            <button
+              onClick={handleTryPlatformClick}
+              className="dr-bg-violet dr-text-pearl px-8 py-4 rounded-xl dr-ui font-bold hover:shadow-xl transition-all"
             >
               🚀 Try Platform
-            </Link>
+            </button>
             <Link
               href="/waitlist"
               className="bg-white/10 dr-text-pearl px-8 py-4 rounded-xl dr-ui font-semibold border border-white/20 hover:bg-white/20 transition-all text-center"
@@ -412,7 +423,7 @@ export default function HomePage() {
             <div>
               <h3 className="dr-text-pearl dr-ui font-bold mb-4">Platform</h3>
               <ul className="space-y-2">
-                <li><Link href="/estimate-options" className="text-gray-300 hover:dr-text-violet dr-ui transition-colors">Try Platform</Link></li>
+                <li><button onClick={handleTryPlatformClick} className="text-gray-300 hover:dr-text-violet dr-ui transition-colors text-left">Try Platform</button></li>
                 <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/waitlist">Join Waitlist</Link></li>
                 <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/watch-demo">Demo</Link></li>
               </ul>
@@ -442,7 +453,12 @@ export default function HomePage() {
       </footer>
 
       {/* Email Gate */}
-      {/* EmailGate removed - auth now handled by UnifiedNavigation only */}
+      {/* EmailGate for page Try Platform buttons */}
+      <EmailGate
+        isOpen={showEmailGate}
+        onSuccess={handleEmailGateSuccess}
+        onClose={() => setShowEmailGate(false)}
+      />
     </div>
   )
 }
