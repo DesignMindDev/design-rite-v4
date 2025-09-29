@@ -42,40 +42,15 @@ export const authHelpers = {
 
   // Sign in with magic link (email only) - perfect for your current flow
   async signInWithMagicLink(email: string, company: string) {
+    // Simple approach: Let Supabase use its configured Site URL
     const getRedirectUrl = () => {
-      // Server-side URL construction
-      if (typeof window === 'undefined') {
-        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
-                       process.env.NEXT_PUBLIC_PRODUCTION_URL ||
-                       'https://design-rite-v3.onrender.com'
-        return `${baseUrl}/auth/confirm?next=/estimate-options`
-      }
-
-      // Client-side URL construction
-      const isLocalhost = window.location.hostname === 'localhost'
-
-      if (isLocalhost) {
-        return 'http://localhost:3000/auth/confirm?next=/estimate-options'
-      }
-
-      // Production URL
-      const productionUrl = process.env.NEXT_PUBLIC_SITE_URL ||
-                           process.env.NEXT_PUBLIC_PRODUCTION_URL ||
-                           'https://design-rite-v3.onrender.com'
-
-      return `${productionUrl}/auth/confirm?next=/estimate-options`
+      // Use production URL directly - let Supabase dashboard config handle the rest
+      return 'https://design-rite-v3.onrender.com/estimate-options'
     }
 
     const redirectUrl = getRedirectUrl()
 
-    // Add debug logging (remove in production later)
     console.log('[Auth Debug] Magic link redirect URL:', redirectUrl)
-    console.log('[Auth Debug] Environment:', {
-      NODE_ENV: process.env.NODE_ENV,
-      SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
-      PROD_URL: process.env.NEXT_PUBLIC_PRODUCTION_URL,
-      IS_CLIENT: typeof window !== 'undefined'
-    })
 
     try {
       const { data, error } = await supabase.auth.signInWithOtp({
