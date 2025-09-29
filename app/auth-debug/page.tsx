@@ -62,6 +62,18 @@ function AuthDebugContent() {
             }, null, 2) : 'Loading...'}
           </pre>
         </div>
+
+        <div className="bg-gray-800 p-6 rounded-lg">
+          <h2 className="text-xl font-bold mb-4">🔧 Environment Variables</h2>
+          <pre className="bg-gray-700 p-4 rounded text-sm overflow-auto">
+            {JSON.stringify({
+              NEXT_PUBLIC_PRODUCTION_URL: process.env.NEXT_PUBLIC_PRODUCTION_URL,
+              NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+              NODE_ENV: process.env.NODE_ENV,
+              NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30) + '...',
+            }, null, 2)}
+          </pre>
+        </div>
       </div>
     </div>
   );
