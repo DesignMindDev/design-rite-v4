@@ -42,30 +42,60 @@ export const authHelpers = {
 
   // Sign in with magic link (email only) - perfect for your current flow
   async signInWithMagicLink(email: string, company: string) {
-    // Determine the redirect URL - use production URL if available, otherwise current origin
     const getRedirectUrl = () => {
-      if (typeof window === 'undefined') return ''
-
-      // If we're on localhost, but have a production URL, use that for mobile compatibility
-      if (window.location.hostname === 'localhost' && process.env.NEXT_PUBLIC_PRODUCTION_URL) {
-        return `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/estimate-options`
+      // Server-side URL construction
+      if (typeof window === 'undefined') {
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
+                       process.env.NEXT_PUBLIC_PRODUCTION_URL ||
+                       'https://design-rite-v3.onrender.com'
+        return `${baseUrl}/auth/confirm?next=/estimate-options`
       }
 
-      // Otherwise use current origin (works for both localhost desktop and production)
-      return `${window.location.origin}/estimate-options`
+      // Client-side URL construction
+      const isLocalhost = window.location.hostname === 'localhost'
+
+      if (isLocalhost) {
+        return 'http://localhost:3000/auth/confirm?next=/estimate-options'
+      }
+
+      // Production URL
+      const productionUrl = process.env.NEXT_PUBLIC_SITE_URL ||
+                           process.env.NEXT_PUBLIC_PRODUCTION_URL ||
+                           'https://design-rite-v3.onrender.com'
+
+      return `${productionUrl}/auth/confirm?next=/estimate-options`
     }
 
-    return await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: getRedirectUrl(),
-        data: {
-          company,
-          plan: 'trial',
-          trial_expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-        }
-      }
+    const redirectUrl = getRedirectUrl()
+
+    // Add debug logging (remove in production later)
+    console.log('[Auth Debug] Magic link redirect URL:', redirectUrl)
+    console.log('[Auth Debug] Environment:', {
+      NODE_ENV: process.env.NODE_ENV,
+      SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+      PROD_URL: process.env.NEXT_PUBLIC_PRODUCTION_URL,
+      IS_CLIENT: typeof window !== 'undefined'
     })
+
+    try {
+      const { data, error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            company,
+            plan: 'trial',
+            trial_expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+          }
+        }
+      })
+
+      if (error) throw error
+      return { data, error: null }
+    } catch (error) {
+      console.error('[Auth Error]:', error)
+      return { data: null, error }
+    }
   },
 
   // Sign in with OAuth providers
