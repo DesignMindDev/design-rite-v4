@@ -201,7 +201,10 @@ export default function AIDiscoveryPage() {
     const newErrors: {[key: string]: string} = {}
 
     switch (stepIndex) {
-      case 0: // Project Basics
+      case 0: // Scenario Selection - Optional, always valid
+        break
+
+      case 1: // Project Basics
         if (!data.projectName.trim()) newErrors.projectName = 'Project name is required'
         if (!data.companyName.trim()) newErrors.companyName = 'Company name is required'
         if (!data.contactName.trim()) newErrors.contactName = 'Contact name is required'
@@ -219,6 +222,15 @@ export default function AIDiscoveryPage() {
         if (data.securityConcerns.length === 0) newErrors.securityConcerns = 'Select at least one security concern'
         if (!data.budgetRange) newErrors.budgetRange = 'Budget range is required'
         if (!data.timeline) newErrors.timeline = 'Timeline is required'
+        break
+
+      case 4: // Compliance - Optional, always valid
+        break
+
+      case 5: // Implementation - Optional, always valid
+        break
+
+      case 6: // Summary - Always valid, just review
         break
     }
 
