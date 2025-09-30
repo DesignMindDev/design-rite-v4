@@ -44,8 +44,8 @@ export const authHelpers = {
   async signInWithMagicLink(email: string, company: string) {
     // Simple approach: Let Supabase use its configured Site URL
     const getRedirectUrl = () => {
-      // Use production URL directly - let Supabase dashboard config handle the rest
-      return 'https://design-rite-v3.onrender.com/estimate-options'
+      // Keep users on main domain instead of render
+      return 'https://www.design-rite.com/estimate-options'
     }
 
     const redirectUrl = getRedirectUrl()

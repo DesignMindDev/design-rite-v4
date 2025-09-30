@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { authHelpers } from '../../lib/supabase';
+import { sessionManager } from '../../lib/sessionManager';
 
 interface EmailGateProps {
   isOpen: boolean;
@@ -15,14 +16,31 @@ const EmailGate = ({ isOpen, onClose, onSuccess }: EmailGateProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Check if user is already authenticated when modal opens
+  // Check if user is already authenticated or is a returning guest
   useEffect(() => {
     const checkAuth = async () => {
       if (isOpen) {
+        // First check Supabase authentication
         const user = await authHelpers.getCurrentUser();
         if (user) {
           // User is already authenticated, proceed
           onSuccess();
+          return;
+        }
+
+        // Check for returning guest with stored session
+        const existingUser = sessionManager.getCurrentUser();
+        if (existingUser && existingUser.email && existingUser.company) {
+          // Returning guest with email/company already provided
+          console.log('🔄 Returning guest detected:', existingUser.email);
+          onSuccess();
+          return;
+        }
+
+        // Pre-fill form if we have partial guest data
+        if (existingUser) {
+          if (existingUser.email) setEmail(existingUser.email);
+          if (existingUser.company) setCompany(existingUser.company);
         }
       }
     };
@@ -66,6 +84,13 @@ const EmailGate = ({ isOpen, onClose, onSuccess }: EmailGateProps) => {
     // }
 
     try {
+      // Create or update guest session data immediately
+      sessionManager.getOrCreateUser({
+        email: email.trim(),
+        company: company.trim(),
+        userType: 'guest'
+      });
+
       // Log lead data first
       const response = await fetch('/api/log-lead', {
         method: 'POST',

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import EmailGate from './EmailGate';
 import { useAuthCache } from '../hooks/useAuthCache';
+import { sessionManager } from '../../lib/sessionManager';
 
 interface SiteSettings {
   logoPath: string
@@ -42,8 +43,9 @@ export default function UnifiedNavigation() {
   const handleAIAssessmentClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    // Check if user is already authenticated
-    if (isAuthenticated) {
+    // Check if user is already authenticated or is a returning guest
+    const existingUser = sessionManager.getCurrentUser();
+    if (isAuthenticated || (existingUser && existingUser.email && existingUser.company)) {
       extendSession();
       window.location.href = '/estimate-options';
     } else {
