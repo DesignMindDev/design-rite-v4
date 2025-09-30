@@ -34,13 +34,13 @@ export default function EnterpriseSecurityPage() {
               onClick={redirectToApp}
               className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg"
             >
-              ?? Start Enterprise Trial
+              🚀 Start Enterprise Trial
             </button>
             <Link 
               href="/contact" 
               className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block"
             >
-              ?? Schedule Enterprise Demo
+              📅 Schedule Enterprise Demo
             </Link>
           </div>
         </section>
@@ -132,7 +132,7 @@ export default function EnterpriseSecurityPage() {
           </div>
           <div className="text-center mt-8">
             <div className="text-2xl font-bold text-white mb-4">
-              ?? Estimated Annual Savings: <span className="text-green-400">$500,000+</span>
+              💰 Estimated Annual Savings: <span className="text-green-400">$500,000+</span>
             </div>
             <p className="text-gray-300 mb-6">
               Based on 50+ facility locations with standardized security processes
@@ -159,13 +159,13 @@ export default function EnterpriseSecurityPage() {
               onClick={redirectToApp}
               className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg"
             >
-              ?? Start Enterprise Trial
+              🚀 Start Enterprise Trial
             </button>
             <Link 
               href="/contact" 
               className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block"
             >
-              ?? Schedule Enterprise Demo
+              📅 Schedule Enterprise Demo
             </Link>
           </div>
         </section>
