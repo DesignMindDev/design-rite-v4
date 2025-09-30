@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuthCache } from '../hooks/useAuthCache';
 
 interface SiteSettings {
   logoPath: string
@@ -14,7 +13,6 @@ export default function UnifiedNavigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAnnouncement, setShowAnnouncement] = useState(true);
   const [settings, setSettings] = useState<SiteSettings>({ logoPath: '', footerLogoPath: '' });
-  const { isAuthenticated, extendSession } = useAuthCache();
 
   useEffect(() => {
     loadSettings()

@@ -40,15 +40,102 @@ export const authHelpers = {
     })
   },
 
-  // Sign in with magic link (email only) - perfect for your current flow
-  async signInWithMagicLink(email: string, company: string) {
-    // Simple approach: Let Supabase use its configured Site URL
-    const getRedirectUrl = () => {
-      // Keep users on main domain instead of render
-      return 'https://www.design-rite.com/estimate-options'
+  // Sign in with magic link with smart redirect handling
+  async signInWithMagicLink(email: string, company: string, redirectTo?: string) {
+    // Smart redirect URL determination with comprehensive URL support
+    const getRedirectUrl = (targetPath?: string) => {
+      // Use production domain for consistency
+      const baseDomain = 'https://www.design-rite.com'
+
+      // Default to estimate-options if no specific redirect requested
+      const defaultPath = '/estimate-options'
+      const finalPath = targetPath || defaultPath
+
+      // Ensure path starts with /
+      const cleanPath = finalPath.startsWith('/') ? finalPath : `/${finalPath}`
+
+      // Comprehensive allowed paths for all Design-Rite pages
+      const allowedPaths = [
+        // Core Authentication & Platform
+        '/estimate-options',
+        '/platform-access',
+        '/dashboard',
+        '/login',
+        '/auth/error',
+
+        // AI Platform & Assessment
+        '/security-estimate',
+        '/ai-assessment',
+        '/ai-assistant',
+        '/ai-discovery',
+        '/ai-discovery-results',
+        '/ai-security-assessment',
+        '/ai-powered-analyst',
+
+        // Subscription & Business
+        '/pricing',
+        '/upgrade',
+        '/subscribe',
+        '/waitlist',
+        '/solutions',
+
+        // Industry & Solutions
+        '/integrators',
+        '/enterprise',
+        '/education',
+        '/healthcare',
+        '/consultants',
+
+        // Compliance & Tools
+        '/compliance',
+        '/compliance/ferpa',
+        '/compliance/hipaa',
+        '/compliance/general-security',
+        '/compliance-check',
+        '/compliance-analyst',
+        '/compliance-analysis',
+
+        // Admin & Management
+        '/admin',
+        '/admin/ai-providers',
+        '/admin/assessments',
+        '/admin/user-activity',
+        '/admin/session-debug',
+        '/admin/ai-assistant',
+        '/admin/chatbot',
+        '/admin/careers',
+        '/admin/harvester',
+        '/admin/creative-studio',
+        '/auth-debug',
+
+        // Content & Support
+        '/about',
+        '/blog',
+        '/careers',
+        '/contact',
+        '/docs',
+        '/support',
+        '/api',
+        '/partners',
+        '/watch-demo',
+
+        // Additional Platform Features
+        '/cost-estimator',
+        '/enterprise-roi',
+        '/pricing-intelligence',
+        '/professional-proposals',
+        '/project-management',
+        '/white-label',
+        '/nda'
+      ]
+
+      // Use allowed path or default for security
+      const safePath = allowedPaths.includes(cleanPath) ? cleanPath : defaultPath
+
+      return `${baseDomain}${safePath}`
     }
 
-    const redirectUrl = getRedirectUrl()
+    const redirectUrl = getRedirectUrl(redirectTo)
 
     console.log('[Auth Debug] Magic link redirect URL:', redirectUrl)
 
@@ -73,12 +160,32 @@ export const authHelpers = {
     }
   },
 
-  // Sign in with OAuth providers
-  async signInWithProvider(provider: 'google' | 'github' | 'linkedin') {
+  // Sign in with OAuth providers with smart redirect handling
+  async signInWithProvider(provider: 'google' | 'github' | 'linkedin', redirectTo?: string) {
+    // Use the same smart redirect logic for OAuth
+    const getRedirectUrl = (targetPath?: string) => {
+      // Use production domain for consistency or fallback to current origin
+      const baseDomain = typeof window !== 'undefined' ? window.location.origin : 'https://www.design-rite.com'
+      const defaultPath = '/estimate-options'
+      const finalPath = targetPath || defaultPath
+      const cleanPath = finalPath.startsWith('/') ? finalPath : `/${finalPath}`
+
+      // Use same allowed paths as magic link for consistency
+      const allowedPaths = [
+        '/estimate-options', '/platform-access', '/dashboard', '/login', '/auth/error',
+        '/security-estimate', '/ai-assessment', '/ai-assistant', '/ai-discovery', '/ai-discovery-results',
+        '/pricing', '/upgrade', '/subscribe', '/solutions', '/integrators', '/enterprise',
+        '/education', '/healthcare', '/compliance', '/admin', '/admin/ai-providers'
+      ]
+
+      const safePath = allowedPaths.includes(cleanPath) ? cleanPath : defaultPath
+      return `${baseDomain}${safePath}`
+    }
+
     return await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/estimate-options`
+        redirectTo: getRedirectUrl(redirectTo)
       }
     })
   },
