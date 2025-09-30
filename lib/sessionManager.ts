@@ -64,41 +64,6 @@ class SessionManager {
     return `proj_${timestamp}_${random}`;
   }
 
-  /**
-   * Get or create user session
-   */
-  getOrCreateUser(userInfo?: Partial<UserSession>): UserSession {
-    let user = this.getCurrentUser();
-
-    if (!user) {
-      // Create new user session
-      user = {
-        userId: this.generateUserId(),
-        userType: userInfo?.email ? 'authenticated' : 'guest',
-        email: userInfo?.email,
-        company: userInfo?.company,
-        name: userInfo?.name,
-        createdAt: new Date().toISOString(),
-        lastActive: new Date().toISOString()
-      };
-
-      localStorage.setItem(this.USER_KEY, JSON.stringify(user));
-      console.log('🆔 Created new user session:', user.userId);
-    } else {
-      // Update existing user with new info if provided
-      if (userInfo) {
-        user = {
-          ...user,
-          ...userInfo,
-          userType: userInfo.email ? 'authenticated' : user.userType,
-          lastActive: new Date().toISOString()
-        };
-        localStorage.setItem(this.USER_KEY, JSON.stringify(user));
-      }
-    }
-
-    return user;
-  }
 
   /**
    * Get current user session
@@ -424,12 +389,115 @@ class SessionManager {
   }
 
   /**
+   * Find user by email from persistent storage (for returning users)
+   */
+  findUserByEmail(email: string): UserSession | null {
+    try {
+      // Check current user first
+      const currentUser = this.getCurrentUser();
+      if (currentUser && currentUser.email === email) {
+        return currentUser;
+      }
+
+      // Check persistent storage for email history
+      const persistentKey = 'design_rite_user_history';
+      const userHistory = localStorage.getItem(persistentKey);
+
+      if (userHistory) {
+        const users: UserSession[] = JSON.parse(userHistory);
+        const foundUser = users.find(user => user.email === email);
+        if (foundUser) {
+          console.log('🔍 Found user in persistent history:', foundUser.userId);
+          return foundUser;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error finding user by email:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Save user to persistent history (for multi-session support)
+   */
+  private saveUserToPersistentHistory(user: UserSession): void {
+    try {
+      const persistentKey = 'design_rite_user_history';
+      let userHistory: UserSession[] = [];
+
+      const existing = localStorage.getItem(persistentKey);
+      if (existing) {
+        userHistory = JSON.parse(existing);
+      }
+
+      // Remove existing user with same email and add updated one
+      userHistory = userHistory.filter(u => u.email !== user.email);
+      userHistory.push(user);
+
+      // Keep only last 10 users to prevent storage bloat
+      if (userHistory.length > 10) {
+        userHistory = userHistory.slice(-10);
+      }
+
+      localStorage.setItem(persistentKey, JSON.stringify(userHistory));
+      console.log('💾 Saved user to persistent history');
+    } catch (error) {
+      console.error('Error saving user to persistent history:', error);
+    }
+  }
+
+  /**
+   * Enhanced getOrCreateUser with userId parameter support
+   */
+  getOrCreateUser(userInfo?: Partial<UserSession> & { userId?: string }): UserSession {
+    let user = this.getCurrentUser();
+
+    if (!user || (userInfo && userInfo.userId && user.userId !== userInfo.userId)) {
+      // Create new user session or use provided userId
+      user = {
+        userId: userInfo?.userId || this.generateUserId(),
+        userType: userInfo?.email ? 'authenticated' : 'guest',
+        email: userInfo?.email,
+        company: userInfo?.company,
+        name: userInfo?.name,
+        createdAt: new Date().toISOString(),
+        lastActive: new Date().toISOString()
+      };
+
+      localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+      console.log('🆔 Created/updated user session:', user.userId);
+    } else {
+      // Update existing user with new info if provided
+      if (userInfo) {
+        user = {
+          ...user,
+          ...userInfo,
+          userType: userInfo.email ? 'authenticated' : user.userType,
+          lastActive: new Date().toISOString()
+        };
+        localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+      }
+    }
+
+    // Save to persistent history for cross-session lookup
+    if (user.email) {
+      this.saveUserToPersistentHistory(user);
+    }
+
+    return user;
+  }
+
+  /**
    * Clear all session data (for testing)
    */
   clearAllSessions(): void {
     localStorage.removeItem(this.USER_KEY);
     localStorage.removeItem(this.PROJECT_KEY);
     localStorage.removeItem(this.PROJECTS_KEY);
+    // Optionally clear persistent history too
+    // localStorage.removeItem('design_rite_user_history');
     console.log('🧹 Cleared all session data');
   }
 }

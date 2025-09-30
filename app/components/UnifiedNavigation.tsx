@@ -43,11 +43,37 @@ export default function UnifiedNavigation() {
   const handleAIAssessmentClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
+    // Check current page
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+
     // Check if user is already authenticated or is a returning guest
     const existingUser = sessionManager.getCurrentUser();
     if (isAuthenticated || (existingUser && existingUser.email && existingUser.company)) {
       extendSession();
-      window.location.href = '/estimate-options';
+
+      // If already on estimate-options, create new project for multi-project workflow
+      if (currentPath === '/estimate-options') {
+        const newProject = sessionManager.createOrUpdateProject({
+          projectName: `New Security Project ${Date.now()}`,
+          facilitySize: undefined,
+          facilityType: undefined,
+          estimatedCost: undefined,
+          systems: [],
+          phase: {
+            tool: 'estimate-options',
+            data: {
+              entry_point: 'multi_project_creation',
+              timestamp: new Date().toISOString()
+            }
+          }
+        });
+        console.log('🆕 Created new project for existing user:', newProject.projectId);
+        // Refresh the page to show new project context
+        window.location.reload();
+      } else {
+        // Navigate to estimate-options if not already there
+        window.location.href = '/estimate-options';
+      }
     } else {
       setShowEmailGate(true);
     }

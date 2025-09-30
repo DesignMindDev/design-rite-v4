@@ -29,21 +29,28 @@ const EstimateOptionsPage = () => {
     const checkAuth = async () => {
       try {
         const user = await authHelpers.getCurrentUser();
-        if (user) {
-          setIsAuthenticated(true);
 
-          // Initialize session with authenticated user
+        if (user) {
+          // Supabase authenticated user
+          setIsAuthenticated(true);
           sessionManager.getOrCreateUser({
             email: user.email,
             name: user.user_metadata?.name || user.email,
             company: user.user_metadata?.company
           });
         } else {
-          // Not authenticated - stay on page but show message
-          setIsAuthenticated(false);
-
-          // Initialize guest session
-          sessionManager.getOrCreateUser();
+          // Check for existing guest session
+          const existingUser = sessionManager.getCurrentUser();
+          if (existingUser && existingUser.email && existingUser.company) {
+            // Valid guest session exists
+            console.log('🔄 Valid guest session found:', existingUser.email);
+            setIsAuthenticated(true);
+          } else {
+            // No valid session - redirect to get authentication
+            console.log('❌ No valid session found, redirecting to home');
+            setIsAuthenticated(false);
+            return;
+          }
         }
 
         // Track estimate options page visit
