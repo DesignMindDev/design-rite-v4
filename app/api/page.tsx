@@ -3,13 +3,11 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useAuthCache } from '../hooks/useAuthCache'
 
 export default function APIAccessPage() {
   const [selectedTab, setSelectedTab] = useState('overview')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const router = useRouter()
-  const { isAuthenticated, extendSession } = useAuthCache()
 
   const handleTryPlatformClick = (e: React.MouseEvent) => {
     e.preventDefault();

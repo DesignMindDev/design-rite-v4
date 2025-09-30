@@ -3,14 +3,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useAuthCache } from '../hooks/useAuthCache'
 
 export default function SubscribePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [email, setEmail] = useState('')
   const [isSubmitted, setIsSubmitted] = useState(false)
   const router = useRouter()
-  const { isAuthenticated, extendSession } = useAuthCache()
 
   const handleTryPlatformClick = (e: React.MouseEvent) => {
     e.preventDefault();
