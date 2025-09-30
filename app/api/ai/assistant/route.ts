@@ -40,17 +40,23 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // If no specific provider or not found, get first enabled assessment provider by priority
+    // If no specific provider or not found, get first enabled provider by priority
+    // Check for general providers first (for demo AI assistants), then assessment providers
     if (!selectedProvider) {
+      const generalProviders = providersData.providers
+        .filter((p: any) => p.use_case === 'general' && p.enabled && p.provider_type === 'openai')
+        .sort((a: any, b: any) => (a.priority || 999) - (b.priority || 999))
+
       const assessmentProviders = providersData.providers
         .filter((p: any) => p.use_case === 'assessment' && p.enabled && p.provider_type === 'openai')
         .sort((a: any, b: any) => (a.priority || 999) - (b.priority || 999))
 
-      selectedProvider = assessmentProviders[0]
+      // Prefer general providers (for demo AI assistants), fallback to assessment
+      selectedProvider = generalProviders[0] || assessmentProviders[0]
 
       if (!selectedProvider) {
-        console.error('No enabled OpenAI assessment providers found in AI Providers system')
-        throw new Error('AI Assessment service is currently unavailable - no providers configured')
+        console.error('No enabled OpenAI providers found in AI Providers system (checked general and assessment use cases)')
+        throw new Error('AI Assistant service is currently unavailable - no providers configured')
       }
     }
 
@@ -83,6 +89,11 @@ export async function POST(request: NextRequest) {
 
     // Create a new thread for this conversation
     const thread = await openai.beta.threads.create()
+    console.log('Thread created:', { threadId: thread?.id, threadObject: !!thread })
+
+    if (!thread?.id) {
+      throw new Error('Failed to create thread - no thread ID returned')
+    }
 
     // Add the user's message to the thread
     await openai.beta.threads.messages.create(thread.id, {
@@ -94,13 +105,34 @@ export async function POST(request: NextRequest) {
     const run = await openai.beta.threads.runs.create(thread.id, {
       assistant_id: assistantId,
     })
+    console.log('Run created:', { runId: run?.id, threadId: thread.id })
 
-    // Wait for the run to complete
-    let runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id)
+    // Store IDs in variables to prevent scope issues
+    const threadId = thread.id
+    const runId = run.id
+
+    // Work around OpenAI library bug by using REST API directly
+    const threadIdStr = thread.id
+    const runIdStr = run.id
+    console.log('Using direct REST API call for:', { threadIdStr, runIdStr })
+
+    // Direct REST API call to work around library bug
+    const fetchRunStatus = async () => {
+      const response = await fetch(`https://api.openai.com/v1/threads/${threadIdStr}/runs/${runIdStr}`, {
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+          'OpenAI-Beta': 'assistants=v2'
+        }
+      })
+      return await response.json()
+    }
+
+    let runStatus = await fetchRunStatus()
 
     while (runStatus.status === 'in_progress' || runStatus.status === 'queued') {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id)
+      runStatus = await fetchRunStatus()
     }
 
     if (runStatus.status !== 'completed') {
@@ -141,10 +173,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Assistant API Error:', error)
 
-    // Log error for AI Provider health monitoring
+    // Log error for AI Provider health monitoring (selectedProvider might be undefined here)
+    const providerInfo = typeof selectedProvider !== 'undefined' ? selectedProvider : null
     console.error('AI Provider Error:', {
-      providerId: selectedProvider?.id || 'none',
-      providerName: selectedProvider?.name || 'none',
+      providerId: providerInfo?.id || 'none',
+      providerName: providerInfo?.name || 'none',
       error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: new Date().toISOString()
     })
