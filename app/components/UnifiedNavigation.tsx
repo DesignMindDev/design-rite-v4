@@ -3,9 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import EmailGate from './EmailGate';
 import { useAuthCache } from '../hooks/useAuthCache';
-import { sessionManager } from '../../lib/sessionManager';
 
 interface SiteSettings {
   logoPath: string
@@ -14,7 +12,6 @@ interface SiteSettings {
 
 export default function UnifiedNavigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showEmailGate, setShowEmailGate] = useState(false);
   const [showAnnouncement, setShowAnnouncement] = useState(true);
   const [settings, setSettings] = useState<SiteSettings>({ logoPath: '', footerLogoPath: '' });
   const { isAuthenticated, extendSession } = useAuthCache();
@@ -40,49 +37,18 @@ export default function UnifiedNavigation() {
     }
   }
 
-  const handleAIAssessmentClick = (e: React.MouseEvent) => {
+  const handleSignInClick = (e: React.MouseEvent) => {
     e.preventDefault();
-
-    // Check current page
-    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
-
-    // Check if user is already authenticated or is a returning guest
-    const existingUser = sessionManager.getCurrentUser();
-    if (isAuthenticated || (existingUser && existingUser.email && existingUser.company)) {
-      extendSession();
-
-      // If already on estimate-options, create new project for multi-project workflow
-      if (currentPath === '/estimate-options') {
-        const newProject = sessionManager.createOrUpdateProject({
-          projectName: `New Security Project ${Date.now()}`,
-          facilitySize: undefined,
-          facilityType: undefined,
-          estimatedCost: undefined,
-          systems: [],
-          phase: {
-            tool: 'estimate-options',
-            data: {
-              entry_point: 'multi_project_creation',
-              timestamp: new Date().toISOString()
-            }
-          }
-        });
-        console.log('🆕 Created new project for existing user:', newProject.projectId);
-        // Refresh the page to show new project context
-        window.location.reload();
-      } else {
-        // Navigate to estimate-options if not already there
-        window.location.href = '/estimate-options';
-      }
-    } else {
-      setShowEmailGate(true);
-    }
+    // All header sign-in clicks go to platform access page
+    window.location.href = '/platform-access';
   };
 
-  const handleEmailGateSuccess = () => {
-    setShowEmailGate(false);
-    // Magic link will handle redirect to /estimate-options - don't redirect here!
+  const handleTryPlatformClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // All page Try Platform clicks go to platform access page
+    window.location.href = '/platform-access';
   };
+
 
   const redirectToWaitlist = () => {
     window.location.href = '/waitlist';
@@ -154,7 +120,7 @@ export default function UnifiedNavigation() {
             </span>
             <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl dr-border-violet rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
 
-              <button onClick={handleAIAssessmentClick} className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2 w-full text-left">
+              <button onClick={handleTryPlatformClick} className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2 w-full text-left">
                 <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   📊
                 </div>
@@ -174,7 +140,7 @@ export default function UnifiedNavigation() {
                 </div>
               </Link>
 
-              <button onClick={handleAIAssessmentClick} className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2 w-full text-left">
+              <button onClick={handleTryPlatformClick} className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2 w-full text-left">
                 <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🧠
                 </div>
@@ -400,10 +366,10 @@ export default function UnifiedNavigation() {
         {/* Call to Action Button */}
         <div className="hidden lg:block">
           <button
-            onClick={handleAIAssessmentClick}
+            onClick={handleSignInClick}
             className="dr-bg-violet dr-text-pearl px-6 py-2.5 rounded-lg font-semibold dr-ui hover:bg-purple-700 transition-all hover:scale-105 shadow-lg hover:shadow-purple-600/25"
           >
-            Try Platform
+            Sign In
           </button>
         </div>
 
@@ -485,9 +451,15 @@ export default function UnifiedNavigation() {
 
             {/* Sign In and CTA */}
             <div className="pt-4 border-t border-white/10">
-              <Link href="/login" className="block text-white/80 hover:dr-text-pearl py-2">👤 Sign In</Link>
               <button
-                onClick={handleAIAssessmentClick}
+                onClick={handleSignInClick}
+                className="block w-full text-left text-white/80 hover:dr-text-pearl py-2 transition-colors"
+                type="button"
+              >
+                👤 Sign In
+              </button>
+              <button
+                onClick={handleTryPlatformClick}
                 className="block w-full text-left dr-bg-violet dr-text-pearl px-4 py-2 rounded-lg mt-2 touch-manipulation active:bg-purple-800 transition-colors"
                 type="button"
               >
@@ -498,12 +470,6 @@ export default function UnifiedNavigation() {
         </div>
       )}
 
-      {/* Email Gate Modal */}
-      <EmailGate
-        isOpen={showEmailGate}
-        onClose={() => setShowEmailGate(false)}
-        onSuccess={handleEmailGateSuccess}
-      />
     </React.Fragment>
   );
 }
