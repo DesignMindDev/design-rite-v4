@@ -109,5 +109,50 @@ export const authHelpers = {
   // Get user's plan
   getUserPlan(user: any) {
     return user?.user_metadata?.plan || 'trial'
+  },
+
+  // Check if user exists in Supabase (server-side only)
+  async checkUserExists(email: string) {
+    try {
+      const response = await fetch('/api/check-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to check user')
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Error checking user existence:', error)
+      return { exists: false, error: error.message }
+    }
+  },
+
+  // Create a session-like experience for returning users
+  async createGuestSession(email: string, company: string, userData?: any) {
+    // This creates a "session-like" experience by storing user data locally
+    // and updating their session without requiring email verification
+    return {
+      user: {
+        id: userData?.id || `guest_${Date.now()}`,
+        email,
+        user_metadata: {
+          company,
+          plan: userData?.plan || 'trial',
+          ...userData
+        }
+      },
+      session: {
+        access_token: 'guest_session',
+        user: {
+          id: userData?.id || `guest_${Date.now()}`,
+          email,
+          user_metadata: { company, ...userData }
+        }
+      }
+    }
   }
 }

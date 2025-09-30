@@ -77,42 +77,68 @@ const EmailGate = ({ isOpen, onClose, onSuccess }: EmailGateProps) => {
     }
 
     try {
-      // SMART USER LOOKUP: Check if email exists in Supabase auth users
+      // SMART USER LOOKUP: Check if email exists in Supabase database FIRST
       console.log('🔍 Checking if user already exists in database...');
 
-      // First check: try to get existing user from Supabase
-      let existingSupabaseUser = null;
-      try {
-        // This won't work directly from client, but we can use sessionManager to track
-        const { data } = await authHelpers.signInWithMagicLink(email.trim(), company.trim());
-        console.log('📧 Magic link sent, checking for existing user patterns...');
-      } catch (authCheckError) {
-        console.log('🆕 Likely new user, proceeding with registration flow');
-      }
+      // Step 1: Check if user exists in Supabase auth database
+      const userCheck = await authHelpers.checkUserExists(email.trim());
+      console.log('User check result:', userCheck);
 
-      // Check if we have this email in our local session history (persistent sessions)
+      // Step 2: Check local session history as backup
       const existingSessionUser = sessionManager.findUserByEmail?.(email.trim());
 
-      if (existingSessionUser) {
-        console.log('🔄 Found existing session user, reusing user ID:', existingSessionUser.userId);
-        // Reuse existing user ID and update session
+      let shouldSendMagicLink = true;
+      let welcomeMessage = '';
+
+      if (userCheck.exists && userCheck.user) {
+        // USER EXISTS IN SUPABASE - Let them in immediately!
+        console.log('✅ Returning user found in database:', userCheck.user.email);
+
+        // Create guest session for immediate access
+        const guestSession = await authHelpers.createGuestSession(
+          email.trim(),
+          company.trim(),
+          userCheck.user
+        );
+
+        // Update session manager with existing user data
         sessionManager.getOrCreateUser({
-          userId: existingSessionUser.userId, // Reuse same ID!
+          userId: userCheck.user.id,
+          email: email.trim(),
+          company: company.trim(),
+          userType: 'authenticated' // They exist in Supabase
+        });
+
+        shouldSendMagicLink = false;
+        welcomeMessage = `Welcome back${userCheck.user.company ? ` to ${userCheck.user.company}` : ''}! Access granted immediately.`;
+
+      } else if (existingSessionUser) {
+        // FOUND IN LOCAL SESSION - but not in Supabase, proceed as returning guest
+        console.log('🔄 Found in local session, reusing user ID:', existingSessionUser.userId);
+
+        sessionManager.getOrCreateUser({
+          userId: existingSessionUser.userId,
           email: email.trim(),
           company: company.trim(),
           userType: existingSessionUser.userType || 'guest'
         });
+
+        welcomeMessage = 'Welcome back! Check your email for a magic link to continue with your existing projects.';
+
       } else {
-        console.log('🆕 Creating new user session');
-        // Create new user session
+        // NEW USER - Send magic link
+        console.log('🆕 New user detected, will send magic link');
+
         sessionManager.getOrCreateUser({
           email: email.trim(),
           company: company.trim(),
           userType: 'guest'
         });
+
+        welcomeMessage = 'Check your email for a magic link to access the platform!';
       }
 
-      // Log lead data
+      // Log lead data (always do this for analytics)
       const response = await fetch('/api/log-lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -120,28 +146,30 @@ const EmailGate = ({ isOpen, onClose, onSuccess }: EmailGateProps) => {
           email,
           company,
           source: 'platform_access_gate',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          user_exists: userCheck.exists
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to process request');
+        console.warn('Failed to log lead data, but continuing...');
       }
 
-      // Send magic link via Supabase (this handles both new and existing users)
-      const { error: authError } = await authHelpers.signInWithMagicLink(email.trim(), company.trim());
+      // Only send magic link if user doesn't exist in database
+      if (shouldSendMagicLink) {
+        console.log('📧 Sending magic link...');
+        const { error: authError } = await authHelpers.signInWithMagicLink(email.trim(), company.trim());
 
-      if (authError) {
-        throw new Error(authError.message);
-      }
-
-      // Show success message
-      setError('');
-      if (existingSessionUser) {
-        alert('Welcome back! Check your email for a magic link to continue with your existing projects.');
+        if (authError) {
+          throw new Error(authError.message);
+        }
       } else {
-        alert('Check your email for a magic link to access the platform!');
+        console.log('⚡ Skipping magic link - user authenticated immediately');
       }
+
+      // Show appropriate success message
+      setError('');
+      alert(welcomeMessage);
       onSuccess();
     } catch (error) {
       console.error('Error submitting lead:', error);
