@@ -189,7 +189,7 @@ const IntegratorDiscoveryAssistant = () => {
         // Create a welcome message with the estimate context
         const welcomeMessage = {
           role: 'assistant',
-          content: `🎯 **Welcome back! I see you've completed a security estimate.**\n\n**Here's what I received from your estimate:**\n• **Facility Size:** ${data.facilitySize?.toLocaleString()} sq ft\n• **Estimated Investment:** $${data.estimate?.toLocaleString()}\n• **Selected Systems:** ${data.selectedSystems?.join(', ')}\n• **Contact:** ${data.contactInfo?.name} (${data.contactInfo?.email})\n\n**Let me help you develop this into a comprehensive security plan!** I can now provide detailed recommendations, compliance analysis, and implementation planning based on your initial estimate.\n\nWhat specific aspects would you like to dive deeper into?`,
+          content: `🎯 **Welcome! I see you've completed a security estimate and want to refine it.**\n\n**Here's what I received from your estimate:**\n• **Facility Size:** ${data.facilitySize?.toLocaleString()} sq ft\n• **Estimated Investment:** $${data.estimate?.toLocaleString()}\n• **Selected Systems:** ${data.selectedSystems?.join(', ')}\n• **Contact:** ${data.contactInfo?.name} (${data.contactInfo?.email})\n• **Company:** ${data.contactInfo?.companyName}\n\n**Let me help you refine this estimate into a comprehensive security plan!** I can now provide:\n✅ Detailed system recommendations\n✅ Compliance analysis (HIPAA, FERPA, CJIS)\n✅ Implementation planning & timelines\n✅ Cost optimization strategies\n✅ Vendor selection guidance\n\nWhat specific aspects would you like to dive deeper into or refine?`,
           timestamp: new Date()
         };
 

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { sessionManager } from '../../lib/sessionManager';
 
 const SecurityEstimateForm = () => {
   const [formData, setFormData] = useState({
@@ -22,6 +23,60 @@ const SecurityEstimateForm = () => {
   const [isCalculating, setIsCalculating] = useState(false);
   const [aiRecommendations, setAiRecommendations] = useState(null);
   const [realPricingData, setRealPricingData] = useState([]);
+  const [sessionInfo, setSessionInfo] = useState({ userId: '', projectId: '' });
+
+  // Initialize session tracking
+  useEffect(() => {
+    const initializeSession = async () => {
+      // Create or get user session
+      const user = sessionManager.getOrCreateUser();
+
+      // Create or update project
+      const project = sessionManager.createOrUpdateProject({
+        projectName: `Security Estimate ${new Date().toLocaleDateString()}`,
+        facilitySize: parseInt(facilitySize) || undefined,
+        facilityType: 'Commercial Building',
+        phase: {
+          tool: 'quick-estimate',
+          data: { formData, contactInfo, facilitySize }
+        }
+      });
+
+      setSessionInfo({
+        userId: user.userId,
+        projectId: project.projectId
+      });
+
+      // Track activity
+      sessionManager.trackActivity({
+        action: 'page_view',
+        tool: 'quick-estimate',
+        data: { facilitySize: facilitySize || 'unknown' }
+      });
+
+      console.log('🎯 Session initialized:', { userId: user.userId, projectId: project.projectId });
+    };
+
+    initializeSession();
+  }, []); // Only run once on mount
+
+  // Update project when form data changes
+  useEffect(() => {
+    if (sessionInfo.projectId && (contactInfo.email || contactInfo.company || facilitySize)) {
+      sessionManager.createOrUpdateProject({
+        projectName: contactInfo.company ?
+          `${contactInfo.company} Security Project` :
+          `Security Estimate ${new Date().toLocaleDateString()}`,
+        facilitySize: parseInt(facilitySize) || undefined,
+        facilityType: 'Commercial Building',
+        systems: Object.keys(formData).filter(key => formData[key].enabled),
+        phase: {
+          tool: 'quick-estimate',
+          data: { formData, contactInfo, facilitySize }
+        }
+      });
+    }
+  }, [contactInfo, facilitySize, formData, sessionInfo.projectId]);
 
   // AI Enhancement Companies Database
   const aiCompanies = {
@@ -166,6 +221,28 @@ const SecurityEstimateForm = () => {
       }
 
       setEstimate({ breakdown, totalCost });
+
+      // Track estimate completion
+      sessionManager.trackActivity({
+        action: 'estimate_completed',
+        tool: 'quick-estimate',
+        data: {
+          totalCost,
+          systems: Object.keys(formData).filter(key => formData[key].enabled),
+          facilitySize: parseInt(facilitySize) || 0
+        }
+      });
+
+      // Update project with final estimate
+      sessionManager.createOrUpdateProject({
+        estimatedCost: totalCost,
+        systems: Object.keys(formData).filter(key => formData[key].enabled),
+        phase: {
+          tool: 'quick-estimate',
+          data: { formData, contactInfo, facilitySize, estimate: { breakdown, totalCost } }
+        }
+      });
+
     } catch (error) {
       console.error('Calculation error:', error);
       // Fallback to basic calculation if AI fails
@@ -226,25 +303,60 @@ const SecurityEstimateForm = () => {
     }).format(amount);
   };
 
-  const handoffToAiAssistant = () => {
-    // Prepare handoff data
+  const handoffToAiAssistant = async () => {
+    // Prepare handoff data in the format expected by AI Assistant
     const handoffData = {
       source: 'Quick Security Estimate',
-      facilitySize,
-      contactInfo,
+      userId: sessionInfo.userId,
+      projectId: sessionInfo.projectId,
+      facilitySize: parseInt(facilitySize) || 0,
+      contactInfo: {
+        name: contactInfo.name,
+        email: contactInfo.email,
+        phone: contactInfo.phone,
+        company: contactInfo.company // Keep as 'company' for ai-assistant compatibility
+      },
       selectedSystems: Object.keys(formData).filter(key => formData[key].enabled),
       formData,
-      estimate,
+      estimate: estimate, // Pass the full estimate object with totalCost
+      breakdown: estimate?.breakdown,
       aiRecommendations,
       realPricingData,
       timestamp: new Date().toISOString()
     };
 
-    // Store in sessionStorage for the AI Assessment
+    // Store in sessionStorage with the key expected by AI Assistant
     sessionStorage.setItem('quickEstimateData', JSON.stringify(handoffData));
 
-    // Navigate to AI Assessment with context
-    window.location.href = '/ai-assessment';
+    // Track handoff activity
+    sessionManager.trackActivity({
+      action: 'ai_assistant_handoff',
+      tool: 'quick-estimate',
+      data: { estimatedCost: estimate?.totalCost, destination: 'ai-assistant' }
+    });
+
+    // Log AI session to Supabase if possible
+    await sessionManager.logAISession({
+      tool: 'ai-assistant',
+      sessionId: `ai_session_${Date.now()}`,
+      userId: sessionInfo.userId,
+      projectId: sessionInfo.projectId,
+      data: handoffData
+    });
+
+    // Update user session with contact info (for potential authentication)
+    if (contactInfo.email && contactInfo.name) {
+      sessionManager.getOrCreateUser({
+        email: contactInfo.email,
+        name: contactInfo.name,
+        company: contactInfo.company
+      });
+    }
+
+    console.log('🚀 Handing off to AI Assistant with session tracking');
+
+    // Navigate to AI Assistant with context
+    window.location.href = '/ai-assistant';
   };
 
   return (

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Bot, Upload, MessageSquare, Zap, RefreshCw, Download, ArrowLeft, Sparkles, FileText, Database, Settings, ChevronDown } from 'lucide-react'
+import { sessionManager } from '../../lib/sessionManager'
 
 interface Message {
   id: string
@@ -87,12 +88,55 @@ export default function AIAssistantPage() {
       const data = JSON.parse(aiDiscoveryData)
       setAssessmentData(data)
       addWelcomeMessage('AI Discovery', data)
+
+      // Initialize session tracking from AI Discovery data
+      if (data.userId && data.projectId) {
+        console.log('🎯 Continuing session from AI Discovery:', data.userId, data.projectId)
+      }
     } else if (quickEstimateData) {
       const data = JSON.parse(quickEstimateData)
       setAssessmentData(data)
       addWelcomeMessage('Quick Estimate', data)
+
+      // Initialize session tracking from Quick Estimate data
+      if (data.userId && data.projectId) {
+        console.log('🎯 Continuing session from Quick Estimate:', data.userId, data.projectId)
+
+        // Track AI assistant usage
+        sessionManager.trackActivity({
+          action: 'ai_assistant_started',
+          tool: 'ai-assistant',
+          data: {
+            source: 'quick-estimate',
+            estimatedCost: data.estimate?.totalCost,
+            systems: data.selectedSystems
+          }
+        });
+
+        // Log AI session continuation
+        sessionManager.logAISession({
+          tool: 'ai-assistant',
+          sessionId: sessionId,
+          userId: data.userId,
+          projectId: data.projectId,
+          data: { source: 'quick_estimate_handoff', assessment_data: data }
+        });
+      }
     } else {
       addInitialMessage()
+
+      // Initialize fresh session for direct AI assistant access
+      const user = sessionManager.getOrCreateUser()
+      const project = sessionManager.createOrUpdateProject({
+        projectName: `AI Assistant Session ${new Date().toLocaleDateString()}`,
+        facilityType: 'Unknown',
+        phase: {
+          tool: 'ai-assistant',
+          data: { direct_access: true }
+        }
+      });
+
+      console.log('🎯 Started fresh AI Assistant session:', user.userId, project.projectId)
     }
   }, [])
 

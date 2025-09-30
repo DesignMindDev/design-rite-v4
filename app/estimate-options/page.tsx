@@ -4,9 +4,26 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Calculator, MessageSquare, Clock, FileText, Zap, Users, ArrowLeft, ArrowRight, Bot, Sparkles, RefreshCw } from 'lucide-react';
 import { authHelpers } from '@/lib/supabase';
+import { sessionManager } from '../../lib/sessionManager';
 
 const EstimateOptionsPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null = loading
+
+  // Track option selection
+  const handleOptionClick = (option: string, description: string) => {
+    sessionManager.trackActivity({
+      action: 'option_selected',
+      tool: 'estimate-options',
+      data: {
+        selected_tool: option,
+        description: description,
+        authenticated: isAuthenticated,
+        timestamp: new Date().toISOString()
+      }
+    });
+
+    console.log(`🎯 User selected: ${option}`)
+  }
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -14,10 +31,33 @@ const EstimateOptionsPage = () => {
         const user = await authHelpers.getCurrentUser();
         if (user) {
           setIsAuthenticated(true);
+
+          // Initialize session with authenticated user
+          sessionManager.getOrCreateUser({
+            email: user.email,
+            name: user.user_metadata?.name || user.email,
+            company: user.user_metadata?.company
+          });
         } else {
           // Not authenticated - stay on page but show message
           setIsAuthenticated(false);
+
+          // Initialize guest session
+          sessionManager.getOrCreateUser();
         }
+
+        // Track estimate options page visit
+        sessionManager.trackActivity({
+          action: 'estimate_options_visited',
+          tool: 'estimate-options',
+          data: {
+            authenticated: !!user,
+            user_email: user?.email || null,
+            timestamp: new Date().toISOString()
+          }
+        });
+
+        console.log('🎯 Estimate Options page - session initialized');
       } catch (error) {
         console.error('Auth check failed:', error);
         window.location.href = '/?auth=required';
@@ -169,6 +209,7 @@ const EstimateOptionsPage = () => {
 
             <Link
               href="/security-estimate"
+              onClick={() => handleOptionClick('security-estimate', 'Quick 5-minute security system estimate')}
               className="w-full flex items-center justify-center dr-bg-violet hover:bg-purple-700 dr-text-pearl font-bold py-4 px-6 rounded-xl text-lg transition-all group-hover:scale-105"
             >
               Start Quick Estimate
@@ -233,6 +274,7 @@ const EstimateOptionsPage = () => {
 
             <Link
               href="/ai-discovery"
+              onClick={() => handleOptionClick('ai-discovery', 'Comprehensive 15-20 minute AI-powered security assessment')}
               className="w-full flex items-center justify-center dr-bg-violet hover:bg-purple-700 dr-text-pearl font-bold py-3 px-4 rounded-xl text-sm transition-all group-hover:scale-105"
             >
               Start AI Discovery
@@ -296,6 +338,7 @@ const EstimateOptionsPage = () => {
 
             <Link
               href="/ai-assistant"
+              onClick={() => handleOptionClick('ai-assistant', 'Interactive AI assistant for security consultation and refinement')}
               className="w-full flex items-center justify-center dr-bg-violet hover:bg-purple-700 dr-text-pearl font-bold py-3 px-4 rounded-xl text-sm transition-all group-hover:scale-105"
             >
               Start AI Assistant
@@ -388,6 +431,7 @@ const EstimateOptionsPage = () => {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/security-estimate"
+              onClick={() => handleOptionClick('security-estimate', 'Quick estimate from recommendation section')}
               className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-xl transition-all"
             >
               Start with Quick Estimate

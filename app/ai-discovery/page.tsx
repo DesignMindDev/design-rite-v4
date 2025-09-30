@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, CheckCircle, Building2, Users, Shield, MapPin, Clock, DollarSign, FileText, AlertTriangle } from 'lucide-react'
+import { sessionManager } from '../../lib/sessionManager'
 
 interface DiscoveryData {
   // Step 1: Project Basics
@@ -48,6 +49,7 @@ const steps = [
 
 export default function AIDiscoveryPage() {
   const [currentStep, setCurrentStep] = useState(0)
+  const [sessionInfo, setSessionInfo] = useState({ userId: '', projectId: '' })
   const [data, setData] = useState<DiscoveryData>({
     projectName: '',
     companyName: '',
@@ -74,25 +76,98 @@ export default function AIDiscoveryPage() {
 
   const [errors, setErrors] = useState<{[key: string]: string}>({})
 
-  // Check for handoff data from security estimate
+  // Initialize session tracking and check for handoff data
   useEffect(() => {
-    const handoffData = sessionStorage.getItem('estimateHandoff')
-    if (handoffData) {
-      try {
-        const parsedData = JSON.parse(handoffData)
-        setData(prev => ({
-          ...prev,
-          companyName: parsedData.contactInfo?.companyName || '',
-          contactName: parsedData.contactInfo?.name || '',
-          contactEmail: parsedData.contactInfo?.email || '',
-          squareFootage: parsedData.facilitySize || 0,
-          facilityType: 'Mixed Use Facility'
-        }))
-        sessionStorage.removeItem('estimateHandoff')
-      } catch (error) {
-        console.error('Error parsing handoff data:', error)
+    const initializeSession = async () => {
+      // Create or get user session
+      const user = sessionManager.getOrCreateUser()
+
+      // Check for handoff data from security estimate
+      const handoffData = sessionStorage.getItem('estimateHandoff')
+      let projectData = {
+        projectName: 'AI Discovery Assessment',
+        facilityType: 'Mixed Use Facility',
+        phase: {
+          tool: 'ai-discovery',
+          data: { currentStep: 0, entry_point: handoffData ? 'security_estimate_handoff' : 'direct_access' }
+        }
       }
+
+      if (handoffData) {
+        try {
+          const parsedData = JSON.parse(handoffData)
+
+          // Update form data with handoff info
+          setData(prev => ({
+            ...prev,
+            companyName: parsedData.contactInfo?.companyName || '',
+            contactName: parsedData.contactInfo?.name || '',
+            contactEmail: parsedData.contactInfo?.email || '',
+            squareFootage: parsedData.facilitySize || 0,
+            facilityType: 'Mixed Use Facility',
+            projectName: parsedData.contactInfo?.companyName ?
+              `${parsedData.contactInfo.companyName} Security Assessment` :
+              'Security Assessment Project'
+          }))
+
+          // Update project data with handoff context
+          projectData = {
+            projectName: parsedData.contactInfo?.companyName ?
+              `${parsedData.contactInfo.companyName} Security Assessment` :
+              'Security Assessment Project',
+            facilitySize: parsedData.facilitySize,
+            facilityType: 'Mixed Use Facility',
+            estimatedCost: parsedData.estimate?.totalCost,
+            systems: parsedData.selectedSystems,
+            phase: {
+              tool: 'ai-discovery',
+              data: {
+                currentStep: 0,
+                entry_point: 'security_estimate_handoff',
+                previous_estimate: parsedData.estimate,
+                handoff_data: parsedData
+              }
+            }
+          }
+
+          // Update user with contact info
+          if (parsedData.contactInfo?.email) {
+            sessionManager.getOrCreateUser({
+              email: parsedData.contactInfo.email,
+              name: parsedData.contactInfo.name,
+              company: parsedData.contactInfo.companyName
+            })
+          }
+
+          sessionStorage.removeItem('estimateHandoff')
+          console.log('🔄 Continuing from Security Estimate handoff')
+        } catch (error) {
+          console.error('Error parsing handoff data:', error)
+        }
+      }
+
+      // Create or update project
+      const project = sessionManager.createOrUpdateProject(projectData)
+
+      setSessionInfo({
+        userId: user.userId,
+        projectId: project.projectId
+      })
+
+      // Track AI Discovery start
+      sessionManager.trackActivity({
+        action: 'ai_discovery_started',
+        tool: 'ai-discovery',
+        data: {
+          entry_point: handoffData ? 'security_estimate_handoff' : 'direct_access',
+          has_previous_estimate: !!handoffData
+        }
+      })
+
+      console.log('🎯 AI Discovery session initialized:', { userId: user.userId, projectId: project.projectId })
     }
+
+    initializeSession()
   }, [])
 
   const updateData = (field: keyof DiscoveryData, value: any) => {
@@ -142,12 +217,53 @@ export default function AIDiscoveryPage() {
 
   const nextStep = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, steps.length - 1))
+      const newStep = Math.min(currentStep + 1, steps.length - 1)
+      setCurrentStep(newStep)
+
+      // Track step progression
+      sessionManager.trackActivity({
+        action: 'step_completed',
+        tool: 'ai-discovery',
+        data: {
+          completed_step: currentStep,
+          step_name: steps[currentStep]?.id,
+          next_step: newStep,
+          progress_percentage: Math.round((newStep / (steps.length - 1)) * 100),
+          form_data_snapshot: data
+        }
+      })
+
+      // Update project with current progress
+      sessionManager.createOrUpdateProject({
+        phase: {
+          tool: 'ai-discovery',
+          data: {
+            currentStep: newStep,
+            progress_percentage: Math.round((newStep / (steps.length - 1)) * 100),
+            last_completed_step: steps[currentStep]?.id,
+            form_data: data
+          }
+        }
+      })
+
+      console.log(`📈 AI Discovery step completed: ${steps[currentStep]?.id} → ${steps[newStep]?.id}`)
     }
   }
 
   const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 0))
+    const newStep = Math.max(currentStep - 1, 0)
+    setCurrentStep(newStep)
+
+    // Track backward navigation
+    sessionManager.trackActivity({
+      action: 'step_back',
+      tool: 'ai-discovery',
+      data: {
+        from_step: currentStep,
+        to_step: newStep,
+        step_name: steps[newStep]?.id
+      }
+    })
   }
 
   const generateAssessment = async () => {
@@ -158,23 +274,85 @@ export default function AIDiscoveryPage() {
     }
 
     try {
+      // Track assessment generation start
+      sessionManager.trackActivity({
+        action: 'assessment_generation_started',
+        tool: 'ai-discovery',
+        data: {
+          final_data: data,
+          all_steps_completed: true,
+          facility_size: data.squareFootage,
+          compliance_requirements: data.complianceRequirements,
+          budget_range: data.budgetRange
+        }
+      })
+
+      // Prepare discovery data with session info for results page
+      const discoveryDataWithSession = {
+        ...data,
+        userId: sessionInfo.userId,
+        projectId: sessionInfo.projectId,
+        sessionTimestamp: new Date().toISOString()
+      }
+
       // Store discovery data for results page
-      sessionStorage.setItem('discoveryAssessmentData', JSON.stringify(data))
+      sessionStorage.setItem('discoveryAssessmentData', JSON.stringify(discoveryDataWithSession))
 
       const response = await fetch('/api/ai-assessment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'generate_discovery_assessment',
-          discoveryData: data
+          discoveryData: data,
+          sessionInfo: sessionInfo
         })
       })
 
       if (response.ok) {
         const result = await response.json()
         if (result.success) {
+          // Track successful completion
+          sessionManager.trackActivity({
+            action: 'ai_discovery_completed',
+            tool: 'ai-discovery',
+            data: {
+              assessment_generated: true,
+              final_data: data,
+              ai_response_size: JSON.stringify(result).length
+            }
+          })
+
+          // Update project as completed
+          sessionManager.createOrUpdateProject({
+            status: 'completed',
+            phase: {
+              tool: 'ai-discovery',
+              data: {
+                completed: true,
+                final_data: data,
+                assessment_results: result,
+                completion_timestamp: new Date().toISOString()
+              }
+            }
+          })
+
+          // Log AI session completion
+          await sessionManager.logAISession({
+            tool: 'ai-discovery',
+            sessionId: `ai_discovery_${Date.now()}`,
+            userId: sessionInfo.userId,
+            projectId: sessionInfo.projectId,
+            data: {
+              action: 'assessment_completed',
+              discovery_data: data,
+              results: result
+            }
+          })
+
           // Store results and redirect
           sessionStorage.setItem('assessmentResults', JSON.stringify(result))
+
+          console.log('🎉 AI Discovery assessment completed successfully')
           window.location.href = '/ai-discovery-results'
         } else {
           throw new Error(result.error || 'Assessment generation failed')
@@ -184,6 +362,17 @@ export default function AIDiscoveryPage() {
       }
     } catch (error) {
       console.error('Failed to generate assessment:', error)
+
+      // Track failure
+      sessionManager.trackActivity({
+        action: 'assessment_generation_failed',
+        tool: 'ai-discovery',
+        data: {
+          error_message: error.message,
+          final_data: data
+        }
+      })
+
       alert(`Assessment generation failed: ${error.message}`)
     }
   }
