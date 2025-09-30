@@ -2,6 +2,7 @@
 // Generates quotes with confidence levels and refinement requirements
 
 import { SecurityScenario } from './scenario-library'
+import { vmsOptions, analyticsOptions, getVMSByDeployment, getCompatibleAnalytics } from './vms-analytics-database'
 
 export interface QuoteLineItem {
   category: string;

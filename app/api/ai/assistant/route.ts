@@ -46,7 +46,18 @@ export async function POST(request: NextRequest) {
     const assistantId = selectedProvider?.api_key || process.env.ASSESSMENT_ASSISTANT_ID || 'asst_k6HbBQBgNG3p04jxkbqUtplv'
 
     if (!assistantId || !assistantId.startsWith('asst_')) {
-      throw new Error('No valid Assistant ID found')
+      console.error('Assistant ID validation failed:', {
+        assistantId,
+        selectedProvider: selectedProvider?.id,
+        hasEnvVar: !!process.env.ASSESSMENT_ASSISTANT_ID
+      })
+      throw new Error(`No valid Assistant ID found. Got: ${assistantId}`)
+    }
+
+    // Validate that we have a proper OpenAI API key
+    if (!process.env.OPENAI_API_KEY) {
+      console.error('Missing OPENAI_API_KEY environment variable')
+      throw new Error('OpenAI API key not configured')
     }
 
     // Create a new thread for this conversation
@@ -100,10 +111,31 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Assistant API Error:', error)
 
+    // Provide more specific error messages for debugging
+    let errorMessage = 'Failed to get assistant response'
+    let statusCode = 500
+
+    if (error instanceof Error) {
+      if (error.message.includes('No valid Assistant ID')) {
+        errorMessage = 'AI Assistant configuration error: Invalid or missing Assistant ID'
+        statusCode = 503 // Service Unavailable
+      } else if (error.message.includes('OpenAI API key not configured')) {
+        errorMessage = 'AI Service configuration error: API key not configured'
+        statusCode = 503
+      } else if (error.message.includes('Assistant run failed')) {
+        errorMessage = 'AI Assistant processing error: Please try again'
+        statusCode = 502 // Bad Gateway
+      } else if (error.message.includes('quota') || error.message.includes('rate limit')) {
+        errorMessage = 'AI Service temporarily unavailable: Please try again in a moment'
+        statusCode = 429 // Too Many Requests
+      }
+    }
+
     return NextResponse.json({
-      error: 'Failed to get assistant response',
+      error: errorMessage,
       details: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
       success: false
-    }, { status: 500 })
+    }, { status: statusCode })
   }
 }
