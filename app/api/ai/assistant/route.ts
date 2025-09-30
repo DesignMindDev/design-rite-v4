@@ -33,13 +33,25 @@ export async function POST(request: NextRequest) {
     let selectedProvider = null
     if (providerId) {
       selectedProvider = providersData.providers.find((p: any) => p.id === providerId)
+      // Validate requested provider is enabled and correct type
+      if (selectedProvider && (!selectedProvider.enabled || selectedProvider.provider_type !== 'openai')) {
+        console.warn(`Requested provider ${providerId} is disabled or not OpenAI compatible, falling back`)
+        selectedProvider = null
+      }
     }
 
-    // If no specific provider or not found, get first enabled assessment provider
+    // If no specific provider or not found, get first enabled assessment provider by priority
     if (!selectedProvider) {
-      selectedProvider = providersData.providers.find((p: any) =>
-        p.use_case === 'assessment' && p.enabled && p.provider_type === 'openai'
-      )
+      const assessmentProviders = providersData.providers
+        .filter((p: any) => p.use_case === 'assessment' && p.enabled && p.provider_type === 'openai')
+        .sort((a: any, b: any) => (a.priority || 999) - (b.priority || 999))
+
+      selectedProvider = assessmentProviders[0]
+
+      if (!selectedProvider) {
+        console.error('No enabled OpenAI assessment providers found in AI Providers system')
+        throw new Error('AI Assessment service is currently unavailable - no providers configured')
+      }
     }
 
     // Fallback to environment variable
@@ -59,6 +71,15 @@ export async function POST(request: NextRequest) {
       console.error('Missing OPENAI_API_KEY environment variable')
       throw new Error('OpenAI API key not configured')
     }
+
+    // Log selected provider for monitoring and debugging
+    console.log('AI Assistant Request:', {
+      selectedProvider: selectedProvider.id,
+      providerName: selectedProvider.name,
+      assistantId: assistantId.substring(0, 8) + '...',
+      priority: selectedProvider.priority,
+      useCase: selectedProvider.use_case
+    })
 
     // Create a new thread for this conversation
     const thread = await openai.beta.threads.create()
@@ -100,16 +121,33 @@ export async function POST(request: NextRequest) {
       throw new Error('Assistant response is not text')
     }
 
+    // Log successful completion for AI Provider health monitoring
+    console.log('AI Assistant Success:', {
+      providerId: selectedProvider.id,
+      assistantId: assistantId.substring(0, 8) + '...',
+      responseLength: content.text.value.length,
+      threadId: thread.id.substring(0, 8) + '...'
+    })
+
     return NextResponse.json({
       message: content.text.value,
       threadId: thread.id,
       assistantId: assistantId,
       providerId: selectedProvider?.id,
+      providerName: selectedProvider?.name,
       success: true
     })
 
   } catch (error) {
     console.error('Assistant API Error:', error)
+
+    // Log error for AI Provider health monitoring
+    console.error('AI Provider Error:', {
+      providerId: selectedProvider?.id || 'none',
+      providerName: selectedProvider?.name || 'none',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    })
 
     // Provide more specific error messages for debugging
     let errorMessage = 'Failed to get assistant response'
@@ -128,6 +166,9 @@ export async function POST(request: NextRequest) {
       } else if (error.message.includes('quota') || error.message.includes('rate limit')) {
         errorMessage = 'AI Service temporarily unavailable: Please try again in a moment'
         statusCode = 429 // Too Many Requests
+      } else if (error.message.includes('unavailable - no providers configured')) {
+        errorMessage = 'AI Assessment service unavailable: Please check AI Providers configuration'
+        statusCode = 503
       }
     }
 
