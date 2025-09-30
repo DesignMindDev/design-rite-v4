@@ -2,10 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, CheckCircle, Building2, Users, Shield, MapPin, Clock, DollarSign, FileText, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CheckCircle, Building2, Users, Shield, MapPin, Clock, DollarSign, FileText, AlertTriangle, Zap } from 'lucide-react'
 import { sessionManager } from '../../lib/sessionManager'
+import { securityScenarios, getScenarioById, type SecurityScenario } from '../../lib/scenario-library'
+import { QuoteGenerator, type SecurityQuote } from '../../lib/quote-generator'
 
 interface DiscoveryData {
+  // Step 0: Scenario Selection (NEW)
+  selectedScenario?: SecurityScenario
+  useScenario: boolean
+
   // Step 1: Project Basics
   projectName: string
   companyName: string
@@ -39,6 +45,7 @@ interface DiscoveryData {
 }
 
 const steps = [
+  { id: 'scenario', title: 'Quick Start', icon: Zap },
   { id: 'basics', title: 'Project Basics', icon: Building2 },
   { id: 'facility', title: 'Facility Details', icon: MapPin },
   { id: 'security', title: 'Security Needs', icon: Shield },
@@ -51,6 +58,8 @@ export default function AIDiscoveryPage() {
   const [currentStep, setCurrentStep] = useState(0)
   const [sessionInfo, setSessionInfo] = useState({ userId: '', projectId: '' })
   const [data, setData] = useState<DiscoveryData>({
+    useScenario: false,
+    selectedScenario: undefined,
     projectName: '',
     companyName: '',
     contactName: '',
@@ -75,6 +84,8 @@ export default function AIDiscoveryPage() {
   })
 
   const [errors, setErrors] = useState<{[key: string]: string}>({})
+  const [generatedQuote, setGeneratedQuote] = useState<SecurityQuote | null>(null)
+  const [isGeneratingQuote, setIsGeneratingQuote] = useState(false)
 
   // Initialize session tracking and check for handoff data
   useEffect(() => {
@@ -198,13 +209,13 @@ export default function AIDiscoveryPage() {
         else if (!/\S+@\S+\.\S+/.test(data.contactEmail)) newErrors.contactEmail = 'Valid email is required'
         break
 
-      case 1: // Facility Information
+      case 2: // Facility Information
         if (!data.facilityType) newErrors.facilityType = 'Facility type is required'
         if (!data.squareFootage) newErrors.squareFootage = 'Square footage is required'
         if (!data.operatingHours) newErrors.operatingHours = 'Operating hours are required'
         break
 
-      case 2: // Security Needs
+      case 3: // Security Needs
         if (data.securityConcerns.length === 0) newErrors.securityConcerns = 'Select at least one security concern'
         if (!data.budgetRange) newErrors.budgetRange = 'Budget range is required'
         if (!data.timeline) newErrors.timeline = 'Timeline is required'
@@ -377,9 +388,126 @@ export default function AIDiscoveryPage() {
     }
   }
 
+  // Function to handle scenario selection
+  const handleScenarioSelect = (scenario: SecurityScenario) => {
+    setData(prev => ({
+      ...prev,
+      selectedScenario: scenario,
+      useScenario: true,
+      facilityType: scenario.facilityType,
+      squareFootage: scenario.sqftRange.typical,
+      budgetRange: `$${scenario.budgetRange.min.toLocaleString()} - $${scenario.budgetRange.max.toLocaleString()}`,
+      complianceRequirements: scenario.compliance,
+      securityConcerns: scenario.securityConcerns
+    }))
+  }
+
+  // Function to generate preliminary quote
+  const handleGenerateQuote = async () => {
+    setIsGeneratingQuote(true)
+
+    try {
+      // Simulate some processing time
+      await new Promise(resolve => setTimeout(resolve, 1500))
+
+      const quoteGenerator = new QuoteGenerator()
+      const quote = quoteGenerator.generateQuote(data, data.selectedScenario)
+
+      setGeneratedQuote(quote)
+
+      // Track quote generation
+      sessionManager.trackActivity('quote_generated', {
+        projectId: sessionInfo.projectId,
+        quoteId: quote.id,
+        confidence: quote.overallConfidence,
+        total: quote.total
+      })
+
+    } catch (error) {
+      console.error('Quote generation error:', error)
+      alert('Failed to generate quote. Please try again.')
+    } finally {
+      setIsGeneratingQuote(false)
+    }
+  }
+
   const renderStepContent = () => {
     switch (currentStep) {
-      case 0: // Project Basics
+      case 0: // Scenario Selection (NEW)
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-white mb-4">🚀 Quick Start with Scenarios</h2>
+              <p className="text-white/70 text-lg">Choose a pre-built scenario to accelerate your assessment, or skip to build from scratch</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {securityScenarios.map((scenario) => (
+                <div
+                  key={scenario.id}
+                  onClick={() => handleScenarioSelect(scenario)}
+                  className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:scale-105 ${
+                    data.selectedScenario?.id === scenario.id
+                      ? 'border-purple-400 bg-purple-500/20'
+                      : 'border-white/20 bg-white/5 hover:border-white/40'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="text-4xl mb-3">{scenario.icon}</div>
+                    <h3 className="text-xl font-bold text-white mb-2">{scenario.name}</h3>
+                    <p className="text-white/70 text-sm mb-4">{scenario.description}</p>
+
+                    <div className="space-y-2 text-xs text-white/60">
+                      <div>📐 {scenario.sqftRange.min.toLocaleString()}-{scenario.sqftRange.max.toLocaleString()} sqft</div>
+                      <div>💰 ${scenario.budgetRange.min.toLocaleString()}-${scenario.budgetRange.max.toLocaleString()}</div>
+                      <div>🎯 {scenario.confidenceLevel}% confidence</div>
+                    </div>
+
+                    {data.selectedScenario?.id === scenario.id && (
+                      <div className="mt-4 text-purple-300 font-medium">✓ Selected</div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {data.selectedScenario && (
+              <div className="mt-8 p-6 bg-white/10 rounded-lg border border-purple-400/30">
+                <h4 className="text-lg font-bold text-white mb-3">Selected: {data.selectedScenario.name}</h4>
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <h5 className="text-white/90 font-medium mb-2">Pre-filled Assumptions:</h5>
+                    <ul className="text-white/70 space-y-1">
+                      <li>• {data.selectedScenario.assumptions.surveillance.cameras} cameras ({data.selectedScenario.assumptions.surveillance.coverage} coverage)</li>
+                      <li>• {data.selectedScenario.assumptions.accessControl.doors} access-controlled doors</li>
+                      <li>• {data.selectedScenario.assumptions.intrusion.zones} security zones</li>
+                      <li>• {data.selectedScenario.compliance.join(', ')} compliance</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h5 className="text-white/90 font-medium mb-2">Typical Security Concerns:</h5>
+                    <ul className="text-white/70 space-y-1">
+                      {data.selectedScenario.securityConcerns.slice(0, 4).map((concern, idx) => (
+                        <li key={idx}>• {concern}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="text-center mt-8">
+              <button
+                onClick={() => setData(prev => ({ ...prev, useScenario: false, selectedScenario: undefined }))}
+                className="text-white/70 hover:text-white transition-colors underline"
+              >
+                Skip scenarios - I'll build from scratch
+              </button>
+            </div>
+          </div>
+        )
+
+      case 1: // Project Basics (moved from case 0)
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -447,7 +575,7 @@ export default function AIDiscoveryPage() {
           </div>
         )
 
-      case 1: // Facility Information
+      case 2: // Facility Information
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -573,7 +701,7 @@ export default function AIDiscoveryPage() {
           </div>
         )
 
-      case 2: // Security Needs
+      case 3: // Security Needs
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -688,7 +816,7 @@ export default function AIDiscoveryPage() {
           </div>
         )
 
-      case 3: // Compliance
+      case 4: // Compliance
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -788,7 +916,7 @@ export default function AIDiscoveryPage() {
           </div>
         )
 
-      case 4: // Implementation
+      case 5: // Implementation
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -894,7 +1022,7 @@ export default function AIDiscoveryPage() {
           </div>
         )
 
-      case 5: // Summary
+      case 6: // Summary
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
