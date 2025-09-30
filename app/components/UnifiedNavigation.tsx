@@ -392,7 +392,7 @@ export default function UnifiedNavigation() {
             <div>
               <div className="text-gray-400 dr-ui uppercase tracking-wider mb-2">Platform</div>
               <button
-                onClick={handleAIAssessmentClick}
+                onClick={handleTryPlatformClick}
                 className="block text-white/80 hover:dr-text-pearl py-2 pl-4 text-left w-full touch-manipulation active:bg-violet-600/10 transition-colors"
                 type="button"
               >
@@ -400,7 +400,7 @@ export default function UnifiedNavigation() {
               </button>
               <Link href="/ai-discovery" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🚀 AI Discovery Assistant</Link>
               <button
-                onClick={handleAIAssessmentClick}
+                onClick={handleTryPlatformClick}
                 className="block text-white/80 hover:dr-text-pearl py-2 pl-4 text-left w-full touch-manipulation active:bg-violet-600/10 transition-colors"
                 type="button"
               >
@@ -457,11 +457,11 @@ export default function UnifiedNavigation() {
                 👤 Sign In
               </button>
               <button
-                onClick={handleTryPlatformClick}
+                onClick={handleSignInClick}
                 className="block w-full text-left dr-bg-violet dr-text-pearl px-4 py-2 rounded-lg mt-2 touch-manipulation active:bg-purple-800 transition-colors"
                 type="button"
               >
-                🚀 Try Platform
+                👤 Sign In / Try Free
               </button>
             </div>
           </div>
