@@ -3,13 +3,11 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import UnifiedNavigation from './components/UnifiedNavigation';
-import EmailGate from './components/EmailGate';
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeStormItem, setActiveStormItem] = useState(0)
   const [isCalm, setIsCalm] = useState(false)
-  const [showEmailGate, setShowEmailGate] = useState(false)
 
   const stormItems = [
     { icon: "☕", text: "Morning coffee, client calls with urgent changes", delay: 0, type: "problem" },
@@ -46,15 +44,10 @@ export default function HomePage() {
     window.location.href = '/watch-demo'
   }
 
-  // Try Platform logic - triggers EmailGate like UnifiedNavigation
+  // Try Platform logic - route to platform-access choice page
   const handleTryPlatformClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    setShowEmailGate(true);
-  };
-
-  const handleEmailGateSuccess = () => {
-    setShowEmailGate(false);
-    // Magic link will handle redirect - don't redirect here
+    window.location.href = '/platform-access';
   };
 
   const calmTheStorm = () => {
@@ -452,13 +445,6 @@ export default function HomePage() {
         </div>
       </footer>
 
-      {/* Email Gate */}
-      {/* EmailGate for page Try Platform buttons */}
-      <EmailGate
-        isOpen={showEmailGate}
-        onSuccess={handleEmailGateSuccess}
-        onClose={() => setShowEmailGate(false)}
-      />
     </div>
   )
 }

@@ -3,30 +3,18 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import EmailGate from '../components/EmailGate'
 import { useAuthCache } from '../hooks/useAuthCache'
 
 export default function SubscribePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [email, setEmail] = useState('')
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [showEmailGate, setShowEmailGate] = useState(false)
   const router = useRouter()
   const { isAuthenticated, extendSession } = useAuthCache()
 
   const handleTryPlatformClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (isAuthenticated) {
-      extendSession();
-      router.push('/ai-assessment');
-    } else {
-      setShowEmailGate(true);
-    }
-  };
-
-  const handleEmailGateSuccess = () => {
-    setShowEmailGate(false);
-    router.push('/ai-assessment');
+    window.location.href = '/platform-access';
   };
 
  const handleSubmit = async (e: React.FormEvent) => {
@@ -240,12 +228,6 @@ export default function SubscribePage() {
         </section>
       </main>
 
-      {/* Email Gate Modal */}
-      <EmailGate
-        isOpen={showEmailGate}
-        onClose={() => setShowEmailGate(false)}
-        onSuccess={handleEmailGateSuccess}
-      />
 
       {/* Footer */}
       <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
