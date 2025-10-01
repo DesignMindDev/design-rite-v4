@@ -453,6 +453,10 @@ export default function AdminPage() {
               </button>
               <div className="absolute right-0 mt-2 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 <div className="py-2">
+                  <Link href="/admin/demo-dashboard" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                    <span>📅</span>
+                    <span>Demo Dashboard</span>
+                  </Link>
                   <button onClick={() => setActiveTab('team')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
                     <span>👥</span>
                     <span>Team Management</span>
