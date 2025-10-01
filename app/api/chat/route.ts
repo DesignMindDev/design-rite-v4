@@ -206,7 +206,3 @@ function handleGeneralQuestion(message: string): string {
   
   return "Great question! Our platform helps with:\n\n• AI-powered security assessments\n• Automated proposal generation\n• Compliance documentation\n• Professional BOMs\n\nWhat aspect interests you most?";
 }
-
-function generateSessionId(): string {
-  return `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-}
