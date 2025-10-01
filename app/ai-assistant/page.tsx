@@ -46,6 +46,10 @@ export default function AIAssistantPage() {
   const [previousSessions, setPreviousSessions] = useState<any[]>([])
   const [showPrintPreview, setShowPrintPreview] = useState(false)
   const [previewContent, setPreviewContent] = useState({ title: '', content: '', filename: '' })
+  const [showAssumptions, setShowAssumptions] = useState(false)
+  const [showCustomCategory, setShowCustomCategory] = useState(false)
+  const [customCategoryTitle, setCustomCategoryTitle] = useState('')
+  const [customCategoryDetails, setCustomCategoryDetails] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -74,27 +78,29 @@ export default function AIAssistantPage() {
   ])
 
   useEffect(() => {
-    // Initialize user hash and session
-    initializeSession()
-
-    // Load AI providers from the AI Providers system
-    loadAIProviders()
-
-    // Check for existing assessment data from previous tools
+    // Check for existing assessment data from previous tools FIRST
+    // This prevents race conditions with session initialization
     const systemSurveyorImport = sessionStorage.getItem('systemSurveyorImport')
     const quickEstimateData = sessionStorage.getItem('quickEstimateData')
     const aiDiscoveryData = sessionStorage.getItem('aiDiscoveryData')
 
+    let hasImportedData = false
+
     // Priority: System Surveyor Import > AI Discovery > Quick Estimate
     if (systemSurveyorImport) {
+      console.log('🎬 System Surveyor Import detected, loading data...')
       const data = JSON.parse(systemSurveyorImport)
       setAssessmentData(data)
+      setHasUploadedFile(true) // Mark as having imported data
       addWelcomeMessage('System Surveyor Import', data)
       sessionStorage.removeItem('systemSurveyorImport') // Clear after loading
+      hasImportedData = true
+      console.log('✅ System Surveyor data loaded successfully')
     } else if (aiDiscoveryData) {
       const data = JSON.parse(aiDiscoveryData)
       setAssessmentData(data)
       addWelcomeMessage('AI Discovery', data)
+      hasImportedData = true
 
       // Initialize session tracking from AI Discovery data
       if (data.userId && data.projectId) {
@@ -104,6 +110,7 @@ export default function AIAssistantPage() {
       const data = JSON.parse(quickEstimateData)
       setAssessmentData(data)
       addWelcomeMessage('Quick Estimate', data)
+      hasImportedData = true
 
       // Initialize session tracking from Quick Estimate data
       if (data.userId && data.projectId) {
@@ -145,6 +152,13 @@ export default function AIAssistantPage() {
 
       console.log('🎯 Started fresh AI Assistant session:', user.userId, project.projectId)
     }
+
+    // Initialize user hash and session AFTER data is loaded
+    // Skip session restore if we have freshly imported data (prevents overwriting welcome message)
+    initializeSession(hasImportedData)
+
+    // Load AI providers from the AI Providers system
+    loadAIProviders()
   }, [])
 
   const loadAIProviders = async () => {
@@ -203,7 +217,7 @@ export default function AIAssistantPage() {
     return `ai_session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }
 
-  const initializeSession = async () => {
+  const initializeSession = async (skipSessionRestore = false) => {
     // Get or create user hash
     let hash = localStorage.getItem('ai_user_hash')
     if (!hash) {
@@ -213,8 +227,9 @@ export default function AIAssistantPage() {
     setUserHash(hash)
 
     // Check for existing session or create new one
+    // Skip session restore if we have fresh imported data
     const existingSessionId = sessionStorage.getItem('ai_current_session')
-    if (existingSessionId) {
+    if (existingSessionId && !skipSessionRestore) {
       setSessionId(existingSessionId)
       await loadSession(existingSessionId, hash)
     } else {
@@ -833,6 +848,22 @@ Date: ${new Date().toLocaleDateString()}
     }
   }
 
+  const handleAddCustomCategory = () => {
+    if (!customCategoryTitle.trim()) {
+      alert('Please enter a category title')
+      return
+    }
+
+    // Create a message requesting the custom category addition
+    const customCategoryMessage = `Add custom category: "${customCategoryTitle}"${customCategoryDetails ? `\n\nDetails: ${customCategoryDetails}` : ''}`
+    setInputValue(customCategoryMessage)
+
+    // Reset the form
+    setCustomCategoryTitle('')
+    setCustomCategoryDetails('')
+    setShowCustomCategory(false)
+  }
+
   return (
     <div className="min-h-screen dr-bg-charcoal dr-text-pearl">
       {/* Header */}
@@ -1111,6 +1142,18 @@ Date: ${new Date().toLocaleDateString()}
                 >
                   🔒 Add compliance
                 </button>
+                <button
+                  onClick={() => setShowAssumptions(true)}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
+                >
+                  📋 Review assumptions
+                </button>
+                <button
+                  onClick={() => setShowCustomCategory(true)}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
+                >
+                  ➕ Add custom category
+                </button>
               </div>
             </div>
 
@@ -1202,6 +1245,213 @@ Date: ${new Date().toLocaleDateString()}
                   Download
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Assumptions Checklist Modal */}
+      {showAssumptions && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col border border-purple-500/30">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-700">
+              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+                <span>📋</span> Standard Assumptions Checklist
+              </h2>
+              <button
+                onClick={() => setShowAssumptions(false)}
+                className="text-gray-400 hover:text-gray-200 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-auto p-6">
+              <div className="space-y-6">
+                <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-4">
+                  <h3 className="text-purple-300 font-medium mb-3">Surveillance System</h3>
+                  <ul className="space-y-2 text-gray-300 text-sm">
+                    <li className="flex items-start gap-2">
+                      <input type="checkbox" className="mt-1" defaultChecked />
+                      <span>NDAA-compliant IP cameras (2MP-4MP resolution)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <input type="checkbox" className="mt-1" defaultChecked />
+                      <span>30-day video retention on local NVR</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <input type="checkbox" className="mt-1" defaultChecked />
+                      <span>Motion detection and analytics included</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <input type="checkbox" className="mt-1" defaultChecked />
+                      <span>Standard coverage: 80-90% of facility area</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+                  <h3 className="text-blue-300 font-medium mb-3">Access Control</h3>
+                  <ul className="space-y-2 text-gray-300 text-sm">
+                    <li className="flex items-start gap-2">
+                      <input type="checkbox" className="mt-1" defaultChecked />
+                      <span>Card reader system (125kHz or 13.56MHz)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <input type="checkbox" className="mt-1" defaultChecked />
+                      <span>Cloud or on-premise management options</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <input type="checkbox" className="mt-1" defaultChecked />
+                      <span>Integration with existing HR/AD systems</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
+                  <h3 className="text-green-300 font-medium mb-3">Installation & Labor</h3>
+                  <ul className="space-y-2 text-gray-300 text-sm">
+                    <li className="flex items-start gap-2">
+                      <input type="checkbox" className="mt-1" defaultChecked />
+                      <span>Professional installation by certified technicians</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <input type="checkbox" className="mt-1" defaultChecked />
+                      <span>Standard business hours installation (M-F, 8am-5pm)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <input type="checkbox" className="mt-1" defaultChecked />
+                      <span>2-hour end-user training session included</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <input type="checkbox" className="mt-1" defaultChecked />
+                      <span>90-day warranty on labor, manufacturer warranty on equipment</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-4">
+                  <h3 className="text-orange-300 font-medium mb-3">Exclusions & Caveats</h3>
+                  <ul className="space-y-2 text-gray-300 text-sm">
+                    <li className="flex items-start gap-2">
+                      <span className="text-orange-400 font-bold">⚠️</span>
+                      <span>Pricing assumes existing network infrastructure is adequate</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-orange-400 font-bold">⚠️</span>
+                      <span>Permits, electrical work, and structural modifications not included</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-orange-400 font-bold">⚠️</span>
+                      <span>Assumes clear mounting surfaces and standard ceiling heights</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-orange-400 font-bold">⚠️</span>
+                      <span>Site survey required for final pricing validation</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-700">
+              <button
+                onClick={() => setShowAssumptions(false)}
+                className="px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-700/50 transition-colors"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  setInputValue("Please provide a detailed quote based on the standard assumptions checklist")
+                  setShowAssumptions(false)
+                }}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                Apply to Quote
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Category Modal */}
+      {showCustomCategory && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-gray-800 rounded-lg shadow-xl max-w-xl w-full border border-purple-500/30">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-700">
+              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+                <span>➕</span> Add Custom Category
+              </h2>
+              <button
+                onClick={() => setShowCustomCategory(false)}
+                className="text-gray-400 hover:text-gray-200 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Category Title *
+                </label>
+                <input
+                  type="text"
+                  value={customCategoryTitle}
+                  onChange={(e) => setCustomCategoryTitle(e.target.value)}
+                  placeholder="e.g., Exclusions, Special Requirements, Caveats"
+                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Details (Optional)
+                </label>
+                <textarea
+                  value={customCategoryDetails}
+                  onChange={(e) => setCustomCategoryDetails(e.target.value)}
+                  placeholder="Enter specific details, exclusions, or requirements..."
+                  rows={6}
+                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                />
+              </div>
+
+              <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+                <h4 className="text-blue-300 font-medium text-sm mb-2">Examples:</h4>
+                <ul className="text-gray-400 text-xs space-y-1">
+                  <li>• <strong>Exclusions:</strong> "Network infrastructure upgrades not included"</li>
+                  <li>• <strong>Special Requirements:</strong> "After-hours installation required"</li>
+                  <li>• <strong>Caveats:</strong> "Pricing subject to site survey confirmation"</li>
+                  <li>• <strong>Additional Costs:</strong> "Permit fees and electrical work separate"</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-700">
+              <button
+                onClick={() => setShowCustomCategory(false)}
+                className="px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-700/50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddCustomCategory}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                Add to Quote
+              </button>
             </div>
           </div>
         </div>
