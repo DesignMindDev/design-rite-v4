@@ -1,7 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Users, TrendingUp, Award, Activity, Mail, Phone, Building, Calendar, ExternalLink, MessageSquare, Target, Clock, MapPin } from 'lucide-react'
+import Link from 'next/link'
+import { Users, TrendingUp, Award, Activity, Mail, Phone, Building, Calendar, ExternalLink, MessageSquare, Target, Clock, MapPin, RefreshCw, ArrowLeft, Filter, TrendingDown } from 'lucide-react'
+import MetricCard from '../../components/dashboard/MetricCard'
+import TimeSeriesChart from '../../components/dashboard/TimeSeriesChart'
+import FunnelChart from '../../components/dashboard/FunnelChart'
 
 interface Lead {
   id: string
@@ -61,9 +65,50 @@ interface DashboardStats {
   new_this_month: number
 }
 
+interface ConversionFunnelData {
+  stage: string
+  count: number
+  percentage: number
+  dropoff: number
+}
+
+interface LeadSourcePerformance {
+  source: string
+  leads: number
+  avgScore: number
+  conversionRate: number
+  customers: number
+}
+
+interface JourneyMetrics {
+  avgTimeToConversion: number
+  avgPageViewsToConversion: number
+  avgSessionsToConversion: number
+  mostCommonFirstPage: string
+  mostCommonConversionPath: string[]
+}
+
+interface TimeSeriesData {
+  date: string
+  newLeads: number
+  qualifiedLeads: number
+  trials: number
+  conversions: number
+}
+
+interface AnalyticsData {
+  conversionFunnel: ConversionFunnelData[]
+  leadSourcePerformance: LeadSourcePerformance[]
+  journeyMetrics: JourneyMetrics
+  timeSeriesData: TimeSeriesData[]
+  topPages: Array<{ page: string; views: number; uniqueVisitors: number }>
+  conversionPaths: Array<{ path: string[]; leads: number; conversions: number; conversionRate: number }>
+}
+
 export default function LeadsDashboard() {
   const [leads, setLeads] = useState<Lead[]>([])
   const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
@@ -75,6 +120,8 @@ export default function LeadsDashboard() {
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [filterGrade, setFilterGrade] = useState<string>('all')
   const [newNote, setNewNote] = useState('')
+  const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d' | '90d'>('30d')
+  const [showAnalytics, setShowAnalytics] = useState(false)
 
   useEffect(() => {
     fetchLeads()
