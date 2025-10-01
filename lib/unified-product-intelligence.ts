@@ -1,5 +1,12 @@
-// File: lib/unified-product-intelligence.ts
-// Purpose: Bridge between harvester data and frontend Discovery Assistant
+/**
+ * Design-Rite Professional - Proprietary & Confidential
+ * Copyright (c) 2025 Design-Rite Professional. All Rights Reserved.
+ *
+ * NOTICE: This code contains proprietary business logic and trade secrets.
+ * Unauthorized copying, distribution, or use is strictly prohibited.
+ *
+ * Last Modified: October 01, 2025
+ */
 
 interface ProductData {
   id: string;

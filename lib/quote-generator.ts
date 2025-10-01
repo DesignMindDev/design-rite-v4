@@ -1,5 +1,14 @@
-// lib/quote-generator.ts
-// Generates quotes with confidence levels and refinement requirements
+/**
+ * Design-Rite Professional - Proprietary & Confidential
+ * Copyright (c) 2025 Design-Rite Professional. All Rights Reserved.
+ *
+ * NOTICE: This code contains proprietary business logic and trade secrets.
+ * Unauthorized copying, distribution, or use is strictly prohibited.
+ * Patent Pending - Pricing algorithms and quote generation systems.
+ *
+ * Quote Generator - Generates quotes with confidence levels and refinement requirements
+ * Last Modified: October 01, 2025
+ */
 
 import { SecurityScenario } from './scenario-library'
 import { vmsOptions, analyticsOptions, getVMSByDeployment, getCompatibleAnalytics } from './vms-analytics-database'

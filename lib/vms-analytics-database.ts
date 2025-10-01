@@ -1,5 +1,14 @@
-// lib/vms-analytics-database.ts
-// VMS and Analytics platforms database from enterprise guides
+/**
+ * Design-Rite Professional - Proprietary & Confidential
+ * Copyright (c) 2025 Design-Rite Professional. All Rights Reserved.
+ *
+ * NOTICE: This code contains proprietary business logic and trade secrets.
+ * Unauthorized copying, distribution, or use is strictly prohibited.
+ * Patent Pending - VMS/Analytics platform database and pricing systems.
+ *
+ * VMS and Analytics Database - Enterprise platform specifications and pricing
+ * Last Modified: October 01, 2025
+ */
 
 import { VMSOption, AnalyticsOption } from './scenario-library';
 

@@ -1,5 +1,14 @@
-// lib/scenario-library.ts
-// Pre-built security scenarios with standard assumptions
+/**
+ * Design-Rite Professional - Proprietary & Confidential
+ * Copyright (c) 2025 Design-Rite Professional. All Rights Reserved.
+ *
+ * NOTICE: This code contains proprietary business logic and trade secrets.
+ * Unauthorized copying, distribution, or use is strictly prohibited.
+ * Patent Pending - Security scenario algorithms and assessment systems.
+ *
+ * Scenario Library - Pre-built security scenarios with standard assumptions
+ * Last Modified: October 01, 2025
+ */
 
 import { VMSOption, AnalyticsOption } from './vms-analytics-database';
 

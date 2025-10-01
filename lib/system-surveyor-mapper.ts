@@ -1,8 +1,16 @@
 /**
- * System Surveyor to Design-Rite Equipment Mapper
+ * Design-Rite Professional - Proprietary & Confidential
+ * Copyright (c) 2025 Design-Rite Professional. All Rights Reserved.
  *
+ * NOTICE: This code contains proprietary business logic and trade secrets.
+ * Unauthorized copying, distribution, or use is strictly prohibited.
+ * Patent Pending - Integration algorithms and equipment mapping systems.
+ *
+ * System Surveyor to Design-Rite Equipment Mapper
  * Maps System Surveyor equipment types and models to Design-Rite product catalog
  * Provides intelligent product matching and recommendations
+ *
+ * Last Modified: October 01, 2025
  */
 
 export interface SystemSurveyorEquipment {

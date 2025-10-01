@@ -1,5 +1,16 @@
 # Design-Rite™ AI Security Platform v3.1
 
+> **⚠️ PROPRIETARY SOFTWARE - CONFIDENTIAL**
+>
+> This repository contains proprietary business logic and trade secrets.
+> All code is Copyright (c) 2025 Design-Rite Professional.
+> Unauthorized access, copying, or distribution is strictly prohibited.
+> **Patent Pending** - Integration algorithms and equipment mapping systems.
+>
+> See [LICENSE.md](LICENSE.md) for complete terms.
+
+---
+
 > Transform security system design from days to minutes with AI-powered assessments, multi-AI provider failover, and automated proposal generation.
 
 ## 🚀 Production Platform
