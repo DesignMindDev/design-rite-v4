@@ -388,6 +388,15 @@ export default function AdminPage() {
             Admin Dashboard
           </h1>
           <div className="flex items-center gap-4">
+            {/* Operations Dashboard - Featured */}
+            <Link
+              href="/admin/operations"
+              className="bg-gradient-to-r from-orange-600 to-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-orange-600/30 transition-all flex items-center gap-2"
+            >
+              <span>📊</span>
+              Operations Dashboard
+            </Link>
+
             {/* AI Management Dropdown */}
             <div className="relative group">
               <button className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all flex items-center gap-2">
