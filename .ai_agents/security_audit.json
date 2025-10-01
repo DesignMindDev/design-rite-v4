@@ -1,0 +1,32 @@
+{
+  "source": "npm audit",
+  "capturedAt": "2025-10-01T00:00:00Z",
+  "summary": {
+    "totalVulnerabilities": 2,
+    "critical": 1,
+    "high": 1
+  },
+  "details": {
+    "next": {
+      "severity": "critical",
+      "fixAvailable": "14.2.33",
+      "advisories": [
+        "GHSA-7m27-7ghc-44w9",
+        "GHSA-qpjv-v59x-3qc4",
+        "GHSA-3h52-269p-cp9r",
+        "GHSA-g5qg-72qw-gw5v",
+        "GHSA-f82v-jwr5-mffw",
+        "GHSA-4342-x723-ch2f",
+        "GHSA-xv57-4mr9-wg8v"
+      ]
+    },
+    "xlsx": {
+      "severity": "high",
+      "fixAvailable": false,
+      "advisories": [
+        "GHSA-4r6h-8v6p-xvw6",
+        "GHSA-5pgg-2g8v-p4x9"
+      ]
+    }
+  }
+}

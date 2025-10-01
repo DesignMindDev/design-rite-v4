@@ -129,35 +129,74 @@ Return as JSON with this EXACT structure (no markdown, pure JSON):
 
     console.log('Sending analysis request to GPT-4o...');
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a security system design expert. Return ONLY valid JSON, no markdown code blocks, no explanations.'
-        },
-        {
-          role: 'user',
-          content: analysisPrompt
+    // Helper: retry wrapper with exponential backoff for OpenAI calls
+    async function retryOpenAI(callable: () => Promise<any>, attempts = 3, baseMs = 1000) {
+      let lastErr: any = null;
+      for (let i = 0; i < attempts; i++) {
+        try {
+          return await callable();
+        } catch (err) {
+          lastErr = err;
+          const wait = baseMs * Math.pow(2, i);
+          console.warn(`OpenAI call failed (attempt ${i + 1}/${attempts}), retrying in ${wait}ms`, String(err));
+          await new Promise((r) => setTimeout(r, wait));
         }
-      ],
-      temperature: 0.7,
-      max_tokens: 3000,
-    });
+      }
+      throw lastErr;
+    }
 
-    console.log('GPT-4o response received');
-
-    // Parse the response
-    let analysis;
+    // Call OpenAI with retry and parse safely; fall back to an empty analysis on failure
+    let analysis: any = null;
     try {
-      const responseText = completion.choices[0].message.content || '{}';
-      const cleanJson = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      analysis = JSON.parse(cleanJson);
-      console.log('Analysis parsed successfully');
-    } catch (parseError) {
-      console.error('JSON parse error:', parseError);
-      console.log('Raw response:', completion.choices[0].message.content);
-      throw new Error('Failed to parse AI response');
+      const completion = await retryOpenAI(() => openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a security system design expert. Return ONLY valid JSON, no markdown code blocks, no explanations.'
+          },
+          {
+            role: 'user',
+            content: analysisPrompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 3000,
+      }));
+
+      console.log('GPT-4o response received');
+
+      // Parse the response
+      try {
+        const responseText = completion.choices?.[0]?.message?.content || '{}';
+        const cleanJson = String(responseText).replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        analysis = JSON.parse(cleanJson);
+        console.log('Analysis parsed successfully');
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        console.log('Raw response:', completion.choices?.[0]?.message?.content);
+        // fallback to empty but valid structure
+        analysis = {
+          cameras: [],
+          access_points: [],
+          blind_spots: [],
+          equipment_list: {},
+          coverage_analysis: {},
+          priority_zones: [],
+          estimated_cost: {}
+        };
+      }
+    } catch (openaiError) {
+      console.error('OpenAI analysis failed after retries:', openaiError);
+      analysis = {
+        cameras: [],
+        access_points: [],
+        blind_spots: [],
+        equipment_list: {},
+        coverage_analysis: {},
+        priority_zones: [],
+        estimated_cost: {}
+      };
     }
 
     // Save camera suggestions to database
@@ -165,17 +204,21 @@ Return as JSON with this EXACT structure (no markdown, pure JSON):
       console.log('Saving', analysis.cameras.length, 'camera suggestions...');
 
       for (const camera of analysis.cameras) {
-        await supabase.from('ai_device_suggestions').insert({
-          project_id: projectId,
-          device_category: camera.type,
-          suggested_coordinates: { x: camera.position[0], y: camera.position[1], z: camera.position[2] },
-          reasoning: camera.reasoning,
-          coverage_area: {
-            radius: camera.coverage_radius,
-            angle: camera.coverage_angle
-          },
-          confidence_score: camera.confidence,
-        });
+        try {
+          await supabase.from('ai_device_suggestions').insert({
+            project_id: projectId,
+            device_category: camera.type,
+            suggested_coordinates: { x: camera.position[0], y: camera.position[1], z: camera.position[2] },
+            reasoning: camera.reasoning,
+            coverage_area: {
+              radius: camera.coverage_radius,
+              angle: camera.coverage_angle
+            },
+            confidence_score: camera.confidence,
+          });
+        } catch (insertErr) {
+          console.error('Failed to save camera suggestion, continuing:', insertErr);
+        }
       }
     }
 
@@ -184,14 +227,18 @@ Return as JSON with this EXACT structure (no markdown, pure JSON):
       console.log('Saving', analysis.access_points.length, 'access control suggestions...');
 
       for (const accessPoint of analysis.access_points) {
-        await supabase.from('ai_device_suggestions').insert({
-          project_id: projectId,
-          device_category: accessPoint.device_type,
-          suggested_coordinates: { x: accessPoint.location[0], y: accessPoint.location[1], z: accessPoint.location[2] },
-          reasoning: accessPoint.reasoning,
-          coverage_area: {},
-          confidence_score: accessPoint.confidence,
-        });
+        try {
+          await supabase.from('ai_device_suggestions').insert({
+            project_id: projectId,
+            device_category: accessPoint.device_type,
+            suggested_coordinates: { x: accessPoint.location[0], y: accessPoint.location[1], z: accessPoint.location[2] },
+            reasoning: accessPoint.reasoning,
+            coverage_area: {},
+            confidence_score: accessPoint.confidence,
+          });
+        } catch (insertErr) {
+          console.error('Failed to save access control suggestion, continuing:', insertErr);
+        }
       }
     }
 

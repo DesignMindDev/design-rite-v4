@@ -10,6 +10,10 @@ CREATE TABLE IF NOT EXISTS spatial_projects (
   threejs_model jsonb,             -- 3D model data (JSON)
   dimensions jsonb,                -- {width, height, scale_factor}
   floor_count integer DEFAULT 1,
+  analysis_status varchar(50) DEFAULT 'pending',  -- 'pending', 'processing', 'completed', 'failed'
+  analysis_error text,             -- Error message if analysis fails
+  analysis_started_at timestamp,
+  analysis_completed_at timestamp,
   created_at timestamp DEFAULT now(),
   updated_at timestamp DEFAULT now()
 );
@@ -53,17 +57,33 @@ CREATE TABLE IF NOT EXISTS site_walk_sessions (
   status varchar(50) DEFAULT 'in_progress'
 );
 
+-- Table 5: Debug logging for AI analysis
+CREATE TABLE IF NOT EXISTS ai_analysis_debug (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  project_id uuid REFERENCES spatial_projects(id) ON DELETE CASCADE,
+  operation varchar(100),          -- 'vision_analysis', 'bucket_creation', etc.
+  input_data jsonb,                -- Request data
+  raw_response text,               -- Raw API response
+  parsed_result jsonb,             -- Parsed result
+  error_message text,
+  execution_time_ms integer,
+  created_at timestamp DEFAULT now()
+);
+
 -- Add indexes for performance
 CREATE INDEX IF NOT EXISTS idx_spatial_projects_customer ON spatial_projects(customer_id);
+CREATE INDEX IF NOT EXISTS idx_spatial_projects_status ON spatial_projects(analysis_status);
 CREATE INDEX IF NOT EXISTS idx_site_annotations_project ON site_annotations(project_id);
 CREATE INDEX IF NOT EXISTS idx_ai_suggestions_project ON ai_device_suggestions(project_id);
 CREATE INDEX IF NOT EXISTS idx_site_walks_project ON site_walk_sessions(project_id);
+CREATE INDEX IF NOT EXISTS idx_ai_debug_project ON ai_analysis_debug(project_id);
 
 -- Enable Row Level Security (optional - configure based on auth needs)
 ALTER TABLE spatial_projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE site_annotations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ai_device_suggestions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE site_walk_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ai_analysis_debug ENABLE ROW LEVEL SECURITY;
 
 -- Create storage bucket for floor plan files
 INSERT INTO storage.buckets (id, name, public)

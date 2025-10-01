@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import OpenAI from 'openai';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
   process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 );
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
+/**
+ * Upload floor plan and create project (async analysis happens in background)
+ * Returns immediately with projectId and status='pending'
+ */
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -25,115 +24,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate file size (10MB limit)
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      return NextResponse.json(
+        { error: 'File too large', details: 'Maximum file size is 10MB' },
+        { status: 400 }
+      );
+    }
+
+    // Validate file type
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json(
+        { error: 'Invalid file type', details: 'Only PDF, PNG, and JPG files are supported' },
+        { status: 400 }
+      );
+    }
+
     console.log(`Processing floor plan: ${file.name}, size: ${file.size} bytes`);
 
-    // Step 1: Upload original file to Supabase Storage
-    const fileBuffer = await file.arrayBuffer();
+    // Upload file to Supabase Storage with retry
+    const fileArrayBuffer = await file.arrayBuffer();
+    const nodeBuffer = Buffer.from(fileArrayBuffer);
     const fileName = `${Date.now()}_${file.name}`;
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('spatial-floorplans')
-      .upload(fileName, fileBuffer, {
-        contentType: file.type,
-      });
-
-    if (uploadError) {
-      console.error('Upload error:', uploadError);
-      throw uploadError;
-    }
+    const uploadData = await uploadWithRetry(fileName, nodeBuffer, file.type);
 
     console.log('File uploaded to Supabase:', uploadData.path);
 
-    // Step 2: Convert to base64 for GPT-4 Vision
-    let imageBuffer = Buffer.from(fileBuffer);
-    const base64Image = imageBuffer.toString('base64');
-    const mimeType = file.type || 'image/png';
-
-    console.log('Analyzing floor plan with GPT-4 Vision...');
-
-    // Step 3: Analyze floor plan with GPT-4 Vision
-    const visionResponse = await openai.chat.completions.create({
-      model: 'gpt-4o', // Using GPT-4o for vision
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: `Analyze this floor plan and identify:
-1. All walls (return as line segments with coordinates in pixels from top-left)
-2. All doors (return as points with type: entry/interior)
-3. All windows (return as points)
-4. Room dimensions (if scale is visible)
-5. Estimated square footage
-
-Return as JSON with this structure:
-{
-  "walls": [{"start": [x1, y1], "end": [x2, y2]}],
-  "doors": [{"position": [x, y], "type": "entry"}],
-  "windows": [{"position": [x, y]}],
-  "dimensions": {"width": 50, "height": 40, "unit": "feet"},
-  "sqft": 2000,
-  "rooms": [{"name": "Living Room", "center": [x, y]}]
-}
-
-IMPORTANT: Return ONLY valid JSON, no markdown, no code blocks.`
-            },
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:${mimeType};base64,${base64Image}`
-              }
-            }
-          ]
-        }
-      ],
-      max_tokens: 2000,
-    });
-
-    console.log('GPT-4 Vision response received');
-
-    // Parse analysis result
-    let analysisResult;
-    try {
-      const responseText = visionResponse.choices[0].message.content || '{}';
-      // Remove markdown code blocks if present
-      const cleanJson = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      analysisResult = JSON.parse(cleanJson);
-      console.log('Analysis parsed successfully:', Object.keys(analysisResult));
-    } catch (parseError) {
-      console.error('JSON parse error:', parseError);
-      console.log('Raw response:', visionResponse.choices[0].message.content);
-      // Fallback to simple structure
-      analysisResult = {
-        walls: [],
-        doors: [],
-        windows: [],
-        dimensions: { width: 50, height: 40, unit: 'feet' },
-        sqft: 2000
-      };
-    }
-
-    // Step 4: Generate 3D model data
-    const threejsModel = {
-      walls: analysisResult.walls || [],
-      doors: analysisResult.doors || [],
-      windows: analysisResult.windows || [],
-      rooms: analysisResult.rooms || [],
-      height: 10, // Default ceiling height in feet
-    };
-
-    console.log('Generated 3D model with', threejsModel.walls.length, 'walls');
-
-    // Step 5: Save to database
+    // Create project record with status='pending'
     const { data: projectData, error: dbError } = await supabase
       .from('spatial_projects')
       .insert({
         customer_id: customerId || 'demo',
         project_name: projectName || 'Untitled Project',
         floorplan_url: uploadData.path,
-        threejs_model: threejsModel,
-        dimensions: analysisResult.dimensions || {},
+        analysis_status: 'pending',
       })
       .select()
       .single();
@@ -143,15 +70,18 @@ IMPORTANT: Return ONLY valid JSON, no markdown, no code blocks.`
       throw dbError;
     }
 
-    console.log('Project saved to database:', projectData.id);
+    console.log('Project created:', projectData.id);
 
+    // Trigger async analysis (fire and forget)
+    triggerAsyncAnalysis(projectData.id);
+
+    // Return immediately
     return NextResponse.json({
       success: true,
       projectId: projectData.id,
-      model: threejsModel,
-      dimensions: analysisResult.dimensions || {},
-      analysis: analysisResult
-    });
+      status: 'pending',
+      message: 'Upload successful. AI analysis in progress.',
+    }, { status: 201 });
 
   } catch (error) {
     console.error('Floor plan upload error:', error);
@@ -165,13 +95,106 @@ IMPORTANT: Return ONLY valid JSON, no markdown, no code blocks.`
   }
 }
 
-// Health check
-export async function GET() {
+/**
+ * Upload file with exponential backoff retry
+ */
+async function uploadWithRetry(
+  fileName: string,
+  buffer: Buffer,
+  contentType: string,
+  maxRetries = 3
+): Promise<any> {
+  let lastError: any = null;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const { data, error } = await supabase.storage
+        .from('spatial-floorplans')
+        .upload(fileName, buffer, { contentType });
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
+
+    } catch (error: any) {
+      lastError = error;
+      console.error(`Upload attempt ${attempt}/${maxRetries} failed:`, error.message);
+
+      // Don't retry on bucket not found - this is a config error
+      if (error.message?.includes('Bucket not found')) {
+        throw new Error('Storage bucket not configured. Please run database migrations.');
+      }
+
+      // Exponential backoff: 500ms, 1s, 2s
+      if (attempt < maxRetries) {
+        const delayMs = Math.pow(2, attempt - 1) * 500;
+        console.log(`Retrying upload in ${delayMs}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+
+  throw lastError || new Error('Upload failed after retries');
+}
+
+/**
+ * Trigger background analysis worker (fire and forget)
+ */
+function triggerAsyncAnalysis(projectId: string) {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3010';
+  const analysisUrl = `${baseUrl}/api/spatial-studio/process-analysis`;
+
+  fetch(analysisUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ projectId }),
+  }).catch(err => {
+    console.error('Failed to trigger async analysis:', err);
+  });
+
+  console.log(`Triggered async analysis for project ${projectId}`);
+}
+
+/**
+ * Get project status endpoint
+ */
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const projectId = searchParams.get('projectId');
+
+  if (!projectId) {
+    return NextResponse.json({
+      service: 'Spatial Studio - Floor Plan Upload',
+      status: 'healthy',
+      openai_configured: !!process.env.OPENAI_API_KEY,
+      supabase_configured: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  // Fetch project status
+  const { data: project, error } = await supabase
+    .from('spatial_projects')
+    .select('*')
+    .eq('id', projectId)
+    .single();
+
+  if (error || !project) {
+    return NextResponse.json(
+      { error: 'Project not found' },
+      { status: 404 }
+    );
+  }
+
   return NextResponse.json({
-    service: 'Spatial Studio - Floor Plan Upload',
-    status: 'healthy',
-    openai_configured: !!process.env.OPENAI_API_KEY,
-    supabase_configured: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-    timestamp: new Date().toISOString()
+    projectId: project.id,
+    status: project.analysis_status,
+    error: project.analysis_error,
+    model: project.threejs_model,
+    dimensions: project.dimensions,
+    startedAt: project.analysis_started_at,
+    completedAt: project.analysis_completed_at,
   });
 }

@@ -1,14 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { callAnthropic } from '../../../../lib/anthropic-client';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { message, model = 'claude-3-sonnet-20240229', apiKey, context } = body
+    const { message, model = undefined, context } = body
 
-    if (!apiKey) {
+    // Basic validation
+    if (!message || typeof message !== 'string' || !message.trim()) {
+      return NextResponse.json({ error: 'Missing or invalid `message` in request body' }, { status: 400 })
+    }
+
+    // Protect against extremely large payloads (avoid sending massive prompts to Anthropic)
+    const MAX_MESSAGE_LENGTH = 60_000
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      return NextResponse.json({ error: 'Message too large' }, { status: 413 })
+    }
+
+    // Use server-side Anthropic key only
+    if (!process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json(
-        { error: 'Claude API key is required' },
-        { status: 400 }
+        { error: 'Anthropic API not configured on server' },
+        { status: 500 }
       )
     }
 
@@ -33,47 +46,29 @@ Always emphasize that AI enhancements work best when added to proven, stable sec
 
 ${conversationText ? `Previous conversation:\n${conversationText}\n\n` : ''}Human: ${message}\n\nAssistant:`
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': apiKey,
-        'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens: 1000,
-        temperature: 0.7,
-        messages: [{
-          role: 'user',
-          content: fullPrompt
-        }]
-      })
-    })
+    // Choose model: prefer explicit request model, then env, then sensible default
+    const modelToUse = model || process.env.CLAUDE_MODEL || 'claude-3-5-sonnet-20241022'
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      return NextResponse.json(
-        { error: `Claude API Error: ${errorData.error?.message || response.statusText}` },
-        { status: response.status }
-      )
+    // Call Anthropic via centralized client with a timeout and a small retry count
+    // callAnthropic(prompt, model?, timeoutMs?, maxRetries?)
+    let result
+    try {
+      result = await callAnthropic(fullPrompt, modelToUse, 60_000, 2)
+    } catch (err: any) {
+      console.error('Anthropic client error:', err)
+      const message = err?.message || 'Anthropic request failed'
+      return NextResponse.json({ error: message }, { status: 502 })
     }
 
-    const data = await response.json()
-    const aiMessage = data.content?.[0]?.text
-
-    if (!aiMessage) {
-      return NextResponse.json(
-        { error: 'No response from Claude' },
-        { status: 500 }
-      )
-    }
+    // Normalize response
+    const aiMessage = typeof result?.content === 'string' ? result.content : String(result?.content || '')
+    const usage = result?.raw?.usage || result?.raw?.meta || undefined
 
     return NextResponse.json({
       message: aiMessage,
       provider: 'Claude',
-      model,
-      usage: data.usage
+      model: modelToUse,
+      usage
     })
 
   } catch (error) {
