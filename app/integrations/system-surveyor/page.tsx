@@ -328,13 +328,13 @@ export default function SystemSurveyorIntegration() {
             </div>
           </div>
 
-          {/* Partnership Info */}
+          {/* Integration Info */}
           <div className="mt-12 p-6 bg-gradient-to-r from-purple-900/20 to-pink-900/20 border border-purple-500/30 rounded-xl">
-            <h3 className="text-lg font-semibold text-white mb-3">Official Integration Partner</h3>
+            <h3 className="text-lg font-semibold text-white mb-3">System Surveyor Integration</h3>
             <p className="text-gray-300 text-sm leading-relaxed">
-              Design-Rite is proud to partner with System Surveyor to provide the most complete
+              Design-Rite integrates seamlessly with System Surveyor to provide a complete
               workflow for security system integrators. From field survey to professional proposal,
-              we've got you covered.
+              we streamline your entire estimation process.
             </p>
           </div>
 
