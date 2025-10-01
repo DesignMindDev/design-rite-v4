@@ -457,6 +457,10 @@ export default function AdminPage() {
                     <span>📅</span>
                     <span>Demo Dashboard</span>
                   </Link>
+                  <Link href="/admin/leads-dashboard" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                    <span>🎯</span>
+                    <span>Leads Dashboard</span>
+                  </Link>
                   <button onClick={() => setActiveTab('team')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
                     <span>👥</span>
                     <span>Team Management</span>
