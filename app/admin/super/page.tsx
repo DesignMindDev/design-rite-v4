@@ -144,6 +144,54 @@ export default function SuperAdminDashboard() {
     }
   };
 
+  const handleSuspendUser = async (userId: string, userEmail: string) => {
+    if (!confirm(`Are you sure you want to suspend ${userEmail}?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/admin/suspend-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to suspend user');
+      }
+
+      alert('User suspended successfully');
+      fetchDashboardData(); // Refresh the data
+    } catch (error) {
+      console.error('Suspend failed:', error);
+      alert('Failed to suspend user. Please try again.');
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, userEmail: string) => {
+    if (!confirm(`⚠️ Are you sure you want to DELETE ${userEmail}?\n\nThis will mark the user as deleted (soft delete).`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/admin/delete-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete user');
+      }
+
+      alert('User deleted successfully');
+      fetchDashboardData(); // Refresh the data
+    } catch (error) {
+      console.error('Delete failed:', error);
+      alert('Failed to delete user. Please try again.');
+    }
+  };
+
   if (loading || !stats) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
@@ -252,10 +300,33 @@ export default function SuperAdminDashboard() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
-                        <button className="text-purple-400 hover:text-purple-300 text-sm">Edit</button>
-                        <button className="text-blue-400 hover:text-blue-300 text-sm">Activity</button>
+                        <button
+                          onClick={() => alert('Edit user coming in Phase 3')}
+                          className="text-purple-400 hover:text-purple-300 text-sm"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => alert('Activity viewer coming in Phase 3')}
+                          className="text-blue-400 hover:text-blue-300 text-sm"
+                        >
+                          Activity
+                        </button>
                         {user.status === 'active' && (
-                          <button className="text-red-400 hover:text-red-300 text-sm">Suspend</button>
+                          <button
+                            onClick={() => handleSuspendUser(user.id, user.email)}
+                            className="text-yellow-400 hover:text-yellow-300 text-sm"
+                          >
+                            Suspend
+                          </button>
+                        )}
+                        {session?.user?.role === 'super_admin' && (
+                          <button
+                            onClick={() => handleDeleteUser(user.id, user.email)}
+                            className="text-red-400 hover:text-red-300 text-sm"
+                          >
+                            Delete
+                          </button>
                         )}
                       </div>
                     </td>
