@@ -280,27 +280,49 @@ export default function SuperAdminDashboard() {
       <div className="px-8 py-6">
         <h2 className="text-xl font-bold mb-4">Quick Stats</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-[#1A1A1A] border border-purple-600/30 rounded-lg p-6">
-            <div className="text-3xl font-bold text-purple-400">{stats.totalUsers}</div>
-            <div className="text-gray-400">Total Users</div>
-          </div>
-          <div className="bg-[#1A1A1A] border border-purple-600/30 rounded-lg p-6">
-            <div className="text-3xl font-bold text-green-400">{stats.activeNow}</div>
-            <div className="text-gray-400">Active (24h)</div>
-          </div>
-          <div className="bg-[#1A1A1A] border border-purple-600/30 rounded-lg p-6">
-            <div className="text-3xl font-bold text-blue-400">{stats.quotesToday}</div>
-            <div className="text-gray-400">Quotes Today</div>
-          </div>
-          <div className="bg-[#1A1A1A] border border-purple-600/30 rounded-lg p-6">
-            <div className="text-3xl font-bold text-yellow-400">{stats.aiSessionsToday}</div>
-            <div className="text-gray-400">AI Sessions Today</div>
-          </div>
+          <button
+            onClick={() => {
+              const userListSection = document.getElementById('user-list');
+              userListSection?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="bg-[#1A1A1A] border border-purple-600/30 rounded-lg p-6 hover:border-purple-400 hover:bg-[#252525] transition-all cursor-pointer text-left group"
+          >
+            <div className="text-3xl font-bold text-purple-400 group-hover:scale-110 transition-transform">{stats.totalUsers}</div>
+            <div className="text-gray-400 group-hover:text-gray-300">Total Users</div>
+            <div className="text-xs text-purple-400/60 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Click to view list →</div>
+          </button>
+
+          <Link
+            href="/admin/super/activity"
+            className="bg-[#1A1A1A] border border-purple-600/30 rounded-lg p-6 hover:border-green-400 hover:bg-[#252525] transition-all cursor-pointer block group"
+          >
+            <div className="text-3xl font-bold text-green-400 group-hover:scale-110 transition-transform">{stats.activeNow}</div>
+            <div className="text-gray-400 group-hover:text-gray-300">Active (24h)</div>
+            <div className="text-xs text-green-400/60 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">View activity logs →</div>
+          </Link>
+
+          <Link
+            href="/admin/assessments"
+            className="bg-[#1A1A1A] border border-purple-600/30 rounded-lg p-6 hover:border-blue-400 hover:bg-[#252525] transition-all cursor-pointer block group"
+          >
+            <div className="text-3xl font-bold text-blue-400 group-hover:scale-110 transition-transform">{stats.quotesToday}</div>
+            <div className="text-gray-400 group-hover:text-gray-300">Quotes Today</div>
+            <div className="text-xs text-blue-400/60 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">View all quotes →</div>
+          </Link>
+
+          <Link
+            href="/admin/ai-analytics"
+            className="bg-[#1A1A1A] border border-purple-600/30 rounded-lg p-6 hover:border-yellow-400 hover:bg-[#252525] transition-all cursor-pointer block group"
+          >
+            <div className="text-3xl font-bold text-yellow-400 group-hover:scale-110 transition-transform">{stats.aiSessionsToday}</div>
+            <div className="text-gray-400 group-hover:text-gray-300">AI Sessions Today</div>
+            <div className="text-xs text-yellow-400/60 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">View AI analytics →</div>
+          </Link>
         </div>
       </div>
 
       {/* User Management */}
-      <div className="px-8 py-6">
+      <div id="user-list" className="px-8 py-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">User Management</h2>
           <Link
