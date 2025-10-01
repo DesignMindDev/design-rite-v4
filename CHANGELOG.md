@@ -1,6 +1,41 @@
 # Design-Rite v3 - Changelog
 **Platform:** Next.js 14 + TypeScript + Supabase
-**Current Version:** 3.2.0
+**Current Version:** 3.2.1
+
+---
+
+## [3.2.1] - 2025-10-01 🔐 **Authentication & Navigation Enhancement**
+
+### 🔐 **NEW: Comprehensive Logout System**
+- **Main navigation logout**: Added logout button to UnifiedNavigation component (desktop and mobile)
+- **AI Assistant logout**: Added logout button to AI assistant page header
+- **Conditional rendering**: Shows "Logout" when authenticated, "Sign In" when not authenticated
+- **Session management**: Integrated with existing `lib/auth.ts` authentication system
+- **User experience**: Logout clears session and redirects to homepage
+
+### ⚙️ **IMPROVED: AI Assistant Settings Management**
+- **Removed inline settings panel**: Eliminated 90+ lines of redundant UI code
+- **Centralized admin**: Settings gear icon now links directly to `/admin/ai-providers`
+- **Code cleanup**: Removed unused state variables (showSettings, selectedProvider, apiKey)
+- **Streamlined interface**: Cleaner AI assistant page without redundant configuration options
+
+### 📋 **Modified Files:**
+```
+app/components/UnifiedNavigation.tsx    # Added logout functionality and auth state
+app/ai-assistant/page.tsx               # Removed settings panel, added logout button
+```
+
+### 🎯 **User Experience Improvements:**
+- **Consistent logout experience** across all pages
+- **Clear authentication state** - users always know if they're logged in
+- **Simplified settings management** - all provider configuration in dedicated admin page
+- **Net code reduction**: -51 lines (cleaner, more maintainable codebase)
+
+### 🔧 **Technical Changes:**
+- Added `auth` import and `isAuthenticated` state to navigation components
+- Added `handleLogout` function with session clearing and redirect logic
+- Replaced AI Settings Panel with direct link to admin providers page
+- Added LogOut icon from lucide-react library
 
 ---
 
