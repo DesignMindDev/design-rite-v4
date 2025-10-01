@@ -10,7 +10,7 @@ Transform System Surveyor field survey exports into professional Design-Rite sec
 2. **Navigate**: Go to `/integrations/system-surveyor/upload`
 3. **Upload**: Drag and drop your Excel file
 4. **Process**: Watch as we extract equipment, locations, and labor hours
-5. **Generate**: Proceed to AI Assessment for instant proposal generation
+5. **Generate**: Proceed to AI Assistant for instant proposal generation
 
 ## 📊 What Gets Imported
 
@@ -94,14 +94,14 @@ Smart Product Mapping
     ↓
 AI Context Generation
     ↓
-AI Assessment Integration
+AI Assistant Integration
 ```
 
 ### Key Files
 - `app/api/system-surveyor/upload-excel/route.ts` - Upload API endpoint
 - `lib/system-surveyor-mapper.ts` - Equipment mapping logic
 - `app/integrations/system-surveyor/upload/page.tsx` - Upload interface
-- `app/ai-assessment/page.tsx` - Enhanced with import detection
+- `app/ai-assistant/page.tsx` - Enhanced with import detection
 
 ### Data Flow
 ```typescript

@@ -42,10 +42,10 @@ Successfully implemented **Excel-based import system** for System Surveyor field
 /api/system-surveyor/upload-excel           - Parses .xlsx files, extracts equipment & site data
 lib/system-surveyor-mapper.ts               - Maps surveyed equipment to product recommendations
 /integrations/system-surveyor/upload        - Upload interface with real-time processing
-/ai-assessment (enhanced)                   - Detects imported data and loads field survey context
+/ai-assistant (enhanced)                    - Detects imported data and loads field survey context
 
 // Data transformation
-System Surveyor Export → Equipment Categories → Product Mappings → AI Context → Professional Proposal
+System Surveyor Export → Equipment Categories → Product Mappings → AI Assistant → Professional Proposal
 ```
 
 #### 🎯 Real-World Testing

@@ -52,11 +52,11 @@ export default function SystemSurveyorUploadPage() {
   const handleProceedToAI = () => {
     if (!uploadResult) return;
 
-    // Store the imported data in sessionStorage for AI Assessment
+    // Store the imported data in sessionStorage for AI Assistant
     sessionStorage.setItem('systemSurveyorImport', JSON.stringify(uploadResult));
 
-    // Navigate to AI Assessment with import flag
-    router.push('/ai-assessment?source=system-surveyor&imported=true');
+    // Navigate to AI Assistant with import flag
+    router.push('/ai-assistant?source=system-surveyor&imported=true');
   };
 
   return (
@@ -215,7 +215,7 @@ export default function SystemSurveyorUploadPage() {
                   onClick={handleProceedToAI}
                   className="dr-btn-primary w-full"
                 >
-                  Continue to AI Assessment
+                  Continue to AI Assistant
                   <ArrowRight className="w-5 h-5" />
                 </button>
 

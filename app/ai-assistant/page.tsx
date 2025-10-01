@@ -81,10 +81,17 @@ export default function AIAssistantPage() {
     loadAIProviders()
 
     // Check for existing assessment data from previous tools
+    const systemSurveyorImport = sessionStorage.getItem('systemSurveyorImport')
     const quickEstimateData = sessionStorage.getItem('quickEstimateData')
     const aiDiscoveryData = sessionStorage.getItem('aiDiscoveryData')
 
-    if (aiDiscoveryData) {
+    // Priority: System Surveyor Import > AI Discovery > Quick Estimate
+    if (systemSurveyorImport) {
+      const data = JSON.parse(systemSurveyorImport)
+      setAssessmentData(data)
+      addWelcomeMessage('System Surveyor Import', data)
+      sessionStorage.removeItem('systemSurveyorImport') // Clear after loading
+    } else if (aiDiscoveryData) {
       const data = JSON.parse(aiDiscoveryData)
       setAssessmentData(data)
       addWelcomeMessage('AI Discovery', data)
@@ -401,7 +408,28 @@ What would you like to work on today?`,
     // Handle different data structures based on source
     let overview = ''
 
-    if (source === 'Quick Estimate') {
+    if (source === 'System Surveyor Import') {
+      // System Surveyor Excel import data structure
+      const siteInfo = data.siteInfo || {}
+      const equipment = data.equipment || {}
+      const totals = data.totals || {}
+
+      const cameraCount = equipment.cameras?.length || 0
+      const networkCount = equipment.network?.length || 0
+      const totalHours = totals.totalInstallHours || 0
+      const estimatedCost = totals.estimatedLaborCost || 0
+
+      overview = `**System Surveyor Field Survey Import:**
+• Site: ${siteInfo.siteName || 'Unknown'}
+• Address: ${siteInfo.address || 'N/A'}
+• Survey: ${siteInfo.surveyName || 'N/A'}
+• Equipment Surveyed: ${cameraCount} cameras, ${networkCount} network devices
+• Installation Labor: ${totalHours} hours estimated
+• Labor Cost: ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(estimatedCost)}
+
+**🎬 Field-Verified Data Loaded!**
+Your System Surveyor field survey is now integrated with ${cameraCount} camera locations and complete installation data.`
+    } else if (source === 'Quick Estimate') {
       // Security estimate data structure
       const facilitySize = data.facilitySize ? `${data.facilitySize} sq ft` : ''
       const selectedSystems = data.selectedSystems || []
