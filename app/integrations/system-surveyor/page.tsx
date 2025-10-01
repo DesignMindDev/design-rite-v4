@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Upload, Zap, FileSpreadsheet } from 'lucide-react';
+import UnifiedNavigation from '@/app/components/UnifiedNavigation';
 
 export default function SystemSurveyorIntegration() {
   const [selectedMethod, setSelectedMethod] = useState<'excel' | 'api' | null>(null);
@@ -50,6 +51,7 @@ export default function SystemSurveyorIntegration() {
   if (!selectedMethod) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-purple-950/20 to-[#0A0A0A]">
+        <UnifiedNavigation />
         <div className="container mx-auto px-4 py-20">
           <div className="max-w-4xl mx-auto">
 
@@ -183,6 +185,7 @@ export default function SystemSurveyorIntegration() {
   // Show API integration flow if selected
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-purple-950/20 to-[#0A0A0A]">
+      <UnifiedNavigation />
       <div className="container mx-auto px-4 py-20">
         <div className="max-w-2xl mx-auto">
 
