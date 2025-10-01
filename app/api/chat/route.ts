@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { logAIConversation, generateUserHash, generateSessionId } from '../../../lib/ai-session-logger';
 
 const supabaseUrl = 'https://ickwrbdpuorzdpzqbqpf.supabase.co';
 const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlja3dyYmRwdW9yemRwenFicXBmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDk1MDc4MywiZXhwIjoyMDY2NTI2NzgzfQ.LGGTBZF3ADOZv7cW7rEGzUi_0JluWf59yw2jWLuOJHo';
@@ -70,17 +71,33 @@ export async function POST(request: Request) {
         // Handle any follow-up questions
         botResponse = handleGeneralQuestion(message);
         break;
-        
+
       default:
         botResponse = "Hi! Let me help you discover how Design-Rite can transform your security design process. What's your name?";
         nextStage = CHAT_STAGES.ASK_NAME;
     }
-    
+
+    // Log conversation to Supabase (non-blocking)
+    const finalSessionId = sessionId || generateSessionId()
+    const userHash = generateUserHash()
+    logAIConversation({
+      sessionId: finalSessionId,
+      userHash,
+      userMessage: message,
+      aiResponse: botResponse,
+      aiProvider: 'chatbot-lead-capture',
+      metadata: {
+        feature: 'chat-widget',
+        stage: nextStage,
+        userData: updatedUserData
+      }
+    }).catch(err => console.error('[Chat Widget] Logging error:', err))
+
     return NextResponse.json({
       response: botResponse,
       nextStage,
       userData: updatedUserData,
-      sessionId: sessionId || generateSessionId()
+      sessionId: finalSessionId
     });
     
   } catch (error) {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '../../../../lib/supabase'
+import { logAIConversation, generateUserHash, generateSessionId } from '../../../../lib/ai-session-logger'
 
 // Creative Studio Chat API
 // Manages chat messages and conversation history
@@ -148,6 +149,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Log conversation to Supabase (non-blocking) - only for assistant messages
+    if (body.role === 'assistant') {
+      const sessionId = body.projectId || generateSessionId()
+      const userHash = generateUserHash(request)
+      logAIConversation({
+        sessionId,
+        userHash,
+        userMessage: 'User message from chat history',
+        aiResponse: body.content,
+        aiProvider: body.provider || 'creative-studio',
+        metadata: {
+          feature: 'creative-studio-chat',
+          projectId: body.projectId
+        }
+      }).catch(err => console.error('[Creative Studio Chat] Logging error:', err))
+    }
+
     // Transform response
     const response: ChatMessageResponse = {
       id: message.id,
@@ -161,7 +179,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       message: response,
-      success: true
+      success: true,
+      sessionId: body.projectId
     }, { status: 201 })
 
   } catch (error) {

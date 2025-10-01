@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { logAIConversation, generateUserHash, generateSessionId } from '../../../lib/ai-session-logger';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -33,9 +34,26 @@ export async function POST(request: NextRequest) {
     // Track usage for analytics (for the n8n monster you're building!)
     await trackAIUsage(selectedProvider, message, response, context);
 
+    // Log conversation to Supabase (non-blocking)
+    const sessionId = generateSessionId();
+    const userHash = generateUserHash(request);
+    logAIConversation({
+      sessionId,
+      userHash,
+      userMessage: message,
+      aiResponse: response,
+      aiProvider: selectedProvider,
+      metadata: {
+        feature: 'general-ai-chat',
+        pathname: context.pathname,
+        messageCount: context.previousMessages?.length || 0
+      }
+    }).catch(err => console.error('[General AI Chat] Logging error:', err));
+
     return NextResponse.json({
       response,
       provider: selectedProvider,
+      sessionId,
       timestamp: new Date().toISOString()
     });
 

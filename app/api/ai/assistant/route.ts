@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import fs from 'fs'
 import path from 'path'
+import { logAIConversation, generateUserHash, generateSessionId } from '../../../../lib/ai-session-logger'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -171,12 +172,31 @@ export async function POST(request: NextRequest) {
       threadId: thread.id.substring(0, 8) + '...'
     })
 
+    // Log conversation to Supabase (non-blocking)
+    const sessionId = thread.id || generateSessionId()
+    const userHash = generateUserHash(request)
+    logAIConversation({
+      sessionId,
+      userHash,
+      userMessage: message,
+      aiResponse: content.text.value,
+      aiProvider: selectedProvider.name,
+      metadata: {
+        feature: 'ai-assistant',
+        providerId: selectedProvider.id,
+        assistantId: assistantId.substring(0, 12),
+        threadId: thread.id,
+        responseLength: content.text.value.length
+      }
+    }).catch(err => console.error('[AI Assistant] Logging error:', err))
+
     return NextResponse.json({
       message: content.text.value,
       threadId: thread.id,
       assistantId: assistantId,
       providerId: selectedProvider?.id,
       providerName: selectedProvider?.name,
+      sessionId,
       success: true
     })
 

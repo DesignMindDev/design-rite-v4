@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { logAIConversation, generateUserHash, generateSessionId } from '../../../lib/ai-session-logger'
 
 // AI Chat API for Creative Studio
 // Provides open dialog with multiple AI providers based on user selection
@@ -228,9 +229,29 @@ export async function POST(request: NextRequest) {
     // 5. Process chat history for context continuity
     // 6. Log usage metrics and costs
 
-    const chatResponse = generateChatResponse(message, provider, chatHistory, requestId, context)
+    const chatResponse = await generateChatResponse(message, provider, chatHistory, requestId, context)
 
-    return NextResponse.json(chatResponse)
+    // Log conversation to Supabase (non-blocking)
+    const sessionId = requestId
+    const userHash = generateUserHash(request)
+    logAIConversation({
+      sessionId,
+      userHash,
+      userMessage: message,
+      aiResponse: chatResponse.response,
+      aiProvider: chatResponse.provider,
+      metadata: {
+        feature: 'ai-chat',
+        processingTime: chatResponse.processingTime,
+        messageLength: chatResponse.metadata.messageLength,
+        contextUsed: chatResponse.metadata.contextUsed
+      }
+    }).catch(err => console.error('[AI Chat] Logging error:', err))
+
+    return NextResponse.json({
+      ...chatResponse,
+      sessionId
+    })
 
   } catch (error) {
     console.error('AI chat error:', error)
