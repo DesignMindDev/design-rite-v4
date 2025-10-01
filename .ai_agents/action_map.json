@@ -1,0 +1,22 @@
+{
+  "run-next-area:import": {
+    "command": "npm run test:log",
+    "description": "Run the full test suite (used as a fallback for import-area validation)."
+  },
+  "fix-failing-tests": {
+    "command": "node scripts/auto_fix_transform.js --agent=ActionRunner",
+    "description": "Generate a human-readable suggested fix for failing tests/transform (safe - does not modify source)."
+  },
+  "run-tests": {
+    "command": "npm run test:log",
+    "description": "Run the test suite and write machine-readable results to tmp/jest_results.json"
+  },
+  "run-load-test": {
+    "command": "node scripts/system_surveyor_load_test.js --workers=3 --iterations=20 --agent=ActionRunner",
+    "description": "Run the System Surveyor load-test simulator locally (may be noisy)."
+  },
+  "no-jest-results-produced": {
+    "command": "npm run test:log",
+    "description": "Re-run tests to produce Jest JSON results."
+  }
+}

@@ -6,7 +6,12 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "test": "jest",
+    "test:log": "node ./scripts/run_tests_and_log.js --agent=Copilot",
+  "watch-tests": "node ./scripts/watch_and_test.js",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "latest",
@@ -64,6 +69,7 @@
     "jsonwebtoken": "latest",
     "lru-cache": "^11.2.2",
     "lucide-react": "^0.454.0",
+    "minimist": "^1.2.8",
     "next": "14.2.16",
     "next-themes": "^0.4.4",
     "node-fetch": "^3.3.2",
@@ -86,10 +92,15 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.0",
+    "@testing-library/react": "^16.3.0",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "jest": "^30.2.0",
     "postcss": "^8.5",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "ts-jest": "^29.4.4"
   }
 }
