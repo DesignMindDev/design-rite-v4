@@ -10,6 +10,12 @@ Welcome to the Design-Rite v3 documentation hub. This directory contains all gui
 ```
 docs/
 ├── README.md                           # This file - master index
+├── owner-knowledge-base/               # ⭐ OWNER'S ESSENTIAL GUIDES
+│   ├── README.md                       # Owner's quick reference
+│   ├── DEPLOYMENT_CHECKLIST.md        # Production deployment guide
+│   ├── ADMIN_OPERATIONS.md            # Daily platform management
+│   ├── TROUBLESHOOTING.md             # Quick fixes for common issues
+│   └── ENVIRONMENT_VARIABLES.md       # Complete config reference
 ├── admin-guides/                       # Administrator guides
 │   └── SUPER_ADMIN_DASHBOARD.md       # Super Admin dashboard user guide
 ├── user-guides/                        # End-user guides (coming soon)
@@ -17,6 +23,20 @@ docs/
 ├── developer-guides/                   # Developer documentation (coming soon)
 └── [Legacy files]                      # Existing technical docs
 ```
+
+---
+
+## ⭐ Owner's Knowledge Base (Dan Kozich)
+
+**[Owner's Knowledge Base](./owner-knowledge-base/README.md)** - Essential guides for platform owner
+
+### Quick Access
+- **[Deployment Checklist](./owner-knowledge-base/DEPLOYMENT_CHECKLIST.md)** - Complete pre/post deployment guide
+- **[Admin Operations](./owner-knowledge-base/ADMIN_OPERATIONS.md)** - Daily platform management tasks
+- **[Troubleshooting](./owner-knowledge-base/TROUBLESHOOTING.md)** - Quick fixes for common issues
+- **[Environment Variables](./owner-knowledge-base/ENVIRONMENT_VARIABLES.md)** - All configuration in one place
+
+**Use this folder for**: Deployments, daily operations, troubleshooting, configuration reference
 
 ---
 
