@@ -11,6 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { securityScenarios, getScenarioById } from '@/lib/scenario-library';
+import { scenarioApiLimiter, getClientIp, createRateLimitResponse } from '@/lib/rate-limiter';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,9 +21,19 @@ export const dynamic = 'force-dynamic';
  *
  * Returns security scenarios (metadata only, not full business logic)
  * Full scenario processing happens server-side only
+ * RATE LIMITED: 30 requests per minute per IP (read-only, more permissive)
  */
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting protection (more permissive for read-only data)
+    const clientIp = getClientIp(request);
+    const rateLimitResult = scenarioApiLimiter.check(30, clientIp); // 30 requests per minute
+
+    if (!rateLimitResult.success) {
+      console.warn(`[Scenarios API] Rate limit exceeded for IP: ${clientIp}`);
+      return createRateLimitResponse(rateLimitResult);
+    }
+
     const { searchParams } = new URL(request.url);
     const scenarioId = searchParams.get('id');
 
@@ -37,17 +48,31 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      return NextResponse.json({
+      const response = NextResponse.json({
         success: true,
         scenario
       });
+
+      // Include rate limit headers
+      response.headers.set('X-RateLimit-Limit', rateLimitResult.limit.toString());
+      response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
+      response.headers.set('X-RateLimit-Reset', new Date(rateLimitResult.reset).toISOString());
+
+      return response;
     }
 
     // Return all scenarios (metadata only)
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       scenarios: securityScenarios
     });
+
+    // Include rate limit headers
+    response.headers.set('X-RateLimit-Limit', rateLimitResult.limit.toString());
+    response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
+    response.headers.set('X-RateLimit-Reset', new Date(rateLimitResult.reset).toISOString());
+
+    return response;
 
   } catch (error) {
     console.error('[Scenarios API] Error:', error);

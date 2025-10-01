@@ -62,6 +62,7 @@
     "helmet": "latest",
     "input-otp": "1.4.1",
     "jsonwebtoken": "latest",
+    "lru-cache": "^11.2.2",
     "lucide-react": "^0.454.0",
     "next": "14.2.16",
     "next-themes": "^0.4.4",
