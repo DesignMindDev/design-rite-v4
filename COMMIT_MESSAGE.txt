@@ -1,0 +1,34 @@
+Add System Surveyor Excel import integration
+
+Implement complete Excel-based import system that transforms System Surveyor
+field survey exports into professional Design-Rite security proposals.
+
+Key Features:
+- Upload interface with drag-and-drop Excel file support
+- Intelligent parser extracting site info, equipment, and labor hours
+- Smart equipment mapper (500+ lines) with indoor/outdoor detection
+- AI Assessment integration with field-verified context
+- Navigation menu integration
+
+Technical Implementation:
+- app/api/system-surveyor/upload-excel/route.ts - Upload API endpoint
+- lib/system-surveyor-mapper.ts - Equipment mapping engine
+- app/integrations/system-surveyor/upload/page.tsx - Upload UI
+- Enhanced AI Assessment page with Excel import detection
+
+Real-World Testing:
+- Tested with Patriot Auto survey (96 equipment items)
+- 14 cameras with location-based recommendations
+- 47 cable runs → 115 hours labor calculation
+- < 2 second processing time
+
+Documentation:
+- CLAUDE.md updated with implementation details
+- SYSTEM_SURVEYOR_IMPORT.md - comprehensive user guide
+- IMPLEMENTATION_SUMMARY.md - technical summary
+
+Dependencies:
+- Added xlsx for Excel parsing
+- Added form-data, node-fetch for testing
+
+🚀 Generated with Claude Code

@@ -171,8 +171,88 @@ const IntegratorDiscoveryAssistant = () => {
     fetchRealPricingData();
   }, []);
 
-  // Check for handoff data from security estimate form
+  // Check for handoff data from security estimate form or System Surveyor import
   useEffect(() => {
+    // Check for System Surveyor Excel import (new format)
+    const surveyorImport = sessionStorage.getItem('systemSurveyorImport');
+    if (surveyorImport) {
+      try {
+        const data = JSON.parse(surveyorImport);
+
+        // Update session data with imported System Surveyor info
+        setSessionData(prev => ({
+          ...prev,
+          companyName: data.siteInfo?.siteName || '',
+          facilityType: data.siteInfo?.siteName || 'System Surveyor Site',
+          currentPhase: 'detailed_analysis'
+        }));
+
+        const cameraCount = data.equipment?.cameras?.length || 0;
+        const networkCount = data.equipment?.network?.length || 0;
+        const totalHours = data.totals?.totalInstallHours || 0;
+        const estimatedCost = data.totals?.estimatedLaborCost || 0;
+
+        // Create equipment summary
+        const equipmentSummary = [];
+        if (cameraCount > 0) equipmentSummary.push(`${cameraCount} cameras`);
+        if (networkCount > 0) equipmentSummary.push(`${networkCount} network devices`);
+        if (data.equipment?.accessControl?.length > 0) {
+          equipmentSummary.push(`${data.equipment.accessControl.length} access control devices`);
+        }
+
+        // Create a welcome message with the System Surveyor context
+        const welcomeMessage = {
+          role: 'assistant',
+          content: `🎯 **System Surveyor Excel Import Successful!**\n\n**Field Survey Data Imported:**\n• **Site:** ${data.siteInfo?.siteName || 'Unknown'}\n• **Address:** ${data.siteInfo?.address || 'N/A'}\n• **Survey:** ${data.siteInfo?.surveyName || 'N/A'}\n• **Equipment Surveyed:** ${equipmentSummary.join(', ')}\n• **Installation Labor:** ${totalHours} hours estimated\n• **Estimated Labor Cost:** $${estimatedCost.toLocaleString()}\n• **Survey Export:** ${data.fileName}\n• **Imported:** ${new Date(data.importedAt).toLocaleString()}\n\n**🎬 Field-Verified Data Integrated!**\n\nYour System Surveyor field survey data is now loaded. I have access to:\n✅ ${cameraCount} camera locations with field measurements\n✅ ${data.equipment?.infrastructure?.length || 0} cable runs and installation hours\n✅ ${networkCount} network devices surveyed on-site\n✅ Professional field notes and location details\n\n**Ready to transform your field survey into a professional proposal!**\n\nI can now provide:\n🔹 Specific product recommendations for surveyed locations\n🔹 Accurate labor estimates based on cable runs\n🔹 VMS/NVR sizing for your camera count\n🔹 Network infrastructure requirements\n🔹 Professional proposal generation\n\n**What would you like to focus on first?** I can help with equipment specifications, pricing optimization, or generate a complete proposal.`,
+          timestamp: new Date()
+        };
+
+        // Replace the initial message with the System Surveyor context message
+        setMessages([welcomeMessage]);
+
+        // Clear the imported data so it doesn't persist
+        sessionStorage.removeItem('systemSurveyorImport');
+
+      } catch (error) {
+        console.error('Error parsing System Surveyor Excel import:', error);
+      }
+      return; // Exit early if System Surveyor data was processed
+    }
+
+    // Check for System Surveyor API imported data (old format - keep for backwards compatibility)
+    const importedData = sessionStorage.getItem('imported_assessment_data');
+    if (importedData) {
+      try {
+        const data = JSON.parse(importedData);
+
+        // Update session data with imported System Surveyor info
+        setSessionData(prev => ({
+          ...prev,
+          companyName: data.siteName || '',
+          facilityType: data.siteName || 'System Surveyor Site',
+          currentPhase: 'detailed_analysis'
+        }));
+
+        // Create a welcome message with the System Surveyor context
+        const welcomeMessage = {
+          role: 'assistant',
+          content: `🎯 **System Surveyor API Import Successful!**\n\n**Here's what I imported from your survey:**\n• **Project:** ${data.projectName}\n• **Site:** ${data.siteName}\n• **Location:** ${data.location}\n• **Equipment Count:** ${data.elementCount} devices surveyed\n• **Estimated Value:** $${data.totalValue?.toLocaleString()}\n• **Labor Hours:** ${data.totalLaborHours} hours estimated\n• **Survey Date:** ${new Date(data.surveyDate).toLocaleDateString()}\n• **Equipment Types:** ${Object.entries(data.equipmentCounts || {}).map(([type, count]) => `${count}x ${type}`).join(', ')}\n\n**Perfect! Your field survey data is now integrated.** I can now provide:\n✅ Enhanced system recommendations based on surveyed equipment\n✅ Accurate pricing using your existing Bill of Materials\n✅ Implementation planning with real site measurements\n✅ Compliance analysis for your specific facility type\n✅ Integration strategies for surveyed infrastructure\n\n**System Surveyor Integration Active** - All recommendations will now incorporate your actual field data. What specific aspects of the security system would you like to explore further?`,
+          timestamp: new Date()
+        };
+
+        // Replace the initial message with the System Surveyor context message
+        setMessages([welcomeMessage]);
+
+        // Clear the imported data so it doesn't persist
+        sessionStorage.removeItem('imported_assessment_data');
+
+      } catch (error) {
+        console.error('Error parsing imported System Surveyor data:', error);
+      }
+      return; // Exit early if System Surveyor data was processed
+    }
+
+    // Check for handoff data from security estimate form
     const handoffData = sessionStorage.getItem('estimateHandoff');
     if (handoffData) {
       try {

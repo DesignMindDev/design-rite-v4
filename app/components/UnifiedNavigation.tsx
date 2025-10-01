@@ -178,6 +178,18 @@ export default function UnifiedNavigation() {
                 </div>
               </Link>
 
+              <div className="border-t dr-border-violet my-2"></div>
+
+              <Link href="/integrations/system-surveyor/upload" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                  📤
+                </div>
+                <div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">System Surveyor Import</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Upload Excel exports for instant proposals</div>
+                </div>
+              </Link>
+
               <Link href="/white-label" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1">
                 <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🏷️
@@ -409,6 +421,7 @@ export default function UnifiedNavigation() {
               <Link href="/compliance-analyst" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">✅ Compliance Tools</Link>
               <Link href="/professional-proposals" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">📋 Proposal Generator</Link>
               <Link href="/pricing-intelligence" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">💰 Pricing Intelligence</Link>
+              <Link href="/integrations/system-surveyor" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🔗 System Surveyor Integration</Link>
               <Link href="/white-label" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🏷️ White Label Solutions</Link>
             </div>
 

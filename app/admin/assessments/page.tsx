@@ -1,13 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
 import { Calendar, Clock, User, Building, DollarSign, Eye, FileText, RefreshCw } from 'lucide-react';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Admin pages use API routes instead of direct Supabase calls for security
 
 interface Assessment {
   id: string;
@@ -43,15 +40,28 @@ export default function AssessmentsAdminPage() {
   const loadAssessments = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('assessments')
-        .select('*')
-        .order('created_at', { ascending: false });
+      console.log('🔄 Loading assessments...');
+      const response = await fetch('/api/admin/assessments');
+      console.log('📡 Response status:', response.status);
 
-      if (error) throw error;
-      setAssessments(data || []);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      console.log('📊 API Result:', {
+        assessmentsCount: result.assessments?.length || 0,
+        hasError: !!result.error,
+        stats: result.stats
+      });
+
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      console.log('✅ Setting assessments:', result.assessments?.length || 0, 'records');
+      setAssessments(result.assessments || []);
     } catch (err) {
-      console.error('Error loading assessments:', err);
+      console.error('❌ Error loading assessments:', err);
       setError(err instanceof Error ? err.message : 'Failed to load assessments');
     } finally {
       setLoading(false);

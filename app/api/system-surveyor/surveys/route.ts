@@ -1,0 +1,46 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getSurveys } from '@/lib/system-surveyor-api';
+
+/**
+ * GET /api/system-surveyor/surveys?siteId={siteId}
+ * Fetches surveys for a specific site
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+    const { searchParams } = new URL(request.url);
+    const siteId = searchParams.get('siteId');
+
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Authorization token required' },
+        { status: 401 }
+      );
+    }
+
+    if (!siteId) {
+      return NextResponse.json(
+        { error: 'siteId parameter required' },
+        { status: 400 }
+      );
+    }
+
+    const surveys = await getSurveys(token, siteId);
+
+    return NextResponse.json({
+      success: true,
+      surveys,
+      count: surveys.length
+    });
+
+  } catch (error: any) {
+    console.error('Surveys fetch error:', error);
+    return NextResponse.json(
+      {
+        error: 'Failed to fetch surveys',
+        details: error.message
+      },
+      { status: 500 }
+    );
+  }
+}
