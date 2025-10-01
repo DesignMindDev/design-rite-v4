@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logAIConversation, generateUserHash, generateSessionId } from '../../../lib/ai-session-logger';
 
 export async function GET() {
   return NextResponse.json({
@@ -76,10 +77,25 @@ Keep responses under 300 words and be helpful!`;
       const data = await response.json();
       const assistantResponse = data.content[0].text;
 
+      // Log conversation to Supabase (non-blocking)
+      const userHash = generateUserHash(request);
+      const finalSessionId = sessionId || generateSessionId();
+      logAIConversation({
+        sessionId: finalSessionId,
+        userHash,
+        userMessage: message,
+        aiResponse: assistantResponse,
+        aiProvider: 'claude-haiku',
+        metadata: {
+          feature: 'help-assistant',
+          model: 'claude-3-haiku-20240307'
+        }
+      }).catch(err => console.error('[Help Assistant] Logging error:', err));
+
       return NextResponse.json({
         response: assistantResponse,
         provider: 'claude-haiku',
-        sessionId: sessionId
+        sessionId: finalSessionId
       });
 
     } else if (process.env.OPENAI_API_KEY) {

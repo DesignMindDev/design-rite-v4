@@ -1,6 +1,7 @@
 // app/api/discovery-assistant/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { aiEngine } from '../../../lib/ai-engine';
+import { logAIConversation, generateUserHash, generateSessionId } from '../../../lib/ai-session-logger';
 
 // Anthropic Configuration - UPDATED TO LATEST MODEL
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
@@ -65,11 +66,30 @@ export async function POST(request: NextRequest) {
 
       if (aiResponse.success) {
         console.log(`✅ AI Response successful using ${aiResponse.provider_used} in ${aiResponse.response_time_ms}ms`);
+
+        // Log conversation to Supabase (non-blocking)
+        const sessionId = body.sessionId || generateSessionId();
+        const userHash = generateUserHash(request);
+        logAIConversation({
+          sessionId,
+          userHash,
+          userMessage: message,
+          aiResponse: aiResponse.content,
+          aiProvider: aiResponse.provider_used,
+          metadata: {
+            feature: 'discovery-assistant',
+            model: aiResponse.provider_used,
+            responseTime: aiResponse.response_time_ms,
+            isTeamMember
+          }
+        }).catch(err => console.error('[Discovery Assistant] Logging error:', err));
+
         return NextResponse.json({
           success: true,
           message: { content: aiResponse.content },
           provider: aiResponse.provider_used,
           response_time_ms: aiResponse.response_time_ms,
+          sessionId, // Include sessionId in response for client to track
           timestamp: new Date().toISOString()
         });
       } else {
