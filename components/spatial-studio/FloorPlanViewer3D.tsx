@@ -19,18 +19,29 @@ interface Room {
   center: [number, number];
 }
 
+interface Camera {
+  type: string;
+  position: [number, number, number];
+  coverage_radius?: number;
+  coverage_angle?: number;
+  reasoning?: string;
+}
+
 interface FloorPlanData {
   walls: Wall[];
   doors: Door[];
   windows: Array<{ position: [number, number] }>;
   rooms?: Room[];
   height: number;
+  cameras?: Camera[];
 }
 
 export default function FloorPlanViewer3D({
-  floorPlanData
+  floorPlanData,
+  showCameras = false
 }: {
-  floorPlanData: FloorPlanData
+  floorPlanData: FloorPlanData;
+  showCameras?: boolean;
 }) {
   // Scale down coordinates for better view (floor plans are often in pixels)
   const scale = 0.1;
@@ -96,6 +107,11 @@ export default function FloorPlanViewer3D({
           {/* Render room labels */}
           {floorPlanData.rooms && floorPlanData.rooms.map((room, index) => (
             <RoomLabel key={`room-${index}`} room={room} scale={scale} />
+          ))}
+
+          {/* Render cameras if enabled */}
+          {showCameras && floorPlanData.cameras && floorPlanData.cameras.map((camera, index) => (
+            <CameraMarker key={`camera-${index}`} camera={camera} scale={scale} />
           ))}
         </Suspense>
       </Canvas>
@@ -178,5 +194,50 @@ function RoomLabel({ room, scale }: { room: Room; scale: number }) {
     >
       {room.name}
     </Text>
+  );
+}
+
+// Camera marker component with coverage cone
+function CameraMarker({ camera, scale }: { camera: Camera; scale: number }) {
+  const [x, y, z] = camera.position.map(v => v * scale);
+
+  return (
+    <group position={[x, z, y]}>
+      {/* Camera body */}
+      <mesh>
+        <boxGeometry args={[0.5, 0.5, 0.8]} />
+        <meshStandardMaterial color="#EF4444" emissive="#EF4444" emissiveIntensity={0.5} />
+      </mesh>
+
+      {/* Camera lens */}
+      <mesh position={[0, 0, 0.5]}>
+        <cylinderGeometry args={[0.2, 0.2, 0.2, 16]} />
+        <meshStandardMaterial color="#1F2937" />
+      </mesh>
+
+      {/* Coverage cone (if radius provided) */}
+      {camera.coverage_radius && (
+        <mesh position={[0, -1, 2]} rotation={[Math.PI / 2, 0, 0]}>
+          <coneGeometry args={[camera.coverage_radius * scale * 0.3, camera.coverage_radius * scale * 0.5, 16, 1, true]} />
+          <meshStandardMaterial
+            color="#EF4444"
+            transparent
+            opacity={0.1}
+            side={2}
+          />
+        </mesh>
+      )}
+
+      {/* Camera label */}
+      <Text
+        position={[0, 2, 0]}
+        fontSize={0.6}
+        color="#EF4444"
+        anchorX="center"
+        anchorY="middle"
+      >
+        📹 {camera.type}
+      </Text>
+    </group>
   );
 }
