@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Bot, Upload, MessageSquare, Zap, RefreshCw, Download, ArrowLeft, Sparkles, FileText, Database, Settings, ChevronDown } from 'lucide-react'
+import { Bot, Upload, MessageSquare, Zap, RefreshCw, Download, ArrowLeft, Sparkles, FileText, Database, Settings, ChevronDown, LogOut } from 'lucide-react'
 import { sessionManager } from '../../lib/sessionManager'
+import * as auth from '@/lib/auth'
 
 interface Message {
   id: string
@@ -36,9 +37,6 @@ export default function AIAssistantPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [assessmentData, setAssessmentData] = useState<AssessmentData | null>(null)
   const [hasUploadedFile, setHasUploadedFile] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
-  const [selectedProvider, setSelectedProvider] = useState('assessment-assistant')
-  const [apiKey, setApiKey] = useState('')
   const [showSessions, setShowSessions] = useState(false)
   const [userHash, setUserHash] = useState('')
   const [sessionId, setSessionId] = useState('')
@@ -50,6 +48,7 @@ export default function AIAssistantPage() {
   const [showCustomCategory, setShowCustomCategory] = useState(false)
   const [customCategoryTitle, setCustomCategoryTitle] = useState('')
   const [customCategoryDetails, setCustomCategoryDetails] = useState('')
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -159,6 +158,9 @@ export default function AIAssistantPage() {
 
     // Load AI providers from the AI Providers system
     loadAIProviders()
+
+    // Check authentication status
+    setIsAuthenticated(auth.isAuthenticated())
   }, [])
 
   const loadAIProviders = async () => {
@@ -815,6 +817,12 @@ Date: ${new Date().toLocaleDateString()}
     setShowPrintPreview(false)
   }
 
+  const handleLogout = () => {
+    auth.logout()
+    setIsAuthenticated(false)
+    window.location.href = '/'
+  }
+
   const handlePrint = () => {
     const printWindow = window.open('', '_blank')
     if (printWindow) {
@@ -877,108 +885,18 @@ Date: ${new Date().toLocaleDateString()}
             <span className="font-bold text-lg">🤖 AI ASSISTANT REFINEMENT</span>
             <span className="ml-2">★★★ Intelligent Conversation-Driven Improvements</span>
           </div>
-          <div className="text-sm">
-            <Settings
-              className="w-5 h-5 cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={() => setShowSettings(!showSettings)}
-            />
+          <div className="flex items-center gap-3">
+            <Link href="/admin/ai-providers" className="text-sm hover:opacity-80 transition-opacity" title="AI Provider Settings">
+              <Settings className="w-5 h-5" />
+            </Link>
+            {isAuthenticated && (
+              <button onClick={handleLogout} className="text-sm hover:opacity-80 transition-opacity flex items-center gap-1" title="Logout">
+                <LogOut className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </div>
       </div>
-
-      {/* AI Settings Panel */}
-      {showSettings && (
-        <div className="border-b border-gray-800 bg-gray-900/50">
-          <div className="max-w-7xl mx-auto px-6 py-6">
-            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl border p-6">
-              <h3 className="text-xl font-bold dr-text-violet mb-4 flex items-center gap-2">
-                <Settings className="w-5 h-5" />
-                AI Provider Selection
-              </h3>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Provider Selection */}
-                <div>
-                  <label className="block text-sm font-medium dr-text-pearl mb-3">
-                    Choose AI Provider:
-                  </label>
-                  <div className="space-y-2">
-                    {aiProviders.map((provider) => (
-                      <label key={provider.id} className="flex items-start gap-3 p-3 bg-gray-700/50 rounded-lg hover:bg-gray-700/70 transition-colors cursor-pointer">
-                        <input
-                          type="radio"
-                          name="aiProvider"
-                          value={provider.id}
-                          checked={selectedProvider === provider.id}
-                          onChange={(e) => setSelectedProvider(e.target.value)}
-                          className="mt-1"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-white">{provider.name}</span>
-                            {!provider.available && (
-                              <span className="text-xs bg-red-600 text-white px-2 py-1 rounded">Coming Soon</span>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-400 mt-1">{provider.description}</p>
-                          {provider.model && (
-                            <p className="text-xs text-purple-400 mt-1">Model: {provider.model}</p>
-                          )}
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* API Configuration */}
-                <div>
-                  <label className="block text-sm font-medium dr-text-pearl mb-3">
-                    API Key (if required):
-                  </label>
-                  <input
-                    type="password"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="Enter API key for external providers..."
-                    className="w-full px-4 py-3 bg-gray-800/60 border border-gray-600/50 rounded-lg dr-text-pearl placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-400 mt-2">
-                    Required for OpenAI and Claude. Not needed for simulated or existing endpoint.
-                  </p>
-
-                  {/* Provider Info */}
-                  <div className="mt-4 p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg">
-                    <h4 className="font-medium text-purple-300 mb-2">Current Selection:</h4>
-                    {(() => {
-                      const current = aiProviders.find(p => p.id === selectedProvider)
-                      return (
-                        <div className="text-sm text-gray-300">
-                          <p><strong>{current?.name}</strong></p>
-                          <p>{current?.description}</p>
-                          {current?.endpoint && (
-                            <p className="text-xs text-purple-400 mt-1">Endpoint: {current.endpoint}</p>
-                          )}
-                        </div>
-                      )
-                    })()}
-                  </div>
-
-                  {/* Test Button */}
-                  <button
-                    onClick={() => {
-                      setInputValue("Test message: Please introduce yourself and explain how you can help with security assessments.")
-                      setShowSettings(false)
-                    }}
-                    className="w-full mt-4 px-4 py-2 dr-bg-violet hover:bg-purple-700 dr-text-pearl rounded-lg transition-colors"
-                  >
-                    Test Selected Provider
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid lg:grid-cols-12 gap-8">

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import * as auth from '@/lib/auth';
 
 interface SiteSettings {
   logoPath: string
@@ -13,6 +14,7 @@ export default function UnifiedNavigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAnnouncement, setShowAnnouncement] = useState(true);
   const [settings, setSettings] = useState<SiteSettings>({ logoPath: '', footerLogoPath: '' });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     loadSettings()
@@ -21,6 +23,8 @@ export default function UnifiedNavigation() {
     if (announcementClosed === 'true') {
       setShowAnnouncement(false);
     }
+    // Check authentication status
+    setIsAuthenticated(auth.isAuthenticated());
   }, [])
 
   const loadSettings = async () => {
@@ -55,6 +59,12 @@ export default function UnifiedNavigation() {
   const closeAnnouncement = () => {
     setShowAnnouncement(false);
     localStorage.setItem('announcementClosed', 'true');
+  };
+
+  const handleLogout = () => {
+    auth.logout();
+    setIsAuthenticated(false);
+    window.location.href = '/';
   };
 
   return (
@@ -375,12 +385,21 @@ export default function UnifiedNavigation() {
 
         {/* Call to Action Button */}
         <div className="hidden lg:block">
-          <button
-            onClick={handleSignInClick}
-            className="dr-bg-violet dr-text-pearl px-6 py-2.5 rounded-lg font-semibold dr-ui hover:bg-purple-700 transition-all hover:scale-105 shadow-lg hover:shadow-purple-600/25"
-          >
-            Sign In
-          </button>
+          {isAuthenticated ? (
+            <button
+              onClick={handleLogout}
+              className="dr-bg-violet dr-text-pearl px-6 py-2.5 rounded-lg font-semibold dr-ui hover:bg-purple-700 transition-all hover:scale-105 shadow-lg hover:shadow-purple-600/25"
+            >
+              🚪 Logout
+            </button>
+          ) : (
+            <button
+              onClick={handleSignInClick}
+              className="dr-bg-violet dr-text-pearl px-6 py-2.5 rounded-lg font-semibold dr-ui hover:bg-purple-700 transition-all hover:scale-105 shadow-lg hover:shadow-purple-600/25"
+            >
+              Sign In
+            </button>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -462,20 +481,32 @@ export default function UnifiedNavigation() {
 
             {/* Sign In and CTA */}
             <div className="pt-4 border-t border-white/10">
-              <button
-                onClick={handleSignInClick}
-                className="block w-full text-left text-white/80 hover:dr-text-pearl py-2 transition-colors"
-                type="button"
-              >
-                👤 Sign In
-              </button>
-              <button
-                onClick={handleSignInClick}
-                className="block w-full text-left dr-bg-violet dr-text-pearl px-4 py-2 rounded-lg mt-2 touch-manipulation active:bg-purple-800 transition-colors"
-                type="button"
-              >
-                👤 Sign In / Try Free
-              </button>
+              {isAuthenticated ? (
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left dr-bg-violet dr-text-pearl px-4 py-2 rounded-lg touch-manipulation active:bg-purple-800 transition-colors"
+                  type="button"
+                >
+                  🚪 Logout
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={handleSignInClick}
+                    className="block w-full text-left text-white/80 hover:dr-text-pearl py-2 transition-colors"
+                    type="button"
+                  >
+                    👤 Sign In
+                  </button>
+                  <button
+                    onClick={handleSignInClick}
+                    className="block w-full text-left dr-bg-violet dr-text-pearl px-4 py-2 rounded-lg mt-2 touch-manipulation active:bg-purple-800 transition-colors"
+                    type="button"
+                  >
+                    👤 Sign In / Try Free
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
