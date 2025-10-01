@@ -171,6 +171,16 @@ export default function UnifiedNavigation() {
                 </div>
               </Link>
 
+              <Link href="/integrations/system-surveyor" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                  📋
+                </div>
+                <div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">System Surveyor</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Field survey Excel import & API</div>
+                </div>
+              </Link>
+
               <Link href="/compliance-analyst" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   ✅
@@ -445,6 +455,9 @@ export default function UnifiedNavigation() {
               <Link href="/ai-discovery" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🚀 AI Discovery Assistant</Link>
               <Link href="/spatial-studio" className="block text-white/80 hover:dr-text-pearl py-2 pl-4 font-semibold">
                 🏗️ Spatial Studio <span className="text-xs bg-gradient-to-r from-purple-600 to-pink-600 px-2 py-0.5 rounded-full ml-2">NEW</span>
+              </Link>
+              <Link href="/integrations/system-surveyor" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">
+                📋 System Surveyor
               </Link>
               <button
                 onClick={handleTryPlatformClick}
