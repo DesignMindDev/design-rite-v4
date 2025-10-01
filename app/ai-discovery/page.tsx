@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, CheckCircle, Building2, Users, Shield, MapPin, Clock, DollarSign, FileText, AlertTriangle, Zap } from 'lucide-react'
 import { sessionManager } from '../../lib/sessionManager'
-import { securityScenarios, getScenarioById, type SecurityScenario } from '../../lib/scenario-library'
-import { QuoteGenerator, type SecurityQuote } from '../../lib/quote-generator'
+import { type SecurityScenario } from '../../lib/scenario-library'
+import { type SecurityQuote } from '../../lib/quote-generator'
 
 interface DiscoveryData {
   // Step 0: Scenario Selection (NEW)
@@ -57,6 +57,8 @@ const steps = [
 export default function AIDiscoveryPage() {
   const [currentStep, setCurrentStep] = useState(0)
   const [sessionInfo, setSessionInfo] = useState({ userId: '', projectId: '' })
+  const [securityScenarios, setSecurityScenarios] = useState<SecurityScenario[]>([])
+  const [loadingScenarios, setLoadingScenarios] = useState(true)
   const [data, setData] = useState<DiscoveryData>({
     useScenario: false,
     selectedScenario: undefined,
@@ -88,6 +90,24 @@ export default function AIDiscoveryPage() {
   const [isGeneratingQuote, setIsGeneratingQuote] = useState(false)
 
   // Initialize session tracking and check for handoff data
+  // Fetch scenarios from server-side API
+  useEffect(() => {
+    const fetchScenarios = async () => {
+      try {
+        const response = await fetch('/api/scenarios');
+        if (response.ok) {
+          const result = await response.json();
+          setSecurityScenarios(result.scenarios || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch scenarios:', error);
+      } finally {
+        setLoadingScenarios(false);
+      }
+    };
+    fetchScenarios();
+  }, []);
+
   useEffect(() => {
     const initializeSession = async () => {
       // Create or get user session
@@ -419,11 +439,22 @@ export default function AIDiscoveryPage() {
     setIsGeneratingQuote(true)
 
     try {
-      // Simulate some processing time
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      // Call server-side quote generation API (proprietary logic stays hidden)
+      const response = await fetch('/api/generate-quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          discoveryData: data,
+          selectedScenario: data.selectedScenario
+        })
+      });
 
-      const quoteGenerator = new QuoteGenerator()
-      const quote = quoteGenerator.generateQuote(data, data.selectedScenario)
+      if (!response.ok) {
+        throw new Error('Failed to generate quote');
+      }
+
+      const result = await response.json();
+      const quote = result.quote;
 
       setGeneratedQuote(quote)
 
