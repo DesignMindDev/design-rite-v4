@@ -159,8 +159,9 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
     async jwt({ token, user }) {
-      // Add role and access code to token on initial sign in
+      // Add user info to token on initial sign in
       if (user) {
+        token.id = user.id;
         token.role = user.role;
         token.accessCode = user.accessCode;
       }
@@ -168,8 +169,9 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
-      // Add role and access code to session
+      // Add user info to session
       if (session.user) {
+        session.user.id = token.id as string;
         session.user.role = token.role as string;
         session.user.accessCode = token.accessCode as string;
       }

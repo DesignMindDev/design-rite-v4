@@ -99,6 +99,90 @@
 
 ---
 
+### Editing User Details & Permissions
+
+**NEW in Phase 3**: Complete user editing with granular permission control
+
+**When to do this**:
+- User changes company or contact info
+- Assign specific admin capabilities to team members
+- Adjust permissions after role changes
+- Fix incorrect user details
+
+**Steps**:
+1. Find user in dashboard table
+2. Click "Edit" button (purple)
+3. Navigate to edit page - you'll see:
+   - User details form (email, name, role, status, company, phone)
+   - Permission checkboxes organized by category
+4. **Update user details** as needed
+5. **Assign permissions** by checking/unchecking boxes:
+   - 🟣 **Content Management**: Team, blog, videos, settings
+   - 🔵 **User Management**: Create, edit, delete users, assign permissions
+   - 🟢 **Data & Analytics**: Activity logs, exports, analytics
+   - 🟡 **System Access**: Admin panel access, integrations
+6. Click "Save Changes"
+7. User's permissions take effect immediately
+
+**Permission Guidelines**:
+- **Content Editors**: Give content management permissions only
+- **Sales Team Leaders**: Can create users, edit users (but not delete/assign)
+- **Operations Managers**: View activity, export data, view analytics
+- **Full Admins**: All user management + data/analytics permissions
+- **Super Admins**: All permissions automatically (cannot be restricted)
+
+**Important notes**:
+- Super admins always have all permissions (checkboxes don't apply)
+- Admins can only edit users they created (not other admins' users)
+- Admins need `can_assign_permissions` to change permissions
+- All permission changes are logged in activity logs
+
+---
+
+### Viewing User Activity
+
+**NEW in Phase 3**: Complete admin access audit trail
+
+**When to do this**:
+- Security audit or compliance check
+- Investigate suspicious behavior
+- Verify permission enforcement
+- Track who accessed what admin pages
+
+**Steps**:
+1. **From dashboard**: Click "Activity" button next to any user
+2. **Or navigate directly**: `/admin/super/activity`
+3. **View complete access logs** showing:
+   - Every admin page access attempt (allowed and denied)
+   - Which permissions were checked
+   - Timestamps, IP addresses, user agents
+   - Success/failure status
+
+**Filtering & Search**:
+- **Filter by status**: All / Allowed / Denied access
+- **Search by email**: Find specific user's attempts
+- **Review statistics**: Total attempts, successful, denied
+
+**Security monitoring**:
+```
+Multiple denied attempts from same user
+→ User may need permissions adjusted
+
+Denied attempts from unexpected IPs
+→ Potential security concern - investigate
+
+Unusual after-hours access
+→ Verify legitimate business need
+```
+
+**Use cases**:
+- **Compliance audits**: Export access logs for regulators
+- **Security incidents**: Track unauthorized access attempts
+- **Permission tuning**: See what users actually need access to
+- **User training**: Identify confusion about access levels
+
+---
+
 ## 📊 Monitoring & Analytics
 
 ### Dashboard Statistics

@@ -143,17 +143,121 @@ The main user table shows all users with the following columns:
 
 For each user in the table, you can:
 
-- **Edit**: Modify user details (coming soon)
-- **Activity**: View user's activity logs (coming soon)
+- **Edit**: Modify user details and assign granular permissions
+- **Activity**: View complete admin access logs
 - **Suspend**: Temporarily disable account (for active users)
+- **Delete**: Permanently remove user (super admin only)
+
+---
+
+---
+
+## 🔐 Granular Permission System
+
+### Overview
+
+Design-Rite v3 now includes a comprehensive permission system that allows you to assign specific admin capabilities to individual users, independent of their role.
+
+### Editing User Permissions
+
+**To edit a user's permissions:**
+
+1. **Click "Edit"** next to any user in the User Management table
+2. **Navigate to the Edit User page** - You'll see:
+   - User details form (email, name, role, status, company, phone)
+   - Permission checkboxes organized into 4 categories
+
+### Permission Categories
+
+#### 🟣 Content Management
+- **Can Manage Team** - Edit team members page
+- **Can Manage Blog** - Create/edit blog posts
+- **Can Manage Videos** - Upload/manage video content
+- **Can Manage Settings** - Modify site settings (logos, branding)
+
+#### 🔵 User Management
+- **Can Create Users** - Create new user accounts
+- **Can Edit Users** - Modify existing user details and permissions
+- **Can Delete Users** - Permanently remove users (super admin feature)
+- **Can Assign Permissions** - Grant permissions to other users
+
+#### 🟢 Data & Analytics
+- **Can View Activity** - Access admin access logs
+- **Can Export Data** - Export users, logs, database backups
+- **Can View Analytics** - Access platform analytics dashboard
+
+#### 🟡 System Access
+- **Can Access Admin Panel** - Access `/admin` routes at all
+- **Can Manage Integrations** - Configure System Surveyor, Calendly, etc.
+
+### Permission Enforcement
+
+**How permissions work:**
+- ✅ **Super Admins** automatically have all permissions (cannot be restricted)
+- ✅ **Permission checks** happen on every admin page access
+- ✅ **Access denied** → User sees "Permission Denied" error
+- ✅ **All attempts logged** → Viewable in Activity Log Viewer
+
+**Example scenarios:**
+```
+User tries to access /admin/team without can_manage_team:
+→ Access denied, logged to admin_access_logs
+
+Admin tries to edit user without can_edit_users:
+→ Edit button hidden, API returns 403 Forbidden
+
+User with can_view_activity clicks Activity button:
+→ Access granted, activity logs displayed
+```
+
+### Assigning Permissions
+
+**Best practices:**
+
+1. **Start minimal**: Grant only permissions users need for their job
+2. **Content editors**: Give content management permissions only
+3. **Sales managers**: Give can_create_users, can_edit_users (but not delete or assign)
+4. **Analytics team**: Give can_view_activity, can_view_analytics, can_export_data
+5. **Super admins**: Full access to everything (automatic)
+
+**Admins editing users:**
+- Admins can only edit users they created (not other admins' users)
+- Admins need `can_assign_permissions` to change any permissions
+- Admins cannot grant permissions they don't have themselves
 
 ---
 
 ## 📈 Activity Monitoring
 
+### Admin Access Logs (NEW)
+
+**Access the Activity Log Viewer:**
+1. Click "Activity" button next to any user in the dashboard
+2. Or navigate to `/admin/super/activity`
+
+**What you'll see:**
+- Complete audit trail of all admin panel access attempts
+- Filter by: All / Allowed / Denied access
+- Search by user email
+- Summary statistics: Total attempts, Successful, Denied
+
+**Log details include:**
+- **Timestamp** - When the access was attempted
+- **User** - Name and email of person attempting access
+- **Path** - Which admin page they tried to access (e.g., `/admin/team`)
+- **Permission** - Which permission was checked (e.g., `can_manage_team`)
+- **Status** - ✓ Allowed or ✗ Denied
+- **Method** - GET, POST, PUT, DELETE
+- **IP Address** - Where the request came from
+
+**Security monitoring:**
+- Look for multiple denied attempts from same user → User needs permissions adjusted
+- Look for denied attempts from unexpected IPs → Potential security issue
+- Track who accesses sensitive pages → Audit trail for compliance
+
 ### Recent Activity Feed
 
-The live activity feed shows the last 50 actions across all users:
+The dashboard also shows the last 50 general actions across all users:
 
 #### What's Logged:
 - ✅ **Login** - Successful login
@@ -437,13 +541,59 @@ def456,user@company.com,John Doe,quote_generated,2025-10-01 10:45:00,true,192.16
 - **Developer Guide**: Coming soon in `docs/developer-guides/`
 
 ### Common Questions
-- **How do I reset a user's password?** - User edit functionality coming in Phase 3
-- **Can I bulk import users?** - Not yet, planned for Phase 4
-- **How do I delete a user?** - Soft delete via user edit (coming soon)
-- **Where are sessions stored?** - `user_sessions` table in Supabase
+
+**Q: How do I reset a user's password?**
+A: Currently requires database update. User edit page password reset coming in Phase 4.
+
+**Q: Can I bulk import users?**
+A: Not yet, planned for Phase 4.
+
+**Q: How do I delete a user?**
+A: Click "Delete" button next to user (super admin only). This is a soft delete - user marked as 'deleted' in database.
+
+**Q: Where are sessions stored?**
+A: `user_sessions` table in Supabase with JWT tokens.
+
+**Q: How do I give an admin user specific permissions?**
+A: Click "Edit" next to the user → Check/uncheck permission boxes → Save.
+
+**Q: What if I accidentally deny myself permissions?**
+A: Super admins cannot be restricted - all permissions are automatic regardless of checkboxes.
+
+**Q: How do I view who tried to access a page they don't have permission for?**
+A: Navigate to `/admin/super/activity` → Filter by "Denied" → Review denied access attempts.
+
+**Q: Can regular admins assign permissions?**
+A: Only if they have the `can_assign_permissions` permission. They also cannot grant permissions they don't have themselves.
+
+---
+
+## 🗄️ Database Migration Required
+
+**IMPORTANT**: Before using the granular permission system in production, you must run the database migration:
+
+1. **Open Supabase SQL Editor**
+2. **Load the migration file**: `supabase/admin_permissions_system.sql`
+3. **Run the entire script** - This creates:
+   - `admin_permissions` table with 13 permission columns
+   - `admin_access_logs` table for tracking access attempts
+   - Helper functions: `check_admin_permission()`, `log_admin_access()`
+   - Default permissions for existing users based on their roles
+   - RLS policies for security
+   - Views for easy querying
+
+4. **Verify tables created**:
+   ```sql
+   -- Check tables exist
+   SELECT COUNT(*) FROM admin_permissions;
+   SELECT COUNT(*) FROM admin_access_logs;
+
+   -- View default permissions
+   SELECT * FROM v_user_permissions ORDER BY role, email;
+   ```
 
 ---
 
 **Last Updated**: October 1, 2025
-**Version**: Phase 2 - User Management & Dashboard
+**Version**: Phase 3 - Granular Permission System Complete
 **Author**: Design-Rite Development Team

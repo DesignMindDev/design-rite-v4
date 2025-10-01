@@ -150,13 +150,16 @@ openssl rand -base64 32
 ### Legacy Admin (Content Management)
 
 #### ADMIN_PASSWORD
-**Value**: `ProcessM@ker2025`
-**Purpose**: Password for legacy `/admin` content management
-**Required**: ❌ Optional (legacy system)
+**Value**: ~~`ProcessM@ker2025`~~ **DEPRECATED**
+**Purpose**: ~~Password for legacy `/admin` content management~~
+**Status**: **REMOVED - Now uses Next-Auth database authentication**
 
-**Note**: This is separate from Next-Auth system
-- Used for: Team members, blog, site settings
-- Not used for: User management, dashboard
+**Note**: As of Phase 3, the `/admin` content management page now uses the same Next-Auth authentication as `/admin/super`. The hardcoded password system has been removed.
+
+**To access `/admin`:**
+1. Login via `/admin/login` with your database credentials
+2. Must have `super_admin` or `admin` role
+3. No separate password needed
 
 ---
 
@@ -193,7 +196,7 @@ ASSESSMENT_ASSISTANT_ID=asst_...
 ANTHROPIC_API_KEY=sk-ant-...
 
 # Optional
-ADMIN_PASSWORD=ProcessM@ker2025
+# ADMIN_PASSWORD=ProcessM@ker2025  # DEPRECATED - No longer used
 HARVESTER_API_URL=http://localhost:8002
 ```
 
@@ -217,14 +220,13 @@ OPENAI_API_KEY=<same-as-dev>
 ASSESSMENT_ASSISTANT_ID=<same-as-dev>
 ANTHROPIC_API_KEY=<same-as-dev>
 
-# Optional
-ADMIN_PASSWORD=<change-this-too>
+# Optional (ADMIN_PASSWORD no longer used - uses Next-Auth)
 ```
 
 **⚠️ Don't Forget**:
 - Change NEXTAUTH_SECRET from dev value
 - Update NEXTAUTH_URL to production domain
-- Consider changing ADMIN_PASSWORD
+- ~~Consider changing ADMIN_PASSWORD~~ (No longer used)
 
 ---
 
@@ -351,7 +353,7 @@ git status
 | OPENAI_API_KEY | ✅ | ❌ | OpenAI Dashboard → API Keys |
 | ASSESSMENT_ASSISTANT_ID | ✅ | ❌ | OpenAI Assistants page |
 | ANTHROPIC_API_KEY | ❌ | ❌ | Anthropic Console → API Keys |
-| ADMIN_PASSWORD | ❌ | ❌ | Your choice |
+| ~~ADMIN_PASSWORD~~ | ❌ | ❌ | DEPRECATED - No longer used |
 
 ---
 

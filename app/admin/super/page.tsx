@@ -44,17 +44,28 @@ export default function SuperAdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Don't do anything while loading
+    if (status === 'loading') {
+      return;
+    }
+
+    // Redirect if not authenticated
     if (status === 'unauthenticated') {
       router.push('/admin/login');
       return;
     }
 
-    if (session?.user?.role !== 'super_admin' && session?.user?.role !== 'admin') {
-      router.push('/admin/login');
-      return;
-    }
-
+    // Check role only when authenticated
     if (status === 'authenticated') {
+      const userRole = session?.user?.role;
+
+      // Redirect if not admin or super_admin
+      if (!userRole || (!['super_admin', 'admin'].includes(userRole))) {
+        router.push('/admin/login');
+        return;
+      }
+
+      // Fetch data only once when authenticated and authorized
       fetchDashboardData();
     }
   }, [session, status, router]);
@@ -165,6 +176,35 @@ export default function SuperAdminDashboard() {
     } catch (error) {
       console.error('Suspend failed:', error);
       alert('Failed to suspend user. Please try again.');
+    }
+  };
+
+  const handleUnsuspendUser = async (userId: string, userEmail: string) => {
+    if (!confirm(`Reactivate ${userEmail}?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/admin/update-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user: {
+            id: userId,
+            status: 'active'
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to reactivate user');
+      }
+
+      alert('User reactivated successfully');
+      fetchDashboardData(); // Refresh the data
+    } catch (error) {
+      console.error('Reactivate failed:', error);
+      alert('Failed to reactivate user. Please try again.');
     }
   };
 
@@ -306,24 +346,32 @@ export default function SuperAdminDashboard() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => alert('Edit user coming in Phase 3')}
+                        <Link
+                          href={`/admin/super/edit-user/${user.id}`}
                           className="text-purple-400 hover:text-purple-300 text-sm"
                         >
                           Edit
-                        </button>
-                        <button
-                          onClick={() => alert('Activity viewer coming in Phase 3')}
+                        </Link>
+                        <Link
+                          href="/admin/super/activity"
                           className="text-blue-400 hover:text-blue-300 text-sm"
                         >
                           Activity
-                        </button>
+                        </Link>
                         {user.status === 'active' && (
                           <button
                             onClick={() => handleSuspendUser(user.id, user.email)}
                             className="text-yellow-400 hover:text-yellow-300 text-sm"
                           >
                             Suspend
+                          </button>
+                        )}
+                        {user.status === 'suspended' && (
+                          <button
+                            onClick={() => handleUnsuspendUser(user.id, user.email)}
+                            className="text-green-400 hover:text-green-300 text-sm"
+                          >
+                            Reactivate
                           </button>
                         )}
                         {session?.user?.role === 'super_admin' && (

@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import * as auth from '../lib/auth'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
 interface TeamMember {
   id: string
@@ -63,10 +64,23 @@ interface ActivityLog {
   userAgent?: string
 }
 
+interface ModulePermissions {
+  operations_dashboard: boolean
+  ai_management: boolean
+  data_harvesting: boolean
+  marketing_content: boolean
+  about_us: boolean
+  team_management: boolean
+  logo_management: boolean
+  video_management: boolean
+  blog_management: boolean
+}
+
 export default function AdminPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const { data: session, status } = useSession()
+  const router = useRouter()
   const [isMounted, setIsMounted] = useState(false)
-  const [password, setPassword] = useState('')
+  const [modulePerms, setModulePerms] = useState<ModulePermissions | null>(null)
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({ logoPath: '', footerLogoPath: '', demoVideoUrl: '' })
   const [videos, setVideos] = useState<VideoContent[]>([])
@@ -96,35 +110,70 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    // Only check authentication after component mounts (client-side only)
     setIsMounted(true)
 
-    const checkAuth = () => {
-      if (auth.isAuthenticated()) {
-        setIsAuthenticated(true)
-        loadTeamMembers()
-        loadSiteSettings()
-        loadBlogPosts()
-      }
+    // Redirect if not authenticated
+    if (status === 'unauthenticated') {
+      router.push('/admin/login?callbackUrl=/admin')
+      return
     }
 
-    checkAuth()
-  }, [])
+    // Check if user has permission to access admin content management
+    if (status === 'authenticated') {
+      const role = session?.user?.role
+      if (!['super_admin', 'admin'].includes(role || '')) {
+        router.push('/admin/login')
+        return
+      }
 
-  const handleLogin = async () => {
-    if (auth.authenticate(password)) {
-      setIsAuthenticated(true)
+      // Fetch user's module permissions
+      fetchModulePermissions()
+
+      // Load content management data
       loadTeamMembers()
       loadSiteSettings()
       loadBlogPosts()
-    } else {
-      alert('Invalid password')
+    }
+  }, [session, status, router])
+
+  const fetchModulePermissions = async () => {
+    try {
+      const response = await fetch(`/api/admin/get-user?userId=${session?.user?.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        const perms = data.modulePermissions
+
+        // Super admins get all permissions by default
+        if (session?.user?.role === 'super_admin') {
+          setModulePerms({
+            operations_dashboard: true,
+            ai_management: true,
+            data_harvesting: true,
+            marketing_content: true,
+            about_us: true,
+            team_management: true,
+            logo_management: true,
+            video_management: true,
+            blog_management: true,
+          })
+        } else {
+          setModulePerms(perms)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch module permissions:', error)
     }
   }
 
+  // Helper function to check if user has access to a module
+  const hasModuleAccess = (module: keyof ModulePermissions) => {
+    if (!modulePerms) return true // Loading state - show all until permissions load
+    if (session?.user?.role === 'super_admin') return true
+    return modulePerms[module]
+  }
+
   const handleLogout = () => {
-    setIsAuthenticated(false)
-    auth.logout()
+    router.push('/admin/login')
   }
 
   const loadTeamMembers = async () => {
@@ -255,38 +304,30 @@ export default function AdminPage() {
     }
   }
 
-  if (!isMounted) {
+  if (!isMounted || status === 'loading') {
     return <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] flex items-center justify-center">
       <div className="text-white">Loading...</div>
     </div>
   }
 
-  if (!isAuthenticated) {
+  if (status === 'unauthenticated' || !['super_admin', 'admin'].includes(session?.user?.role || '')) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] flex items-center justify-center">
-        <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 max-w-md w-full mx-4">
-          <h1 className="text-3xl font-black text-white mb-6 text-center">Admin Login</h1>
-          <div className="space-y-4">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter admin password"
-              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600"
-              onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-            />
-            <button
-              onClick={handleLogin}
-              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all"
-            >
-              Login
-            </button>
-          </div>
+        <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 max-w-md w-full mx-4 text-center">
+          <h1 className="text-3xl font-black text-white mb-4">Access Denied</h1>
+          <p className="text-gray-400 mb-6">You need super_admin or admin role to access content management.</p>
+          <Link
+            href="/admin/login"
+            className="inline-block bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all"
+          >
+            Go to Login
+          </Link>
         </div>
       </div>
     )
   }
 
+  // Blog image upload handler
   const handleBlogImageUpload = async (file: File): Promise<string | null> => {
     setUploadingBlogImage(true)
     const formData = new FormData()
@@ -389,16 +430,19 @@ export default function AdminPage() {
           </h1>
           <div className="flex items-center gap-4">
             {/* Operations Dashboard - Featured */}
-            <Link
-              href="/admin/operations"
-              className="bg-gradient-to-r from-orange-600 to-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-orange-600/30 transition-all flex items-center gap-2"
-            >
-              <span>📊</span>
-              Operations Dashboard
-            </Link>
+            {hasModuleAccess('operations_dashboard') && (
+              <Link
+                href="/admin/operations"
+                className="bg-gradient-to-r from-orange-600 to-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-orange-600/30 transition-all flex items-center gap-2"
+              >
+                <span>📊</span>
+                Operations Dashboard
+              </Link>
+            )}
 
             {/* AI Management Dropdown */}
-            <div className="relative group">
+            {hasModuleAccess('ai_management') && (
+              <div className="relative group">
               <button className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all flex items-center gap-2">
                 <span>🤖</span>
                 AI Management
@@ -430,10 +474,12 @@ export default function AdminPage() {
                   </Link>
                 </div>
               </div>
-            </div>
+              </div>
+            )}
 
             {/* Data & Harvesting Dropdown */}
-            <div className="relative group">
+            {hasModuleAccess('data_harvesting') && (
+              <div className="relative group">
               <button className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-600/30 transition-all flex items-center gap-2">
                 <span>🗄️</span>
                 Data & Harvesting
@@ -453,10 +499,12 @@ export default function AdminPage() {
                   </Link>
                 </div>
               </div>
-            </div>
+              </div>
+            )}
 
             {/* Marketing & Content Dropdown */}
-            <div className="relative group">
+            {hasModuleAccess('marketing_content') && (
+              <div className="relative group">
               <button className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-green-600/30 transition-all flex items-center gap-2">
                 <span>📈</span>
                 Marketing & Content
@@ -478,28 +526,36 @@ export default function AdminPage() {
                     <span>🗺️</span>
                     <span>User Journey</span>
                   </Link>
-                  <button onClick={() => setActiveTab('team')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
-                    <span>👥</span>
-                    <span>Team Management</span>
-                  </button>
+                  {hasModuleAccess('team_management') && (
+                    <button onClick={() => setActiveTab('team')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                      <span>👥</span>
+                      <span>Team Management</span>
+                    </button>
+                  )}
                   <Link href="/admin/creative-studio" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
                     <span>🎨</span>
                     <span>Creative Studio</span>
                   </Link>
-                  <button onClick={() => setActiveTab('logos')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
-                    <span>🎨</span>
-                    <span>Logo Management</span>
-                  </button>
-                  <button onClick={() => setActiveTab('videos')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
-                    <span>🎥</span>
-                    <span>Video Management</span>
-                  </button>
+                  {hasModuleAccess('logo_management') && (
+                    <button onClick={() => setActiveTab('logos')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                      <span>🎨</span>
+                      <span>Logo Management</span>
+                    </button>
+                  )}
+                  {hasModuleAccess('video_management') && (
+                    <button onClick={() => setActiveTab('videos')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                      <span>🎥</span>
+                      <span>Video Management</span>
+                    </button>
+                  )}
                 </div>
               </div>
-            </div>
+              </div>
+            )}
 
             {/* About Us Dropdown */}
-            <div className="relative group">
+            {hasModuleAccess('about_us') && (
+              <div className="relative group">
               <button className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-indigo-600/30 transition-all flex items-center gap-2">
                 <span>ℹ️</span>
                 About Us
@@ -515,7 +571,8 @@ export default function AdminPage() {
                   </Link>
                 </div>
               </div>
-            </div>
+              </div>
+            )}
 
             <button
               onClick={handleLogout}
@@ -528,46 +585,54 @@ export default function AdminPage() {
 
         {/* Tab Navigation */}
         <div className="grid grid-cols-2 md:grid-cols-4 mb-8 bg-gray-800/30 rounded-lg p-1">
-          <button
-            onClick={() => setActiveTab('team')}
-            className={`py-3 px-4 rounded-lg font-semibold transition-all ${
-              activeTab === 'team'
-                ? 'bg-purple-600 text-white'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            Team
-          </button>
-          <button
-            onClick={() => setActiveTab('logos')}
-            className={`py-3 px-4 rounded-lg font-semibold transition-all ${
-              activeTab === 'logos'
-                ? 'bg-purple-600 text-white'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            Logos
-          </button>
-          <button
-            onClick={() => setActiveTab('videos')}
-            className={`py-3 px-4 rounded-lg font-semibold transition-all ${
-              activeTab === 'videos'
-                ? 'bg-purple-600 text-white'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            Videos
-          </button>
-          <button
-            onClick={() => setActiveTab('blog')}
-            className={`py-3 px-4 rounded-lg font-semibold transition-all ${
-              activeTab === 'blog'
-                ? 'bg-purple-600 text-white'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            Blog
-          </button>
+          {hasModuleAccess('team_management') && (
+            <button
+              onClick={() => setActiveTab('team')}
+              className={`py-3 px-4 rounded-lg font-semibold transition-all ${
+                activeTab === 'team'
+                  ? 'bg-purple-600 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Team
+            </button>
+          )}
+          {hasModuleAccess('logo_management') && (
+            <button
+              onClick={() => setActiveTab('logos')}
+              className={`py-3 px-4 rounded-lg font-semibold transition-all ${
+                activeTab === 'logos'
+                  ? 'bg-purple-600 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Logos
+            </button>
+          )}
+          {hasModuleAccess('video_management') && (
+            <button
+              onClick={() => setActiveTab('videos')}
+              className={`py-3 px-4 rounded-lg font-semibold transition-all ${
+                activeTab === 'videos'
+                  ? 'bg-purple-600 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Videos
+            </button>
+          )}
+          {hasModuleAccess('blog_management') && (
+            <button
+              onClick={() => setActiveTab('blog')}
+              className={`py-3 px-4 rounded-lg font-semibold transition-all ${
+                activeTab === 'blog'
+                  ? 'bg-purple-600 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Blog
+            </button>
+          )}
         </div>
 
         {activeTab === 'team' && (
