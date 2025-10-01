@@ -127,6 +127,22 @@ export default function LeadsDashboard() {
     fetchLeads()
   }, [filterStatus, filterGrade])
 
+  useEffect(() => {
+    if (showAnalytics) {
+      fetchAnalytics()
+    }
+  }, [timeRange, showAnalytics])
+
+  const fetchAnalytics = async () => {
+    try {
+      const response = await fetch(`/api/admin/leads-analytics?timeRange=${timeRange}`)
+      const data = await response.json()
+      setAnalytics(data)
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error)
+    }
+  }
+
   const fetchLeads = async () => {
     try {
       setLoading(true)
@@ -250,17 +266,81 @@ export default function LeadsDashboard() {
     )
   }
 
+  const timeRangeLabels = {
+    '24h': 'Last 24 Hours',
+    '7d': 'Last 7 Days',
+    '30d': 'Last 30 Days',
+    '90d': 'Last 90 Days'
+  }
+
   return (
-    <div className="min-h-screen dr-bg-charcoal dr-text-pearl">
+    <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-8">
-        <div className="max-w-7xl mx-auto px-6">
-          <h1 className="text-3xl font-bold mb-2">👥 Leads & Web Activity Dashboard</h1>
-          <p className="text-purple-100">Track lead journey from first visit to conversion</p>
+      <div className="mb-6">
+        <Link
+          href="/admin"
+          className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Admin
+        </Link>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <Users className="w-8 h-8 text-blue-600" />
+              Leads & Web Activity Dashboard
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Track lead journey from first visit to conversion
+            </p>
+          </div>
+
+          {/* Controls */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setShowAnalytics(!showAnalytics)}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                showAnalytics
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              <Filter className="w-4 h-4 inline mr-2" />
+              {showAnalytics ? 'Hide' : 'Show'} Analytics
+            </button>
+
+            {showAnalytics && (
+              <div className="flex gap-2 bg-white rounded-lg border border-gray-300 p-1">
+                {(['24h', '7d', '30d', '90d'] as const).map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => setTimeRange(range)}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      timeRange === range
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    {timeRangeLabels[range]}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <button
+              onClick={fetchLeads}
+              disabled={loading}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 inline mr-2 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto">
         {error && (
           <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 mb-6">
             <p className="text-red-400">{error}</p>
@@ -314,15 +394,210 @@ export default function LeadsDashboard() {
           </div>
         )}
 
+        {/* Advanced Analytics Section */}
+        {showAnalytics && analytics && (
+          <div className="space-y-6 mb-8">
+            {/* Journey Metrics */}
+            <section>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Journey Metrics</h2>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <MetricCard
+                  title="Avg Time to Conversion"
+                  value={`${analytics.journeyMetrics.avgTimeToConversion} days`}
+                  icon={<Clock className="w-6 h-6" />}
+                  color="blue"
+                />
+                <MetricCard
+                  title="Avg Page Views"
+                  value={analytics.journeyMetrics.avgPageViewsToConversion}
+                  icon={<Activity className="w-6 h-6" />}
+                  color="green"
+                  description="Before conversion"
+                />
+                <MetricCard
+                  title="Avg Sessions"
+                  value={analytics.journeyMetrics.avgSessionsToConversion}
+                  icon={<Target className="w-6 h-6" />}
+                  color="purple"
+                  description="Before conversion"
+                />
+                <MetricCard
+                  title="Top Entry Page"
+                  value={analytics.journeyMetrics.mostCommonFirstPage.split('/').pop() || 'Home'}
+                  icon={<MapPin className="w-6 h-6" />}
+                  color="yellow"
+                  description="Most common first visit"
+                />
+              </div>
+            </section>
+
+            {/* Conversion Funnel */}
+            <section>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Conversion Funnel</h2>
+              <div className="bg-white p-6 rounded-lg border-2 border-gray-200">
+                <FunnelChart stages={analytics.conversionFunnel} />
+              </div>
+            </section>
+
+            {/* Time Series & Lead Sources */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Time Series */}
+              <section>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Leads Over Time</h2>
+                <div className="bg-white p-6 rounded-lg border-2 border-gray-200">
+                  <TimeSeriesChart
+                    data={analytics.timeSeriesData}
+                    xKey="date"
+                    yKeys={['newLeads', 'qualifiedLeads', 'trials', 'conversions']}
+                    colors={['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6']}
+                    height={300}
+                  />
+                  <div className="flex items-center justify-center gap-4 mt-4 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-blue-600 rounded"></div>
+                      <span className="text-sm text-gray-600">New Leads</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-green-600 rounded"></div>
+                      <span className="text-sm text-gray-600">Qualified</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-yellow-600 rounded"></div>
+                      <span className="text-sm text-gray-600">Trials</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-purple-600 rounded"></div>
+                      <span className="text-sm text-gray-600">Conversions</span>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Lead Source Performance */}
+              <section>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Lead Source Performance</h2>
+                <div className="bg-white p-6 rounded-lg border-2 border-gray-200">
+                  <div className="space-y-3">
+                    {analytics.leadSourcePerformance.map((source, index) => (
+                      <div key={index} className="pb-3 border-b border-gray-200 last:border-0">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-semibold text-gray-900">{source.source}</h3>
+                          <span className="text-sm font-medium text-blue-600">
+                            {source.leads} leads
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 text-sm">
+                          <div>
+                            <span className="text-gray-500">Avg Score:</span>
+                            <span className="ml-2 font-medium">{source.avgScore}</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Conversion:</span>
+                            <span className="ml-2 font-medium text-green-600">{source.conversionRate}%</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Customers:</span>
+                            <span className="ml-2 font-medium">{source.customers}</span>
+                          </div>
+                        </div>
+                        <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-blue-600 h-2 rounded-full"
+                            style={{ width: `${Math.min(source.conversionRate, 100)}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            {/* Conversion Paths & Top Pages */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Conversion Paths */}
+              <section>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Top Conversion Paths</h2>
+                <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Path</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Leads</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Conversions</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {analytics.conversionPaths.map((path, index) => (
+                        <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
+                          <td className="px-4 py-3">
+                            <div className="text-xs text-gray-600 flex flex-wrap gap-1">
+                              {path.path.map((step, i) => (
+                                <span key={i}>
+                                  {step}
+                                  {i < path.path.length - 1 && ' →'}
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-gray-900">{path.leads}</td>
+                          <td className="px-4 py-3 text-green-600 font-medium">{path.conversions}</td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              path.conversionRate > 20 ? 'bg-green-100 text-green-800' :
+                              path.conversionRate > 10 ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {path.conversionRate}%
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              {/* Top Pages */}
+              <section>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Top Pages</h2>
+                <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Page</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Views</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Visitors</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {analytics.topPages.map((page, index) => (
+                        <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
+                          <td className="px-4 py-3 text-gray-900 truncate max-w-xs">
+                            {page.page.split('/').pop() || page.page}
+                          </td>
+                          <td className="px-4 py-3 text-blue-600 font-medium">{page.views}</td>
+                          <td className="px-4 py-3 text-gray-600">{page.uniqueVisitors}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+          </div>
+        )}
+
         {/* Filters */}
-        <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl border p-6 mb-6">
+        <div className="bg-white rounded-lg border-2 border-gray-200 p-6 mb-6">
           <div className="flex flex-wrap gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-2">Filter by Status:</label>
+              <label className="block text-sm text-gray-600 mb-2">Filter by Status:</label>
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 outline-none"
+                className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
               >
                 <option value="all">All Statuses</option>
                 <option value="new">New</option>
@@ -337,11 +612,11 @@ export default function LeadsDashboard() {
             </div>
 
             <div>
-              <label className="block text-sm text-gray-400 mb-2">Filter by Grade:</label>
+              <label className="block text-sm text-gray-600 mb-2">Filter by Grade:</label>
               <select
                 value={filterGrade}
                 onChange={(e) => setFilterGrade(e.target.value)}
-                className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 outline-none"
+                className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
               >
                 <option value="all">All Grades</option>
                 <option value="A">A (90-100)</option>
@@ -357,7 +632,7 @@ export default function LeadsDashboard() {
                   setFilterStatus('all')
                   setFilterGrade('all')
                 }}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded-lg transition-colors"
               >
                 Clear Filters
               </button>
@@ -366,8 +641,8 @@ export default function LeadsDashboard() {
         </div>
 
         {/* Leads Table */}
-        <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl border p-6">
-          <h2 className="text-xl font-bold dr-text-violet mb-4">
+        <div className="bg-white rounded-lg border-2 border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
             Leads ({leads.length})
           </h2>
 
