@@ -3,7 +3,7 @@
  */
 
 // Admin password from environment variables
-export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ProcessM@ker2025'
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Pl@tformbuilder2025'
 
 // Local storage key for authentication state
 const AUTH_KEY = 'design-rite-admin-auth'
