@@ -18,7 +18,11 @@ export type Permission =
   | 'can_export_data'
   | 'can_view_analytics'
   | 'can_access_admin_panel'
-  | 'can_manage_integrations';
+  | 'can_manage_integrations'
+  | 'can_view_revenue'
+  | 'can_view_quick_stats'
+  | 'can_view_user_list'
+  | 'can_view_recent_activity';
 
 export interface PermissionCheckResult {
   allowed: boolean;
@@ -176,6 +180,10 @@ export async function getUserPermissions(userId: string): Promise<Record<Permiss
         can_view_analytics: true,
         can_access_admin_panel: true,
         can_manage_integrations: true,
+        can_view_revenue: true,
+        can_view_quick_stats: true,
+        can_view_user_list: true,
+        can_view_recent_activity: true,
       };
     }
 
@@ -202,6 +210,10 @@ export async function getUserPermissions(userId: string): Promise<Record<Permiss
         can_view_analytics: false,
         can_access_admin_panel: false,
         can_manage_integrations: false,
+        can_view_revenue: false,
+        can_view_quick_stats: false,
+        can_view_user_list: false,
+        can_view_recent_activity: false,
       };
     }
 
@@ -219,6 +231,10 @@ export async function getUserPermissions(userId: string): Promise<Record<Permiss
       can_view_analytics: permissions.can_view_analytics,
       can_access_admin_panel: permissions.can_access_admin_panel,
       can_manage_integrations: permissions.can_manage_integrations,
+      can_view_revenue: permissions.can_view_revenue ?? false,
+      can_view_quick_stats: permissions.can_view_quick_stats ?? true,
+      can_view_user_list: permissions.can_view_user_list ?? true,
+      can_view_recent_activity: permissions.can_view_recent_activity ?? true,
     };
   } catch (error) {
     console.error('Error getting user permissions:', error);

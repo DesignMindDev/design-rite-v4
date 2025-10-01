@@ -4,6 +4,26 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Download, ChevronDown } from 'lucide-react';
+
+type Permission =
+  | 'can_manage_team'
+  | 'can_manage_blog'
+  | 'can_manage_videos'
+  | 'can_manage_settings'
+  | 'can_create_users'
+  | 'can_edit_users'
+  | 'can_delete_users'
+  | 'can_assign_permissions'
+  | 'can_view_activity'
+  | 'can_export_data'
+  | 'can_view_analytics'
+  | 'can_access_admin_panel'
+  | 'can_manage_integrations'
+  | 'can_view_revenue'
+  | 'can_view_quick_stats'
+  | 'can_view_user_list'
+  | 'can_view_recent_activity';
 
 interface DashboardStats {
   totalUsers: number;
@@ -42,6 +62,8 @@ export default function SuperAdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
   const [recentActivity, setRecentActivity] = useState<ActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showExportDropdown, setShowExportDropdown] = useState(false);
+  const [permissions, setPermissions] = useState<Record<Permission, boolean> | null>(null);
 
   useEffect(() => {
     // Don't do anything while loading
@@ -57,7 +79,7 @@ export default function SuperAdminDashboard() {
 
     // Check role only when authenticated
     if (status === 'authenticated') {
-      const userRole = session?.user?.role;
+      const userRole = (session?.user as any)?.role;
 
       // Redirect if not admin or super_admin
       if (!userRole || (!['super_admin', 'admin'].includes(userRole))) {
@@ -80,6 +102,15 @@ export default function SuperAdminDashboard() {
       setStats(data.stats);
       setUsers(data.users);
       setRecentActivity(data.recentActivity);
+
+      // Fetch user permissions
+      if ((session?.user as any)?.id) {
+        const permResponse = await fetch(`/api/admin/get-permissions?userId=${(session.user as any).id}`);
+        if (permResponse.ok) {
+          const permData = await permResponse.json();
+          setPermissions(permData.permissions);
+        }
+      }
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {
@@ -247,13 +278,83 @@ export default function SuperAdminDashboard() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold">
-              {session?.user?.role === 'super_admin' ? 'Super Admin Dashboard' : 'Admin Dashboard'}
+              {(session?.user as any)?.role === 'super_admin' ? 'Super Admin Dashboard' : 'Admin Dashboard'}
             </h1>
             <p className="text-gray-400">
-              Logged in as: {session?.user?.name} ({session?.user?.role})
+              Logged in as: {session?.user?.name} ({(session?.user as any)?.role})
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-center">
+            {/* Export Dropdown */}
+            {permissions?.can_export_data && (
+              <div className="relative">
+                <button
+                  onClick={() => setShowExportDropdown(!showExportDropdown)}
+                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Export
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+
+                {showExportDropdown && (
+                  <div className="absolute right-0 mt-2 w-64 bg-[#1A1A1A] border border-purple-600/30 rounded-lg shadow-xl z-10">
+                    <button
+                      onClick={() => {
+                        handleExport('users');
+                        setShowExportDropdown(false);
+                      }}
+                      className="w-full text-left px-4 py-3 hover:bg-purple-900/20 transition-colors border-b border-purple-600/10"
+                    >
+                      <div className="font-semibold text-white">Users</div>
+                      <div className="text-xs text-gray-400">All user data (CSV)</div>
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleExport('activity');
+                        setShowExportDropdown(false);
+                      }}
+                      className="w-full text-left px-4 py-3 hover:bg-purple-900/20 transition-colors border-b border-purple-600/10"
+                    >
+                      <div className="font-semibold text-white">Activity Logs</div>
+                      <div className="text-xs text-gray-400">90 days (CSV)</div>
+                    </button>
+                    <button
+                      onClick={() => {
+                        alert('Quote export coming soon!');
+                        setShowExportDropdown(false);
+                      }}
+                      className="w-full text-left px-4 py-3 hover:bg-purple-900/20 transition-colors border-b border-purple-600/10 opacity-50"
+                    >
+                      <div className="font-semibold text-white">Quotes</div>
+                      <div className="text-xs text-gray-400">This month (Coming soon)</div>
+                    </button>
+                    {(session?.user as any)?.role === 'super_admin' && (
+                      <button
+                        onClick={() => {
+                          handleExport('database');
+                          setShowExportDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-purple-900/20 transition-colors"
+                      >
+                        <div className="font-semibold text-white">Database Backup</div>
+                        <div className="text-xs text-gray-400">Full backup (JSON)</div>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {(session?.user as any)?.role === 'super_admin' && (
+              <Link
+                href="/admin/super/permissions"
+                className="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded transition-colors"
+              >
+                Manage Permissions
+              </Link>
+            )}
+
             <Link
               href="/admin"
               className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors"
@@ -277,6 +378,7 @@ export default function SuperAdminDashboard() {
       </div>
 
       {/* Quick Stats */}
+      {permissions?.can_view_quick_stats && (
       <div className="px-8 py-6">
         <h2 className="text-xl font-bold mb-4">Quick Stats</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -320,8 +422,10 @@ export default function SuperAdminDashboard() {
           </Link>
         </div>
       </div>
+      )}
 
       {/* User Management */}
+      {permissions?.can_view_user_list && (
       <div id="user-list" className="px-8 py-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">User Management</h2>
@@ -396,7 +500,7 @@ export default function SuperAdminDashboard() {
                             Reactivate
                           </button>
                         )}
-                        {session?.user?.role === 'super_admin' && (
+                        {(session?.user as any)?.role === 'super_admin' && (
                           <button
                             onClick={() => handleDeleteUser(user.id, user.email)}
                             className="text-red-400 hover:text-red-300 text-sm"
@@ -413,8 +517,10 @@ export default function SuperAdminDashboard() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Recent Activity */}
+      {permissions?.can_view_recent_activity && (
       <div className="px-8 py-6">
         <h2 className="text-xl font-bold mb-4">Recent Activity (Live Feed)</h2>
         <div className="bg-[#1A1A1A] border border-purple-600/30 rounded-lg p-6">
@@ -450,8 +556,10 @@ export default function SuperAdminDashboard() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Data Exports */}
+      {permissions?.can_export_data && (
       <div className="px-8 py-6 pb-12">
         <h2 className="text-xl font-bold mb-4">Data Exports</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -485,6 +593,7 @@ export default function SuperAdminDashboard() {
           </button>
         </div>
       </div>
+      )}
     </div>
   );
 }
