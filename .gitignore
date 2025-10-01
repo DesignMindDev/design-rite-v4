@@ -85,5 +85,9 @@ coverage/
 .nyc_output/
 test-results/
 
+# AI Agent Coordination
+.ai_agents/agent_log.json
+jest_output.txt
+
 # Claude AI Development Settings
 .claude/
