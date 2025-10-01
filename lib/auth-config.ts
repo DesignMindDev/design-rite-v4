@@ -7,6 +7,7 @@ import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compare } from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
+import './init'; // Validate environment variables on startup
 
 // Supabase client with service role key for admin operations
 const supabase = createClient(
