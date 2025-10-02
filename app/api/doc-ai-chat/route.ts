@@ -2,19 +2,26 @@
  * Document AI Chat API Route
  * Migrated from Supabase Edge Function to Next.js API Route
  * Handles AI conversations with document context and OpenAI integration
+ * Auth: Supabase Auth (migrated from Next-Auth 2025-10-02)
  * Original: Designalmostright/supabase/functions/ai-chat
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth-config';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { createClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
 import { incrementUsage, logActivity } from '@/lib/permissions';
 
-// Supabase client with service role key
-const supabase = createClient(
+// Supabase admin client for database operations (bypasses RLS)
+const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
+  process.env.SUPABASE_SERVICE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
 );
 
 interface DocAIChatRequest {
@@ -30,11 +37,14 @@ interface DocAIChatRequest {
 export async function POST(req: NextRequest) {
   try {
     // ============================================
-    // AUTHENTICATION - Next-Auth Session
+    // AUTHENTICATION - Supabase Auth
     // ============================================
-    const session = await getServerSession(authOptions);
+    const supabase = createRouteHandlerClient({ cookies });
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    if (!session?.user?.id) {
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Unauthorized', message: 'Authentication required' },
         { status: 401 }
@@ -61,7 +71,7 @@ export async function POST(req: NextRequest) {
     // ============================================
     // FETCH ADMIN SETTINGS (API Key + Config)
     // ============================================
-    const { data: adminSettings, error: adminError } = await supabase
+    const { data: adminSettings, error: adminError } = await supabaseAdmin
       .from('admin_settings')
       .select('global_prompt, general_assistant_id, ai_model, api_key_encrypted, temperature, max_tokens, max_completion_tokens')
       .limit(1)
@@ -91,7 +101,7 @@ export async function POST(req: NextRequest) {
     // ============================================
     // FETCH USER DOCUMENTS
     // ============================================
-    const { data: userDocs, error: userDocsError } = await supabase
+    const { data: userDocs, error: userDocsError } = await supabaseAdmin
       .from('user_documents')
       .select('filename, file_path, mime_type, extracted_text')
       .eq('user_id', userId);

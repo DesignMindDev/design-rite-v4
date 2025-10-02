@@ -2,19 +2,26 @@
  * Document AI - Generate Document API Route
  * Migrated from Supabase Edge Function to Next.js API Route
  * Generates security assessment reports, invoices, proposals using AI
+ * Auth: Supabase Auth (migrated from Next-Auth 2025-10-02)
  * Original: Designalmostright/supabase/functions/generate-document
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth-config';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { createClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
 import { incrementUsage, logActivity } from '@/lib/permissions';
 
-// Supabase client with service role key
-const supabase = createClient(
+// Supabase admin client for database operations (bypasses RLS)
+const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
+  process.env.SUPABASE_SERVICE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
 );
 
 interface GenerateDocumentRequest {
@@ -27,11 +34,14 @@ interface GenerateDocumentRequest {
 export async function POST(req: NextRequest) {
   try {
     // ============================================
-    // AUTHENTICATION - Next-Auth Session
+    // AUTHENTICATION - Supabase Auth
     // ============================================
-    const session = await getServerSession(authOptions);
+    const supabase = createRouteHandlerClient({ cookies });
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    if (!session?.user?.id) {
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Unauthorized', message: 'Authentication required' },
         { status: 401 }
@@ -59,16 +69,15 @@ export async function POST(req: NextRequest) {
 
     // ============================================
     // FETCH USER PROFILE & BRANDING
-    // Changed from 'profiles' to 'users' + 'user_themes'
     // ============================================
-    const { data: user } = await supabase
-      .from('users')
+    const { data: user } = await supabaseAdmin
+      .from('profiles')
       .select('company, full_name, email')
       .eq('id', userId)
       .single();
 
     // Get user theme for branding (logo, colors)
-    const { data: theme } = await supabase
+    const { data: theme } = await supabaseAdmin
       .from('user_themes')
       .select('logo_url, primary_color, company_tagline')
       .eq('user_id', userId)
@@ -161,7 +170,7 @@ Output only the Markdown content, no additional explanations.`;
       console.log('[Doc AI Generate] Using OpenAI');
 
       // Get AI model from admin_settings
-      const { data: adminSettings } = await supabase
+      const { data: adminSettings } = await supabaseAdmin
         .from('admin_settings')
         .select('ai_model, api_key_encrypted')
         .limit(1)
@@ -236,7 +245,7 @@ Output only the Markdown content, no additional explanations.`;
       insertData.conversation_id = conversation_id;
     }
 
-    const { data: savedDoc, error: saveError } = await supabase
+    const { data: savedDoc, error: saveError } = await supabaseAdmin
       .from('generated_documents')
       .insert(insertData)
       .select()

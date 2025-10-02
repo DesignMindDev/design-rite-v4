@@ -1,20 +1,27 @@
 /**
  * Document AI - Create Stripe Checkout Session
  * Migrated from Supabase Edge Function to Next.js API Route
- * Creates checkout sessions for Pro/Enterprise subscriptions
+ * Creates checkout sessions for Starter/Professional/Enterprise subscriptions
+ * Auth: Supabase Auth (migrated from Next-Auth 2025-10-02)
  * Original: Designalmostright/supabase/functions/create-checkout-session
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth-config';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { createClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
 import Stripe from 'stripe';
 
-// Supabase client with service role key
-const supabase = createClient(
+// Supabase admin client for database operations (bypasses RLS)
+const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
+  process.env.SUPABASE_SERVICE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
 );
 
 // Stripe client
@@ -29,17 +36,20 @@ const getStripe = () => {
 
 interface CheckoutRequest {
   priceId?: string; // Stripe price ID
-  tier?: 'pro' | 'enterprise'; // Or tier name
+  tier?: 'starter' | 'professional' | 'enterprise'; // Tier name
 }
 
 export async function POST(req: NextRequest) {
   try {
     // ============================================
-    // AUTHENTICATION - Next-Auth Session
+    // AUTHENTICATION - Supabase Auth
     // ============================================
-    const session = await getServerSession(authOptions);
+    const supabase = createRouteHandlerClient({ cookies });
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    if (!session?.user?.id || !session?.user?.email) {
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Unauthorized', message: 'Authentication required' },
         { status: 401 }
@@ -47,7 +57,7 @@ export async function POST(req: NextRequest) {
     }
 
     const userId = session.user.id;
-    const userEmail = session.user.email;
+    const userEmail = session.user.email!;
 
     console.log('[Doc AI Checkout] Creating session for user:', userId);
 
@@ -57,18 +67,14 @@ export async function POST(req: NextRequest) {
     const body: CheckoutRequest = await req.json();
     let { priceId, tier } = body;
 
-    // If tier provided instead of priceId, look up priceId from admin_settings
+    // If tier provided instead of priceId, use environment variables
     if (!priceId && tier) {
-      const { data: adminSettings } = await supabase
-        .from('admin_settings')
-        .select('stripe_price_id_pro, stripe_price_id_enterprise')
-        .limit(1)
-        .single();
-
-      if (tier === 'pro') {
-        priceId = adminSettings?.stripe_price_id_pro || process.env.STRIPE_PRICE_PRO;
+      if (tier === 'starter') {
+        priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER;
+      } else if (tier === 'professional') {
+        priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_PROFESSIONAL;
       } else if (tier === 'enterprise') {
-        priceId = adminSettings?.stripe_price_id_enterprise || process.env.STRIPE_PRICE_ENTERPRISE;
+        priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ENTERPRISE;
       }
     }
 
@@ -87,8 +93,8 @@ export async function POST(req: NextRequest) {
     const stripe = getStripe();
 
     // Check if user already has a Stripe customer ID
-    const { data: user } = await supabase
-      .from('users')
+    const { data: user } = await supabaseAdmin
+      .from('profiles')
       .select('stripe_customer_id, full_name')
       .eq('id', userId)
       .single();
@@ -110,9 +116,9 @@ export async function POST(req: NextRequest) {
 
       customerId = customer.id;
 
-      // Save customer ID to users table
-      await supabase
-        .from('users')
+      // Save customer ID to profiles table
+      await supabaseAdmin
+        .from('profiles')
         .update({ stripe_customer_id: customerId })
         .eq('id', userId);
 
@@ -141,7 +147,7 @@ export async function POST(req: NextRequest) {
       },
       subscription_data: {
         metadata: {
-          userId: userId
+          user_id: userId  // Changed to user_id for webhook handler
         }
       }
     });
