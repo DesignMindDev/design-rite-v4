@@ -8,27 +8,44 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
-});
+// Lazy Stripe initialization (only when route is called)
+function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('STRIPE_SECRET_KEY is not configured');
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2024-12-18.acacia',
+  });
+}
 
 // Supabase admin client (bypasses RLS)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
     }
-  }
-);
-
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+  );
+}
 
 export async function POST(req: NextRequest) {
   try {
+    const stripe = getStripe();
+    const supabase = getSupabase();
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+      console.error('[Stripe Webhook] STRIPE_WEBHOOK_SECRET not configured');
+      return NextResponse.json(
+        { error: 'Webhook secret not configured' },
+        { status: 500 }
+      );
+    }
+
     const body = await req.text();
     const signature = req.headers.get('stripe-signature');
 
@@ -57,31 +74,31 @@ export async function POST(req: NextRequest) {
     // Handle the event
     switch (event.type) {
       case 'checkout.session.completed':
-        await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
+        await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session, stripe, supabase);
         break;
 
       case 'customer.subscription.created':
-        await handleSubscriptionCreated(event.data.object as Stripe.Subscription);
+        await handleSubscriptionCreated(event.data.object as Stripe.Subscription, stripe, supabase);
         break;
 
       case 'customer.subscription.updated':
-        await handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
+        await handleSubscriptionUpdated(event.data.object as Stripe.Subscription, stripe, supabase);
         break;
 
       case 'customer.subscription.deleted':
-        await handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
+        await handleSubscriptionDeleted(event.data.object as Stripe.Subscription, stripe, supabase);
         break;
 
       case 'invoice.payment_succeeded':
-        await handlePaymentSucceeded(event.data.object as Stripe.Invoice);
+        await handlePaymentSucceeded(event.data.object as Stripe.Invoice, stripe, supabase);
         break;
 
       case 'invoice.payment_failed':
-        await handlePaymentFailed(event.data.object as Stripe.Invoice);
+        await handlePaymentFailed(event.data.object as Stripe.Invoice, stripe, supabase);
         break;
 
       case 'customer.subscription.trial_will_end':
-        await handleTrialWillEnd(event.data.object as Stripe.Subscription);
+        await handleTrialWillEnd(event.data.object as Stripe.Subscription, stripe, supabase);
         break;
 
       default:
@@ -106,7 +123,11 @@ export async function POST(req: NextRequest) {
  * Handle checkout.session.completed
  * Creates initial subscription record
  */
-async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
+async function handleCheckoutCompleted(
+  session: Stripe.Checkout.Session,
+  stripe: Stripe,
+  supabase: ReturnType<typeof createClient>
+) {
   console.log('[Stripe] Checkout completed:', session.id);
 
   const userId = session.metadata?.user_id;
@@ -167,7 +188,11 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 /**
  * Handle customer.subscription.created
  */
-async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
+async function handleSubscriptionCreated(
+  subscription: Stripe.Subscription,
+  stripe: Stripe,
+  supabase: ReturnType<typeof createClient>
+) {
   console.log('[Stripe] Subscription created:', subscription.id);
   // Usually handled by checkout.session.completed, but keeping for direct subscriptions
 }
@@ -176,7 +201,11 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
  * Handle customer.subscription.updated
  * Handles plan changes, status updates, etc.
  */
-async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
+async function handleSubscriptionUpdated(
+  subscription: Stripe.Subscription,
+  stripe: Stripe,
+  supabase: ReturnType<typeof createClient>
+) {
   console.log('[Stripe] Subscription updated:', subscription.id);
 
   const tier = getTierFromPrice(subscription.items.data[0].price.id);
@@ -242,7 +271,11 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 /**
  * Handle customer.subscription.deleted
  */
-async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
+async function handleSubscriptionDeleted(
+  subscription: Stripe.Subscription,
+  stripe: Stripe,
+  supabase: ReturnType<typeof createClient>
+) {
   console.log('[Stripe] Subscription deleted:', subscription.id);
 
   const { data: currentSub } = await supabase
@@ -282,7 +315,11 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
  * Handle invoice.payment_succeeded
  * Records successful payments
  */
-async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
+async function handlePaymentSucceeded(
+  invoice: Stripe.Invoice,
+  stripe: Stripe,
+  supabase: ReturnType<typeof createClient>
+) {
   console.log('[Stripe] Payment succeeded:', invoice.id);
 
   const { data: sub } = await supabase
@@ -333,7 +370,11 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
  * Handle invoice.payment_failed
  * Records failed payments and updates status
  */
-async function handlePaymentFailed(invoice: Stripe.Invoice) {
+async function handlePaymentFailed(
+  invoice: Stripe.Invoice,
+  stripe: Stripe,
+  supabase: ReturnType<typeof createClient>
+) {
   console.log('[Stripe] Payment failed:', invoice.id);
 
   const { data: sub } = await supabase
@@ -389,7 +430,11 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
  * Handle customer.subscription.trial_will_end
  * 3 days before trial ends
  */
-async function handleTrialWillEnd(subscription: Stripe.Subscription) {
+async function handleTrialWillEnd(
+  subscription: Stripe.Subscription,
+  stripe: Stripe,
+  supabase: ReturnType<typeof createClient>
+) {
   console.log('[Stripe] Trial will end:', subscription.id);
 
   const { data: sub } = await supabase

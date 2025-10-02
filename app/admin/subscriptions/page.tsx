@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { createClientComponentClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import { useSupabaseAuth } from '@/lib/hooks/useSupabaseAuth';
 import {
   Search, Filter, Download, RefreshCw, TrendingUp, TrendingDown,
@@ -71,7 +71,10 @@ interface DashboardMetrics {
 
 export default function AdminSubscriptionsPage() {
   const auth = useSupabaseAuth();
-  const supabase = createClientComponentClient();
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
   // State
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
