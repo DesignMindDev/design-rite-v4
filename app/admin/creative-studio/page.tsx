@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Upload, Image as ImageIcon, MessageSquare, Sparkles, FileText, Eye, Download, Trash2, Tag, Send, Bot, User, Search, Globe, TrendingUp, BookOpen, ExternalLink, MapPin, Satellite, Layers, PenTool, Square, Circle, Type, Move, Ruler, Grid, Save } from 'lucide-react'
-import * as auth from '../../lib/auth'
 
 interface Asset {
   id: string
@@ -273,14 +274,25 @@ Ready to create something amazing? Upload your first asset! 📸✨`,
     return specs[deviceType as keyof typeof specs] || 'Standard Device'
   }
 
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
   useEffect(() => {
     setIsMounted(true)
-    if (auth.isAuthenticated()) {
+
+    // Redirect if not authenticated
+    if (status === 'unauthenticated') {
+      router.push('/admin/login?callbackUrl=/admin/creative-studio')
+      return
+    }
+
+    // Load data when authenticated
+    if (status === 'authenticated') {
       setIsAuthenticated(true)
       loadAssets()
       loadContentDrafts()
     }
-  }, [])
+  }, [status, router])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -368,20 +380,6 @@ Ready to create something amazing? Upload your first asset! 📸✨`,
     })
   }, [drawings, activeLayers])
 
-  const handleLogin = async () => {
-    if (auth.authenticate(password)) {
-      setIsAuthenticated(true)
-      loadAssets()
-      loadContentDrafts()
-    } else {
-      alert('Invalid password')
-    }
-  }
-
-  const handleLogout = () => {
-    setIsAuthenticated(false)
-    auth.logout()
-  }
 
   const loadAssets = async () => {
     try {
