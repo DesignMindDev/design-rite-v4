@@ -1018,36 +1018,10 @@ What type of content would be most valuable for your goals right now? I'm here t
     saveToHistory(newDrawings)
   }
 
-  if (!isMounted) {
+  if (!isMounted || status === 'loading') {
     return <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] flex items-center justify-center">
       <div className="text-white">Loading...</div>
     </div>
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] flex items-center justify-center">
-        <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 max-w-md w-full mx-4">
-          <h1 className="text-3xl font-black text-white mb-6 text-center">Creative Studio Login</h1>
-          <div className="space-y-4">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter admin password"
-              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-600"
-              onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-            />
-            <button
-              onClick={handleLogin}
-              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all"
-            >
-              Login
-            </button>
-          </div>
-        </div>
-      </div>
-    )
   }
 
   return (
