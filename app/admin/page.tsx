@@ -87,7 +87,8 @@ export default function AdminPage() {
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
   const [teamCodes, setTeamCodes] = useState<TeamCode[]>([])
   const [teamActivity, setTeamActivity] = useState<ActivityLog[]>([])
-  const [activeTab, setActiveTab] = useState<'team' | 'logos' | 'videos' | 'blog' | 'team-codes' | 'activity'>('team')
+  const [spatialMetrics, setSpatialMetrics] = useState<any>(null)
+  const [activeTab, setActiveTab] = useState<'team' | 'logos' | 'videos' | 'blog' | 'team-codes' | 'activity' | 'spatial-studio'>('team')
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null)
   const [newMember, setNewMember] = useState<Partial<TeamMember>>({})
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
@@ -135,6 +136,20 @@ export default function AdminPage() {
       loadBlogPosts()
     }
   }, [session, status, router])
+
+  // Load Spatial Studio metrics when tab is active
+  useEffect(() => {
+    if (activeTab === 'spatial-studio') {
+      fetch('/api/spatial-studio/analytics')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setSpatialMetrics(data.metrics)
+          }
+        })
+        .catch(err => console.error('Failed to load Spatial Studio metrics:', err))
+    }
+  }, [activeTab])
 
   const fetchModulePermissions = async () => {
     try {
@@ -536,10 +551,10 @@ export default function AdminPage() {
                     <span>🎨</span>
                     <span>Creative Studio</span>
                   </Link>
-                  <Link href="/admin/spatial-studio-dev" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                  <button onClick={() => setActiveTab('spatial-studio')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
                     <span>🏗️</span>
                     <span>Spatial Studio (Dev)</span>
-                  </Link>
+                  </button>
                   {hasModuleAccess('logo_management') && (
                     <button onClick={() => setActiveTab('logos')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
                       <span>🎨</span>
@@ -1313,6 +1328,70 @@ export default function AdminPage() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Spatial Studio Tab */}
+        {activeTab === 'spatial-studio' && (
+          <div className="space-y-6">
+            {/* Analytics Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="bg-gradient-to-br from-purple-600/20 to-purple-900/20 border border-purple-600/30 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-400 text-sm">Total Projects</span>
+                  <span className="text-2xl">🏗️</span>
+                </div>
+                <div className="text-3xl font-bold text-white">
+                  {spatialMetrics?.totalProjects || 0}
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-green-600/20 to-green-900/20 border border-green-600/30 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-400 text-sm">Success Rate</span>
+                  <span className="text-2xl">✅</span>
+                </div>
+                <div className="text-3xl font-bold text-white">
+                  {spatialMetrics?.successRate || 0}%
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-blue-600/20 to-blue-900/20 border border-blue-600/30 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-400 text-sm">Avg Analysis Time</span>
+                  <span className="text-2xl">⏱️</span>
+                </div>
+                <div className="text-3xl font-bold text-white">
+                  {spatialMetrics?.avgAnalysisTime || 0}s
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-pink-600/20 to-pink-900/20 border border-pink-600/30 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-400 text-sm">Walls Detected</span>
+                  <span className="text-2xl">🧱</span>
+                </div>
+                <div className="text-3xl font-bold text-white">
+                  {spatialMetrics?.totalWalls || 0}
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <span>🏗️</span>
+                Spatial Studio (Development)
+              </h2>
+              <p className="text-gray-400 mb-6">
+                AI-powered 3D floor plan analysis with intelligent camera placement recommendations.
+                Upload PNG/JPG floor plans only (Vision API limitation).
+              </p>
+              <iframe
+                src="/admin/spatial-studio-dev"
+                className="w-full h-[800px] border-0 rounded-lg bg-black"
+                title="Spatial Studio Development"
+              />
+            </div>
           </div>
         )}
       </div>
