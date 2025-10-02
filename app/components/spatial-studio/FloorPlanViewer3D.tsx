@@ -1,8 +1,9 @@
 'use client';
 
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Grid, PerspectiveCamera, Text } from '@react-three/drei';
+import { OrbitControls, Grid, PerspectiveCamera } from '@react-three/drei';
 import { Suspense } from 'react';
+import * as THREE from 'three';
 
 interface Wall {
   start: [number, number];
@@ -46,10 +47,24 @@ export default function FloorPlanViewer3D({
   // Scale down coordinates for better view (floor plans are often in pixels)
   const scale = 0.1;
 
+  // Validate data before rendering
+  if (!floorPlanData || typeof floorPlanData !== 'object') {
+    return (
+      <div className="w-full h-[600px] bg-gray-900 rounded-lg overflow-hidden border border-purple-600/30 flex items-center justify-center">
+        <p className="text-white">No floor plan data available</p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full h-[600px] bg-gray-900 rounded-lg overflow-hidden border border-purple-600/30">
-      <Canvas>
-        <PerspectiveCamera makeDefault position={[30, 30, 30]} />
+      <Canvas
+        gl={{ antialias: true, alpha: false }}
+        camera={{ position: [30, 30, 30], fov: 50 }}
+        onCreated={({ gl }) => {
+          gl.setClearColor('#111827');
+        }}
+      >
         <OrbitControls
           enablePan={true}
           enableZoom={true}
@@ -149,16 +164,11 @@ function Door3D({ door, scale }: { door: Door; scale: number }) {
           color={door.type === 'entry' ? '#92400E' : '#78350F'}
         />
       </mesh>
-      {/* Door label */}
-      <Text
-        position={[0, 3, 0]}
-        fontSize={0.5}
-        color="white"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {door.type === 'entry' ? '🚪 Entry' : '🚪 Door'}
-      </Text>
+      {/* Door indicator - small sphere above door */}
+      <mesh position={[0, 3, 0]}>
+        <sphereGeometry args={[0.3, 16, 16]} />
+        <meshStandardMaterial color="#FCD34D" emissive="#FCD34D" emissiveIntensity={0.5} />
+      </mesh>
     </group>
   );
 }
@@ -179,21 +189,15 @@ function Window3D({ window, scale }: { window: { position: [number, number] }; s
   );
 }
 
-// Room label component
+// Room label component - uses colored sphere marker instead of text
 function RoomLabel({ room, scale }: { room: Room; scale: number }) {
   const [x, y] = room.center.map(v => v * scale);
 
   return (
-    <Text
-      position={[x, 0.1, y]}
-      fontSize={1}
-      color="#9333EA"
-      anchorX="center"
-      anchorY="middle"
-      rotation={[-Math.PI / 2, 0, 0]}
-    >
-      {room.name}
-    </Text>
+    <mesh position={[x, 0.5, y]}>
+      <sphereGeometry args={[0.5, 16, 16]} />
+      <meshStandardMaterial color="#9333EA" emissive="#9333EA" emissiveIntensity={0.3} />
+    </mesh>
   );
 }
 
@@ -223,21 +227,16 @@ function CameraMarker({ camera, scale }: { camera: Camera; scale: number }) {
             color="#EF4444"
             transparent
             opacity={0.1}
-            side={2}
+            side={THREE.DoubleSide}
           />
         </mesh>
       )}
 
-      {/* Camera label */}
-      <Text
-        position={[0, 2, 0]}
-        fontSize={0.6}
-        color="#EF4444"
-        anchorX="center"
-        anchorY="middle"
-      >
-        📹 {camera.type}
-      </Text>
+      {/* Camera indicator sphere */}
+      <mesh position={[0, 2, 0]}>
+        <sphereGeometry args={[0.4, 16, 16]} />
+        <meshStandardMaterial color="#EF4444" emissive="#EF4444" emissiveIntensity={0.8} />
+      </mesh>
     </group>
   );
 }
