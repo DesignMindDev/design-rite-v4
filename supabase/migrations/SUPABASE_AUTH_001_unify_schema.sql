@@ -429,8 +429,9 @@ INSERT INTO permissions (role, feature, can_create, can_read, can_update, can_de
 -- Update profiles RLS to include Design-Rite access patterns
 -- (Existing policies from backup will remain, we add new ones)
 
--- Super admins can manage all profiles
-CREATE POLICY IF NOT EXISTS "Super admins can manage all profiles" ON profiles
+-- Drop and recreate policies (PostgreSQL doesn't support IF NOT EXISTS for policies)
+DROP POLICY IF EXISTS "Super admins can manage all profiles" ON profiles;
+CREATE POLICY "Super admins can manage all profiles" ON profiles
   FOR ALL
   USING (
     EXISTS (
@@ -440,8 +441,8 @@ CREATE POLICY IF NOT EXISTS "Super admins can manage all profiles" ON profiles
     )
   );
 
--- Admins can view profiles they created
-CREATE POLICY IF NOT EXISTS "Admins can view created profiles" ON profiles
+DROP POLICY IF EXISTS "Admins can view created profiles" ON profiles;
+CREATE POLICY "Admins can view created profiles" ON profiles
   FOR SELECT
   USING (
     EXISTS (
@@ -459,10 +460,12 @@ ALTER TABLE usage_tracking ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_sessions ENABLE ROW LEVEL SECURITY;
 
 -- Activity logs: Users can view their own, admins can view all
+DROP POLICY IF EXISTS "Users can view own activity" ON activity_logs;
 CREATE POLICY "Users can view own activity" ON activity_logs
   FOR SELECT
   USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Admins can view all activity" ON activity_logs;
 CREATE POLICY "Admins can view all activity" ON activity_logs
   FOR SELECT
   USING (
@@ -474,10 +477,12 @@ CREATE POLICY "Admins can view all activity" ON activity_logs
   );
 
 -- Permissions: Everyone can read, only admins can modify
+DROP POLICY IF EXISTS "Everyone can read permissions" ON permissions;
 CREATE POLICY "Everyone can read permissions" ON permissions
   FOR SELECT
   USING (true);
 
+DROP POLICY IF EXISTS "Admins can manage permissions" ON permissions;
 CREATE POLICY "Admins can manage permissions" ON permissions
   FOR ALL
   USING (
@@ -489,19 +494,23 @@ CREATE POLICY "Admins can manage permissions" ON permissions
   );
 
 -- Usage tracking: Users can view own, system can modify
+DROP POLICY IF EXISTS "Users can view own usage" ON usage_tracking;
 CREATE POLICY "Users can view own usage" ON usage_tracking
   FOR SELECT
   USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "System can manage usage" ON usage_tracking;
 CREATE POLICY "System can manage usage" ON usage_tracking
   FOR ALL
   USING (true); -- Backend will manage this
 
 -- User sessions: Users can view own sessions
+DROP POLICY IF EXISTS "Users can view own sessions" ON user_sessions;
 CREATE POLICY "Users can view own sessions" ON user_sessions
   FOR SELECT
   USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "System can manage sessions" ON user_sessions;
 CREATE POLICY "System can manage sessions" ON user_sessions
   FOR ALL
   USING (true);
