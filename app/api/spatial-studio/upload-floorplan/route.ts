@@ -163,8 +163,14 @@ async function uploadWithRetry(
  * Trigger background analysis worker (fire and forget)
  */
 function triggerAsyncAnalysis(projectId: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3010';
+  // Determine the correct base URL for production
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL
+    || process.env.RENDER_EXTERNAL_URL
+    || 'https://www.design-rite.com';
+
   const analysisUrl = `${baseUrl}/api/spatial-studio/process-analysis`;
+
+  console.log(`Triggering async analysis for project ${projectId} at ${analysisUrl}`);
 
   fetch(analysisUrl, {
     method: 'POST',
@@ -172,9 +178,8 @@ function triggerAsyncAnalysis(projectId: string) {
     body: JSON.stringify({ projectId }),
   }).catch(err => {
     console.error('Failed to trigger async analysis:', err);
+    console.error('Analysis URL was:', analysisUrl);
   });
-
-  console.log(`Triggered async analysis for project ${projectId}`);
 }
 
 /**
