@@ -548,10 +548,6 @@ export default function AdminPage() {
                     <span>🎨</span>
                     <span>Creative Studio</span>
                   </Link>
-                  <Link href="/admin/spatial-studio-dev" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
-                    <span>🏗️</span>
-                    <span>Spatial Studio (Dev)</span>
-                  </Link>
                   {hasModuleAccess('logo_management') && (
                     <button onClick={() => setActiveTab('logos')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
                       <span>🖼️</span>
@@ -1341,7 +1337,7 @@ export default function AdminPage() {
             </h2>
 
             {/* Quick Links to Dashboards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <Link href="/admin/demo-dashboard" className="bg-gradient-to-br from-purple-600/20 to-purple-900/20 border border-purple-600/30 rounded-xl p-6 hover:border-purple-500/50 transition-all group">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xl font-bold text-white">Demo Dashboard</span>
@@ -1364,6 +1360,14 @@ export default function AdminPage() {
                   <span className="text-3xl group-hover:scale-110 transition-transform">🗺️</span>
                 </div>
                 <p className="text-gray-400 text-sm">User flow analysis, session tracking & behavior insights</p>
+              </Link>
+
+              <Link href="/admin/spatial-studio-dev" className="bg-gradient-to-br from-pink-600/20 to-pink-900/20 border border-pink-600/30 rounded-xl p-6 hover:border-pink-500/50 transition-all group">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xl font-bold text-white">Spatial Studio</span>
+                  <span className="text-3xl group-hover:scale-110 transition-transform">🏗️</span>
+                </div>
+                <p className="text-gray-400 text-sm">3D floor plan analysis & AI camera placement tool</p>
               </Link>
             </div>
 
