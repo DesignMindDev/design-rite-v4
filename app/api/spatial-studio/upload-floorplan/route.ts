@@ -12,6 +12,23 @@ const supabase = createClient(
  */
 export async function POST(request: NextRequest) {
   try {
+    // Verify environment variables
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      console.error('NEXT_PUBLIC_SUPABASE_URL is not set');
+      return NextResponse.json(
+        { error: 'Configuration error', details: 'Supabase URL not configured' },
+        { status: 503 }
+      );
+    }
+
+    if (!process.env.SUPABASE_SERVICE_KEY && !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      console.error('No Supabase key configured');
+      return NextResponse.json(
+        { error: 'Configuration error', details: 'Supabase authentication not configured' },
+        { status: 503 }
+      );
+    }
+
     const formData = await request.formData();
     const file = formData.get('floorplan') as File;
     const projectName = formData.get('projectName') as string;
@@ -85,10 +102,13 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Floor plan upload error:', error);
+    console.error('Error type:', typeof error);
+    console.error('Error details:', JSON.stringify(error, null, 2));
+
     return NextResponse.json(
       {
         error: 'Failed to process floor plan',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error))
       },
       { status: 500 }
     );
