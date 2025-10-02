@@ -1,5 +1,11 @@
 # Design-Rite v3 - Security Estimation System
 
+## 🗺️ Strategic Roadmap
+
+**[Spatial Studio Roadmap & Vision](./SPATIAL_STUDIO_ROADMAP.md)** - Complete product roadmap for Spatial Studio / Integrator Plus+ platform, including phasing strategy, technical architecture, and investment timeline.
+
+---
+
 ## Recent Implementation Success ✅
 
 ### Admin Authentication System - Phase 1 (Completed 2025-10-01)
