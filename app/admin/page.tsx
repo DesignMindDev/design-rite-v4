@@ -464,74 +464,62 @@ export default function AdminPage() {
               Analytics
             </button>
 
-            {/* AI Management Dropdown */}
+            {/* AI Tools Dropdown */}
             {hasModuleAccess('ai_management') && (
               <div className="relative group">
               <button className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-600/30 transition-all flex items-center gap-2">
                 <span>🤖</span>
-                AI Management
+                AI Tools
                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
               <div className="absolute right-0 mt-2 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 <div className="py-2">
-                  <Link href="/admin/ai-analytics" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-purple-600/20 transition-colors">
-                    <span>📊</span>
-                    <span>AI Sessions Analytics</span>
-                  </Link>
                   <Link href="/admin/ai-providers" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-purple-600/20 transition-colors">
                     <span>🧠</span>
                     <span>AI Providers</span>
                   </Link>
                   <Link href="/admin/ai-assistant" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-purple-600/20 transition-colors">
                     <span>✨</span>
-                    <span>AI Assistant</span>
+                    <span>AI Assistant Config</span>
                   </Link>
                   <Link href="/admin/chatbot" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-purple-600/20 transition-colors">
-                    <span>🤖</span>
-                    <span>Chatbot Analytics</span>
-                  </Link>
-                  <Link href="/admin/creative-studio" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-purple-600/20 transition-colors">
-                    <span>🎨</span>
-                    <span>Creative Studio</span>
+                    <span>💬</span>
+                    <span>Chatbot Config</span>
                   </Link>
                 </div>
               </div>
               </div>
             )}
 
-            {/* Data & Harvesting Dropdown */}
+            {/* Data Tools Dropdown */}
             {hasModuleAccess('data_harvesting') && (
               <div className="relative group">
-              <button className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-600/30 transition-all flex items-center gap-2">
+              <button className="bg-gradient-to-r from-cyan-600 to-cyan-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-600/30 transition-all flex items-center gap-2">
                 <span>🗄️</span>
-                Data & Harvesting
+                Data Tools
                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
               <div className="absolute right-0 mt-2 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 <div className="py-2">
-                  <Link href="/admin/harvester" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-blue-600/20 transition-colors">
-                    <span>🗄️</span>
+                  <Link href="/admin/harvester" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-cyan-600/20 transition-colors">
+                    <span>🔍</span>
                     <span>Product Harvester</span>
-                  </Link>
-                  <Link href="/admin/assessments" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-blue-600/20 transition-colors">
-                    <span>📊</span>
-                    <span>Assessment Logs</span>
                   </Link>
                 </div>
               </div>
               </div>
             )}
 
-            {/* Marketing & Content Dropdown */}
+            {/* Content Tools Dropdown */}
             {hasModuleAccess('marketing_content') && (
               <div className="relative group">
               <button className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-green-600/30 transition-all flex items-center gap-2">
-                <span>🎨</span>
-                Marketing & Content
+                <span>✍️</span>
+                Content Tools
                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -547,6 +535,10 @@ export default function AdminPage() {
                   <Link href="/admin/creative-studio" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
                     <span>🎨</span>
                     <span>Creative Studio</span>
+                  </Link>
+                  <Link href="/admin/spatial-studio-dev" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                    <span>🏗️</span>
+                    <span>Spatial Studio</span>
                   </Link>
                   {hasModuleAccess('logo_management') && (
                     <button onClick={() => setActiveTab('logos')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
@@ -1337,13 +1329,13 @@ export default function AdminPage() {
             </h2>
 
             {/* Quick Links to Dashboards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
               <Link href="/admin/demo-dashboard" className="bg-gradient-to-br from-purple-600/20 to-purple-900/20 border border-purple-600/30 rounded-xl p-6 hover:border-purple-500/50 transition-all group">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xl font-bold text-white">Demo Dashboard</span>
                   <span className="text-3xl group-hover:scale-110 transition-transform">📅</span>
                 </div>
-                <p className="text-gray-400 text-sm">Calendly bookings, lead scoring & conversion tracking</p>
+                <p className="text-gray-400 text-sm">Calendly demo bookings & lead scoring</p>
               </Link>
 
               <Link href="/admin/leads-dashboard" className="bg-gradient-to-br from-green-600/20 to-green-900/20 border border-green-600/30 rounded-xl p-6 hover:border-green-500/50 transition-all group">
@@ -1351,7 +1343,7 @@ export default function AdminPage() {
                   <span className="text-xl font-bold text-white">Leads Dashboard</span>
                   <span className="text-3xl group-hover:scale-110 transition-transform">🎯</span>
                 </div>
-                <p className="text-gray-400 text-sm">Lead pipeline, contact tracking & engagement metrics</p>
+                <p className="text-gray-400 text-sm">Lead pipeline & engagement</p>
               </Link>
 
               <Link href="/admin/user-journey" className="bg-gradient-to-br from-blue-600/20 to-blue-900/20 border border-blue-600/30 rounded-xl p-6 hover:border-blue-500/50 transition-all group">
@@ -1359,7 +1351,7 @@ export default function AdminPage() {
                   <span className="text-xl font-bold text-white">User Journey</span>
                   <span className="text-3xl group-hover:scale-110 transition-transform">🗺️</span>
                 </div>
-                <p className="text-gray-400 text-sm">User flow analysis, session tracking & behavior insights</p>
+                <p className="text-gray-400 text-sm">User flow & behavior insights</p>
               </Link>
 
               <Link href="/admin/spatial-studio-dev" className="bg-gradient-to-br from-pink-600/20 to-pink-900/20 border border-pink-600/30 rounded-xl p-6 hover:border-pink-500/50 transition-all group">
@@ -1367,7 +1359,39 @@ export default function AdminPage() {
                   <span className="text-xl font-bold text-white">Spatial Studio</span>
                   <span className="text-3xl group-hover:scale-110 transition-transform">🏗️</span>
                 </div>
-                <p className="text-gray-400 text-sm">3D floor plan analysis & AI camera placement tool</p>
+                <p className="text-gray-400 text-sm">3D floor plan AI analysis</p>
+              </Link>
+
+              <Link href="/admin/ai-analytics" className="bg-gradient-to-br from-indigo-600/20 to-indigo-900/20 border border-indigo-600/30 rounded-xl p-6 hover:border-indigo-500/50 transition-all group">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xl font-bold text-white">AI Analytics</span>
+                  <span className="text-3xl group-hover:scale-110 transition-transform">🤖</span>
+                </div>
+                <p className="text-gray-400 text-sm">AI session & usage metrics</p>
+              </Link>
+
+              <Link href="/admin/user-activity" className="bg-gradient-to-br from-orange-600/20 to-orange-900/20 border border-orange-600/30 rounded-xl p-6 hover:border-orange-500/50 transition-all group">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xl font-bold text-white">User Activity</span>
+                  <span className="text-3xl group-hover:scale-110 transition-transform">👤</span>
+                </div>
+                <p className="text-gray-400 text-sm">User actions & events log</p>
+              </Link>
+
+              <Link href="/admin/assessments" className="bg-gradient-to-br from-teal-600/20 to-teal-900/20 border border-teal-600/30 rounded-xl p-6 hover:border-teal-500/50 transition-all group">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xl font-bold text-white">Assessments</span>
+                  <span className="text-3xl group-hover:scale-110 transition-transform">📋</span>
+                </div>
+                <p className="text-gray-400 text-sm">AI assessment logs</p>
+              </Link>
+
+              <Link href="/admin/session-debug" className="bg-gradient-to-br from-red-600/20 to-red-900/20 border border-red-600/30 rounded-xl p-6 hover:border-red-500/50 transition-all group">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xl font-bold text-white">Session Debug</span>
+                  <span className="text-3xl group-hover:scale-110 transition-transform">🐛</span>
+                </div>
+                <p className="text-gray-400 text-sm">Session debugging tools</p>
               </Link>
             </div>
 
