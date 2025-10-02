@@ -43,8 +43,10 @@ export default function SpatialStudioPage() {
 
       if (data.success) {
         console.log('Upload successful:', data);
-        setFloorPlanData(data.model);
         setProjectId(data.projectId);
+
+        // Start polling for analysis completion
+        pollForAnalysis(data.projectId);
       } else {
         console.error('Upload failed:', data);
         setError(data.error || 'Upload failed');
@@ -57,6 +59,46 @@ export default function SpatialStudioPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Poll for analysis completion
+  const pollForAnalysis = async (id: string) => {
+    const maxAttempts = 30; // 30 seconds max
+    let attempts = 0;
+
+    const poll = async () => {
+      if (attempts >= maxAttempts) {
+        setError('Analysis timeout - please refresh to check status');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/spatial-studio/upload-floorplan?projectId=${id}`);
+        const data = await response.json();
+
+        console.log('Poll status:', data.status);
+
+        if (data.status === 'completed') {
+          console.log('Analysis complete!', data);
+          setFloorPlanData(data.model);
+          return;
+        }
+
+        if (data.status === 'failed') {
+          setError(data.error || 'Analysis failed');
+          return;
+        }
+
+        // Still processing, poll again
+        attempts++;
+        setTimeout(poll, 1000);
+      } catch (error) {
+        console.error('Polling error:', error);
+        setError('Failed to check analysis status');
+      }
+    };
+
+    poll();
   };
 
   const handleAnalyzeSite = async () => {
