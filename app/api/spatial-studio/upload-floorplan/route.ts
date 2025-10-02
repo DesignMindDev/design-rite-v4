@@ -50,11 +50,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file type
-    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+    // Validate file type (Vision API only supports images)
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
-        { error: 'Invalid file type', details: 'Only PDF, PNG, and JPG files are supported' },
+        { error: 'Invalid file type', details: 'Only PNG and JPG image files are supported. Please convert PDFs to images first.' },
         { status: 400 }
       );
     }
