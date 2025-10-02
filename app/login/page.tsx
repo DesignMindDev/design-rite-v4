@@ -1,169 +1,220 @@
-"use client"
+'use client';
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
-export default function LoginPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const router = useRouter()
+function LoginForm() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl');
+  const supabase = createClientComponentClient();
 
-  const handleTryPlatformClick = (e: React.MouseEvent) => {
+  // Check if already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        // Get user role to determine redirect
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .single();
+
+        const role = roleData?.role || 'user';
+
+        // Redirect based on role or callback URL
+        if (callbackUrl) {
+          router.push(callbackUrl);
+        } else if (role === 'super_admin' || role === 'admin' || role === 'manager') {
+          router.push('/admin');
+        } else {
+          router.push('/doc-ai/chat');
+        }
+      }
+    };
+    checkSession();
+  }, [supabase, router, callbackUrl]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    window.location.href = '/platform-access';
+    setError('');
+    setLoading(true);
+
+    try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.toLowerCase(),
+        password,
+      });
+
+      if (signInError) {
+        setError(signInError.message);
+        setLoading(false);
+        return;
+      }
+
+      if (!data.session) {
+        setError('Login failed. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      // Get user role to determine redirect
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .single();
+
+      const role = roleData?.role || 'user';
+
+      // Redirect based on role or callback URL
+      if (callbackUrl) {
+        router.push(callbackUrl);
+      } else if (role === 'super_admin' || role === 'admin' || role === 'manager') {
+        router.push('/admin');
+      } else {
+        router.push('/doc-ai/chat');
+      }
+
+      router.refresh();
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('An unexpected error occurred. Please try again.');
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
-      {/* Header */}
-      <header className="bg-black/10 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 py-5">
-        <nav className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-3 text-white font-bold text-2xl">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-black text-sm">
-              DR
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0A0A0A] to-purple-900/20">
+      <div className="bg-[#1A1A1A] p-8 rounded-lg shadow-xl border border-purple-600/30 w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-black text-xl mx-auto mb-4">
+            DR
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-2">Design-Rite v3</h1>
+          <p className="text-gray-400">Sign In to Continue</p>
+        </div>
+
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-3 rounded">
+              {error}
             </div>
-            Design-Rite
-          </Link>
+          )}
 
-          {/* Desktop Navigation */}
-          <ul className="hidden lg:flex items-center gap-8">
-            <li><Link href="/integrators" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Security Integrators</Link></li>
-            <li><Link href="/enterprise" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Enterprise</Link></li>
-            <li><Link href="/education" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Education</Link></li>
-            <li><Link href="/solutions" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Solutions</Link></li>
-            <li><Link href="/contact" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Contact</Link></li>
-          </ul>
-
-          <div className="hidden lg:flex items-center gap-3">
-            <Link href="/subscribe" className="text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
-              Join Waitlist
-            </Link>
-            <button
-              onClick={handleTryPlatformClick}
-              className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
-            >
-              Try Platform
-            </button>
+          {/* Email Field */}
+          <div>
+            <label htmlFor="email" className="block text-gray-300 mb-2 font-medium">
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-[#0A0A0A] border border-purple-600/30 rounded px-4 py-3 text-white focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+              placeholder="you@company.com"
+              required
+              disabled={loading}
+              autoComplete="email"
+            />
           </div>
 
-          {/* Mobile Menu Button */}
-          <button 
-            className="lg:hidden text-white text-2xl"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          {/* Password Field */}
+          <div>
+            <label htmlFor="password" className="block text-gray-300 mb-2 font-medium">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-[#0A0A0A] border border-purple-600/30 rounded px-4 py-3 text-white focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+              placeholder="Enter your password"
+              required
+              disabled={loading}
+              autoComplete="current-password"
+            />
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            ☰
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Signing In...
+              </span>
+            ) : (
+              'Sign In'
+            )}
           </button>
-        </nav>
+        </form>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
-            <div className="px-6 py-4 space-y-4">
-              <Link href="/integrators" className="block text-white/80 hover:text-white transition-colors py-2">Security Integrators</Link>
-              <Link href="/enterprise" className="block text-white/80 hover:text-white transition-colors py-2">Enterprise</Link>
-              <Link href="/education" className="block text-white/80 hover:text-white transition-colors py-2">Education</Link>
-              <Link href="/solutions" className="block text-white/80 hover:text-white transition-colors py-2">Solutions</Link>
-              <Link href="/contact" className="block text-white/80 hover:text-white transition-colors py-2">Contact</Link>
-              <div className="pt-4 border-t border-white/10 space-y-3">
-                <Link href="/subscribe" className="block text-center text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
-                  Join Waitlist
-                </Link>
-                <button
-                  onClick={handleTryPlatformClick}
-                  className="block w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
-                >
-                  Try Platform
-                </button>
-              </div>
-            </div>
+        {/* Footer Links */}
+        <div className="mt-6 text-center space-y-3">
+          <div className="text-gray-400 text-sm">
+            <a href="mailto:support@designrite.com" className="text-purple-400 hover:text-purple-300 transition-colors">
+              Forgot password or need access?
+            </a>
           </div>
-        )}
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center min-h-[80vh]">
-        <div className="max-w-md w-full mx-auto px-8">
-          <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-purple-700 rounded-full flex items-center justify-center text-white font-black text-2xl mx-auto mb-6">
-              DR
-            </div>
-            <h1 className="text-3xl font-bold mb-4">Authentication Coming Soon</h1>
-            <p className="text-white/80 text-lg">
-              Full authentication and user accounts will be available with our Q4 2025 platform launch.
-            </p>
-          </div>
-
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 text-center mb-8">
-            <div className="text-4xl mb-4">🚀</div>
-            <h3 className="text-xl font-bold mb-4">Early Access Available</h3>
-            <p className="text-white/80 mb-6">
-              Join our waitlist to be notified when the full platform launches with secure user authentication, saved assessments, and subscription management.
-            </p>
-            <Link 
-              href="/subscribe"
-              className="inline-block bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all transform hover:scale-[1.02]"
+          <div className="pt-4 border-t border-purple-600/20">
+            <Link
+              href="/"
+              className="text-gray-400 hover:text-white transition-colors text-sm flex items-center justify-center gap-2"
             >
-              Join Waitlist
-            </Link>
-          </div>
-
-          <div className="space-y-4">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
-                <span className="text-lg">🎯</span>
-                Try Platform Demo
-              </h4>
-              <p className="text-white/70 text-sm mb-4">Experience our AI security assessment without signing up.</p>
-              <button
-                onClick={handleTryPlatformClick}
-                className="w-full bg-white/10 text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/20 transition-all"
-              >
-                Try Demo Now
-              </button>
-            </div>
-
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
-                <span className="text-lg">📹</span>
-                Watch Demo Video
-              </h4>
-              <p className="text-white/70 text-sm mb-4">See how Design-Rite transforms security system design.</p>
-              <button 
-                onClick={() => router.push('/watch-demo')}
-                className="w-full bg-white/10 text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/20 transition-all"
-              >
-                Watch Demo
-              </button>
-            </div>
-          </div>
-
-          <div className="text-center mt-8">
-            <Link href="/" className="text-white/60 hover:text-white transition-colors">
-              ← Return to Home
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Return to Platform
             </Link>
           </div>
         </div>
-      </main>
 
-      {/* Footer */}
-      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
-        <div className="max-w-6xl mx-auto px-8 py-12">
-          <div className="text-center">
-            <Link href="/" className="flex items-center gap-3 text-white font-bold text-xl justify-center mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-black text-xs">
-                DR
-              </div>
-              Design-Rite
-            </Link>
-            <p className="text-white/60">
-              © 2025 Design-Rite™. All rights reserved. | Revolutionary AI-Powered Security Solutions
-            </p>
+        {/* Security Notice */}
+        <div className="mt-6 bg-purple-900/20 border border-purple-600/30 rounded p-3">
+          <div className="flex items-start gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <div>
+              <p className="text-xs text-gray-400">
+                <strong className="text-purple-400">Unified Platform Access</strong><br />
+                One login for Admin Panel and Document AI. Redirects based on your role.
+              </p>
+            </div>
           </div>
         </div>
-      </footer>
-
+      </div>
     </div>
-  )
+  );
 }
 
-
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0A0A0A] to-purple-900/20">
+        <div className="text-white">Loading...</div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
+  );
+}

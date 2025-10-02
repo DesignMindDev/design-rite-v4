@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { requireRole, logAdminAction } from '@/lib/supabase-admin-auth';
 
 // Lazy initialization to avoid build-time errors
 function getStripe() {
@@ -31,6 +32,10 @@ function getSupabase() {
 }
 
 export async function POST(req: NextRequest) {
+  // Check admin authentication
+  const admin = await requireRole(['super_admin', 'admin']);
+  if (admin instanceof NextResponse) return admin; // Return error if not authorized
+
   try {
     const stripe = getStripe();
     const supabase = getSupabase();
@@ -90,6 +95,17 @@ export async function POST(req: NextRequest) {
         reason: reason || 'Admin cancellation',
         is_automatic: false,
       });
+
+    // Log admin action
+    await logAdminAction({
+      userId: admin.id,
+      action: 'subscription_cancelled',
+      details: {
+        subscription_id,
+        customer_id: sub.user_id,
+        reason: reason || 'Admin cancellation',
+      },
+    });
 
     return NextResponse.json({
       success: true,

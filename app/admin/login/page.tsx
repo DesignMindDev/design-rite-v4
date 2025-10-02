@@ -1,9 +1,9 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -13,6 +13,18 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/admin/super';
+  const supabase = createClientComponentClient();
+
+  // Check if already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.push(callbackUrl);
+      }
+    };
+    checkSession();
+  }, [supabase, router, callbackUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,16 +32,15 @@ function LoginForm() {
     setLoading(true);
 
     try {
-      const result = await signIn('credentials', {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.toLowerCase(),
         password,
-        redirect: false,
       });
 
-      if (result?.error) {
-        setError(result.error);
+      if (signInError) {
+        setError(signInError.message);
         setLoading(false);
-      } else if (result?.ok) {
+      } else if (data.session) {
         // Successful login - redirect to callback URL
         router.push(callbackUrl);
         router.refresh();

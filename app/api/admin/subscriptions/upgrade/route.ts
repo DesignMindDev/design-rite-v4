@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { requireRole, logAdminAction } from '@/lib/supabase-admin-auth';
 
 // Lazy initialization to avoid build-time errors
 function getStripe() {
@@ -42,6 +43,10 @@ function getPriceIdForTier(tier: string): string {
 }
 
 export async function POST(req: NextRequest) {
+  // Check admin authentication
+  const admin = await requireRole(['super_admin', 'admin']);
+  if (admin instanceof NextResponse) return admin; // Return error if not authorized
+
   try {
     const stripe = getStripe();
     const supabase = getSupabase();
@@ -124,6 +129,18 @@ export async function POST(req: NextRequest) {
         reason: 'Admin manual change',
         is_automatic: false,
       });
+
+    // Log admin action
+    await logAdminAction({
+      userId: admin.id,
+      action: `subscription_${action}`,
+      details: {
+        subscription_id,
+        customer_id: sub.user_id,
+        old_tier: sub.tier,
+        new_tier,
+      },
+    });
 
     return NextResponse.json({
       success: true,
