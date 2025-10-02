@@ -1,13 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import dynamic from 'next/dynamic';
-
-// Dynamic import with no SSR to avoid Three.js SSR issues
-const FloorPlanViewer3D = dynamic(
-  () => import('@/components/spatial-studio/FloorPlanViewer3D'),
-  { ssr: false }
-);
+import FloorPlanViewer3DWrapper from '@/components/spatial-studio/FloorPlanViewer3DWrapper';
 
 export default function SpatialStudioPage() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -305,7 +299,7 @@ export default function SpatialStudioPage() {
               </div>
             )}
 
-            <FloorPlanViewer3D floorPlanData={floorPlanData} showCameras={showCameras} />
+            <FloorPlanViewer3DWrapper floorPlanData={floorPlanData} showCameras={showCameras} />
 
             <div className="mt-4 bg-gray-800 rounded-lg p-4">
               <p className="text-sm font-semibold text-gray-300 mb-2">💡 3D Viewer Controls:</p>

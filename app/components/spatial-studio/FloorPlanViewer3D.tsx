@@ -1,7 +1,7 @@
 'use client';
 
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Grid, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { Suspense } from 'react';
 import * as THREE from 'three';
 
@@ -59,33 +59,25 @@ export default function FloorPlanViewer3D({
   return (
     <div className="w-full h-[600px] bg-gray-900 rounded-lg overflow-hidden border border-purple-600/30">
       <Canvas
-        gl={{ antialias: true, alpha: false }}
         camera={{ position: [30, 30, 30], fov: 50 }}
-        onCreated={({ gl }) => {
-          gl.setClearColor('#111827');
-        }}
       >
+        {/* Lighting */}
+        <ambientLight intensity={0.6} />
+        <directionalLight position={[10, 10, 5]} intensity={0.8} />
+        <directionalLight position={[-10, -10, -5]} intensity={0.3} />
+
+        {/* Simple floor plane instead of Grid */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
+          <planeGeometry args={[100, 100]} />
+          <meshStandardMaterial color="#1F2937" />
+        </mesh>
+
         <OrbitControls
           enablePan={true}
           enableZoom={true}
           enableRotate={true}
           minDistance={10}
           maxDistance={100}
-        />
-
-        {/* Lighting */}
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[10, 10, 5]} intensity={1} />
-        <pointLight position={[-10, 10, -10]} intensity={0.5} />
-
-        {/* Floor grid */}
-        <Grid
-          args={[100, 100]}
-          cellSize={1}
-          cellColor="#6B7280"
-          sectionColor="#9333EA"
-          fadeDistance={50}
-          fadeStrength={1}
         />
 
         <Suspense fallback={null}>
