@@ -530,7 +530,7 @@ export default function AdminPage() {
             {hasModuleAccess('marketing_content') && (
               <div className="relative group">
               <button className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-green-600/30 transition-all flex items-center gap-2">
-                <span>📈</span>
+                <span>🎨</span>
                 Marketing & Content
                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -538,18 +538,6 @@ export default function AdminPage() {
               </button>
               <div className="absolute right-0 mt-2 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 <div className="py-2">
-                  <Link href="/admin/demo-dashboard" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
-                    <span>📅</span>
-                    <span>Demo Dashboard</span>
-                  </Link>
-                  <Link href="/admin/leads-dashboard" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
-                    <span>🎯</span>
-                    <span>Leads Dashboard</span>
-                  </Link>
-                  <Link href="/admin/user-journey" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
-                    <span>🗺️</span>
-                    <span>User Journey</span>
-                  </Link>
                   {hasModuleAccess('team_management') && (
                     <button onClick={() => setActiveTab('team')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
                       <span>👥</span>
@@ -566,7 +554,7 @@ export default function AdminPage() {
                   </Link>
                   {hasModuleAccess('logo_management') && (
                     <button onClick={() => setActiveTab('logos')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
-                      <span>🎨</span>
+                      <span>🖼️</span>
                       <span>Logo Management</span>
                     </button>
                   )}
@@ -576,6 +564,10 @@ export default function AdminPage() {
                       <span>Video Management</span>
                     </button>
                   )}
+                  <button onClick={() => setActiveTab('blog')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                    <span>📝</span>
+                    <span>Blog Posts</span>
+                  </button>
                 </div>
               </div>
               </div>
@@ -1348,6 +1340,33 @@ export default function AdminPage() {
               Platform Analytics
             </h2>
 
+            {/* Quick Links to Dashboards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <Link href="/admin/demo-dashboard" className="bg-gradient-to-br from-purple-600/20 to-purple-900/20 border border-purple-600/30 rounded-xl p-6 hover:border-purple-500/50 transition-all group">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xl font-bold text-white">Demo Dashboard</span>
+                  <span className="text-3xl group-hover:scale-110 transition-transform">📅</span>
+                </div>
+                <p className="text-gray-400 text-sm">Calendly bookings, lead scoring & conversion tracking</p>
+              </Link>
+
+              <Link href="/admin/leads-dashboard" className="bg-gradient-to-br from-green-600/20 to-green-900/20 border border-green-600/30 rounded-xl p-6 hover:border-green-500/50 transition-all group">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xl font-bold text-white">Leads Dashboard</span>
+                  <span className="text-3xl group-hover:scale-110 transition-transform">🎯</span>
+                </div>
+                <p className="text-gray-400 text-sm">Lead pipeline, contact tracking & engagement metrics</p>
+              </Link>
+
+              <Link href="/admin/user-journey" className="bg-gradient-to-br from-blue-600/20 to-blue-900/20 border border-blue-600/30 rounded-xl p-6 hover:border-blue-500/50 transition-all group">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xl font-bold text-white">User Journey</span>
+                  <span className="text-3xl group-hover:scale-110 transition-transform">🗺️</span>
+                </div>
+                <p className="text-gray-400 text-sm">User flow analysis, session tracking & behavior insights</p>
+              </Link>
+            </div>
+
             {/* Spatial Studio Analytics */}
             <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
               <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
@@ -1395,14 +1414,6 @@ export default function AdminPage() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Placeholder for more analytics sections */}
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-blue-600/20 rounded-2xl p-6">
-              <h3 className="text-2xl font-bold mb-4">More Analytics Coming Soon</h3>
-              <p className="text-gray-400">
-                Additional platform metrics and analytics dashboards will be added here.
-              </p>
             </div>
           </div>
         )}
