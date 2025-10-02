@@ -80,7 +80,12 @@ export default function SpatialStudioPage() {
 
         if (data.status === 'completed') {
           console.log('Analysis complete!', data);
-          setFloorPlanData(data.model);
+          console.log('3D Model data:', data.model);
+          if (data.model) {
+            setFloorPlanData(data.model);
+          } else {
+            console.warn('No model data in response');
+          }
           return;
         }
 

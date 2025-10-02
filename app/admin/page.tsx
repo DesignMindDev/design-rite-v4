@@ -536,6 +536,10 @@ export default function AdminPage() {
                     <span>🎨</span>
                     <span>Creative Studio</span>
                   </Link>
+                  <Link href="/admin/spatial-studio-dev" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                    <span>🏗️</span>
+                    <span>Spatial Studio (Dev)</span>
+                  </Link>
                   {hasModuleAccess('logo_management') && (
                     <button onClick={() => setActiveTab('logos')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
                       <span>🎨</span>
