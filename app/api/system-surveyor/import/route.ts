@@ -10,12 +10,19 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSurveyDetails, transformToAssessmentData } from '@/lib/system-surveyor-api';
+import { requireAuth } from '@/lib/api-auth';
 
 /**
  * POST /api/system-surveyor/import
  * Imports survey data and transforms it for Design-Rite
  */
 export async function POST(request: NextRequest) {
+  // Require authentication
+  const auth = await requireAuth();
+  if (auth.error) {
+    return auth.error;
+  }
+
   try {
     const token = request.headers.get('Authorization')?.replace('Bearer ', '');
     const { surveyId, site } = await request.json();

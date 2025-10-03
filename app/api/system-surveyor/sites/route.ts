@@ -10,12 +10,19 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSites } from '@/lib/system-surveyor-api';
+import { requireAuth } from '@/lib/api-auth';
 
 /**
  * GET /api/system-surveyor/sites
  * Fetches all sites for authenticated user
  */
 export async function GET(request: NextRequest) {
+  // Require authentication
+  const auth = await requireAuth();
+  if (auth.error) {
+    return auth.error;
+  }
+
   try {
     const token = request.headers.get('Authorization')?.replace('Bearer ', '');
 

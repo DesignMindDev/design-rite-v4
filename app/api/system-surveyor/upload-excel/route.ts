@@ -10,6 +10,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { mapAllEquipment, generateAIContext } from '@/lib/system-surveyor-mapper';
+import { requireAuth } from '@/lib/api-auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,6 +24,12 @@ export const dynamic = 'force-dynamic';
  * Returns transformed data ready for Design-Rite AI Assessment
  */
 export async function POST(request: NextRequest) {
+  // Require authentication
+  const auth = await requireAuth();
+  if (auth.error) {
+    return auth.error;
+  }
+
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
