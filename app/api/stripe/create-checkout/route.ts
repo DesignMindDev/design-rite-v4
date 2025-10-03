@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { supabase } from '@/lib/supabase'
+import { withErrorHandling, ValidationErrors, APIError } from '@/lib/api-error-handler'
 
 // Initialize Stripe only if secret key is available
 const getStripe = () => {
   if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error('STRIPE_SECRET_KEY is not configured')
+    throw new APIError(503, 'Payment processing is temporarily unavailable. Please try again later.', 'STRIPE_NOT_CONFIGURED')
   }
   return new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2024-09-30.acacia',
@@ -13,14 +14,15 @@ const getStripe = () => {
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const { planId, userEmail, successUrl, cancelUrl } = await request.json()
+  return withErrorHandling(async () => {
+    const { planId, userEmail, successUrl, cancelUrl} = await request.json()
 
-    if (!planId || !userEmail) {
-      return NextResponse.json(
-        { error: 'Missing required fields: planId, userEmail' },
-        { status: 400 }
-      )
+    if (!planId) {
+      throw ValidationErrors.MISSING_REQUIRED_FIELD('planId')
+    }
+
+    if (!userEmail) {
+      throw ValidationErrors.MISSING_REQUIRED_FIELD('userEmail')
     }
 
     // Get Stripe instance
@@ -48,10 +50,7 @@ export async function POST(request: NextRequest) {
     // Get price ID based on plan
     const priceId = getPriceIdForPlan(planId)
     if (!priceId) {
-      return NextResponse.json(
-        { error: 'Invalid plan ID' },
-        { status: 400 }
-      )
+      throw new APIError(400, `Invalid plan ID: ${planId}. Must be one of: starter, professional, enterprise`, 'INVALID_PLAN_ID')
     }
 
     // Create checkout session with 14-day trial
@@ -101,15 +100,7 @@ export async function POST(request: NextRequest) {
       sessionId: session.id,
       url: session.url
     })
-
-  } catch (error: any) {
-    console.error('Error creating checkout session:', error)
-
-    return NextResponse.json(
-      { error: 'Failed to create checkout session' },
-      { status: 500 }
-    )
-  }
+  }, 'Stripe Checkout');
 }
 
 function getPriceIdForPlan(planId: string): string | null {

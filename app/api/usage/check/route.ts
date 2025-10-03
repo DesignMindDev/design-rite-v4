@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { checkUsageLimit, getUserTier, getCurrentUsage, getLimitsForTier } from '@/lib/usage-limits';
+import { handleAPIError, AuthErrors, withErrorHandling } from '@/lib/api-error-handler';
 
 export async function GET(req: NextRequest) {
-  try {
+  return withErrorHandling(async () => {
     const supabase = createRouteHandlerClient({ cookies });
     const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw AuthErrors.UNAUTHORIZED;
     }
 
     const { searchParams } = new URL(req.url);
@@ -18,22 +19,16 @@ export async function GET(req: NextRequest) {
     const result = await checkUsageLimit(session.user.id, action);
 
     return NextResponse.json(result);
-  } catch (error) {
-    console.error('Error checking usage:', error);
-    return NextResponse.json(
-      { error: 'Failed to check usage limits' },
-      { status: 500 }
-    );
-  }
+  }, 'Usage Check - GET');
 }
 
 export async function POST(req: NextRequest) {
-  try {
+  return withErrorHandling(async () => {
     const supabase = createRouteHandlerClient({ cookies });
     const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      throw AuthErrors.UNAUTHORIZED;
     }
 
     // Get complete usage stats for dashboard
@@ -51,11 +46,5 @@ export async function POST(req: NextRequest) {
         storage: limits.storage_gb === -1 ? 0 : (usage.storage_used_gb / limits.storage_gb) * 100
       }
     });
-  } catch (error) {
-    console.error('Error fetching usage stats:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch usage stats' },
-      { status: 500 }
-    );
-  }
+  }, 'Usage Check - POST');
 }
