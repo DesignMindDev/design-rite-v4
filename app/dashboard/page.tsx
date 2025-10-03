@@ -9,6 +9,7 @@ import {
   BarChart3, Download, Eye
 } from 'lucide-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import UpgradeModal from '../components/UpgradeModal';
 
 interface UserStats {
   projectsCreated: number;
@@ -39,6 +40,9 @@ export default function DashboardPage() {
     plan: 'trial'
   });
   const [recentProjects, setRecentProjects] = useState<RecentProject[]>([]);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeReason, setUpgradeReason] = useState<string>();
+  const [usageLimits, setUsageLimits] = useState<any>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -104,6 +108,18 @@ export default function DashboardPage() {
         ]);
 
         setLoading(false);
+
+        // Fetch usage limits
+        const usageRes = await fetch('/api/usage/check', { method: 'POST' });
+        if (usageRes.ok) {
+          const usageData = await usageRes.json();
+          setUsageLimits(usageData);
+
+          // Auto-show upgrade prompt if at 80% usage
+          if (usageData.percentages.assessments >= 80) {
+            setTimeout(() => setShowUpgradeModal(true), 2000); // Show after 2 seconds
+          }
+        }
       } catch (error) {
         console.error('Dashboard auth error:', error);
         router.push('/login?redirect=/dashboard');
@@ -116,6 +132,25 @@ export default function DashboardPage() {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     router.push('/');
+  };
+
+  const handleToolAccess = async (toolUrl: string, e: React.MouseEvent) => {
+    e.preventDefault();
+
+    // Check usage limits before allowing access
+    const response = await fetch('/api/usage/check?action=assessment');
+    if (response.ok) {
+      const { allowed, reason } = await response.json();
+
+      if (!allowed && reason) {
+        setUpgradeReason(reason);
+        setShowUpgradeModal(true);
+        return;
+      }
+    }
+
+    // If allowed or check failed (fail open), navigate to tool
+    router.push(toolUrl);
   };
 
   if (loading) {
@@ -248,13 +283,13 @@ export default function DashboardPage() {
               <p className="text-gray-300 mb-6 text-sm">
                 Fast budget planning with instant cost breakdowns and real-time pricing.
               </p>
-              <Link
-                href="/security-estimate"
+              <button
+                onClick={(e) => handleToolAccess('/security-estimate', e)}
                 className="w-full flex items-center justify-center dr-bg-violet hover:bg-purple-700 dr-text-pearl font-bold py-3 px-4 rounded-xl transition-all group-hover:scale-105"
               >
                 Start Quick Estimate
                 <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
+              </button>
             </div>
 
             {/* AI Discovery */}
@@ -271,13 +306,13 @@ export default function DashboardPage() {
               <p className="text-gray-300 mb-6 text-sm">
                 Comprehensive AI-guided assessment with detailed proposals and compliance mapping.
               </p>
-              <Link
-                href="/ai-discovery"
+              <button
+                onClick={(e) => handleToolAccess('/ai-discovery', e)}
                 className="w-full flex items-center justify-center dr-bg-violet hover:bg-purple-700 dr-text-pearl font-bold py-3 px-4 rounded-xl transition-all group-hover:scale-105"
               >
                 Start AI Discovery
                 <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
+              </button>
             </div>
 
             {/* AI Assistant */}
@@ -294,13 +329,13 @@ export default function DashboardPage() {
               <p className="text-gray-300 mb-6 text-sm">
                 Refine any assessment with natural language. Upload existing proposals for enhancement.
               </p>
-              <Link
-                href="/ai-assistant"
+              <button
+                onClick={(e) => handleToolAccess('/ai-assistant', e)}
                 className="w-full flex items-center justify-center dr-bg-violet hover:bg-purple-700 dr-text-pearl font-bold py-3 px-4 rounded-xl transition-all group-hover:scale-105"
               >
                 Start AI Assistant
                 <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -381,6 +416,16 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        reason={upgradeReason}
+        currentTier={stats.plan}
+        usage={usageLimits?.usage}
+        limits={usageLimits?.limits}
+      />
     </div>
   );
 }
