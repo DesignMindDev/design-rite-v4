@@ -11,6 +11,7 @@
 import { NextResponse } from 'next/server';
 import { getEnhancedRecommendations } from '../../../lib/unified-product-intelligence';
 import { createClient } from '@supabase/supabase-js';
+import { requireAuth } from '../../../lib/api-auth';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -28,11 +29,17 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  // Require authentication
+  const auth = await requireAuth();
+  if (auth.error) {
+    return auth.error;
+  }
+
   try {
     const body = await request.json();
     const { action, sessionData, discoveryData } = body;
 
-    console.log(`Processing action: ${action}`);
+    console.log(`Processing action: ${action} for user: ${auth.user?.email}`);
 
     switch (action) {
       case 'generate_recommendations':

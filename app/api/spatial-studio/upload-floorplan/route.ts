@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAuth } from '../../../../lib/api-auth';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -11,6 +12,12 @@ const supabase = createClient(
  * Returns immediately with projectId and status='pending'
  */
 export async function POST(request: NextRequest) {
+  // Require authentication
+  const auth = await requireAuth();
+  if (auth.error) {
+    return auth.error;
+  }
+
   try {
     // Verify environment variables
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {

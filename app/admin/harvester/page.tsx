@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Database, TrendingUp, Package, RefreshCw, DollarSign, AlertCircle, CheckCircle, Activity, BarChart3, Search, Filter, ExternalLink, Eye, MessageSquare, Play, Building2, FileText, Clock, Plus, Trash2, Edit, Power } from 'lucide-react'
-import * as auth from '../../lib/auth'
 import harvesterClient from '../../../lib/harvester-client'
 
 interface HarvesterStats {
@@ -44,9 +43,7 @@ interface Product {
 }
 
 export default function HarvesterDashboard() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
-  const [password, setPassword] = useState('')
   const [activeTab, setActiveTab] = useState('overview')
   const [stats, setStats] = useState<HarvesterStats | null>(null)
   const [products, setProducts] = useState<Product[]>([])
@@ -64,33 +61,10 @@ export default function HarvesterDashboard() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
-  // Check authentication on page load (client-side only)
+  // Initialize component on mount
   useEffect(() => {
     setIsMounted(true)
-
-    const checkAuth = () => {
-      if (auth.isAuthenticated()) {
-        setIsAuthenticated(true)
-      }
-    }
-
-    checkAuth()
   }, [])
-
-  // Handle authentication
-  const handleAuth = () => {
-    if (auth.authenticate(password)) {
-      setIsAuthenticated(true)
-    } else {
-      alert('Invalid password')
-    }
-  }
-
-  // Handle logout
-  const handleLogout = () => {
-    setIsAuthenticated(false)
-    auth.logout()
-  }
 
   // Load overview data
   const loadOverview = async () => {
@@ -404,36 +378,6 @@ export default function HarvesterDashboard() {
     )
   }
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen dr-bg-charcoal dr-text-pearl flex items-center justify-center">
-        <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-8 max-w-md w-full mx-4">
-          <div className="text-center mb-6">
-            <Database className="w-12 h-12 dr-text-violet mx-auto mb-4" />
-            <h1 className="dr-heading-lg dr-text-pearl mb-2">Harvester Dashboard</h1>
-            <p className="text-gray-300">Enter admin password to access</p>
-          </div>
-          <div className="space-y-4">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleAuth()}
-              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl dr-text-pearl placeholder-gray-400 focus:outline-none focus:dr-border-violet"
-              placeholder="Admin Password"
-            />
-            <button
-              onClick={handleAuth}
-              className="w-full dr-bg-violet dr-text-pearl py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
-            >
-              Access Dashboard
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen dr-bg-charcoal dr-text-pearl p-6">
       <div className="max-w-7xl mx-auto">
@@ -452,12 +396,6 @@ export default function HarvesterDashboard() {
                 <span>🏠</span>
                 Main Admin
               </Link>
-              <button
-                onClick={handleLogout}
-                className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
-              >
-                Logout
-              </button>
             </div>
           </div>
           <p className="text-gray-300">Monitor your web harvesting operations and product database</p>

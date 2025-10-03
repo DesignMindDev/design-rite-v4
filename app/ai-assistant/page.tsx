@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Bot, Upload, MessageSquare, Zap, RefreshCw, Download, ArrowLeft, Sparkles, FileText, Database, Settings, ChevronDown, LogOut } from 'lucide-react'
 import { sessionManager } from '../../lib/sessionManager'
-import * as auth from '@/lib/auth'
+import { useSupabaseAuth } from '@/app/hooks/useSupabaseAuth'
 
 interface Message {
   id: string
@@ -48,7 +48,7 @@ export default function AIAssistantPage() {
   const [showCustomCategory, setShowCustomCategory] = useState(false)
   const [customCategoryTitle, setCustomCategoryTitle] = useState('')
   const [customCategoryDetails, setCustomCategoryDetails] = useState('')
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const { isAuthenticated, signOut } = useSupabaseAuth()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -158,9 +158,6 @@ export default function AIAssistantPage() {
 
     // Load AI providers from the AI Providers system
     loadAIProviders()
-
-    // Check authentication status
-    setIsAuthenticated(auth.isAuthenticated())
   }, [])
 
   const loadAIProviders = async () => {
@@ -817,9 +814,8 @@ Date: ${new Date().toLocaleDateString()}
     setShowPrintPreview(false)
   }
 
-  const handleLogout = () => {
-    auth.logout()
-    setIsAuthenticated(false)
+  const handleLogout = async () => {
+    await signOut()
     window.location.href = '/'
   }
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import * as auth from '@/lib/auth';
+import { useSupabaseAuth } from '@/app/hooks/useSupabaseAuth';
 
 interface SiteSettings {
   logoPath: string
@@ -14,7 +14,7 @@ export default function UnifiedNavigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAnnouncement, setShowAnnouncement] = useState(true);
   const [settings, setSettings] = useState<SiteSettings>({ logoPath: '', footerLogoPath: '' });
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isAuthenticated, signOut } = useSupabaseAuth();
 
   useEffect(() => {
     loadSettings()
@@ -23,8 +23,6 @@ export default function UnifiedNavigation() {
     if (announcementClosed === 'true') {
       setShowAnnouncement(false);
     }
-    // Check authentication status
-    setIsAuthenticated(auth.isAuthenticated());
   }, [])
 
   const loadSettings = async () => {
@@ -61,9 +59,8 @@ export default function UnifiedNavigation() {
     localStorage.setItem('announcementClosed', 'true');
   };
 
-  const handleLogout = () => {
-    auth.logout();
-    setIsAuthenticated(false);
+  const handleLogout = async () => {
+    await signOut();
     window.location.href = '/';
   };
 
