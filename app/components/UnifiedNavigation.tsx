@@ -41,14 +41,14 @@ export default function UnifiedNavigation() {
 
   const handleSignInClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    // All header sign-in clicks go to platform access page
-    window.location.href = '/platform-access';
+    // All header sign-in clicks go to login page
+    window.location.href = '/login';
   };
 
   const handleTryPlatformClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    // All page Try Platform clicks go to platform access page
-    window.location.href = '/platform-access';
+    // All page Try Platform clicks go to estimate options page
+    window.location.href = '/estimate-options';
   };
 
 

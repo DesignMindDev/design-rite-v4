@@ -37,7 +37,7 @@ function LoginForm() {
         } else if (role === 'super_admin' || role === 'admin' || role === 'manager') {
           router.push('/admin');
         } else {
-          router.push('/doc-ai/chat');
+          router.push('/dashboard');
         }
       }
     };
@@ -82,7 +82,7 @@ function LoginForm() {
       } else if (role === 'super_admin' || role === 'admin' || role === 'manager') {
         router.push('/admin');
       } else {
-        router.push('/doc-ai/chat');
+        router.push('/dashboard');
       }
 
       router.refresh();
