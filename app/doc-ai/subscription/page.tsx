@@ -50,8 +50,8 @@ export default function SubscriptionPage() {
     {
       tier: 'professional',
       name: 'Professional',
-      price: 149,
-      annualPrice: 1490,
+      price: 199,
+      annualPrice: 1990,
       priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PROFESSIONAL,
       features: [
         'Unlimited assessments',
