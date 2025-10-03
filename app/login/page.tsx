@@ -261,17 +261,28 @@ function LoginForm() {
         {/* Footer Links */}
         <div className="mt-6 text-center space-y-3">
           {!showResetForm && (
-            <div className="text-gray-400 text-sm">
-              <button
-                onClick={() => {
-                  setShowResetForm(true);
-                  setError('');
-                }}
-                className="text-purple-400 hover:text-purple-300 transition-colors"
-              >
-                Forgot password?
-              </button>
-            </div>
+            <>
+              <div className="text-gray-400 text-sm">
+                <button
+                  onClick={() => {
+                    setShowResetForm(true);
+                    setError('');
+                  }}
+                  className="text-purple-400 hover:text-purple-300 transition-colors"
+                >
+                  Forgot password?
+                </button>
+              </div>
+              <div className="text-gray-400 text-sm">
+                Don't have an account?{' '}
+                <Link
+                  href="/signup"
+                  className="text-purple-400 hover:text-purple-300 transition-colors font-medium"
+                >
+                  Create Account
+                </Link>
+              </div>
+            </>
           )}
           <div className="pt-4 border-t border-purple-600/20">
             <Link

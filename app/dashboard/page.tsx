@@ -42,14 +42,16 @@ export default function DashboardPage() {
         .from('subscriptions')
         .select('tier, status, billing_period, current_period_end, next_billing_date')
         .eq('user_id', user.id)
-        .eq('status', 'active')
-        .or('status.eq.trialing')
+        .in('status', ['active', 'trialing'])
         .single();
+
+      console.log('Subscription query result:', { subscription, error, userId: user.id });
 
       let plan = 'trial';
       let assessmentLimit = 3;
 
       if (subscription && !error) {
+        console.log('Found subscription tier:', subscription.tier);
         plan = subscription.tier;
         // Set limits based on tier
         switch (subscription.tier) {
