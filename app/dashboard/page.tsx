@@ -1,307 +1,385 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useSupabaseAuth } from '../hooks/useSupabaseAuth';
+import {
+  Calculator, MessageSquare, Clock, FileText, Zap, Users,
+  ArrowRight, Bot, Sparkles, TrendingUp, LogOut, Settings,
+  BarChart3, Download, Eye
+} from 'lucide-react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 interface UserStats {
+  projectsCreated: number;
   assessmentsUsed: number;
   assessmentLimit: number;
+  timeSaved: number;
   plan: string;
-  lastAssessment?: string;
+}
+
+interface RecentProject {
+  id: string;
+  name: string;
+  type: string;
+  createdAt: string;
+  status: string;
 }
 
 export default function DashboardPage() {
-  const { user, userCompany, isAuthenticated, loading, signOut } = useSupabaseAuth();
-  const [userStats, setUserStats] = useState<UserStats | null>(null);
-  const [statsLoading, setStatsLoading] = useState(true);
   const router = useRouter();
+  const supabase = createClientComponentClient();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<UserStats>({
+    projectsCreated: 0,
+    assessmentsUsed: 0,
+    assessmentLimit: 3,
+    timeSaved: 0,
+    plan: 'trial'
+  });
+  const [recentProjects, setRecentProjects] = useState<RecentProject[]>([]);
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push('/estimate-options');
-    }
-  }, [isAuthenticated, loading, router]);
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
 
-  useEffect(() => {
-    if (user) {
-      fetchUserStats();
-    }
-  }, [user]);
-
-  const fetchUserStats = async () => {
-    try {
-      // Fetch subscription data from Supabase
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-
-      const { data: subscription, error } = await supabase
-        .from('subscriptions')
-        .select('tier, status, billing_period, current_period_end, next_billing_date')
-        .eq('user_id', user.id)
-        .in('status', ['active', 'trialing'])
-        .single();
-
-      console.log('Subscription query result:', { subscription, error, userId: user.id });
-
-      let plan = 'trial';
-      let assessmentLimit = 3;
-
-      if (subscription && !error) {
-        console.log('Found subscription tier:', subscription.tier);
-        plan = subscription.tier;
-        // Set limits based on tier
-        switch (subscription.tier) {
-          case 'starter':
-            assessmentLimit = 25;
-            break;
-          case 'professional':
-          case 'enterprise':
-            assessmentLimit = -1; // Unlimited
-            break;
-          default:
-            assessmentLimit = 3;
+        if (!session) {
+          router.push('/login?redirect=/dashboard');
+          return;
         }
-      }
 
-      setUserStats({
-        assessmentsUsed: 0, // TODO: Fetch actual usage from activity logs
-        assessmentLimit,
-        plan,
-        lastAssessment: undefined
-      });
-    } catch (error) {
-      console.error('Failed to fetch user stats:', error);
-      // Fall back to trial
-      setUserStats({
-        assessmentsUsed: 0,
-        assessmentLimit: 3,
-        plan: 'trial',
-        lastAssessment: undefined
-      });
-    } finally {
-      setStatsLoading(false);
-    }
-  };
+        setUser(session.user);
+
+        // Fetch user stats and subscription
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('tier, status')
+          .eq('user_id', session.user.id)
+          .in('status', ['active', 'trialing'])
+          .single();
+
+        // Set stats based on subscription
+        let plan = 'trial';
+        let assessmentLimit = 3;
+
+        if (subscription) {
+          plan = subscription.tier;
+          switch (subscription.tier) {
+            case 'starter':
+              assessmentLimit = 25;
+              break;
+            case 'professional':
+            case 'enterprise':
+              assessmentLimit = -1; // Unlimited
+              break;
+          }
+        }
+
+        setStats({
+          projectsCreated: 12, // TODO: Fetch from database
+          assessmentsUsed: 8, // TODO: Fetch from activity logs
+          assessmentLimit,
+          timeSaved: 40, // TODO: Calculate from project data
+          plan
+        });
+
+        // TODO: Fetch recent projects from database
+        setRecentProjects([
+          {
+            id: '1',
+            name: 'Elementary School Security Assessment',
+            type: 'AI Discovery',
+            createdAt: new Date().toISOString(),
+            status: 'completed'
+          },
+          {
+            id: '2',
+            name: 'Office Building Quick Estimate',
+            type: 'Quick Estimate',
+            createdAt: new Date(Date.now() - 86400000).toISOString(),
+            status: 'completed'
+          }
+        ]);
+
+        setLoading(false);
+      } catch (error) {
+        console.error('Dashboard auth error:', error);
+        router.push('/login?redirect=/dashboard');
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const handleSignOut = async () => {
-    await signOut();
+    await supabase.auth.signOut();
     router.push('/');
   };
 
-  const handleUpgrade = () => {
-    router.push('/upgrade');
-  };
-
-  const handleNewAssessment = () => {
-    router.push('/estimate-options');
-  };
-
-  if (loading || !isAuthenticated) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen dr-bg-charcoal dr-text-pearl flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading your dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading your workspace...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen dr-bg-charcoal dr-text-pearl">
+      {/* Top Stats Bar */}
+      <div className="bg-gray-800/40 border-b border-gray-700">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex justify-between items-center mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Welcome back!
+              <h1 className="text-2xl font-bold text-white">
+                Welcome back, {user?.user_metadata?.name || user?.email}! 👋
               </h1>
-              <p className="text-gray-600">
-                <strong>Email:</strong> {user?.email}<br/>
-                <strong>Company:</strong> {userCompany}<br/>
-                <strong>Plan:</strong> <span className="capitalize font-semibold text-purple-600">{userStats?.plan || 'Trial'}</span>
+              <p className="text-gray-400 text-sm mt-1">
+                Your Security Design Workspace
               </p>
             </div>
-            <div className="flex space-x-4">
-              <button
-                onClick={handleNewAssessment}
-                className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
+            <div className="flex items-center gap-4">
+              <Link
+                href="/account"
+                className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
               >
-                New Assessment
-              </button>
+                <Settings className="w-5 h-5" />
+                <span>Account</span>
+              </Link>
               <button
                 onClick={handleSignOut}
-                className="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-all"
+                className="flex items-center gap-2 text-gray-300 hover:text-red-400 transition-colors"
               >
-                Sign Out
+                <LogOut className="w-5 h-5" />
+                <span>Sign Out</span>
               </button>
             </div>
           </div>
+
+          {/* Mini Stats Cards */}
+          <div className="grid grid-cols-4 gap-4">
+            <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600/20">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-400 text-sm">Projects</span>
+                <FileText className="w-5 h-5 text-purple-400" />
+              </div>
+              <div className="text-2xl font-bold text-white">{stats.projectsCreated}</div>
+            </div>
+
+            <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600/20">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-400 text-sm">Assessments</span>
+                <Zap className="w-5 h-5 text-yellow-400" />
+              </div>
+              <div className="text-2xl font-bold text-white">
+                {stats.assessmentsUsed}
+                {stats.assessmentLimit !== -1 && (
+                  <span className="text-sm text-gray-400 ml-1">/ {stats.assessmentLimit}</span>
+                )}
+              </div>
+              {stats.assessmentLimit !== -1 && (
+                <div className="mt-2 w-full bg-gray-600 rounded-full h-1.5">
+                  <div
+                    className="bg-purple-500 h-1.5 rounded-full transition-all"
+                    style={{ width: `${Math.min((stats.assessmentsUsed / stats.assessmentLimit) * 100, 100)}%` }}
+                  ></div>
+                </div>
+              )}
+            </div>
+
+            <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600/20">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-400 text-sm">Time Saved</span>
+                <Clock className="w-5 h-5 text-green-400" />
+              </div>
+              <div className="text-2xl font-bold text-white">{stats.timeSaved}h</div>
+            </div>
+
+            <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600/20">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-400 text-sm">Current Plan</span>
+                <TrendingUp className="w-5 h-5 text-blue-400" />
+              </div>
+              <div className="text-lg font-bold text-white capitalize">
+                {stats.plan}
+                {stats.plan === 'trial' && (
+                  <Link href="/upgrade" className="text-xs text-purple-400 hover:text-purple-300 block mt-1">
+                    Upgrade →
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Tools Section */}
+        <div className="mb-16">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-white">Your Security Design Tools</h2>
+            <Link
+              href="/estimate-options"
+              className="text-purple-400 hover:text-purple-300 text-sm transition-colors"
+            >
+              View All Options →
+            </Link>
+          </div>
+
+          {/* 3-Column Tool Grid - Same as estimate-options */}
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Quick Estimate */}
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6 border hover:shadow-2xl hover:shadow-purple-600/20 transition-all group">
+              <div className="flex items-center mb-4">
+                <div className="p-3 dr-bg-violet rounded-xl mr-3">
+                  <Calculator className="w-6 h-6 dr-text-pearl" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">Quick Estimate</h3>
+                  <p className="text-gray-400 text-sm">5 minutes</p>
+                </div>
+              </div>
+              <p className="text-gray-300 mb-6 text-sm">
+                Fast budget planning with instant cost breakdowns and real-time pricing.
+              </p>
+              <Link
+                href="/security-estimate"
+                className="w-full flex items-center justify-center dr-bg-violet hover:bg-purple-700 dr-text-pearl font-bold py-3 px-4 rounded-xl transition-all group-hover:scale-105"
+              >
+                Start Quick Estimate
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
+            </div>
+
+            {/* AI Discovery */}
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6 border hover:shadow-2xl hover:shadow-purple-600/20 transition-all group">
+              <div className="flex items-center mb-4">
+                <div className="p-3 dr-bg-violet rounded-xl mr-3">
+                  <MessageSquare className="w-6 h-6 dr-text-pearl" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">AI Discovery</h3>
+                  <p className="text-gray-400 text-sm">15-20 minutes</p>
+                </div>
+              </div>
+              <p className="text-gray-300 mb-6 text-sm">
+                Comprehensive AI-guided assessment with detailed proposals and compliance mapping.
+              </p>
+              <Link
+                href="/ai-discovery"
+                className="w-full flex items-center justify-center dr-bg-violet hover:bg-purple-700 dr-text-pearl font-bold py-3 px-4 rounded-xl transition-all group-hover:scale-105"
+              >
+                Start AI Discovery
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
+            </div>
+
+            {/* AI Assistant */}
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6 border hover:shadow-2xl hover:shadow-purple-600/20 transition-all group">
+              <div className="flex items-center mb-4">
+                <div className="p-3 dr-bg-violet rounded-xl mr-3">
+                  <Bot className="w-6 h-6 dr-text-pearl" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">AI Assistant</h3>
+                  <p className="text-gray-400 text-sm">5-10 minutes</p>
+                </div>
+              </div>
+              <p className="text-gray-300 mb-6 text-sm">
+                Refine any assessment with natural language. Upload existing proposals for enhancement.
+              </p>
+              <Link
+                href="/ai-assistant"
+                className="w-full flex items-center justify-center dr-bg-violet hover:bg-purple-700 dr-text-pearl font-bold py-3 px-4 rounded-xl transition-all group-hover:scale-105"
+              >
+                Start AI Assistant
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
+            </div>
+          </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Usage Stats */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Usage Overview</h2>
-
-              {statsLoading ? (
-                <div className="animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
-                  <div className="h-8 bg-gray-200 rounded w-full mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                </div>
-              ) : userStats ? (
-                <div>
-                  <div className="mb-6">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-gray-700">Assessments Used</span>
-                      <span className="font-semibold text-gray-900">
-                        {userStats.assessmentsUsed} / {userStats.assessmentLimit === -1 ? '∞' : userStats.assessmentLimit}
-                      </span>
-                    </div>
-
-                    {userStats.assessmentLimit !== -1 && (
-                      <div className="w-full bg-gray-200 rounded-full h-3">
-                        <div
-                          className="bg-gradient-to-r from-purple-600 to-purple-700 h-3 rounded-full transition-all"
-                          style={{
-                            width: `${Math.min((userStats.assessmentsUsed / userStats.assessmentLimit) * 100, 100)}%`
-                          }}
-                        ></div>
-                      </div>
-                    )}
-                  </div>
-
-                  {userStats.plan === 'trial' && userStats.assessmentsUsed >= userStats.assessmentLimit && (
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
-                      <div className="flex items-center">
-                        <svg className="w-5 h-5 text-orange-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                        </svg>
-                        <div>
-                          <p className="text-orange-700 font-medium">Trial limit reached</p>
-                          <p className="text-orange-600 text-sm">Upgrade to continue using unlimited assessments</p>
+        {/* Recent Projects */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-white mb-6">Recent Projects</h2>
+          {recentProjects.length === 0 ? (
+            <div className="bg-gray-800/40 rounded-2xl p-12 text-center border border-gray-700/30">
+              <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-400 mb-2">No projects yet</h3>
+              <p className="text-gray-500 mb-6">Start your first security assessment above</p>
+              <Link
+                href="/estimate-options"
+                className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+              >
+                <Sparkles className="w-5 h-5" />
+                Create Your First Project
+              </Link>
+            </div>
+          ) : (
+            <div className="bg-gray-800/40 rounded-2xl border border-gray-700/30 overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-gray-700/30 border-b border-gray-600/30">
+                  <tr>
+                    <th className="text-left py-4 px-6 text-gray-300 font-semibold">Project Name</th>
+                    <th className="text-left py-4 px-6 text-gray-300 font-semibold">Type</th>
+                    <th className="text-left py-4 px-6 text-gray-300 font-semibold">Created</th>
+                    <th className="text-left py-4 px-6 text-gray-300 font-semibold">Status</th>
+                    <th className="text-right py-4 px-6 text-gray-300 font-semibold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentProjects.map((project) => (
+                    <tr key={project.id} className="border-b border-gray-700/20 hover:bg-gray-700/20 transition-colors">
+                      <td className="py-4 px-6 text-white font-medium">{project.name}</td>
+                      <td className="py-4 px-6 text-gray-400">{project.type}</td>
+                      <td className="py-4 px-6 text-gray-400">
+                        {new Date(project.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-500/30">
+                          {project.status}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center justify-end gap-2">
+                          <button className="p-2 hover:bg-gray-600/30 rounded-lg transition-colors" title="View">
+                            <Eye className="w-4 h-4 text-gray-400" />
+                          </button>
+                          <button className="p-2 hover:bg-gray-600/30 rounded-lg transition-colors" title="Download">
+                            <Download className="w-4 h-4 text-gray-400" />
+                          </button>
                         </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-purple-50 rounded-lg p-4">
-                      <h3 className="font-semibold text-purple-900 mb-2">Total Assessments</h3>
-                      <p className="text-2xl font-bold text-purple-600">{userStats.assessmentsUsed}</p>
-                    </div>
-
-                    <div className="bg-green-50 rounded-lg p-4">
-                      <h3 className="font-semibold text-green-900 mb-2">Current Plan</h3>
-                      <p className="text-2xl font-bold text-green-600 capitalize">{userStats.plan}</p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-gray-500">Unable to load usage statistics</p>
-              )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Activity</h2>
-              <div className="text-center py-8">
-                <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <p className="text-gray-500 mb-4">No assessments yet</p>
-                <button
-                  onClick={handleNewAssessment}
-                  className="text-purple-600 hover:text-purple-700 font-semibold"
-                >
-                  Create your first assessment →
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-8">
-            {/* Plan Status */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Plan Status</h3>
-
-              {userStats?.plan === 'trial' ? (
-                <div>
-                  <div className="bg-blue-50 rounded-lg p-4 mb-4">
-                    <p className="text-blue-700 font-medium mb-2">Free Trial Active</p>
-                    <p className="text-blue-600 text-sm">
-                      {userStats.assessmentLimit - userStats.assessmentsUsed} assessments remaining
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={handleUpgrade}
-                    className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 px-4 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
-                  >
-                    Upgrade Now
-                  </button>
-
-                  <p className="text-xs text-gray-500 mt-2 text-center">
-                    Unlock unlimited assessments
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  <div className="bg-green-50 rounded-lg p-4 mb-4">
-                    <p className="text-green-700 font-medium mb-2 capitalize">{userStats?.plan} Plan</p>
-                    <p className="text-green-600 text-sm">Unlimited assessments</p>
-                  </div>
-
-                  <button
-                    onClick={() => router.push('/account')}
-                    className="w-full bg-gray-200 text-gray-700 py-3 px-4 rounded-lg font-semibold hover:bg-gray-300 transition-all"
-                  >
-                    Manage Billing
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Quick Actions */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
-
-              <div className="space-y-3">
-                <button
-                  onClick={handleNewAssessment}
-                  className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-all"
-                >
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    <span className="font-medium text-gray-900">New Assessment</span>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => router.push('/help')}
-                  className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-all"
-                >
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span className="font-medium text-gray-900">Help & Support</span>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
+
+        {/* Upgrade CTA (if on trial) */}
+        {stats.plan === 'trial' && (
+          <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-2xl p-8 border border-purple-500/30 text-center">
+            <h3 className="text-2xl font-bold text-white mb-2">🚀 Unlock Unlimited Assessments</h3>
+            <p className="text-gray-300 mb-6">
+              Upgrade to Professional for unlimited projects, priority support, and advanced features
+            </p>
+            <Link
+              href="/upgrade"
+              className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all"
+            >
+              Upgrade Now
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
