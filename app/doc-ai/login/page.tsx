@@ -11,6 +11,8 @@ export default function DocAILoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/doc-ai/chat';
@@ -87,6 +89,30 @@ export default function DocAILoginPage() {
     }
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.toLowerCase(), {
+        redirectTo: `${window.location.origin}/doc-ai/reset-password`,
+      });
+
+      if (resetError) {
+        setError(resetError.message);
+        setLoading(false);
+      } else {
+        setResetSent(true);
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error('Reset password error:', err);
+      setError('An unexpected error occurred. Please try again.');
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0A0A0A] to-blue-900/20">
       <div className="bg-[#1A1A1A] p-8 rounded-lg shadow-xl border border-blue-600/30 w-full max-w-md">
@@ -96,11 +122,32 @@ export default function DocAILoginPage() {
             DR
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Document AI</h1>
-          <p className="text-gray-400">{isSignUp ? 'Create Your Account' : 'Sign In to Continue'}</p>
+          <p className="text-gray-400">
+            {showResetPassword ? 'Reset Your Password' : isSignUp ? 'Create Your Account' : 'Sign In to Continue'}
+          </p>
         </div>
 
-        {/* Login/Sign Up Form */}
-        <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-6">
+        {/* Password Reset Success Message */}
+        {resetSent && (
+          <div className="mb-6 bg-green-500/10 border border-green-500/50 text-green-400 p-4 rounded">
+            <p className="font-medium mb-1">Check Your Email</p>
+            <p className="text-sm">We've sent a password reset link to <strong>{email}</strong></p>
+            <button
+              onClick={() => {
+                setShowResetPassword(false);
+                setResetSent(false);
+                setEmail('');
+              }}
+              className="text-sm text-green-300 hover:text-green-200 underline mt-2"
+            >
+              Back to sign in
+            </button>
+          </div>
+        )}
+
+        {/* Login/Sign Up/Reset Form */}
+        {!resetSent && (
+          <form onSubmit={showResetPassword ? handleResetPassword : (isSignUp ? handleSignUp : handleSignIn)} className="space-y-6">
           {/* Error Message */}
           {error && (
             <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-3 rounded">
@@ -126,28 +173,30 @@ export default function DocAILoginPage() {
             />
           </div>
 
-          {/* Password Field */}
-          <div>
-            <label htmlFor="password" className="block text-gray-300 mb-2 font-medium">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-[#0A0A0A] border border-blue-600/30 rounded px-4 py-3 text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
-              placeholder={isSignUp ? 'Create a password' : 'Enter your password'}
-              required
-              disabled={loading}
-              autoComplete={isSignUp ? 'new-password' : 'current-password'}
-            />
-            {isSignUp && (
-              <p className="text-xs text-gray-400 mt-2">
-                Password must be at least 6 characters
-              </p>
-            )}
-          </div>
+          {/* Password Field - Only show if not resetting password */}
+          {!showResetPassword && (
+            <div>
+              <label htmlFor="password" className="block text-gray-300 mb-2 font-medium">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-[#0A0A0A] border border-blue-600/30 rounded px-4 py-3 text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                placeholder={isSignUp ? 'Create a password' : 'Enter your password'}
+                required
+                disabled={loading}
+                autoComplete={isSignUp ? 'new-password' : 'current-password'}
+              />
+              {isSignUp && (
+                <p className="text-xs text-gray-400 mt-2">
+                  Password must be at least 6 characters
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Submit Button */}
           <button
@@ -161,36 +210,56 @@ export default function DocAILoginPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                {isSignUp ? 'Creating Account...' : 'Signing In...'}
+                {showResetPassword ? 'Sending Reset Link...' : isSignUp ? 'Creating Account...' : 'Signing In...'}
               </span>
             ) : (
-              isSignUp ? 'Create Account' : 'Sign In'
+              showResetPassword ? 'Send Reset Link' : isSignUp ? 'Create Account' : 'Sign In'
             )}
           </button>
         </form>
+        )}
 
-        {/* Toggle Sign In / Sign Up */}
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => {
-              setIsSignUp(!isSignUp);
-              setError('');
-            }}
-            className="text-blue-400 hover:text-blue-300 transition-colors text-sm"
-          >
-            {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
-          </button>
-        </div>
+        {/* Toggle Sign In / Sign Up / Reset Password */}
+        {!resetSent && (
+          <div className="mt-6 text-center space-y-2">
+            {!showResetPassword && (
+              <button
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setError('');
+                }}
+                className="text-blue-400 hover:text-blue-300 transition-colors text-sm block w-full"
+              >
+                {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+              </button>
+            )}
+            {!isSignUp && !showResetPassword && (
+              <button
+                onClick={() => {
+                  setShowResetPassword(true);
+                  setError('');
+                }}
+                className="text-blue-400 hover:text-blue-300 transition-colors text-sm block w-full"
+              >
+                Forgot password?
+              </button>
+            )}
+            {showResetPassword && (
+              <button
+                onClick={() => {
+                  setShowResetPassword(false);
+                  setError('');
+                }}
+                className="text-blue-400 hover:text-blue-300 transition-colors text-sm block w-full"
+              >
+                Back to sign in
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Footer Links */}
         <div className="mt-6 text-center space-y-3">
-          {!isSignUp && (
-            <div className="text-gray-400 text-sm">
-              <a href="mailto:support@designrite.com" className="text-blue-400 hover:text-blue-300 transition-colors">
-                Forgot password?
-              </a>
-            </div>
-          )}
           <div className="pt-4 border-t border-blue-600/20">
             <Link
               href="/"
