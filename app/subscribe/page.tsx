@@ -14,12 +14,8 @@ export default function SubscribePage() {
   const [loading, setLoading] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/login?redirect=/subscribe')
-    }
-  }, [user, authLoading, router])
+  // Don't redirect - let guests browse pricing
+  // Only require login when they click subscribe button
 
   const plans = {
     starter: {
@@ -143,17 +139,7 @@ export default function SubscribePage() {
     }
   }
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 text-purple-600 animate-spin mx-auto mb-4" />
-          <p className="text-white">Loading...</p>
-        </div>
-      </div>
-    )
-  }
-
+  // Don't block guests with loading screen - show pricing immediately
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
       <UnifiedNavigation />
