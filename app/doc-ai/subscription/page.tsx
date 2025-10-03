@@ -201,10 +201,10 @@ export default function SubscriptionPage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {plans.map((plan) => {
               const isCurrentPlan = plan.tier === auth.user?.subscriptionTier;
-              const canUpgrade = plan.tier !== 'base' && !isCurrentPlan;
+              const canUpgrade = plan.tier !== 'starter' && !isCurrentPlan;
               const tierIcons = {
-                base: Shield,
-                pro: Zap,
+                starter: Shield,
+                professional: Zap,
                 enterprise: Crown
               };
               const TierIcon = tierIcons[plan.tier];
@@ -214,7 +214,7 @@ export default function SubscriptionPage() {
                   key={plan.tier}
                   className={`
                     relative bg-white rounded-2xl p-8 transition-all
-                    ${plan.tier === 'pro'
+                    ${plan.tier === 'professional'
                       ? 'border-2 border-purple-600 shadow-xl scale-105'
                       : 'border border-gray-200 shadow-md'
                     }
@@ -222,7 +222,7 @@ export default function SubscriptionPage() {
                   `}
                 >
                   {/* Popular Badge */}
-                  {plan.tier === 'pro' && (
+                  {plan.tier === 'professional' && (
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-white text-sm font-bold shadow-md">
                       Most Popular
                     </div>
@@ -240,7 +240,7 @@ export default function SubscriptionPage() {
                     w-16 h-16 rounded-2xl flex items-center justify-center mb-6
                     ${plan.tier === 'enterprise'
                       ? 'bg-gradient-to-br from-yellow-600 to-orange-600'
-                      : plan.tier === 'pro'
+                      : plan.tier === 'professional'
                       ? 'bg-gradient-to-br from-purple-600 to-blue-600'
                       : 'bg-gray-200'
                     }
@@ -267,7 +267,7 @@ export default function SubscriptionPage() {
 
                   {/* Action Button */}
                   <button
-                    onClick={() => canUpgrade && handleUpgrade(plan.tier as 'pro' | 'enterprise')}
+                    onClick={() => canUpgrade && handleUpgrade(plan.tier as 'professional' | 'enterprise')}
                     disabled={!canUpgrade || isLoading}
                     className={`
                       w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2

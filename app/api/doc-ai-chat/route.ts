@@ -122,11 +122,11 @@ export async function POST(req: NextRequest) {
     }
 
     // ============================================
-    // FETCH USER PROFILE (users table)
-    // Changed from 'profiles' to 'users' for unified schema
+    // FETCH USER PROFILE (profiles table)
+    // Uses Supabase 'profiles' table for user data
     // ============================================
     const { data: user, error: userError} = await supabase
-      .from('users')
+      .from('profiles')
       .select('full_name, email, company')
       .eq('id', userId)
       .single();
@@ -481,13 +481,20 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('[Doc AI Chat] Error:', error);
 
-    // Log failed activity
-    const session = await getServerSession(authOptions);
-    if (session?.user?.id) {
-      await logActivity(session.user.id, 'ai_chat', {
-        success: false,
-        errorMessage: (error as Error).message
-      });
+    // Log failed activity (use the session from the try block scope)
+    // Note: session variable is already defined at the top of the POST function (line 44)
+    try {
+      const supabase = createRouteHandlerClient({ cookies });
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session?.user?.id) {
+        await logActivity(session.user.id, 'ai_chat', {
+          success: false,
+          errorMessage: (error as Error).message
+        });
+      }
+    } catch (logError) {
+      console.error('[Doc AI Chat] Error logging failed activity:', logError);
     }
 
     return NextResponse.json(
