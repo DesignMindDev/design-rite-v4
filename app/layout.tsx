@@ -2,7 +2,6 @@
 import './globals.css'
 import ChatAssistant from './components/ChatAssistant'
 import HelpSearchSidebar from './components/HelpSearchSidebar'
-import SessionProvider from './components/SessionProvider'
 
 export const metadata: Metadata = {
   title: 'Design-Rite™ - AI-Powered Security Design Platform',
@@ -87,11 +86,9 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body className="font-inter antialiased">
-        <SessionProvider>
-          {children}
-          <ChatAssistant />
-          <HelpSearchSidebar />
-        </SessionProvider>
+        {children}
+        <ChatAssistant />
+        <HelpSearchSidebar />
       </body>
     </html>
   )
