@@ -3,9 +3,8 @@
  * Provides authenticated access to the harvester service
  */
 
-import * as auth from './auth'
-
 const HARVESTER_API_URL = process.env.NEXT_PUBLIC_HARVESTER_API_URL || 'http://localhost:8000'
+const HARVESTER_PASSWORD = process.env.HARVESTER_PASSWORD || process.env.ADMIN_PASSWORD || 'Pl@tformbuilder2025'
 
 export interface HarvestJob {
   job_id: string
@@ -51,9 +50,6 @@ class HarvesterClient {
       return this.token
     }
 
-    // Get admin password from Design-Rite auth system
-    const adminPassword = auth.ADMIN_PASSWORD
-
     try {
       const response = await fetch(`${HARVESTER_API_URL}/api/v1/auth/login`, {
         method: 'POST',
@@ -61,7 +57,7 @@ class HarvesterClient {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          password: adminPassword
+          password: HARVESTER_PASSWORD
         })
       })
 
