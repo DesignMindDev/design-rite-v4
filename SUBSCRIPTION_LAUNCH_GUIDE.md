@@ -29,7 +29,7 @@ You now have a **complete, production-ready subscription system** that can accep
 - Automatic subscription status updates
 
 #### **4. User Experience**
-- 30-day free trial (no credit card required initially)
+- 14-day free trial (credit card required)
 - Monthly and annual billing options (20% discount for annual)
 - Instant access after signup
 - Dashboard shows subscription status and usage limits
@@ -197,7 +197,7 @@ Monitor at https://dashboard.stripe.com:
 3. **Checkout**
    - Clicks "Start 30-Day Free Trial"
    - Redirected to Stripe Checkout
-   - Enters payment details (no charge for 30 days)
+   - Enters payment details (no charge for 14 days)
    - Trial starts immediately
 
 4. **Activation**
@@ -206,7 +206,7 @@ Monitor at https://dashboard.stripe.com:
    - Can immediately use platform features
 
 5. **Trial → Paid**
-   - After 30 days, Stripe automatically charges card
+   - After 14 days, Stripe automatically charges card
    - Webhook updates subscription status to "active"
    - Customer continues using platform
    - Email notification sent (TODO: configure in Stripe)

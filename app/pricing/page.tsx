@@ -25,7 +25,7 @@ export default function PricingPage() {
         'Standard equipment database',
         'Email support',
         'Mobile app access',
-        '30-day free trial'
+        '14-day free trial'
       ],
       cta: 'Start Free Trial',
       popular: false
@@ -220,8 +220,8 @@ export default function PricingPage() {
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
               <h3 className="text-xl font-bold text-white mb-3">What's included in the free trial?</h3>
               <p className="text-gray-300">
-                All plans include a 30-day free trial with full access to features. No credit card required. 
-                You can perform up to 10 assessments during your trial period.
+                All plans include a 14-day free trial with full access to features. Credit card required to prevent abuse,
+                but you won't be charged until day 15. Cancel anytime before then at no cost.
               </p>
             </div>
 
@@ -256,7 +256,7 @@ export default function PricingPage() {
               onClick={redirectToApp}
               className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg"
             >
-              Start Free Trial - No Credit Card Required
+              Start 14-Day Free Trial
             </button>
             <Link 
               href="/contact" 

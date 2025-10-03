@@ -30,7 +30,7 @@ export default function SubscribePage() {
         'Standard equipment database',
         'Email support',
         'Mobile app access',
-        '30-day free trial'
+        '14-day free trial'
       ],
       limits: {
         assessments: 25,
@@ -155,7 +155,7 @@ export default function SubscribePage() {
             Choose Your Plan
           </h1>
           <p className="text-xl text-gray-400 leading-relaxed mb-8">
-            Start with a 30-day free trial. No credit card required. Cancel anytime.
+            Start with a 14-day free trial. Your card won't be charged until day 15. Cancel anytime.
           </p>
 
           {/* Trust Badges */}
@@ -267,7 +267,7 @@ export default function SubscribePage() {
                         Processing...
                       </>
                     ) : (
-                      <>Start 30-Day Free Trial</>
+                      <>Start 14-Day Free Trial</>
                     )}
                   </button>
                 </div>
@@ -286,8 +286,9 @@ export default function SubscribePage() {
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
               <h3 className="text-xl font-bold text-white mb-3">Is the free trial really free?</h3>
               <p className="text-gray-300">
-                Yes! Start with a 30-day free trial with full access to all features in your chosen plan.
-                No credit card required. You can cancel anytime before the trial ends with no charges.
+                Yes! Start with a 14-day free trial with full access to all features in your chosen plan.
+                We require a valid payment method to prevent abuse, but you won't be charged until day 15.
+                Cancel anytime before then at no cost.
               </p>
             </div>
 

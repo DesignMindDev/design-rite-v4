@@ -129,7 +129,7 @@ Your platform can now accept paying customers!
 2. Selects tier → Clicks "Start Free Trial"
 3. Completes Stripe Checkout
 4. Gets immediate access to platform
-5. 30 days later, automatically charged
+5. 14 days later, automatically charged
 
 **You Monitor:**
 - Revenue: `/admin/subscriptions`
