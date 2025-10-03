@@ -108,8 +108,9 @@ export async function POST(request: NextRequest) {
 function getPriceIdForPlan(planId: string): string | null {
   // Update these with your actual Stripe Price IDs from the dashboard
   const priceMap: Record<string, string> = {
-    'professional': process.env.STRIPE_PROFESSIONAL_PRICE_ID || '',
-    'enterprise': process.env.STRIPE_ENTERPRISE_PRICE_ID || ''
+    'starter': process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER || '',
+    'professional': process.env.NEXT_PUBLIC_STRIPE_PRICE_PROFESSIONAL || '',
+    'enterprise': process.env.NEXT_PUBLIC_STRIPE_PRICE_ENTERPRISE || ''
   }
 
   return priceMap[planId] || null
