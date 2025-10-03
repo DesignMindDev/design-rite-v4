@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
+import { useSupabaseAuth } from '@/lib/hooks/useSupabaseAuth'
 import { useRouter } from 'next/navigation'
 
 interface TeamMember {
@@ -77,7 +77,7 @@ interface ModulePermissions {
 }
 
 export default function AdminPage() {
-  const { data: session, status } = useSession()
+  const auth = useSupabaseAuth()
   const router = useRouter()
   const [isMounted, setIsMounted] = useState(false)
   const [modulePerms, setModulePerms] = useState<ModulePermissions | null>(null)
@@ -114,14 +114,14 @@ export default function AdminPage() {
     setIsMounted(true)
 
     // Redirect if not authenticated
-    if (status === 'unauthenticated') {
+    if (!auth.isLoading && !auth.isAuthenticated) {
       router.push('/admin/login?callbackUrl=/admin')
       return
     }
 
     // Check if user has permission to access admin content management
-    if (status === 'authenticated') {
-      const role = session?.user?.role
+    if (auth.isAuthenticated && auth.user) {
+      const role = auth.user.role
       if (!['super_admin', 'admin'].includes(role || '')) {
         router.push('/admin/login')
         return
@@ -135,7 +135,7 @@ export default function AdminPage() {
       loadSiteSettings()
       loadBlogPosts()
     }
-  }, [session, status, router])
+  }, [auth.isAuthenticated, auth.isLoading, auth.user, router])
 
   // Load Spatial Studio metrics when Analytics tab is active
   useEffect(() => {
@@ -153,13 +153,13 @@ export default function AdminPage() {
 
   const fetchModulePermissions = async () => {
     try {
-      const response = await fetch(`/api/admin/get-user?userId=${session?.user?.id}`)
+      const response = await fetch(`/api/admin/get-user?userId=${auth.user?.id}`)
       if (response.ok) {
         const data = await response.json()
         const perms = data.modulePermissions
 
         // Super admins get all permissions by default
-        if (session?.user?.role === 'super_admin') {
+        if (auth.user?.role === 'super_admin') {
           setModulePerms({
             operations_dashboard: true,
             ai_management: true,
@@ -183,7 +183,7 @@ export default function AdminPage() {
   // Helper function to check if user has access to a module
   const hasModuleAccess = (module: keyof ModulePermissions) => {
     if (!modulePerms) return true // Loading state - show all until permissions load
-    if (session?.user?.role === 'super_admin') return true
+    if (auth.user?.role === 'super_admin') return true
     return modulePerms[module]
   }
 
@@ -319,13 +319,13 @@ export default function AdminPage() {
     }
   }
 
-  if (!isMounted || status === 'loading') {
+  if (!isMounted || auth.isLoading) {
     return <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] flex items-center justify-center">
       <div className="text-white">Loading...</div>
     </div>
   }
 
-  if (status === 'unauthenticated' || !['super_admin', 'admin'].includes(session?.user?.role || '')) {
+  if (!auth.isAuthenticated || !['super_admin', 'admin'].includes(auth.user?.role || '')) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] flex items-center justify-center">
         <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 max-w-md w-full mx-4 text-center">

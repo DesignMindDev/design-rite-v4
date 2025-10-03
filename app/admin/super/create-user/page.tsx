@@ -1,13 +1,15 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 export default function CreateUserPage() {
-  const { data: session, status } = useSession();
+  const supabase = createClientComponentClient();
   const router = useRouter();
+  const [session, setSession] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string>('user');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -24,15 +26,44 @@ export default function CreateUserPage() {
   });
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/admin/login');
-      return;
-    }
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (!session) {
+        router.push('/admin/login');
+        return;
+      }
 
-    if (session?.user?.role !== 'super_admin' && session?.user?.role !== 'admin') {
+      // Check role
+      checkUserRole(session.user.id);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (!session) {
+        router.push('/admin/login');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [router]);
+
+  const checkUserRole = async (sessionUserId: string) => {
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', sessionUserId)
+      .single();
+
+    const role = roleData?.role || 'user';
+    setUserRole(role);
+    if (role !== 'super_admin' && role !== 'admin') {
       router.push('/admin/login');
     }
-  }, [session, status, router]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +73,7 @@ export default function CreateUserPage() {
 
     try {
       // Validate role restrictions for regular admins
-      if (session?.user?.role === 'admin' && (formData.role === 'super_admin' || formData.role === 'admin')) {
+      if (userRole === 'admin' && (formData.role === 'super_admin' || formData.role === 'admin')) {
         setError('Admins can only create User or Manager roles');
         setLoading(false);
         return;
@@ -95,7 +126,7 @@ export default function CreateUserPage() {
     });
   };
 
-  if (status === 'loading') {
+  if (!session) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
         <div className="text-white text-lg">Loading...</div>
@@ -190,7 +221,7 @@ export default function CreateUserPage() {
                 required
                 disabled={loading}
               >
-                {session?.user?.role === 'super_admin' && (
+                {userRole === 'super_admin' && (
                   <>
                     <option value="super_admin">Super Admin</option>
                     <option value="admin">Admin</option>
@@ -201,7 +232,7 @@ export default function CreateUserPage() {
                 <option value="guest">Guest</option>
               </select>
               <p className="text-gray-500 text-sm mt-1">
-                {session?.user?.role === 'admin' && 'Admins can only create User or Manager roles'}
+                {userRole === 'admin' && 'Admins can only create User or Manager roles'}
               </p>
             </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useSupabaseAuth } from '@/lib/hooks/useSupabaseAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -27,7 +27,7 @@ interface AdminUser {
 }
 
 export default function PermissionsManagement() {
-  const { data: session, status } = useSession();
+  const auth = useSupabaseAuth();
   const router = useRouter();
   const [admins, setAdmins] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,21 +35,21 @@ export default function PermissionsManagement() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (status === 'loading') return;
+    if (auth.isLoading) return;
 
-    if (status === 'unauthenticated') {
+    if (!auth.isAuthenticated) {
       router.push('/admin/login');
       return;
     }
 
     // Only super_admin can access this page
-    if (session?.user?.role !== 'super_admin') {
+    if (auth.user?.role !== 'super_admin') {
       router.push('/admin/super');
       return;
     }
 
     fetchAdmins();
-  }, [session, status, router]);
+  }, [auth.isAuthenticated, auth.isLoading, auth.user, router]);
 
   const fetchAdmins = async () => {
     try {

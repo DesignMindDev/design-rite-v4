@@ -1,14 +1,15 @@
 /**
  * Permission checking and rate limiting for Design-Rite v3
  * Server-side permission validation with Supabase backend
+ * MIGRATED TO SUPABASE AUTH - 2025-10-03
  */
 
-import { getServerSession } from 'next-auth';
-import { authOptions } from './auth-config';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 import { createClient } from '@supabase/supabase-js';
 
 // Supabase client with service role key for admin operations
-const supabase = createClient(
+const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_KEY!
 );
@@ -46,6 +47,31 @@ export interface RateLimitResult {
 }
 
 /**
+ * Get current user session from Supabase
+ */
+async function getCurrentSession() {
+  const supabase = createServerComponentClient({ cookies });
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) return null;
+
+  // Get user role
+  const { data: roleData } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', session.user.id)
+    .single();
+
+  return {
+    ...session,
+    user: {
+      ...session.user,
+      role: roleData?.role || 'guest'
+    }
+  };
+}
+
+/**
  * Check if current user has permission for an action on a feature
  * @param feature - Feature to check permission for
  * @param action - Action to perform (read, create, update, delete, export)
@@ -56,7 +82,7 @@ export async function checkPermission(
   action: PermissionAction
 ): Promise<boolean> {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getCurrentSession();
 
     if (!session?.user?.role) {
       return false;
@@ -68,7 +94,7 @@ export async function checkPermission(
     }
 
     // Check permission in database
-    const { data: permission, error } = await supabase
+    const { data: permission, error } = await supabaseAdmin
       .from('permissions')
       .select(`can_${action}`)
       .eq('role', session.user.role)
@@ -98,7 +124,7 @@ export async function checkRateLimit(
   feature: Feature
 ): Promise<RateLimitResult> {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getCurrentSession();
 
     if (!session?.user?.role) {
       return { allowed: false, remaining: 0, limit: 0 };
@@ -110,7 +136,7 @@ export async function checkRateLimit(
     }
 
     // Check if user has rate limit override
-    const { data: user } = await supabase
+    const { data: user } = await supabaseAdmin
       .from('users')
       .select('rate_limit_override')
       .eq('id', userId)
@@ -121,7 +147,7 @@ export async function checkRateLimit(
     }
 
     // Get user's permission limits
-    const { data: permission } = await supabase
+    const { data: permission } = await supabaseAdmin
       .from('permissions')
       .select('daily_limit, monthly_limit')
       .eq('role', session.user.role)
@@ -135,7 +161,7 @@ export async function checkRateLimit(
 
     // Get today's usage
     const today = new Date().toISOString().split('T')[0];
-    const { data: usage } = await supabase
+    const { data: usage } = await supabaseAdmin
       .from('usage_tracking')
       .select('daily_count')
       .eq('user_id', userId)
@@ -172,7 +198,7 @@ export async function incrementUsage(userId: string, feature: Feature): Promise<
     const today = new Date().toISOString().split('T')[0];
 
     // Call Supabase function to increment usage
-    const { error } = await supabase.rpc('increment_usage', {
+    const { error } = await supabaseAdmin.rpc('increment_usage', {
       p_user_id: userId,
       p_feature: feature,
       p_usage_date: today
@@ -199,7 +225,7 @@ export async function getUsageCount(
   period: 'daily' | 'monthly' = 'daily'
 ): Promise<number> {
   try {
-    const { data, error } = await supabase.rpc('get_usage_count', {
+    const { data, error } = await supabaseAdmin.rpc('get_usage_count', {
       p_user_id: userId,
       p_feature: feature,
       p_period: period
@@ -241,7 +267,7 @@ export async function logActivity(
   }
 ): Promise<void> {
   try {
-    const { error } = await supabase.from('activity_logs').insert({
+    const { error } = await supabaseAdmin.from('activity_logs').insert({
       user_id: userId,
       action,
       resource_type: options?.resourceType,
@@ -267,7 +293,7 @@ export async function logActivity(
  * @returns Promise<boolean> - True if user has required role or higher
  */
 export async function hasRole(requiredRole: Role): Promise<boolean> {
-  const session = await getServerSession(authOptions);
+  const session = await getCurrentSession();
 
   if (!session?.user?.role) {
     return false;
@@ -292,7 +318,7 @@ export async function hasRole(requiredRole: Role): Promise<boolean> {
  * @returns Promise<Session | null> - Current session or null
  */
 export async function getCurrentUser() {
-  return await getServerSession(authOptions);
+  return await getCurrentSession();
 }
 
 /**
@@ -300,7 +326,7 @@ export async function getCurrentUser() {
  * @throws Error if user is not authenticated
  */
 export async function requireAuth() {
-  const session = await getServerSession(authOptions);
+  const session = await getCurrentSession();
 
   if (!session) {
     throw new Error('Unauthorized - Authentication required');
@@ -330,7 +356,7 @@ export async function requireRole(requiredRole: Role) {
  * @returns Promise<boolean> - True if current user can manage target user
  */
 export async function canManageUser(targetUserId: string): Promise<boolean> {
-  const session = await getServerSession(authOptions);
+  const session = await getCurrentSession();
 
   if (!session?.user?.role) {
     return false;
@@ -342,7 +368,7 @@ export async function canManageUser(targetUserId: string): Promise<boolean> {
   }
 
   // Get target user's details
-  const { data: targetUser } = await supabase
+  const { data: targetUser } = await supabaseAdmin
     .from('users')
     .select('role, created_by')
     .eq('id', targetUserId)

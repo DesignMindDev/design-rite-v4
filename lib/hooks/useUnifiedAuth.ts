@@ -1,11 +1,12 @@
 /**
  * Unified Auth Hook
- * Combines Next-Auth session with Design-Rite permission checking
+ * Uses Supabase Auth with Design-Rite permission checking
  * Replaces Document AI's useAuth hook with unified schema support
  */
 
-import { useSession } from 'next-auth/react';
-import { useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import type { Session } from '@supabase/supabase-js';
 
 export interface UnifiedAuthUser {
   id: string;
@@ -62,14 +63,81 @@ export interface UnifiedAuthState {
  * ```
  */
 export function useUnifiedAuth(): UnifiedAuthState {
-  const { data: session, status } = useSession();
+  const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setIsLoading(false);
+      }
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setProfile(null);
+        setIsLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          full_name,
+          company,
+          phone,
+          subscription_tier,
+          subscription_status,
+          stripe_customer_id
+        `)
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+
+      // Fetch role from user_roles table
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+
+      setProfile({ ...data, role: roleData?.role || 'user' });
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      // Set default profile if fetch fails
+      setProfile({
+        role: 'user',
+        subscription_tier: 'base',
+        subscription_status: 'inactive'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return useMemo(() => {
-    const isLoading = status === 'loading';
-    const isAuthenticated = status === 'authenticated' && !!session?.user;
+    const isAuthenticated = !!session?.user && !!profile;
 
     // Not authenticated - return empty state
-    if (!isAuthenticated || !session?.user) {
+    if (!isAuthenticated || !session?.user || !profile) {
       return {
         user: null,
         session: null,
@@ -89,21 +157,20 @@ export function useUnifiedAuth(): UnifiedAuthState {
       };
     }
 
-    // Extract user data from session
-    const sessionUser = session.user as any;
-    const role = (sessionUser.role || 'guest') as UnifiedAuthUser['role'];
-    const subscriptionTier = (sessionUser.subscriptionTier || 'base') as UnifiedAuthUser['tier'];
-    const subscriptionStatus = (sessionUser.subscriptionStatus || 'inactive') as UnifiedAuthUser['subscriptionStatus'];
+    // Extract user data
+    const role = (profile.role || 'guest') as UnifiedAuthUser['role'];
+    const subscriptionTier = (profile.subscription_tier || 'base') as UnifiedAuthUser['subscriptionTier'];
+    const subscriptionStatus = (profile.subscription_status || 'inactive') as UnifiedAuthUser['subscriptionStatus'];
 
     const user: UnifiedAuthUser = {
-      id: sessionUser.id,
-      email: sessionUser.email!,
-      name: sessionUser.name,
+      id: session.user.id,
+      email: session.user.email!,
+      name: profile.full_name,
       role,
       subscriptionTier,
       subscriptionStatus,
-      company: sessionUser.company,
-      stripeCustomerId: sessionUser.stripeCustomerId
+      company: profile.company,
+      stripeCustomerId: profile.stripe_customer_id
     };
 
     // Role hierarchy
@@ -166,7 +233,7 @@ export function useUnifiedAuth(): UnifiedAuthState {
       hasRole,
       hasTier
     };
-  }, [session, status]);
+  }, [session, profile, isLoading]);
 }
 
 /**
@@ -181,14 +248,15 @@ export function useUnifiedAuth(): UnifiedAuthState {
  * AFTER (Unified):
  * ```typescript
  * import { useUnifiedAuth } from '@/lib/hooks/useUnifiedAuth';
- * import { signIn, signOut } from 'next-auth/react';
+ * import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
  *
  * const auth = useUnifiedAuth();
  * const { user, session, isLoading } = auth;
+ * const supabase = createClientComponentClient();
  *
- * // Sign in/out handled by Next-Auth
- * await signIn('credentials', { email, password });
- * await signOut();
+ * // Sign in/out handled by Supabase
+ * await supabase.auth.signInWithPassword({ email, password });
+ * await supabase.auth.signOut();
  * ```
  *
  * Property Mapping:
@@ -198,6 +266,6 @@ export function useUnifiedAuth(): UnifiedAuthState {
  * - NEW: `user.role` - User's role (super_admin, admin, manager, user, guest)
  * - NEW: `user.subscriptionTier` - Subscription tier (base, pro, enterprise)
  * - NEW: `isPro`, `isEnterprise`, `hasSubscription` - Subscription checks
- * - `signIn()` → `import { signIn } from 'next-auth/react'`
- * - `signOut()` → `import { signOut } from 'next-auth/react'`
+ * - `signIn()` → `supabase.auth.signInWithPassword()`
+ * - `signOut()` → `supabase.auth.signOut()`
  */

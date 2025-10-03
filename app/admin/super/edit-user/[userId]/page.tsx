@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -53,11 +53,13 @@ interface User {
 }
 
 export default function EditUserPage() {
-  const { data: session, status } = useSession();
+  const supabase = createClientComponentClient();
   const router = useRouter();
   const params = useParams();
   const userId = params?.userId as string;
 
+  const [session, setSession] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string>('user');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -93,20 +95,50 @@ export default function EditUserPage() {
   });
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/admin/login');
-      return;
-    }
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (!session) {
+        router.push('/admin/login');
+        return;
+      }
 
-    if (session?.user?.role !== 'super_admin' && session?.user?.role !== 'admin') {
-      router.push('/admin/super');
-      return;
-    }
+      // Check role (from profiles table)
+      checkUserRole(session.user.id);
+    });
 
-    if (userId) {
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (!session) {
+        router.push('/admin/login');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [router]);
+
+  useEffect(() => {
+    if (session && userId) {
       fetchUser();
     }
-  }, [session, status, userId, router]);
+  }, [session, userId]);
+
+  const checkUserRole = async (sessionUserId: string) => {
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', sessionUserId)
+      .single();
+
+    const role = roleData?.role || 'user';
+    setUserRole(role);
+    if (role !== 'super_admin' && role !== 'admin') {
+      router.push('/admin/super');
+    }
+  };
 
   const fetchUser = async () => {
     try {
@@ -249,7 +281,7 @@ export default function EditUserPage() {
                   className="w-full bg-[#0A0A0A] border border-purple-600/30 rounded px-4 py-2 text-white"
                   required
                 >
-                  {session?.user?.role === 'super_admin' && (
+                  {userRole === 'super_admin' && (
                     <>
                       <option value="super_admin">Super Admin</option>
                       <option value="admin">Admin</option>

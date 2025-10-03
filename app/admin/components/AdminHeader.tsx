@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession, signOut } from 'next-auth/react';
+import { useSupabaseAuth } from '@/lib/hooks/useSupabaseAuth';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -21,11 +21,12 @@ export default function AdminHeader({
   showBackButton = true,
   backButtonUrl = '/admin'
 }: AdminHeaderProps) {
-  const { data: session } = useSession();
+  const auth = useSupabaseAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: '/admin/login' });
+    await auth.signOut();
+    window.location.href = '/admin/login';
   };
 
   const getRoleBadgeColor = (role?: string) => {
@@ -89,16 +90,16 @@ export default function AdminHeader({
             >
               {/* User avatar */}
               <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-purple-700 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                {session?.user?.name?.charAt(0).toUpperCase() || 'U'}
+                {auth.user?.fullName?.charAt(0).toUpperCase() || auth.user?.email?.charAt(0).toUpperCase() || 'U'}
               </div>
 
               {/* User info */}
               <div className="text-left hidden md:block">
                 <div className="text-white font-medium text-sm">
-                  {session?.user?.name || session?.user?.email}
+                  {auth.user?.fullName || auth.user?.email}
                 </div>
-                <div className={`text-xs px-2 py-0.5 rounded inline-block border ${getRoleBadgeColor(session?.user?.role)}`}>
-                  {getRoleDisplayName(session?.user?.role)}
+                <div className={`text-xs px-2 py-0.5 rounded inline-block border ${getRoleBadgeColor(auth.user?.role)}`}>
+                  {getRoleDisplayName(auth.user?.role)}
                 </div>
               </div>
 
@@ -118,11 +119,11 @@ export default function AdminHeader({
             {showUserMenu && (
               <div className="absolute right-0 mt-2 w-64 bg-[#1A1A1A] border border-purple-600/30 rounded-lg shadow-xl z-50">
                 <div className="p-4 border-b border-purple-600/20">
-                  <div className="text-white font-medium">{session?.user?.name}</div>
-                  <div className="text-gray-400 text-sm">{session?.user?.email}</div>
-                  {session?.user?.accessCode && (
+                  <div className="text-white font-medium">{auth.user?.fullName}</div>
+                  <div className="text-gray-400 text-sm">{auth.user?.email}</div>
+                  {auth.user?.company && (
                     <div className="text-gray-500 text-xs mt-1">
-                      Access Code: {session.user.accessCode}
+                      Company: {auth.user.company}
                     </div>
                   )}
                 </div>

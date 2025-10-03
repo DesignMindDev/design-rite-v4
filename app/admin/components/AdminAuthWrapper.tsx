@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useSupabaseAuth } from '@/lib/hooks/useSupabaseAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect, ReactNode } from 'react';
 
@@ -19,21 +19,21 @@ export default function AdminAuthWrapper({
   requiredRole,
   loadingMessage = 'Loading...'
 }: AdminAuthWrapperProps) {
-  const { data: session, status } = useSession();
+  const auth = useSupabaseAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === 'loading') return;
+    if (auth.isLoading) return;
 
     // Not authenticated - redirect to login
-    if (status === 'unauthenticated') {
+    if (!auth.isAuthenticated) {
       const currentPath = window.location.pathname;
       router.push(`/admin/login?callbackUrl=${encodeURIComponent(currentPath)}`);
       return;
     }
 
     // Check role requirement if specified
-    if (requiredRole && session?.user?.role) {
+    if (requiredRole && auth.user?.role) {
       const roleHierarchy: Record<string, number> = {
         super_admin: 5,
         admin: 4,
@@ -42,7 +42,7 @@ export default function AdminAuthWrapper({
         guest: 1
       };
 
-      const userRoleLevel = roleHierarchy[session.user.role] || 0;
+      const userRoleLevel = roleHierarchy[auth.user.role] || 0;
       const requiredRoleLevel = roleHierarchy[requiredRole] || 0;
 
       if (userRoleLevel < requiredRoleLevel) {
@@ -51,10 +51,10 @@ export default function AdminAuthWrapper({
         return;
       }
     }
-  }, [status, session, requiredRole, router]);
+  }, [auth.isAuthenticated, auth.isLoading, auth.user, requiredRole, router]);
 
   // Show loading state
-  if (status === 'loading') {
+  if (auth.isLoading) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
         <div className="text-center">
@@ -66,12 +66,12 @@ export default function AdminAuthWrapper({
   }
 
   // Not authenticated or insufficient role - show nothing (redirecting)
-  if (status === 'unauthenticated') {
+  if (!auth.isAuthenticated) {
     return null;
   }
 
   // Check role requirement
-  if (requiredRole && session?.user?.role) {
+  if (requiredRole && auth.user?.role) {
     const roleHierarchy: Record<string, number> = {
       super_admin: 5,
       admin: 4,
@@ -80,7 +80,7 @@ export default function AdminAuthWrapper({
       guest: 1
     };
 
-    const userRoleLevel = roleHierarchy[session.user.role] || 0;
+    const userRoleLevel = roleHierarchy[auth.user.role] || 0;
     const requiredRoleLevel = roleHierarchy[requiredRole] || 0;
 
     if (userRoleLevel < requiredRoleLevel) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -21,28 +21,61 @@ interface AdminAccessLog {
 }
 
 export default function ActivityLogViewer() {
-  const { data: session, status } = useSession();
+  const supabase = createClientComponentClient();
   const router = useRouter();
+  const [session, setSession] = useState<any>(null);
   const [logs, setLogs] = useState<AdminAccessLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'allowed' | 'denied'>('all');
   const [searchEmail, setSearchEmail] = useState('');
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/admin/login');
-      return;
-    }
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (!session) {
+        router.push('/admin/login');
+        return;
+      }
 
-    if (session?.user?.role !== 'super_admin' && session?.user?.role !== 'admin') {
-      router.push('/admin/login');
-      return;
-    }
+      // Check role
+      checkUserRole(session.user.id);
+    });
 
-    if (status === 'authenticated') {
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (!session) {
+        router.push('/admin/login');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [router]);
+
+  useEffect(() => {
+    if (session) {
       fetchActivityLogs();
     }
-  }, [session, status, router]);
+  }, [session]);
+
+  const checkUserRole = async (sessionUserId: string) => {
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', sessionUserId)
+      .single();
+
+    const userRole = roleData?.role || 'user';
+    if (userRole !== 'super_admin' && userRole !== 'admin') {
+      router.push('/admin/login');
+      return;
+    }
+
+    fetchActivityLogs();
+  };
 
   const fetchActivityLogs = async () => {
     try {

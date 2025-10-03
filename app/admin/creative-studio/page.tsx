@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useSession } from 'next-auth/react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -274,25 +274,41 @@ Ready to create something amazing? Upload your first asset! 📸✨`,
     return specs[deviceType as keyof typeof specs] || 'Standard Device'
   }
 
-  const { data: session, status } = useSession()
+  const supabase = createClientComponentClient()
   const router = useRouter()
+  const [session, setSession] = useState<any>(null)
 
   useEffect(() => {
     setIsMounted(true)
 
-    // Redirect if not authenticated
-    if (status === 'unauthenticated') {
-      router.push('/admin/login?callbackUrl=/admin/creative-studio')
-      return
-    }
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      if (session) {
+        setIsAuthenticated(true)
+        loadAssets()
+        loadContentDrafts()
+      } else {
+        router.push('/admin/login?callbackUrl=/admin/creative-studio')
+      }
+    })
 
-    // Load data when authenticated
-    if (status === 'authenticated') {
-      setIsAuthenticated(true)
-      loadAssets()
-      loadContentDrafts()
-    }
-  }, [status, router])
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+      if (session) {
+        setIsAuthenticated(true)
+        loadAssets()
+        loadContentDrafts()
+      } else {
+        router.push('/admin/login?callbackUrl=/admin/creative-studio')
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [router])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })

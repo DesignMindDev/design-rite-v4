@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useSupabaseAuth } from '@/lib/hooks/useSupabaseAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -56,7 +56,7 @@ interface ActivityLog {
 }
 
 export default function SuperAdminDashboard() {
-  const { data: session, status } = useSession();
+  const auth = useSupabaseAuth();
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
@@ -67,19 +67,19 @@ export default function SuperAdminDashboard() {
 
   useEffect(() => {
     // Don't do anything while loading
-    if (status === 'loading') {
+    if (auth.isLoading) {
       return;
     }
 
     // Redirect if not authenticated
-    if (status === 'unauthenticated') {
+    if (!auth.isAuthenticated) {
       router.push('/admin/login');
       return;
     }
 
     // Check role only when authenticated
-    if (status === 'authenticated') {
-      const userRole = (session?.user as any)?.role;
+    if (auth.isAuthenticated && auth.user) {
+      const userRole = auth.user.role;
 
       // Redirect if not admin or super_admin
       if (!userRole || (!['super_admin', 'admin'].includes(userRole))) {
@@ -90,7 +90,7 @@ export default function SuperAdminDashboard() {
       // Fetch data only once when authenticated and authorized
       fetchDashboardData();
     }
-  }, [session, status, router]);
+  }, [auth.isAuthenticated, auth.isLoading, auth.user, router]);
 
   const fetchDashboardData = async () => {
     try {
@@ -104,8 +104,8 @@ export default function SuperAdminDashboard() {
       setRecentActivity(data.recentActivity);
 
       // Fetch user permissions
-      if ((session?.user as any)?.id) {
-        const permResponse = await fetch(`/api/admin/get-permissions?userId=${(session.user as any).id}`);
+      if (auth.user?.id) {
+        const permResponse = await fetch(`/api/admin/get-permissions?userId=${auth.user.id}`);
         if (permResponse.ok) {
           const permData = await permResponse.json();
           setPermissions(permData.permissions);
@@ -278,10 +278,10 @@ export default function SuperAdminDashboard() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold">
-              {(session?.user as any)?.role === 'super_admin' ? 'Super Admin Dashboard' : 'Admin Dashboard'}
+              {auth.user?.role === 'super_admin' ? 'Super Admin Dashboard' : 'Admin Dashboard'}
             </h1>
             <p className="text-gray-400">
-              Logged in as: {session?.user?.name} ({(session?.user as any)?.role})
+              Logged in as: {auth.user?.fullName || auth.user?.email} ({auth.user?.role})
             </p>
           </div>
           <div className="flex gap-3 items-center">
@@ -329,7 +329,7 @@ export default function SuperAdminDashboard() {
                       <div className="font-semibold text-white">Quotes</div>
                       <div className="text-xs text-gray-400">This month (Coming soon)</div>
                     </button>
-                    {(session?.user as any)?.role === 'super_admin' && (
+                    {auth.user?.role === 'super_admin' && (
                       <button
                         onClick={() => {
                           handleExport('database');
@@ -346,7 +346,7 @@ export default function SuperAdminDashboard() {
               </div>
             )}
 
-            {(session?.user as any)?.role === 'super_admin' && (
+            {auth.user?.role === 'super_admin' && (
               <Link
                 href="/admin/super/permissions"
                 className="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded transition-colors"
@@ -500,7 +500,7 @@ export default function SuperAdminDashboard() {
                             Reactivate
                           </button>
                         )}
-                        {(session?.user as any)?.role === 'super_admin' && (
+                        {auth.user?.role === 'super_admin' && (
                           <button
                             onClick={() => handleDeleteUser(user.id, user.email)}
                             className="text-red-400 hover:text-red-300 text-sm"
