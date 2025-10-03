@@ -31,19 +31,55 @@ export default function DashboardPage() {
 
   const fetchUserStats = async () => {
     try {
-      // In production, this would call your backend API
-      // For now, we'll use trial defaults based on Supabase user metadata
-      const plan = user?.user_metadata?.plan || 'trial';
-      const trialExpires = user?.user_metadata?.trial_expires;
+      // Fetch subscription data from Supabase
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+
+      const { data: subscription, error } = await supabase
+        .from('subscriptions')
+        .select('tier, status, billing_period, current_period_end, next_billing_date')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .or('status.eq.trialing')
+        .single();
+
+      let plan = 'trial';
+      let assessmentLimit = 3;
+
+      if (subscription && !error) {
+        plan = subscription.tier;
+        // Set limits based on tier
+        switch (subscription.tier) {
+          case 'starter':
+            assessmentLimit = 25;
+            break;
+          case 'professional':
+          case 'enterprise':
+            assessmentLimit = -1; // Unlimited
+            break;
+          default:
+            assessmentLimit = 3;
+        }
+      }
 
       setUserStats({
-        assessmentsUsed: 0, // This would come from backend
-        assessmentLimit: plan === 'trial' ? 3 : -1,
-        plan: plan,
+        assessmentsUsed: 0, // TODO: Fetch actual usage from activity logs
+        assessmentLimit,
+        plan,
         lastAssessment: undefined
       });
     } catch (error) {
       console.error('Failed to fetch user stats:', error);
+      // Fall back to trial
+      setUserStats({
+        assessmentsUsed: 0,
+        assessmentLimit: 3,
+        plan: 'trial',
+        lastAssessment: undefined
+      });
     } finally {
       setStatsLoading(false);
     }

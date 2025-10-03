@@ -9,7 +9,7 @@ export default function PricingPage() {
   const [billingPeriod, setBillingPeriod] = useState('monthly') // 'monthly' or 'annual'
 
   const redirectToApp = () => {
-    window.location.href = '/waitlist'
+    window.location.href = '/subscribe'
   }
 
   const plans = {
@@ -33,8 +33,8 @@ export default function PricingPage() {
     professional: {
       name: 'Professional',
       description: 'For established integrators scaling their business',
-      monthlyPrice: 149,
-      annualPrice: 1490, // 2 months free
+      monthlyPrice: 199,
+      annualPrice: 1990, // 2 months free
       features: [
         'Unlimited assessments',
         'Advanced AI recommendations',
