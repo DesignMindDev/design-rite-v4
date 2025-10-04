@@ -580,6 +580,10 @@ export default function AdminPage() {
                     <span>📅</span>
                     <span>Demo Dashboard</span>
                   </Link>
+                  <Link href="/admin/testing" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-yellow-600/20 transition-colors">
+                    <span>🧪</span>
+                    <span>Testing Dashboard</span>
+                  </Link>
                 </div>
               </div>
             </div>
