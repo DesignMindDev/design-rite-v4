@@ -15,7 +15,7 @@ export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
   // Allow access to login page
-  if (path.startsWith('/admin/login')) {
+  if (path.startsWith('/login')) {
     return res;
   }
 
@@ -25,7 +25,7 @@ export async function middleware(req: NextRequest) {
 
     if (!session) {
       // Redirect to login if not authenticated
-      const loginUrl = new URL('/admin/login', req.url);
+      const loginUrl = new URL('/login', req.url);
       loginUrl.searchParams.set('callbackUrl', path);
       return NextResponse.redirect(loginUrl);
     }
