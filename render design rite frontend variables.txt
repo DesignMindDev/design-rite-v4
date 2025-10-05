@@ -1,0 +1,57 @@
+Web Service
+design-rite-frontend
+Node
+Free
+Upgrade your instance
+
+Connect
+
+Manual Deploy
+Service ID:
+srv-d1nf6cp5pdvs739cmlc0
+
+DesignMindDev / design-rite-v3
+main
+https://design-rite-v3-fh3t.onrender.com
+
+Environment
+
+Create environment group
+Environment Variables
+Set environment-specific config and secrets (such as API keys), then read those values from your code. Learn more.
+Key	Value	Delete
+Key
+NEXT_PUBLIC_API_URL
+Value
+https://design-rite-backend.onrender.com
+
+
+Key
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+Value
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlja3dyYmRwdW9yemRwenFicXBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5NTA3ODMsImV4cCI6MjA2NjUyNjc4M30.s5ay50ug1EaTtZrVSPDnXGo6l-4IRKk_cG-XFUX1c5g
+
+
+Key
+NEXT_PUBLIC_SUPABASE_URL
+Value
+https://ickwrbdpuorzdpzqbqpf.supabase.co
+
+
+Key
+NODE_ENV
+Value
+production
+
+
+Key
+PORT
+Value
+10000
+
+
+
+Add
+Save, rebuild, and deploy
+Choose an option
+C

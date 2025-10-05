@@ -2,6 +2,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { aiEngine } from '../../../lib/ai-engine';
 import { logAIConversation, generateUserHash, generateSessionId } from '../../../lib/ai-session-logger';
+import { rateLimit, getClientIp, createRateLimitResponse } from '../../../lib/rate-limiter';
+
+// Rate limiter for discovery assistant (20 requests per minute)
+const limiter = rateLimit({ interval: 60000, uniqueTokenPerInterval: 500 });
 
 // Anthropic Configuration - UPDATED TO LATEST MODEL
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
@@ -35,6 +39,13 @@ export async function GET() {
 
 // Main chat endpoint (POST)
 export async function POST(request: NextRequest) {
+  // Rate limit check
+  const ip = getClientIp(request);
+  const rateCheck = limiter.check(20, ip); // 20 requests per minute
+  if (!rateCheck.success) {
+    return createRateLimitResponse(rateCheck);
+  }
+
   try {
     const body = await request.json();
     const { message, sessionData, conversationHistory = [], isTeamMember = false } = body;

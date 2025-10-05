@@ -24,7 +24,7 @@ export default function SubscribePage() {
       monthlyPrice: 49,
       annualPrice: 490,
       features: [
-        'Up to 25 assessments per month',
+        'Up to 10 assessments per month',
         'AI-powered site analysis',
         'Basic proposal generation',
         'Standard equipment database',
@@ -33,7 +33,7 @@ export default function SubscribePage() {
         '14-day free trial'
       ],
       limits: {
-        assessments: 25,
+        assessments: 10,
         projects: 50,
         storage: '5GB'
       },
@@ -48,7 +48,6 @@ export default function SubscribePage() {
         'Unlimited assessments',
         'Advanced AI recommendations',
         'Custom proposal templates',
-        'White-label branding',
         'Premium equipment database',
         'Priority phone & email support',
         'Client portal access',

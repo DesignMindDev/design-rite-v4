@@ -1,0 +1,10 @@
+{
+  "issue_id": "CATEGORY_X_TIMESTAMP",
+  "files_modified": [
+    "path/to/file1.ts",
+    "path/to/file2.tsx"
+  ],
+  "changes_made": "Brief description of what was fixed. Example: Added input validation with Zod schemas, sanitized user inputs, implemented rate limiting",
+  "tested": true,
+  "notes": "Any additional context for ChatGPT to know when retesting. Example: Login form now properly rejects malicious SQL strings with 400 status code"
+}

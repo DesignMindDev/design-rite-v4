@@ -8,10 +8,14 @@
  * Last Modified: October 01, 2025
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getEnhancedRecommendations } from '../../../lib/unified-product-intelligence';
 import { createClient } from '@supabase/supabase-js';
 import { requireAuth } from '../../../lib/api-auth';
+import { rateLimit, getClientIp, createRateLimitResponse } from '../../../lib/rate-limiter';
+
+// Rate limiter for AI assessment (15 requests per minute - expensive operations)
+const limiter = rateLimit({ interval: 60000, uniqueTokenPerInterval: 500 });
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -28,7 +32,14 @@ export async function GET() {
   });
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  // Rate limit check
+  const ip = getClientIp(request);
+  const rateCheck = limiter.check(15, ip); // 15 requests per minute (expensive operations)
+  if (!rateCheck.success) {
+    return createRateLimitResponse(rateCheck);
+  }
+
   // Require authentication
   const auth = await requireAuth();
   if (auth.error) {

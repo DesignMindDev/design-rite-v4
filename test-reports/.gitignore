@@ -1,0 +1,29 @@
+# AI Testing Workflow - Don't commit test output
+
+# Issue files created by ChatGPT
+issues/*.json
+
+# Fix files created by Claude Code
+fixes/*.json
+
+# Final reports
+final/*.md
+
+# Claude notification file
+CLAUDE_TODO.md
+
+# But keep the directories
+!issues/.gitkeep
+!fixes/.gitkeep
+!final/.gitkeep
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Node modules (if added)
+node_modules/
+
+# Logs
+*.log

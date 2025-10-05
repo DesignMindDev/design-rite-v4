@@ -196,6 +196,19 @@ export default function UnifiedNavigation() {
                 </div>
               </Link>
 
+              <Link href="/intelligence" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2 border border-purple-500/40 bg-gradient-to-r from-purple-900/20 to-blue-900/20">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center text-2xl flex-shrink-0 shadow-lg">
+                  🧠
+                </div>
+                <div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1 flex items-center gap-2">
+                    LowVolt Intelligence
+                    <span className="text-xs bg-purple-500 px-2 py-0.5 rounded-full">NEW</span>
+                  </div>
+                  <div className="dr-ui text-gray-400 leading-tight">AI competitive intelligence platform</div>
+                </div>
+              </Link>
+
               <div className="border-t dr-border-violet my-2"></div>
 
               <Link href="/integrations/system-surveyor/upload" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
@@ -463,6 +476,9 @@ export default function UnifiedNavigation() {
               <Link href="/compliance-analyst" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">✅ Compliance Tools</Link>
               <Link href="/professional-proposals" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">📋 Proposal Generator</Link>
               <Link href="/pricing-intelligence" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">💰 Pricing Intelligence</Link>
+              <Link href="/intelligence" className="block text-white/80 hover:dr-text-pearl py-2 pl-4 bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded border border-purple-500/40">
+                🧠 LowVolt Intelligence <span className="text-xs bg-purple-500 px-1.5 py-0.5 rounded-full ml-2">NEW</span>
+              </Link>
               <Link href="/integrations/system-surveyor" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🔗 System Surveyor Integration</Link>
               <Link href="/white-label" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🏷️ White Label Solutions</Link>
             </div>
