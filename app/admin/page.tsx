@@ -113,17 +113,22 @@ export default function AdminPage() {
   useEffect(() => {
     setIsMounted(true)
 
+    // Wait for auth to finish loading
+    if (auth.isLoading) {
+      return
+    }
+
     // Redirect if not authenticated
-    if (!auth.isLoading && !auth.isAuthenticated) {
-      router.push('/admin/login?callbackUrl=/admin')
+    if (!auth.isAuthenticated) {
+      router.push('/login?callbackUrl=/admin')
       return
     }
 
     // Check if user has permission to access admin content management
-    if (auth.isAuthenticated && auth.user) {
+    if (auth.user) {
       const role = auth.user.role
       if (!['super_admin', 'admin'].includes(role || '')) {
-        router.push('/admin/login')
+        router.push('/unauthorized?reason=insufficient_permissions')
         return
       }
 

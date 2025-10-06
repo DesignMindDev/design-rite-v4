@@ -6,27 +6,49 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
-  const next = searchParams.get('next') ?? '/estimate-options'
-
-  // Validate redirect destination
-  const validRedirects = [
-    '/estimate-options',
-    '/dashboard',
-    '/app',
-    '/account',
-    '/'
-  ]
-
-  const redirectPath = validRedirects.includes(next) ? next : '/estimate-options'
+  const next = searchParams.get('next')
 
   if (token_hash && type) {
     try {
-      const { error } = await supabase.auth.verifyOtp({
+      const { error, data } = await supabase.auth.verifyOtp({
         type,
         token_hash,
       })
 
-      if (!error) {
+      if (!error && data.user) {
+        // Get user role to determine redirect
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', data.user.id)
+          .single()
+
+        const role = roleData?.role || 'user'
+
+        // Determine redirect based on role
+        let redirectPath = next || '/dashboard'
+
+        if (role === 'super_admin' || role === 'admin' || role === 'manager') {
+          redirectPath = '/admin'
+        } else {
+          redirectPath = '/dashboard'
+        }
+
+        // Validate redirect destination
+        const validRedirects = [
+          '/estimate-options',
+          '/dashboard',
+          '/admin',
+          '/app',
+          '/account',
+          '/'
+        ]
+
+        // Use custom redirect if valid, otherwise use role-based redirect
+        if (next && validRedirects.includes(next)) {
+          redirectPath = next
+        }
+
         // Determine base URL
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
                        process.env.NEXT_PUBLIC_PRODUCTION_URL ||
@@ -37,7 +59,7 @@ export async function GET(request: NextRequest) {
           ? `${origin}${redirectPath}`
           : `${baseUrl}${redirectPath}`
 
-        console.log('[Auth Success] Redirecting to:', redirectUrl)
+        console.log('[Auth Success] User role:', role, '- Redirecting to:', redirectUrl)
         return NextResponse.redirect(redirectUrl)
       }
 

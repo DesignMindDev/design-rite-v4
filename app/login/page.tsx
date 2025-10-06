@@ -57,38 +57,103 @@ function LoginForm() {
       });
 
       if (signInError) {
+        // Log failed login attempt
+        await fetch('/api/log-activity', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'login_attempt',
+            resource_type: 'auth',
+            details: { email: email.toLowerCase() },
+            success: false,
+            error_message: signInError.message
+          })
+        });
+
         setError(signInError.message);
         setLoading(false);
         return;
       }
 
       if (!data.session) {
+        // Log failed login (no session)
+        await fetch('/api/log-activity', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'login_attempt',
+            resource_type: 'auth',
+            details: { email: email.toLowerCase() },
+            success: false,
+            error_message: 'No session returned'
+          })
+        });
+
         setError('Login failed. Please try again.');
         setLoading(false);
         return;
       }
 
       // Get user role to determine redirect
-      const { data: roleData } = await supabase
+      const { data: roleData, error: roleError } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', data.user.id)
         .single();
 
+      console.log('[Login Debug] User ID:', data.user.id);
+      console.log('[Login Debug] User Email:', data.user.email);
+      console.log('[Login Debug] Role query result:', roleData);
+      console.log('[Login Debug] Role query error:', roleError);
+
       const role = roleData?.role || 'user';
+      console.log('[Login Debug] Final role:', role);
+
+      // Log successful login
+      await fetch('/api/log-activity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: data.user.id,
+          action: 'login_success',
+          resource_type: 'auth',
+          details: {
+            email: data.user.email,
+            role: role
+          },
+          success: true
+        })
+      });
 
       // Redirect based on role or callback URL
       if (callbackUrl) {
+        console.log('[Login Debug] Redirecting to callback:', callbackUrl);
         router.push(callbackUrl);
       } else if (role === 'super_admin' || role === 'admin' || role === 'manager') {
+        console.log('[Login Debug] Redirecting super_admin/admin/manager to /admin');
         router.push('/admin');
       } else {
+        console.log('[Login Debug] Redirecting regular user to /dashboard');
         router.push('/dashboard');
       }
 
       router.refresh();
     } catch (err) {
       console.error('Login error:', err);
+
+      // Log unexpected error
+      await fetch('/api/log-activity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'login_attempt',
+          resource_type: 'auth',
+          details: { email: email.toLowerCase() },
+          success: false,
+          error_message: err instanceof Error ? err.message : 'Unknown error'
+        })
+      });
+
       setError('An unexpected error occurred. Please try again.');
       setLoading(false);
     }
@@ -110,15 +175,54 @@ function LoginForm() {
       });
 
       if (resetError) {
+        // Log failed password reset
+        await fetch('/api/log-activity', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'password_reset_request',
+            resource_type: 'auth',
+            details: { email: email.toLowerCase() },
+            success: false,
+            error_message: resetError.message
+          })
+        });
+
         setError(resetError.message);
         setLoading(false);
         return;
       }
 
+      // Log successful password reset request
+      await fetch('/api/log-activity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'password_reset_request',
+          resource_type: 'auth',
+          details: { email: email.toLowerCase() },
+          success: true
+        })
+      });
+
       setResetSent(true);
       setLoading(false);
     } catch (err) {
       console.error('Password reset error:', err);
+
+      // Log password reset error
+      await fetch('/api/log-activity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'password_reset_request',
+          resource_type: 'auth',
+          details: { email: email.toLowerCase() },
+          success: false,
+          error_message: err instanceof Error ? err.message : 'Unknown error'
+        })
+      });
+
       setError('Failed to send reset email. Please try again.');
       setLoading(false);
     }

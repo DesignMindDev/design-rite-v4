@@ -1,0 +1,6 @@
+// Paste this in browser console to force logout:
+
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient('https://aeorianxnxpxveoxzhov.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlb3JpYW54bnhweHZlb3h6aG92Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNzczMjksImV4cCI6MjA3NDc1MzMyOX0.Ko6tdjeM-6D9WM8qnJZkU8ep8Av2Q-N9dp3hPXnOPT0');
+await supabase.auth.signOut();
+location.href = '/login';
