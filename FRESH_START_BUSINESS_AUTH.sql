@@ -155,6 +155,10 @@ CREATE TABLE profiles (
   full_name text,
   company text,
 
+  -- Contact info
+  phone text,
+  avatar_url text,
+
   -- Business user info
   department text,
   job_title text,
