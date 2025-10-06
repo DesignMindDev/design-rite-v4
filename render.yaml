@@ -1,104 +1,137 @@
-# Render.com Infrastructure as Code
-# This file defines all services for Design-Rite v3 platform
-
 services:
-  # Frontend - Next.js Application
   - type: web
-    name: design-rite-v3
-    env: node
+    name: design-rite-staging
+    runtime: node
     region: oregon
     plan: starter
-    branch: main
-    buildCommand: npm install --legacy-peer-deps && npm run build
-    startCommand: npm start
+    branch: staging
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    autoDeploy: false
+    healthCheckPath: /
     envVars:
-      - key: NODE_VERSION
-        value: 22.16.0
+      # ========================================
+      # ENVIRONMENT
+      # ========================================
       - key: NODE_ENV
         value: production
+      - key: NEXT_PUBLIC_ENVIRONMENT
+        value: staging
+      - key: ENVIRONMENT
+        value: staging
+      
+      # ========================================
+      # SUPABASE (Validation Lab)
+      # ========================================
       - key: NEXT_PUBLIC_SUPABASE_URL
-        sync: false  # Set in Render dashboard
+        value: https://ickwrbdpuorzdpzqbqpf.supabase.co
       - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
         sync: false
       - key: SUPABASE_SERVICE_KEY
         sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      
+      # ========================================
+      # APP URLS
+      # ========================================
+      - key: NEXT_PUBLIC_APP_URL
+        value: https://design-rite-staging.onrender.com
+      - key: NEXT_PUBLIC_PRODUCTION_URL
+        value: https://design-rite-staging.onrender.com
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://design-rite-staging.onrender.com
+      
+      # ========================================
+      # NEXTAUTH
+      # ========================================
+      - key: NEXTAUTH_URL
+        value: https://design-rite-staging.onrender.com
+      - key: NEXTAUTH_SECRET
+        sync: false
+      
+      # ========================================
+      # AI SERVICES
+      # ========================================
       - key: OPENAI_API_KEY
         sync: false
       - key: ANTHROPIC_API_KEY
         sync: false
-      - key: ASSESSMENT_ASSISTANT_ID
+      - key: ASSISTANT_ID
         sync: false
-      - key: DISCOVERY_ASSISTANT_ID
-        sync: false
-      - key: HELP_ASSISTANT_ID
-        sync: false
+      
+      # ========================================
+      # STRIPE (Test Mode)
+      # ========================================
       - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
-      - key: CALENDLY_WEBHOOK_SECRET
-        sync: false
-      - key: SLACK_WEBHOOK_URL
-        sync: false
-    domains:
-      - www.design-rite.com
-    healthCheckPath: /api/health
-
-  # Backend - Express.js API Server
-  - type: web
-    name: cak-end
-    env: node
-    region: oregon
-    plan: starter
-    branch: main
-    rootDir: services/backend  # CRITICAL: Backend has its own package.json
-    buildCommand: npm install
-    startCommand: node server.js
-    envVars:
-      - key: NODE_VERSION
-        value: 18.0.0
-      - key: NODE_ENV
-        value: production
+      
+      # ========================================
+      # PORT
+      # ========================================
       - key: PORT
-        value: 8000
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_SERVICE_KEY
-        sync: false
-      - key: OPENAI_API_KEY
-        sync: false
-      - key: ANTHROPIC_API_KEY
-        sync: false
-      - key: JWT_SECRET
-        sync: false
-    healthCheckPath: /health
-
-# Documentation
-#
-# Frontend Service (design-rite-v3):
-# - Next.js 14 application with App Router
-# - React 18 with Three.js for 3D visualization
-# - Spatial Studio, AI Assessment, Security Estimator
-# - Deployed from root directory
-#
-# Backend Service (cak-end):
-# - Standalone Express.js API server
-# - Separate package.json in services/backend/
-# - CORS configured for frontend origins
-# - Deployed from services/backend/ directory
-#
-# Key Configuration Notes:
-# 1. Backend MUST use rootDir: services/backend
-# 2. Frontend uses --legacy-peer-deps for @react-three/drei compatibility
-# 3. Both services share Supabase credentials
-# 4. Environment variables are managed in Render dashboard (sync: false)
-#
-# Deployment Commands:
-# - Frontend: Automatic on push to main branch
-# - Backend: Automatic on push to main branch
-# - Manual: Click "Manual Deploy" in Render dashboard
-#
-# Troubleshooting:
-# - If backend fails with React errors: Verify rootDir is set to services/backend
-# - If frontend fails with dependency errors: Ensure --legacy-peer-deps is in build command
-# - Check environment variables are set in Render dashboard for each service
+        value: 10000
+      
+      # ========================================
+      # FEATURE FLAGS
+      # ========================================
+      - key: ENABLE_SUBSCRIBER_PORTAL
+        value: true
+      - key: ENABLE_PRICING_INTELLIGENCE
+        value: true
+      - key: ENABLE_ADMIN_DASHBOARD
+        value: true
+      - key: ENABLE_CONVERSION_TRACKING
+        value: true
+      
+      # ========================================
+      # RATE LIMITING
+      # ========================================
+      - key: RATE_LIMIT_ENABLED
+        value: true
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 200
+      
+      # ========================================
+      # LOGGING
+      # ========================================
+      - key: LOG_LEVEL
+        value: info
+      - key: ENABLE_REQUEST_LOGGING
+        value: true
+      - key: ENABLE_QUERY_LOGGING
+        value: false
+      - key: ENABLE_DEBUG_PANEL
+        value: false
+      
+      # ========================================
+      # MONITORING
+      # ========================================
+      - key: ENABLE_ANALYTICS
+        value: true
+      - key: ENABLE_ERROR_TRACKING
+        value: true
+      - key: ENABLE_PERFORMANCE_MONITORING
+        value: true
+      
+      # ========================================
+      # SECURITY
+      # ========================================
+      - key: SECURITY_HEADERS_ENABLED
+        value: true
+      - key: HELMET_ENABLED
+        value: true
+      - key: CSRF_PROTECTION_ENABLED
+        value: true
+      
+      # ========================================
+      # HEALTH CHECK
+      # ========================================
+      - key: HEALTH_CHECK_ENDPOINT
+        value: /api/health
