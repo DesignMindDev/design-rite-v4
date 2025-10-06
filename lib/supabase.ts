@@ -44,8 +44,8 @@ export const authHelpers = {
   async signInWithMagicLink(email: string, company: string, redirectTo?: string) {
     // Smart redirect URL determination with comprehensive URL support
     const getRedirectUrl = (targetPath?: string) => {
-      // Use production domain for consistency
-      const baseDomain = 'https://www.design-rite.com'
+      // Use configured app URL or fallback to production
+      const baseDomain = process.env.NEXT_PUBLIC_APP_URL || 'https://www.design-rite.com'
 
       // Default to estimate-options if no specific redirect requested
       const defaultPath = '/estimate-options'
@@ -164,8 +164,8 @@ export const authHelpers = {
   async signInWithProvider(provider: 'google' | 'github' | 'linkedin', redirectTo?: string) {
     // Use the same smart redirect logic for OAuth
     const getRedirectUrl = (targetPath?: string) => {
-      // Use production domain for consistency or fallback to current origin
-      const baseDomain = typeof window !== 'undefined' ? window.location.origin : 'https://www.design-rite.com'
+      // Use configured app URL or fallback to current origin
+      const baseDomain = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || 'https://www.design-rite.com')
       const defaultPath = '/estimate-options'
       const finalPath = targetPath || defaultPath
       const cleanPath = finalPath.startsWith('/') ? finalPath : `/${finalPath}`
