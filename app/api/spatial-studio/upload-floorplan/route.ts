@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { requireAuth } from '../../../../lib/api-auth';
-import { rateLimit, getClientIp, createRateLimitResponse } from '../../../../lib/rate-limiter';
-
-// Rate limiter for floor plan uploads (10 uploads per 5 minutes)
-const uploadLimiter = rateLimit({ interval: 5 * 60000, uniqueTokenPerInterval: 200 });
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -16,19 +11,6 @@ const supabase = createClient(
  * Returns immediately with projectId and status='pending'
  */
 export async function POST(request: NextRequest) {
-  // Rate limit check
-  const ip = getClientIp(request);
-  const rateCheck = uploadLimiter.check(10, ip); // 10 uploads per 5 minutes
-  if (!rateCheck.success) {
-    return createRateLimitResponse(rateCheck);
-  }
-
-  // Require authentication
-  const auth = await requireAuth();
-  if (auth.error) {
-    return auth.error;
-  }
-
   try {
     // Verify environment variables
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
