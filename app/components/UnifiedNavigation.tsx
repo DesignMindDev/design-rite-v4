@@ -419,12 +419,20 @@ export default function UnifiedNavigation() {
             Subscribe
           </Link>
           {isAuthenticated ? (
-            <button
-              onClick={handleLogout}
-              className="dr-bg-violet dr-text-pearl px-6 py-2.5 rounded-lg font-semibold dr-ui hover:bg-purple-700 transition-all hover:scale-105 shadow-lg hover:shadow-purple-600/25"
-            >
-              🚪 Logout
-            </button>
+            <>
+              <a
+                href={process.env.NODE_ENV === 'development' ? 'http://localhost:3040/profile' : 'https://portal.design-rite.com/profile'}
+                className="text-gray-300 hover:dr-text-violet font-medium transition-all dr-ui text-sm"
+              >
+                👤 Account
+              </a>
+              <button
+                onClick={handleLogout}
+                className="dr-bg-violet dr-text-pearl px-6 py-2.5 rounded-lg font-semibold dr-ui hover:bg-purple-700 transition-all hover:scale-105 shadow-lg hover:shadow-purple-600/25"
+              >
+                🚪 Logout
+              </button>
+            </>
           ) : (
             <button
               onClick={handleSignInClick}
@@ -528,13 +536,21 @@ export default function UnifiedNavigation() {
             {/* Sign In and CTA */}
             <div className="pt-4 border-t border-white/10">
               {isAuthenticated ? (
-                <button
-                  onClick={handleLogout}
-                  className="block w-full text-left dr-bg-violet dr-text-pearl px-4 py-2 rounded-lg touch-manipulation active:bg-purple-800 transition-colors"
-                  type="button"
-                >
-                  🚪 Logout
-                </button>
+                <>
+                  <a
+                    href={process.env.NODE_ENV === 'development' ? 'http://localhost:3040/profile' : 'https://portal.design-rite.com/profile'}
+                    className="block w-full text-left text-white/80 hover:dr-text-pearl py-2 pl-4 transition-colors"
+                  >
+                    👤 Manage Account
+                  </a>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left dr-bg-violet dr-text-pearl px-4 py-2 rounded-lg mt-2 touch-manipulation active:bg-purple-800 transition-colors"
+                    type="button"
+                  >
+                    🚪 Logout
+                  </button>
+                </>
               ) : (
                 <>
                   <button
