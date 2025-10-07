@@ -614,6 +614,17 @@ export default function AdminPage() {
               </div>
             )}
 
+            {/* Super Admin Button - Only for super_admin role */}
+            {auth.user?.role === 'super_admin' && (
+              <Link
+                href="/admin/super"
+                className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-red-600/30 transition-all flex items-center gap-2"
+              >
+                <span>👑</span>
+                Super Admin
+              </Link>
+            )}
+
             <button
               onClick={handleLogout}
               className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
