@@ -35,7 +35,9 @@ function LoginForm() {
         // Redirect based on role or callback URL
         if (callbackUrl) {
           router.push(callbackUrl);
-        } else if (role === 'super_admin' || role === 'admin' || role === 'manager') {
+        } else if (role === 'super_admin') {
+          router.push('/admin/super');
+        } else if (role === 'admin' || role === 'manager') {
           router.push('/admin');
         } else {
           router.push('/dashboard');
@@ -129,8 +131,11 @@ function LoginForm() {
       if (callbackUrl) {
         console.log('[Login Debug] Redirecting to callback:', callbackUrl);
         router.push(callbackUrl);
-      } else if (role === 'super_admin' || role === 'admin' || role === 'manager') {
-        console.log('[Login Debug] Redirecting super_admin/admin/manager to /admin');
+      } else if (role === 'super_admin') {
+        console.log('[Login Debug] Redirecting super_admin to /admin/super');
+        router.push('/admin/super');
+      } else if (role === 'admin' || role === 'manager') {
+        console.log('[Login Debug] Redirecting admin/manager to /admin');
         router.push('/admin');
       } else {
         console.log('[Login Debug] Redirecting regular user to /dashboard');
