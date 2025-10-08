@@ -1,11 +1,20 @@
 # Design-Rite Subscriber Portal - Project Plan
 
+> ⚠️ **STATUS UPDATE (October 7, 2025)**: This plan has been **SUPERSEDED** by an integrated approach.
+>
+> **See**: [SUBSCRIBER_PORTAL_STATUS_UPDATE.md](./SUBSCRIBER_PORTAL_STATUS_UPDATE.md) for current status.
+>
+> **Summary**: Instead of integrating an external subscriber portal as a microservice, we built all subscriber features natively into the main platform. This resulted in earlier delivery (Oct 1 vs Oct 18), exceeded feature scope, and simplified architecture.
+
+---
+
 **Project**: Subscriber Self-Service Portal Microservice Integration
 **Date Created**: October 7, 2025
 **Project Owner**: Dan Kozich
 **Technical Implementation**: Claude Code AI
 **Admin Team Lead**: Phil Lisk
 **Target Launch**: October 18, 2025 (10 business days)
+**Actual Status**: ✅ Features deployed October 1-7 via integrated approach
 
 ---
 

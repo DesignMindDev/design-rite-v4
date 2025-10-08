@@ -48,6 +48,7 @@ export default function AIAssistantPage() {
   const [showCustomCategory, setShowCustomCategory] = useState(false)
   const [customCategoryTitle, setCustomCategoryTitle] = useState('')
   const [customCategoryDetails, setCustomCategoryDetails] = useState('')
+  const [selectedProvider, setSelectedProvider] = useState<string>('assessment-assistant')
   const { isAuthenticated, signOut } = useSupabaseAuth()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
