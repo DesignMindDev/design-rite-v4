@@ -47,6 +47,24 @@ export default function DashboardPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        // Check if session tokens are in URL hash (from portal redirect)
+        const hash = window.location.hash;
+        if (hash.startsWith('#auth=')) {
+          const authDataEncoded = hash.substring(6); // Remove '#auth='
+          try {
+            const authData = JSON.parse(decodeURIComponent(authDataEncoded));
+            // Set the session from portal tokens
+            await supabase.auth.setSession({
+              access_token: authData.access_token,
+              refresh_token: authData.refresh_token
+            });
+            // Clean up URL
+            window.history.replaceState(null, '', window.location.pathname);
+          } catch (e) {
+            console.error('Failed to parse auth data from hash:', e);
+          }
+        }
+
         const { data: { session } } = await supabase.auth.getSession();
 
         if (!session) {
