@@ -1,7 +1,6 @@
 /**
  * Supabase Admin Authentication Helper
  * Helper functions for admin route protection with Supabase Auth
- * Replaces Next-Auth getServerSession() with Supabase Auth
  */
 
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';

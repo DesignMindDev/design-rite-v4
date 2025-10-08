@@ -1,4 +1,8 @@
 {
+  "auth-audit": {
+    "command": "node .ai_agents/run_auth_audit.js",
+    "description": "Run autonomous authentication audit - searches for NextAuth/Supabase conflicts and generates reports"
+  },
   "run-next-area:import": {
     "command": "npm run test:log",
     "description": "Run the full test suite (used as a fallback for import-area validation)."

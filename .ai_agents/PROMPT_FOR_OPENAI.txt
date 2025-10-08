@@ -1,0 +1,61 @@
+🤖 COPY THIS ENTIRE MESSAGE AND PASTE INTO YOUR OPENAI AGENT IN VS CODE:
+
+---
+
+You are conducting a CRITICAL authentication audit for the Design-Rite v4 project.
+
+**PROJECT PATH**: C:\Users\dkozi\Projects\design-rite-v4
+**BRANCH**: staging (validation environment)
+**WORKFLOW**: Part of foolproof methodology - fixes will be validated in staging before production
+
+**YOUR MISSION**: Read the detailed instructions in `.ai_agents/OPENAI_AUTH_AUDIT_TASK.md` and follow them EXACTLY.
+
+**TASK SUMMARY**:
+1. Search the ENTIRE codebase for all NextAuth references (next-auth, getServerSession, useSession, etc.)
+2. Search for all Supabase Auth references (@supabase/supabase-js, signInWithPassword, etc.)
+3. Identify conflicts between NextAuth and Supabase (dual session checks, cookie conflicts, redirect loops)
+4. Analyze middleware.ts for authentication conflicts
+5. Create a comprehensive audit report with line numbers, file paths, and exact code snippets
+6. Provide prioritized fix recommendations with exact code changes
+
+**CRITICAL RULES**:
+- This is a READ-ONLY audit - DO NOT modify any code files
+- Document EVERYTHING you find with file paths and line numbers
+- Save all findings to separate markdown files in `.ai_agents/` folder
+- Create a master report: `AUTH_AUDIT_MASTER_REPORT.md`
+- Add completion entry to `command_queue.json` and `agent_log.json`
+
+**DELIVERABLES** (save to `.ai_agents/`):
+1. AUDIT_NEXTAUTH_REFERENCES.md
+2. AUDIT_SUPABASE_REFERENCES.md
+3. AUDIT_MIDDLEWARE_CONFLICTS.md
+4. AUDIT_ENV_VARIABLES.md
+5. AUDIT_CONFLICT_MATRIX.md
+6. AUDIT_COOKIE_CONFLICTS.md
+7. AUTH_AUDIT_MASTER_REPORT.md (comprehensive final report)
+
+**SEARCH PATTERNS TO FIND**:
+
+NextAuth patterns:
+- "next-auth"
+- "getServerSession"
+- "useSession"
+- "[...nextauth]"
+- "NEXTAUTH_"
+- "SessionProvider"
+- "authOptions"
+
+Supabase patterns:
+- "@supabase/supabase-js"
+- "createClient"
+- "signInWithPassword"
+- "supabase.auth"
+- "getSession"
+- "getUser"
+
+**START NOW**: Read the full instructions in `OPENAI_AUTH_AUDIT_TASK.md` and begin your systematic audit.
+
+Expected completion time: 2-3 hours
+Output: Comprehensive markdown reports documenting every auth reference and conflict
+
+🚀 BEGIN AUDIT

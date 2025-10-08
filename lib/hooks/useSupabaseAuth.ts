@@ -1,6 +1,5 @@
 /**
  * Supabase Auth Hook for Document AI
- * Replaces Next-Auth based useUnifiedAuth
  * Uses Supabase Auth with unified profiles schema
  *
  * Migration Date: 2025-10-02
@@ -280,7 +279,7 @@ export function useSupabaseAuth(): SupabaseAuthState {
 }
 
 /**
- * Migration Guide from useUnifiedAuth (Next-Auth) to useSupabaseAuth
+ * Migration Guide from useUnifiedAuth to useSupabaseAuth
  *
  * CHANGES:
  *
@@ -308,7 +307,7 @@ export function useSupabaseAuth(): SupabaseAuthState {
  *    NEW: auth.isOnTrial (checks if trialing)
  *
  * 6. Sign Out:
- *    OLD: import { signOut } from 'next-auth/react'; signOut();
+ *    OLD: Legacy auth methods
  *    NEW: await auth.signOut();
  *
  * 7. Database Schema:
@@ -316,21 +315,8 @@ export function useSupabaseAuth(): SupabaseAuthState {
  *    - Role stored in 'user_roles' table
  *    - Subscription fields in 'profiles'
  *
- * Example Migration:
+ * Example Usage:
  *
- * BEFORE:
- * ```typescript
- * import { useUnifiedAuth } from '@/lib/hooks/useUnifiedAuth';
- * import { signOut } from 'next-auth/react';
- *
- * const auth = useUnifiedAuth();
- * if (auth.isPro) {
- *   // Show pro features
- * }
- * await signOut();
- * ```
- *
- * AFTER:
  * ```typescript
  * import { useSupabaseAuth } from '@/lib/hooks/useSupabaseAuth';
  *
