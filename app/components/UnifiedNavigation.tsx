@@ -39,8 +39,11 @@ export default function UnifiedNavigation() {
 
   const handleSignInClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    // All header sign-in clicks go to estimate options page
-    window.location.href = '/estimate-options';
+    // Redirect directly to portal auth
+    const portalUrl = process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3040/auth'
+      : 'https://portal.design-rite.com/auth';
+    window.location.href = portalUrl;
   };
 
   const handleTryPlatformClick = (e: React.MouseEvent) => {
