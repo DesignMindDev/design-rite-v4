@@ -8,7 +8,21 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+    storageKey: 'design-rite-auth',
+    flowType: 'pkce'
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'design-rite-web'
+    }
+  }
+})
 
 // Only create admin client if service key is available (server-side)
 export const supabaseAdmin = supabaseServiceKey

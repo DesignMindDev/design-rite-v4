@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Calculator, MessageSquare, Clock, FileText, Zap, Users, ArrowLeft, ArrowRight, Bot, Sparkles, RefreshCw } from 'lucide-react';
 import { authHelpers } from '@/lib/supabase';
 import { sessionManager } from '../../lib/sessionManager';
+import { crossDomainAuth } from '@/lib/cross-domain-auth';
 
 const EstimateOptionsPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null = loading
@@ -28,6 +29,13 @@ const EstimateOptionsPage = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        // FIRST: Check for cross-domain auth redirect from portal
+        const hasPortalAuth = await crossDomainAuth.handleAuthRedirect();
+        if (hasPortalAuth) {
+          console.log('✅ Authenticated via portal redirect');
+        }
+
+        // THEN: Check for current user
         const user = await authHelpers.getCurrentUser();
 
         if (user) {
