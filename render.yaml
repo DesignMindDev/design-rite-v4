@@ -7,7 +7,7 @@ services:
     branch: staging
     buildCommand: npm install --force && npm run build
     startCommand: npm run start
-    autoDeploy: false
+    autoDeploy: true
     healthCheckPath: /
     envVars:
       # ========================================

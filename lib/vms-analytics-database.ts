@@ -52,6 +52,28 @@ export const vmsOptions: VMSOption[] = [
       'Small-to-mid businesses'
     ]
   },
+  {
+    id: 'flir-meridian',
+    name: 'FLIR Meridian',
+    vendor: 'FLIR (Teledyne)',
+    deploymentModel: 'on-premise',
+    priceModel: 'per-camera-perpetual',
+    priceRange: { min: 150, max: 250 }, // $2,500-$4,500 for 8-24 cameras
+    features: [
+      'Compact NVR with built-in 8-port PoE',
+      'Pre-licensed 8, 16, or 24 camera channels',
+      'Up to 16TB storage',
+      'Control Center, Admin Center, Web Client',
+      'FLIR Nexus integration',
+      'Mobile access'
+    ],
+    bestFor: [
+      'Small businesses (8-24 cameras)',
+      'FLIR thermal camera deployments',
+      'Simple plug-and-play installations',
+      'Remote locations'
+    ]
+  },
 
   // Professional Level VMS
   {
@@ -115,6 +137,28 @@ export const vmsOptions: VMSOption[] = [
       'Scalable deployments'
     ]
   },
+  {
+    id: 'flir-horizon',
+    name: 'FLIR Horizon',
+    vendor: 'FLIR (Teledyne)',
+    deploymentModel: 'on-premise',
+    priceModel: 'per-camera-perpetual',
+    priceRange: { min: 400, max: 600 }, // $12,000-$18,000 for 24-150 cameras
+    features: [
+      'Enterprise NVR for up to 150 cameras',
+      'Up to 48TB RAID5 storage',
+      'Pre-licensed with 24 camera channels',
+      'Control Center, Admin Center, Web Client',
+      'FLIR Nexus integration',
+      'Health Monitor included'
+    ],
+    bestFor: [
+      'Mid-to-large deployments (24-150 cameras)',
+      'FLIR thermal + visible mixed systems',
+      'Critical infrastructure monitoring',
+      'High-reliability requirements'
+    ]
+  },
 
   // Enterprise Level VMS
   {
@@ -176,6 +220,54 @@ export const vmsOptions: VMSOption[] = [
       'Large enterprises',
       'Multi-site operations',
       'Integration-heavy projects'
+    ]
+  },
+  {
+    id: 'flir-latitude',
+    name: 'FLIR Latitude',
+    vendor: 'FLIR (Teledyne)',
+    deploymentModel: 'hybrid',
+    priceModel: 'per-camera-perpetual',
+    priceRange: { min: 800, max: 1200 }, // $8,000-$25,000 base + $150-$300/camera
+    features: [
+      'Effectively unlimited cameras (multi-server)',
+      'Up to 500 cameras per high-spec server',
+      'Up to 272TB storage (additional modules available)',
+      'Multi-server failover and redundancy',
+      'FLIR Nexus integration',
+      'Control Center, Admin Center, Web Client, Health Monitor',
+      'Classic, Elite, and Enterprise base licenses'
+    ],
+    bestFor: [
+      'Large enterprises (100+ cameras)',
+      'Critical infrastructure (power plants, substations)',
+      'Government facilities',
+      'Multi-site thermal + visible deployments',
+      'High-availability requirements'
+    ]
+  },
+  {
+    id: 'flir-cameleon',
+    name: 'FLIR Cameleon',
+    vendor: 'FLIR (Teledyne)',
+    deploymentModel: 'on-premise',
+    priceModel: 'custom',
+    priceRange: { min: 3000, max: 8000 }, // $15,000-$40,000 enterprise deployment
+    features: [
+      'Decision Support Software (not just VMS)',
+      'GIS mapping integration (extensive support)',
+      'Multi-sensor fusion (cameras, radar, fence detection, UAS countermeasures)',
+      'Automation engine with workflow logic',
+      'Client/Server with hot standby backup',
+      'Advanced device control (laser range finders, calibration, analytics)',
+      'Blue Force trackers, AIS, ADSB, sonar, access control, RF detection'
+    ],
+    bestFor: [
+      'Critical infrastructure (airports, seaports, borders)',
+      'Government and military facilities',
+      'Large perimeter protection (cameras + radar + fence)',
+      'Command & control centers',
+      'Advanced threat detection systems'
     ]
   },
 
