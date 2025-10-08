@@ -39,8 +39,8 @@ export default function UnifiedNavigation() {
 
   const handleSignInClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    // All header sign-in clicks go to login page
-    window.location.href = '/login';
+    // All header sign-in clicks go to estimate options page
+    window.location.href = '/estimate-options';
   };
 
   const handleTryPlatformClick = (e: React.MouseEvent) => {
