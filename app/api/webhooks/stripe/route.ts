@@ -1,3 +1,6 @@
+// Force dynamic rendering (don't pre-render at build time)
+export const dynamic = 'force-dynamic';
+
 /**
  * Stripe Webhook Handler
  * Processes Stripe subscription events

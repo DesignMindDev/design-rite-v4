@@ -1,3 +1,6 @@
+// Force dynamic rendering (don't pre-render at build time)
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '../../../../lib/supabase'
 import { logAIConversation, generateUserHash, generateSessionId } from '../../../../lib/ai-session-logger'

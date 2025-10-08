@@ -1,4 +1,8 @@
 /**
+
+// Force dynamic rendering (don't pre-render at build time)
+export const dynamic = 'force-dynamic';
+
  * Design-Rite Professional - Proprietary & Confidential
  * Copyright (c) 2025 Design-Rite Professional. All Rights Reserved.
  *

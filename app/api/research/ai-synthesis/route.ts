@@ -1,3 +1,6 @@
+// Force dynamic rendering (don't pre-render at build time)
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server'
 
 // AI Synthesis API for Research Assistant

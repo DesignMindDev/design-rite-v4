@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+
+// Force dynamic rendering (don't pre-render at build time)
+export const dynamic = 'force-dynamic';
+
 import { logAIConversation, generateUserHash, generateSessionId } from '../../../lib/ai-session-logger'
 
 // AI Chat API for Creative Studio
