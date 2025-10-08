@@ -1,4 +1,6 @@
 /**
+// Force dynamic rendering (do not pre-render at build time)
+export const dynamic = 'force-dynamic';
  * Create User API Endpoint
  * Allows admins to create new users via Supabase Auth
  */

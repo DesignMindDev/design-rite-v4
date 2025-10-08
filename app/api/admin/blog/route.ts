@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+// Force dynamic rendering (do not pre-render at build time)
+export const dynamic = 'force-dynamic';
 import fs from 'fs'
 import path from 'path'
 

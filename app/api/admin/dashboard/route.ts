@@ -1,4 +1,6 @@
 /**
+// Force dynamic rendering (do not pre-render at build time)
+export const dynamic = 'force-dynamic';
  * Super Admin Dashboard API
  * Provides stats, user list, and recent activity
  */

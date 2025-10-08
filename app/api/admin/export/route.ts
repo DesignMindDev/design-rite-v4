@@ -1,4 +1,6 @@
 /**
+// Force dynamic rendering (do not pre-render at build time)
+export const dynamic = 'force-dynamic';
  * Data Export API
  * Allows admins to export users, activity logs, and database backups
  */

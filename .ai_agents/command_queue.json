@@ -1,0 +1,10 @@
+[
+  {
+    "id": "req_auth_audit_1759937191",
+    "agent": "OpenAI",
+    "action": "auth-audit",
+    "risk": "low",
+    "status": "executing",
+    "createdAt": "2025-10-08T15:26:31.868Z"
+  }
+]

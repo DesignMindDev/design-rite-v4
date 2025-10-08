@@ -1,4 +1,6 @@
 /**
+// Force dynamic rendering (do not pre-render at build time)
+export const dynamic = 'force-dynamic';
  * Admin API: Cancel Subscription
  * Allows admins to manually cancel a customer's subscription
  */

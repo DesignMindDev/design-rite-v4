@@ -1,4 +1,6 @@
 /**
+// Force dynamic rendering (do not pre-render at build time)
+export const dynamic = 'force-dynamic';
  * Suspend User API Endpoint
  * Allows admins to suspend user accounts
  */
