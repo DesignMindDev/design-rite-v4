@@ -113,6 +113,46 @@ export default function AdminPage() {
   useEffect(() => {
     setIsMounted(true)
 
+    // Session sync from portal admin
+    const handleSessionSync = async () => {
+      const hash = window.location.hash
+      if (hash.startsWith('#auth=')) {
+        try {
+          const authDataString = decodeURIComponent(hash.slice(6))
+          const authData = JSON.parse(authDataString)
+
+          // Import supabase client
+          const { createClient } = await import('@/integrations/supabase/client')
+          const supabase = createClient()
+
+          // Set session from portal
+          await supabase.auth.setSession({
+            access_token: authData.access_token,
+            refresh_token: authData.refresh_token
+          })
+
+          console.log('[Admin Session Sync] Session transferred from portal')
+
+          // Clean up URL
+          window.location.hash = ''
+
+          // Reload to re-run auth check with new session
+          window.location.reload()
+          return true
+        } catch (error) {
+          console.error('[Admin Session Sync] Error:', error)
+        }
+      }
+      return false
+    }
+
+    // Try session sync first
+    handleSessionSync().then(synced => {
+      if (synced) return // Will reload, don't continue
+
+      // Normal auth flow continues below
+    })
+
     // Wait for auth to finish loading
     if (auth.isLoading) {
       return
