@@ -17,8 +17,8 @@ export async function middleware(req: NextRequest) {
 
   const path = req.nextUrl.pathname;
 
-  // Allow access to login page
-  if (path.startsWith('/login')) {
+  // Allow access to login page and session sync endpoint
+  if (path.startsWith('/login') || path.startsWith('/api/admin/session-sync')) {
     return res;
   }
 
@@ -85,8 +85,8 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // Protect API routes that require authentication
-  if (path.startsWith('/api/admin')) {
+  // Protect API routes that require authentication (except session-sync)
+  if (path.startsWith('/api/admin') && !path.startsWith('/api/admin/session-sync')) {
     const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
