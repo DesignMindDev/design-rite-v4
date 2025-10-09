@@ -122,8 +122,7 @@ export default function AdminPage() {
           const authData = JSON.parse(authDataString)
 
           // Import supabase client
-          const { createClient } = await import('@/integrations/supabase/client')
-          const supabase = createClient()
+          const { supabase } = await import('@/lib/supabase')
 
           // Set session from portal
           await supabase.auth.setSession({
