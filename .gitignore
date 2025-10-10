@@ -91,3 +91,4 @@ jest_output.txt
 
 # Claude AI Development Settings
 .claude/
+services/

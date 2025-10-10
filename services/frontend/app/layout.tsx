@@ -1,6 +1,0 @@
-export const dynamic = 'force-dynamic' 
-export const revalidate = 0 
-import './globals.css' 
-export default function RootLayout({ children }: { children: React.ReactNode }) { 
-  return <html><body>{children}</body></html> 
-}
