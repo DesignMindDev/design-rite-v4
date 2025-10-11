@@ -584,6 +584,10 @@ export default function AdminPage() {
                     <span>🏗️</span>
                     <span>Spatial Studio</span>
                   </Link>
+                  <Link href="/integrations/system-surveyor/upload" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                    <span>📋</span>
+                    <span>System Surveyor</span>
+                  </Link>
                   {hasModuleAccess('logo_management') && (
                     <button onClick={() => setActiveTab('logos')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
                       <span>🖼️</span>
