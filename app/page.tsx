@@ -31,6 +31,39 @@ export default function HomePage() {
   ]
 
   useEffect(() => {
+    // Handle session transfer from portal
+    const handleSessionSync = async () => {
+      const hash = window.location.hash
+      if (hash.startsWith('#auth=')) {
+        try {
+          const authDataString = decodeURIComponent(hash.slice(6))
+          const authData = JSON.parse(authDataString)
+
+          // Import supabase client
+          const { supabase } = await import('@/lib/supabase')
+
+          // Set session from portal
+          await supabase.auth.setSession({
+            access_token: authData.access_token,
+            refresh_token: authData.refresh_token
+          })
+
+          console.log('[Session Sync] Session transferred from portal')
+
+          // Clean up URL
+          window.location.hash = ''
+
+          // Reload to update auth state
+          window.location.reload()
+        } catch (error) {
+          console.error('[Session Sync] Error:', error)
+        }
+      }
+    }
+
+    // Try session sync first
+    handleSessionSync()
+
     const interval = setInterval(() => {
       setActiveStormItem((prev) => (prev + 1) % stormItems.length)
     }, 5000) // Even slower timing for better readability
