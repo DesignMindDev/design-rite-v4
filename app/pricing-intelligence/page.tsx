@@ -7,6 +7,8 @@ import { Input } from '../components/ui/input'
 import { Button } from '../components/ui/button'
 // import { Badge } from '@/components/ui/badge' // Temporarily disabled
 import { Loader2, Search, TrendingUp, DollarSign, Package } from 'lucide-react'
+import UnifiedNavigation from '../components/UnifiedNavigation'
+import Footer from '../components/Footer'
 
 interface PricingTrend {
   productId: number;
@@ -149,8 +151,9 @@ export default function PricingIntelligencePage() {
   }, [])
 
   return (
-    <div className="min-h-screen dr-bg-charcoal dr-text-pearl p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen dr-bg-charcoal dr-text-pearl">
+      <UnifiedNavigation />
+      <div className="max-w-7xl mx-auto p-8 pt-24">
         {/* Header */}
         <div className="mb-8">
           <h1 className="dr-heading-xl font-black dr-text-pearl mb-4">
@@ -439,6 +442,7 @@ export default function PricingIntelligencePage() {
           </CardContent>
         </Card>
       </div>
+      <Footer />
     </div>
   )
 }
