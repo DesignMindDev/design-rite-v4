@@ -118,7 +118,7 @@ export default function SubscribePage() {
         body: JSON.stringify({
           planId: tier,
           userEmail: user.email,
-          successUrl: `${window.location.origin}/dashboard?payment=success`,
+          successUrl: `https://portal.design-rite.com/welcome?payment=success&plan=${tier}`,
           cancelUrl: `${window.location.origin}/subscribe?payment=canceled`,
         }),
       })
