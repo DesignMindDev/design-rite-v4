@@ -37,10 +37,6 @@ export default function HomePage() {
     return () => clearInterval(interval)
   }, [])
 
-  const redirectToWaitlist = () => {
-    window.location.href = '/waitlist'
-  }
-
   const scheduleDemo = () => {
     window.location.href = '/watch-demo'
   }
@@ -191,10 +187,10 @@ export default function HomePage() {
                 🚀 Try Platform
               </button>
               <Link
-                href="/waitlist"
+                href="/pricing"
                 className="bg-white/10 dr-text-pearl px-8 py-4 rounded-xl dr-ui font-semibold border border-white/20 hover:bg-white/20 transition-all text-center"
               >
-                Join Waitlist
+                View Pricing
               </Link>
             </div>
             <div className="flex gap-12">
@@ -384,10 +380,10 @@ export default function HomePage() {
               🚀 Try Platform
             </button>
             <Link
-              href="/waitlist"
+              href="/pricing"
               className="bg-white/10 dr-text-pearl px-8 py-4 rounded-xl dr-ui font-semibold border border-white/20 hover:bg-white/20 transition-all text-center"
             >
-              📝 Join Waitlist
+              💰 View Pricing
             </Link>
           </div>
 

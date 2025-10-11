@@ -34,7 +34,7 @@ export default function Footer({ redirectToApp }: FooterProps) {
   }
 
   const defaultRedirectToApp = () => {
-    window.location.href = '/waitlist'
+    window.location.href = '/pricing'
   }
 
   const handleRedirect = redirectToApp || defaultRedirectToApp

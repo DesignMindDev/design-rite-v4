@@ -12,17 +12,11 @@ interface SiteSettings {
 
 export default function UnifiedNavigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showAnnouncement, setShowAnnouncement] = useState(true);
   const [settings, setSettings] = useState<SiteSettings>({ logoPath: '', footerLogoPath: '' });
   const { isAuthenticated, signOut } = useSupabaseAuth();
 
   useEffect(() => {
     loadSettings()
-    // Load announcement state from localStorage
-    const announcementClosed = localStorage.getItem('announcementClosed');
-    if (announcementClosed === 'true') {
-      setShowAnnouncement(false);
-    }
   }, [])
 
   const loadSettings = async () => {
@@ -56,16 +50,6 @@ export default function UnifiedNavigation() {
     window.location.href = portalUrl;
   };
 
-
-  const redirectToWaitlist = () => {
-    window.location.href = '/waitlist';
-  };
-
-  const closeAnnouncement = () => {
-    setShowAnnouncement(false);
-    localStorage.setItem('announcementClosed', 'true');
-  };
-
   const handleLogout = async () => {
     await signOut();
     window.location.href = '/';
@@ -73,32 +57,6 @@ export default function UnifiedNavigation() {
 
   return (
     <React.Fragment>
-      {/* Top Announcement Bar */}
-      {showAnnouncement && (
-        <div className="dr-bg-violet dr-text-pearl py-2.5 text-center dr-ui font-semibold relative z-[1001]">
-        <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
-          <span className="text-base">🎓</span>
-          <span className="flex-1 text-center">
-            Design-Rite's Revolutionary AI is launching Q4 2025 - Join the waitlist for early access to security design mastery
-          </span>
-          <Link
-            href="/waitlist"
-            className="bg-white/20 dr-text-pearl px-3 py-1 rounded-full dr-ui font-semibold hover:bg-white/30 transition-all border border-white/30"
-          >
-            Join Waitlist
-          </Link>
-          <button
-            onClick={closeAnnouncement}
-            className="dr-text-pearl text-lg opacity-70 hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center hover:bg-white/10 rounded-full"
-            aria-label="Close announcement"
-          >
-            ×
-          </button>
-        </div>
-      </div>
-      )}
-
-
       {/* Main Navigation Header */}
       <header className="sticky top-0 left-0 right-0 z-[1000] bg-black/95 backdrop-blur-xl border-b dr-border-violet py-4">
       <nav className="max-w-6xl mx-auto px-8 flex justify-between items-center">
