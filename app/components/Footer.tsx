@@ -22,12 +22,13 @@ export default function Footer({ redirectToApp }: FooterProps) {
 
   const loadSettings = async () => {
     try {
-      const response = await fetch('/api/admin/settings')
+      const response = await fetch('/api/settings')
       if (response.ok) {
         const data = await response.json()
         setSettings(data)
       }
     } catch (error) {
+      // Silently fail - use default logo
       console.error('Failed to load settings:', error)
     }
   }
@@ -98,12 +99,19 @@ export default function Footer({ redirectToApp }: FooterProps) {
           </div>
         </div>
 
-        <div className="border-t border-gray-600/30 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
-          <div>© 2025 Design-Rite. All rights reserved.</div>
-          <div className="flex gap-4 mt-4 md:mt-0">
-            <a href="mailto:hello@design-rite.com" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">📧</a>
-            <a href="https://linkedin.com/company/design-rite" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">💼</a>
-            <a href="https://twitter.com/designrite" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">🐦</a>
+        <div className="border-t border-gray-600/30 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm mb-4">
+            <div>© 2025 Design-Rite. All rights reserved.</div>
+            <div className="flex gap-4 mt-4 md:mt-0">
+              <a href="mailto:hello@design-rite.com" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">📧</a>
+              <a href="https://linkedin.com/company/design-rite" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">💼</a>
+              <a href="https://twitter.com/designrite" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-purple-600 text-xl transition-colors">🐦</a>
+            </div>
+          </div>
+          <div className="flex justify-center gap-6 text-sm">
+            <Link href="/privacy" className="text-gray-400 hover:text-purple-600 transition-colors">Privacy Policy</Link>
+            <span className="text-gray-600">•</span>
+            <Link href="/terms" className="text-gray-400 hover:text-purple-600 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

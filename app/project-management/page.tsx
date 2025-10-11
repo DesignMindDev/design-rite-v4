@@ -1,154 +1,17 @@
 "use client"
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import UnifiedNavigation from '../components/UnifiedNavigation'
+import Footer from '../components/Footer'
 
 export default function ProjectManagementPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const router = useRouter()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
-      {/* Top Announcement Bar */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2.5 text-center text-sm font-semibold relative z-[1001]">
-        <div className="max-w-6xl mx-auto px-8 flex items-center justify-center gap-4">
-          <span className="text-base">📊</span>
-          <span className="flex-1 text-center">
-            AI-Enhanced Project Management - Streamline security installations from design to completion
-          </span>
-          <Link 
-            href="/subscribe"
-            className="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-white/30 transition-all border border-white/30"
-          >
-            Get Early Access
-          </Link>
-        </div>
-      </div>
-
-      {/* Header */}
-      <header className="bg-black/10 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 py-5">
-        <nav className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-3 text-white font-bold text-2xl">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-black text-sm">
-              DR
-            </div>
-            Design-Rite
-          </Link>
-
-{/* Mobile Menu */}
-{isMenuOpen && (
-  <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
-    <div className="px-6 py-4 space-y-4">
-      
-      {/* Platform Section */}
-      <div>
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Platform</div>
-        <Link href="/ai-assessment" className="block text-white/80 hover:text-white py-2 pl-4">AI Assessment</Link>
-        <Link href="/compliance-analyst" className="block text-white/80 hover:text-white py-2 pl-4">Compliance Tools</Link>
-        <Link href="/white-label" className="block text-white/80 hover:text-white py-2 pl-4">White Label</Link>
-        <Link href="/enterprise-roi" className="block text-white/80 hover:text-white py-2 pl-4">ROI Calculator</Link>
-      </div>
-      
-      {/* Solutions Section */}
-      <div className="border-t border-white/10 pt-2">
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Solutions</div>
-        <Link href="/integrators" className="block text-white/80 hover:text-white py-2 pl-4">Security Integrators</Link>
-        <Link href="/enterprise" className="block text-white/80 hover:text-white py-2 pl-4">Enterprise Security</Link>
-        <Link href="/education" className="block text-white/80 hover:text-white py-2 pl-4">Education & Healthcare</Link>
-        <Link href="/consultants" className="block text-white/80 hover:text-white py-2 pl-4">Security Consultants</Link>
-      </div>
-      
-      {/* Partners Link */}
-      <Link href="/partners" className="block text-white/80 hover:text-white py-2 border-t border-white/10 pt-2">Partners</Link>
-      
-      {/* Company Section */}
-      <div className="border-t border-white/10 pt-2">
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Company</div>
-        <Link href="/about" className="block text-white/80 hover:text-white py-2 pl-4">About Us</Link>
-        <Link href="/team" className="block text-white/80 hover:text-white py-2 pl-4">Team</Link>
-        <Link href="/careers" className="block text-white/80 hover:text-white py-2 pl-4">Careers</Link>
-        <Link href="/contact" className="block text-white/80 hover:text-white py-2 pl-4">Contact</Link>
-      </div>
-      
-      {/* Sign In and CTA */}
-      <div className="pt-4 border-t border-white/10">
-        <Link href="/login" className="block text-white/80 hover:text-white py-2">Sign In</Link>
-        <button onClick={redirectToWaitlist} className="block w-full text-left bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">
-          Join Waitlist
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-          <div className="hidden lg:flex items-center gap-3">
-            <Link href="/login" className="text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
-              Sign In
-            </Link>
-            <button 
-              onClick={() => router.push('/app')}
-              className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
-            >
-              Try Demo
-            </button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button 
-            className="lg:hidden text-white text-2xl"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            ☰
-          </button>
-        </nav>
-
-{/* Mobile Menu */}
-{isMenuOpen && (
-  <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
-    <div className="px-6 py-4 space-y-4">
-      
-      {/* Platform Section */}
-      <div>
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Platform</div>
-        <Link href="/ai-assessment" className="block text-white/80 hover:text-white py-2 pl-4">AI Assessment</Link>
-        <Link href="/compliance-analyst" className="block text-white/80 hover:text-white py-2 pl-4">Compliance Tools</Link>
-        <Link href="/white-label" className="block text-white/80 hover:text-white py-2 pl-4">White Label</Link>
-        <Link href="/enterprise-roi" className="block text-white/80 hover:text-white py-2 pl-4">ROI Calculator</Link>
-      </div>
-      
-      {/* Solutions Section */}
-      <div className="border-t border-white/10 pt-2">
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Solutions</div>
-        <Link href="/integrators" className="block text-white/80 hover:text-white py-2 pl-4">Security Integrators</Link>
-        <Link href="/enterprise" className="block text-white/80 hover:text-white py-2 pl-4">Enterprise Security</Link>
-        <Link href="/education" className="block text-white/80 hover:text-white py-2 pl-4">Education & Healthcare</Link>
-        <Link href="/consultants" className="block text-white/80 hover:text-white py-2 pl-4">Security Consultants</Link>
-      </div>
-      
-      {/* Partners Link */}
-      <Link href="/partners" className="block text-white/80 hover:text-white py-2 border-t border-white/10 pt-2">Partners</Link>
-      
-      {/* Company Section */}
-      <div className="border-t border-white/10 pt-2">
-        <div className="text-gray-400 text-xs uppercase tracking-wider mb-2">Company</div>
-        <Link href="/about" className="block text-white/80 hover:text-white py-2 pl-4">About Us</Link>
-        <Link href="/team" className="block text-white/80 hover:text-white py-2 pl-4">Team</Link>
-        <Link href="/careers" className="block text-white/80 hover:text-white py-2 pl-4">Careers</Link>
-        <Link href="/contact" className="block text-white/80 hover:text-white py-2 pl-4">Contact</Link>
-      </div>
-      
-      {/* Sign In and CTA */}
-      <div className="pt-4 border-t border-white/10">
-        <Link href="/login" className="block text-white/80 hover:text-white py-2">Sign In</Link>
-        <button onClick={redirectToWaitlist} className="block w-full text-left bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">
-          Join Waitlist
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-      </header>
+      {/* Main Navigation Header */}
+      <UnifiedNavigation />
 
       {/* Main Content */}
       <main className="flex-1">
@@ -404,46 +267,7 @@ export default function ProjectManagementPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
-        <div className="max-w-6xl mx-auto px-8 py-12">
-          <div className="grid lg:grid-cols-4 gap-8 mb-12">
-            <div className="lg:col-span-2">
-              <Link href="/" className="flex items-center gap-3 text-white font-bold text-2xl mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-black text-sm">
-                  DR
-                </div>
-                Design-Rite
-              </Link>
-              <p className="text-white/70 text-lg leading-relaxed max-w-md">
-                Revolutionary AI-powered platform transforming security system design through intelligent automation and expert-level analysis.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold text-lg mb-4">AI Solutions</h4>
-              <ul className="space-y-3">
-                <li><Link href="/ai-powered-analyst" className="text-white/70 hover:text-white transition-colors">AI Security Analyst</Link></li>
-                <li><Link href="/compliance-analyst" className="text-white/70 hover:text-white transition-colors">Compliance Analyst</Link></li>
-                <li><Link href="/project-management" className="text-purple-400 hover:text-purple-300 transition-colors">Project Management</Link></li>
-                <li><Link href="/solutions" className="text-white/70 hover:text-white transition-colors">All Solutions</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold text-lg mb-4">Company</h4>
-              <ul className="space-y-3">
-                <li><Link href="/about" className="text-white/70 hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="/contact" className="text-white/70 hover:text-white transition-colors">Contact</Link></li>
-                <li><Link href="/privacy" className="text-white/70 hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="text-white/70 hover:text-white transition-colors">Terms of Service</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-white/10 pt-8 text-center">
-            <p className="text-white/60">
-              © 2025 Design-Rite™. All rights reserved. | Revolutionary AI-Powered Security Solutions
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer redirectToApp={() => router.push('/subscribe')} />
     </div>
   )
 }

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import UnifiedNavigation from '../components/UnifiedNavigation';
+import Footer from '../components/Footer';
 
 interface ApplicationFormProps {
   position: string
@@ -398,6 +399,9 @@ export default function CareersPage() {
           onClose={closeApplicationForm}
         />
       )}
+
+      {/* Footer */}
+      <Footer redirectToApp={() => window.location.href = '/careers'} />
     </div>
   )
 }

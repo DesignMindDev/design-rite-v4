@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import UnifiedNavigation from '../components/UnifiedNavigation';
+import Footer from '../components/Footer';
 
 export default function CostEstimator() {
   const router = useRouter();
@@ -92,14 +94,8 @@ export default function CostEstimator() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white">
-      {/* Header */}
-      <div className="bg-black/50 backdrop-blur-sm border-b border-white/10">
-        <div className="max-w-6xl mx-auto px-8 py-4">
-          <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-            Design-Rite
-          </Link>
-        </div>
-      </div>
+      {/* Main Navigation Header */}
+      <UnifiedNavigation />
 
       {/* Progress Bar */}
       <div className="bg-black/30 backdrop-blur-sm border-b border-white/10">
@@ -441,6 +437,9 @@ export default function CostEstimator() {
           )}
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer redirectToApp={() => router.push('/estimate-options')} />
     </div>
   );
 }

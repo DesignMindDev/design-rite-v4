@@ -27,12 +27,13 @@ export default function UnifiedNavigation() {
 
   const loadSettings = async () => {
     try {
-      const response = await fetch('/api/admin/settings')
+      const response = await fetch('/api/settings')
       if (response.ok) {
         const data = await response.json()
         setSettings(data)
       }
     } catch (error) {
+      // Silently fail - use default logo
       console.error('Failed to load settings:', error)
     }
   }

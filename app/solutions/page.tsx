@@ -1,67 +1,17 @@
 "use client"
 
-import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import UnifiedNavigation from '../components/UnifiedNavigation'
+import Footer from '../components/Footer'
 
 export default function SolutionsPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  // Auth logic removed - handled by UnifiedNavigation only
+  const router = useRouter()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 text-white">
-      {/* Header */}
-      <header className="bg-black/10 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 py-5">
-        <nav className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-3 text-white font-bold text-2xl">
-            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-purple-600 font-black text-sm">
-              DR
-            </div>
-            Design-Rite
-          </Link>
-
-          {/* Desktop Navigation */}
-          <ul className="hidden lg:flex items-center gap-8">
-            <li><Link href="/platform" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Platform</Link></li>
-            <li><Link href="/solutions" className="text-white bg-white/10 px-4 py-2 rounded-lg font-medium">Solutions</Link></li>
-            <li><Link href="/partners" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Partners</Link></li>
-            <li><Link href="/about" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">About</Link></li>
-            <li><Link href="/contact" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Contact</Link></li>
-          </ul>
-
-          <div className="hidden lg:flex items-center gap-3">
-            <Link href="/login" className="text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
-              Sign In
-            </Link>
-            <Link
-              href="/estimate-options"
-              className="bg-white text-purple-600 px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all inline-block text-center"
-            >
-              Try Platform
-            </Link>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button 
-            className="lg:hidden text-white text-2xl"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            ☰
-          </button>
-        </nav>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="lg:hidden bg-black/20 backdrop-blur-sm border-t border-white/10">
-            <div className="px-6 py-4 space-y-4">
-              <Link href="/platform" className="block text-white/80 hover:text-white py-2">Platform</Link>
-              <Link href="/solutions" className="block text-white font-medium py-2">Solutions</Link>
-              <Link href="/partners" className="block text-white/80 hover:text-white py-2">Partners</Link>
-              <Link href="/about" className="block text-white/80 hover:text-white py-2">About</Link>
-              <Link href="/contact" className="block text-white/80 hover:text-white py-2">Contact</Link>
-            </div>
-          </div>
-        )}
-      </header>
+      {/* Main Navigation Header */}
+      <UnifiedNavigation />
 
       {/* Main Content */}
       <main className="py-20 px-6 max-w-7xl mx-auto">
@@ -287,8 +237,8 @@ export default function SolutionsPage() {
         </section>
       </main>
 
-      {/* Email Gate Modal */}
-      {/* EmailGate removed - auth handled by UnifiedNavigation only */}
+      {/* Footer */}
+      <Footer redirectToApp={() => router.push('/estimate-options')} />
     </div>
   )
 }

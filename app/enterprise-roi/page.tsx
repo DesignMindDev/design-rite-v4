@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Footer from '../components/Footer'
+import UnifiedNavigation from '../components/UnifiedNavigation'
 
 export default function EnterpriseROICalculatorPage() {
   const [facilities, setFacilities] = useState(10)
@@ -74,26 +76,8 @@ export default function EnterpriseROICalculatorPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
-      {/* Navigation Header */}
-      <header className="bg-black/95 backdrop-blur-xl border-b border-purple-600/20 py-4">
-        <nav className="max-w-6xl mx-auto px-8 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-3 text-white font-black text-2xl">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
-              DR
-            </div>
-            Design-Rite
-          </Link>
-
-          <div className="flex items-center gap-4">
-            <Link href="/enterprise" className="text-gray-300 hover:text-white transition-colors">
-              Back to Enterprise
-            </Link>
-            <Link href="/contact" className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition-all">
-              Contact Sales
-            </Link>
-          </div>
-        </nav>
-      </header>
+      {/* Main Navigation Header */}
+      <UnifiedNavigation />
 
       {/* Main Content */}
       <main className="py-20 px-6">
@@ -312,11 +296,7 @@ export default function EnterpriseROICalculatorPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
-        <div className="max-w-6xl mx-auto px-8 text-center">
-          <p className="text-white/70">© 2025 Design-Rite. All rights reserved.</p>
-        </div>
-      </footer>
+      <Footer redirectToApp={() => window.location.href = '/enterprise'} />
 
       <style jsx>{`
         .slider::-webkit-slider-thumb {

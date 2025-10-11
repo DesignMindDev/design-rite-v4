@@ -44,7 +44,7 @@ export default function AboutPage() {
   }
 
   const scheduleDemo = () => {
-    window.location.href = '/demo.html'
+    window.location.href = '/watch-demo'
   }
 
   return (

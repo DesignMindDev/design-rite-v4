@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Footer from './components/Footer'
 
 export default function WaitlistPage() {
   const [email, setEmail] = useState('')
@@ -280,16 +281,7 @@ export default function WaitlistPage() {
       </main>
 
       {/* Footer */}
-      <footer className="dr-bg-charcoal dr-border-violet py-12 mt-20">
-        <div className="max-w-6xl mx-auto px-8 text-center">
-          <p className="text-white/70 dr-ui">© 2025 Design-Rite. All rights reserved.</p>
-          <div className="flex justify-center gap-6 mt-4">
-            <Link href="/" className="text-white/70 hover:dr-text-violet dr-ui transition-colors">Home</Link>
-            <Link href="/integrators" className="text-white/70 hover:dr-text-violet dr-ui transition-colors">Solutions</Link>
-            <Link href="/contact" className="text-white/70 hover:dr-text-violet dr-ui transition-colors">Contact</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer redirectToApp={() => window.location.href = '/waitlist'} />
     </div>
   )
 }

@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import Footer from '../components/Footer'
+import UnifiedNavigation from '../components/UnifiedNavigation'
 
 export default function APIAccessPage() {
   const [selectedTab, setSelectedTab] = useState('overview')
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const router = useRouter()
 
   const handleTryPlatformClick = (e: React.MouseEvent) => {
@@ -16,36 +17,8 @@ export default function APIAccessPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white">
-      {/* Header */}
-      <header className="bg-black/10 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 py-5">
-        <nav className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-3 text-white font-bold text-2xl">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center font-black text-lg">
-              DR
-            </div>
-            Design-Rite
-          </Link>
-
-          <ul className="hidden lg:flex items-center gap-8">
-            <li><Link href="/platform" className="text-white bg-white/10 px-4 py-2 rounded-lg font-medium">Platform</Link></li>
-            <li><Link href="/solutions" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Solutions</Link></li>
-            <li><Link href="/partners" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Partners</Link></li>
-            <li><Link href="/about" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">About</Link></li>
-            <li><Link href="/contact" className="text-white/80 hover:text-white transition-colors px-4 py-2 rounded-lg">Contact</Link></li>
-          </ul>
-
-          <div className="hidden lg:flex items-center gap-3">
-            <Link href="/login" className="text-white border-2 border-white/30 px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
-              Sign In
-            </Link>
-            <Link href="/app" className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-xl transition-all">
-              Try Platform
-            </Link>
-          </div>
-
-          <button className="lg:hidden text-white text-2xl" onClick={() => setIsMenuOpen(!isMenuOpen)}>☰</button>
-        </nav>
-      </header>
+      {/* Main Navigation Header */}
+      <UnifiedNavigation />
 
       {/* Main Content */}
       <main className="py-20 px-6">
@@ -601,20 +574,7 @@ export default function APIAccessPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
-        <div className="max-w-6xl mx-auto px-8 text-center">
-          <p className="text-white/70">© 2025 Design-Rite. All rights reserved.</p>
-          <div className="flex justify-center gap-6 mt-4">
-            <Link href="/" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Home</Link>
-            <Link href="/about" className="text-white/70 hover:text-purple-600 text-sm transition-colors">About</Link>
-            <Link href="/contact" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Contact</Link>
-            <button onClick={handleTryPlatformClick} className="text-white/70 hover:text-purple-600 text-sm transition-colors text-left">Try Platform</button>
-          </div>
-          <p className="text-sm text-white/60 mt-4">
-            🔒 Your API keys and data are secure with enterprise-grade encryption.
-          </p>
-        </div>
-      </footer>
+      <Footer redirectToApp={handleTryPlatformClick} />
 
     </div>
   )

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import UnifiedNavigation from './components/UnifiedNavigation';
+import Footer from './components/Footer';
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -399,51 +400,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="dr-bg-charcoal border-t dr-border-violet py-12">
-        <div className="max-w-6xl mx-auto px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-8">
-            <div>
-              <div className="flex items-center gap-3 dr-text-pearl font-black text-2xl mb-4">
-                <div className="w-10 h-10 dr-bg-violet rounded-lg flex items-center justify-center font-black text-lg">
-                  DR
-                </div>
-                Design-Rite
-              </div>
-              <p className="dr-body text-gray-300 leading-relaxed">
-                Calming the chaos for Sales Engineers everywhere.
-              </p>
-            </div>
-            <div>
-              <h3 className="dr-text-pearl dr-ui font-bold mb-4">Platform</h3>
-              <ul className="space-y-2">
-                <li><button onClick={handleTryPlatformClick} className="text-gray-300 hover:dr-text-violet dr-ui transition-colors text-left">Try Platform</button></li>
-                <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/waitlist">Join Waitlist</Link></li>
-                <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/watch-demo">Demo</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="dr-text-pearl dr-ui font-bold mb-4">Solutions</h3>
-              <ul className="space-y-2">
-                <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/integrators">Security Integrators</Link></li>
-                <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/enterprise">Enterprise</Link></li>
-                <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/education">Education</Link></li>
-                <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/consultants">Consultants</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="dr-text-pearl dr-ui font-bold mb-4">Company</h3>
-              <ul className="space-y-2">
-                <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/about">About Us</Link></li>
-                <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/contact">Contact</Link></li>
-                <li><Link className="text-gray-300 hover:dr-text-violet dr-ui transition-colors" href="/careers">Careers</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-600/30 pt-8 text-center text-gray-400 dr-ui">
-            <div className="dr-ui">© 2025 Design-Rite. All rights reserved.</div>
-          </div>
-        </div>
-      </footer>
+      <Footer redirectToApp={handleTryPlatformClick} />
 
     </div>
   )

@@ -32,12 +32,13 @@ export default function WatchDemoPage() {
 
   const loadSettings = async () => {
     try {
-      const response = await fetch('/api/admin/settings')
+      const response = await fetch('/api/settings')
       if (response.ok) {
         const data = await response.json()
         setSettings(data)
       }
     } catch (error) {
+      // Silently fail - use default
       console.error('Failed to load settings:', error)
     } finally {
       setLoading(false)
