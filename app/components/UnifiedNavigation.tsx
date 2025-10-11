@@ -381,15 +381,27 @@ export default function UnifiedNavigation() {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          className="lg:hidden dr-text-pearl text-2xl p-2 touch-manipulation active:bg-white/10 rounded transition-colors"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          type="button"
-          aria-label="Toggle mobile menu"
-        >
-          ☰
-        </button>
+        {/* Mobile Menu Buttons */}
+        <div className="lg:hidden flex items-center gap-2">
+          {isAuthenticated && (
+            <button
+              onClick={handleLogout}
+              className="dr-bg-violet dr-text-pearl px-4 py-2 rounded-lg font-semibold dr-ui hover:bg-purple-700 transition-all shadow-lg text-sm"
+              type="button"
+              aria-label="Logout"
+            >
+              🚪 Logout
+            </button>
+          )}
+          <button
+            className="dr-text-pearl text-2xl p-2 touch-manipulation active:bg-white/10 rounded transition-colors"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            type="button"
+            aria-label="Toggle mobile menu"
+          >
+            ☰
+          </button>
+        </div>
       </nav>
       </header>
 
