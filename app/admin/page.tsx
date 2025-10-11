@@ -97,6 +97,10 @@ export default function AdminPage() {
   const [newPost, setNewPost] = useState<Partial<BlogPost>>({})
   const [uploadingBlogImage, setUploadingBlogImage] = useState(false)
 
+  // Easter egg: 5-click logo for super admin access
+  const [logoClickCount, setLogoClickCount] = useState(0)
+  const [lastLogoClickTime, setLastLogoClickTime] = useState(0)
+
   // Blog Management Functions
   const loadBlogPosts = async () => {
     try {
@@ -312,6 +316,30 @@ export default function AdminPage() {
       console.error('Failed to upload logo:', error)
     } finally {
       setUploadingLogo(false)
+    }
+  }
+
+  // Easter egg: 5-click logo handler for super admin access
+  const handleLogoClick = () => {
+    const now = Date.now()
+    const timeSinceLastClick = now - lastLogoClickTime
+
+    // Reset counter if more than 10 seconds since last click
+    if (timeSinceLastClick > 10000) {
+      setLogoClickCount(1)
+      setLastLogoClickTime(now)
+      return
+    }
+
+    const newCount = logoClickCount + 1
+    setLogoClickCount(newCount)
+    setLastLogoClickTime(now)
+
+    if (newCount === 5) {
+      // Grant super admin access
+      alert('🎉 Super Admin Easter Egg Unlocked!')
+      router.push('/admin/super')
+      setLogoClickCount(0)
     }
   }
 
@@ -965,7 +993,11 @@ export default function AdminPage() {
             <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
               <h2 className="text-2xl font-bold mb-6">Header Logo</h2>
               <div className="flex items-center gap-6">
-                <div className="w-32 h-32 bg-gray-700/50 rounded-lg flex items-center justify-center">
+                <div
+                  className="w-32 h-32 bg-gray-700/50 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-700/70 transition-all"
+                  onClick={handleLogoClick}
+                  title="Secret: Click 5 times for super admin access"
+                >
                   {siteSettings.logoPath ? (
                     <Image
                       src={siteSettings.logoPath}
@@ -976,6 +1008,11 @@ export default function AdminPage() {
                     />
                   ) : (
                     <span className="text-gray-400">No Logo</span>
+                  )}
+                  {logoClickCount > 0 && logoClickCount < 5 && (
+                    <div className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">
+                      {logoClickCount}
+                    </div>
                   )}
                 </div>
                 <div>
