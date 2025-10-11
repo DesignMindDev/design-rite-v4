@@ -588,6 +588,10 @@ export default function AdminPage() {
                     <span>📋</span>
                     <span>System Surveyor</span>
                   </Link>
+                  <Link href="/help" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
+                    <span>❓</span>
+                    <span>Help</span>
+                  </Link>
                   {hasModuleAccess('logo_management') && (
                     <button onClick={() => setActiveTab('logos')} className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
                       <span>🖼️</span>

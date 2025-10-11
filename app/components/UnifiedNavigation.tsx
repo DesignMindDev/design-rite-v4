@@ -351,12 +351,6 @@ export default function UnifiedNavigation() {
         {/* Utility Menu */}
         <div className="hidden lg:flex items-center gap-4">
           <Link
-            href="/help"
-            className="text-gray-300 hover:dr-text-violet font-medium transition-all dr-ui text-sm"
-          >
-            Help
-          </Link>
-          <Link
             href="/pricing"
             className="text-gray-300 hover:dr-text-violet font-medium transition-all dr-ui text-sm"
           >
@@ -461,7 +455,6 @@ export default function UnifiedNavigation() {
             {/* Utility Menu */}
             <div className="pt-4 border-t border-white/10">
               <div className="text-gray-400 dr-ui uppercase tracking-wider mb-2">Quick Links</div>
-              <Link href="/help" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">❓ Help</Link>
               <Link href="/pricing" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">💳 Subscribe</Link>
             </div>
 
