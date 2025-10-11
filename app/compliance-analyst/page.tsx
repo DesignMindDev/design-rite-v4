@@ -52,19 +52,13 @@ export default function ComplianceAnalystPage() {
               Ensure 100% regulatory compliance across all security installations. Our AI compliance analyst automatically verifies adherence to industry standards, local codes, and federal regulations while identifying potential violations before they become costly problems.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <button
                 onClick={handleTryComplianceClick}
                 className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all transform hover:scale-[1.02] shadow-lg"
               >
                 Try Compliance Check
               </button>
-              <Link 
-                href="/watch-demo"
-                className="bg-white/10 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all border border-white/20"
-              >
-                Watch Demo Video
-              </Link>
             </div>
           </div>
         </section>
