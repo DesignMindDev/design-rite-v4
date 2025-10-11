@@ -2,10 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import UnifiedNavigation from '../components/UnifiedNavigation'
+import Footer from '../components/Footer'
 
 export default function IntelligencePage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'features' | 'pricing'>('overview')
+  const router = useRouter()
 
   return (
     <div className="min-h-screen dr-bg-charcoal dr-text-pearl">
@@ -636,20 +639,8 @@ export default function IntelligencePage() {
         </div>
       </section>
 
-      {/* Footer CTA */}
-      <section className="py-16 border-t border-white/10">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <p className="text-white/60 mb-6">
-            The security industry's first AI-powered competitive intelligence engine
-          </p>
-          <div className="flex flex-wrap justify-center gap-8 text-sm text-white/50">
-            <Link href="/solutions" className="hover:text-white transition-colors">Solutions</Link>
-            <Link href="/about" className="hover:text-white transition-colors">About</Link>
-            <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
-            <Link href="/login" className="hover:text-white transition-colors">Sign In</Link>
-          </div>
-        </div>
-      </section>
+      {/* Footer */}
+      <Footer redirectToApp={() => router.push('/estimate-options')} />
     </div>
   )
 }

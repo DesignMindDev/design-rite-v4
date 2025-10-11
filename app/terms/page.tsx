@@ -1,9 +1,13 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import UnifiedNavigation from '../components/UnifiedNavigation';
+import Footer from '../components/Footer';
 
 export default function TermsPage() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white">
       <UnifiedNavigation />
@@ -329,17 +333,10 @@ export default function TermsPage() {
           </section>
 
         </div>
-
-        {/* Footer Navigation */}
-        <div className="mt-12 flex justify-between items-center border-t border-purple-600/20 pt-8">
-          <a href="/privacy" className="text-purple-400 hover:text-purple-300 transition-colors">
-            → View Privacy Policy
-          </a>
-          <a href="/" className="text-gray-400 hover:text-white transition-colors">
-            ← Back to Home
-          </a>
-        </div>
       </div>
+
+      {/* Footer */}
+      <Footer redirectToApp={() => router.push('/estimate-options')} />
     </div>
   );
 }
