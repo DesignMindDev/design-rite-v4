@@ -29,10 +29,6 @@ export default function ComplianceAnalystPage() {
     router.push('/ai-assessment');
   };
 
-  const redirectToWaitlist = () => {
-    router.push('/waitlist');
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
       <UnifiedNavigation />
@@ -227,19 +223,13 @@ export default function ComplianceAnalystPage() {
             <p className="text-xl text-white/80 mb-8">
               Join security integrators who trust AI-powered compliance analysis to protect their projects and reputation.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <button
                 onClick={handleTryComplianceClick}
                 className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all transform hover:scale-[1.02] shadow-lg"
               >
                 Try Compliance Demo
               </button>
-              <Link 
-                href="/subscribe"
-                className="bg-white/10 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all border border-white/20"
-              >
-                Get Early Access
-              </Link>
             </div>
           </div>
         </section>
