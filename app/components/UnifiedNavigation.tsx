@@ -90,15 +90,15 @@ export default function UnifiedNavigation() {
             </span>
             <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl dr-border-violet rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
 
-              <button onClick={handleTryPlatformClick} className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2 w-full text-left">
+              <Link href="/security-estimate" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   📊
                 </div>
                 <div>
-                  <div className="font-semibold dr-ui dr-text-pearl mb-1">Security Estimate</div>
-                  <div className="dr-ui text-gray-400 leading-tight">Quick estimate or thorough AI assessment</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">Quick Security Estimate</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Self-guided form • 5 minutes</div>
                 </div>
-              </button>
+              </Link>
 
               <Link href="/ai-discovery" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
@@ -106,19 +106,19 @@ export default function UnifiedNavigation() {
                 </div>
                 <div>
                   <div className="font-semibold dr-ui dr-text-pearl mb-1">AI Discovery Assistant</div>
-                  <div className="dr-ui text-gray-400 leading-tight">Structured form-based security assessment</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Thorough AI-powered assessment • 15-20 min</div>
                 </div>
               </Link>
 
-              <button onClick={handleTryPlatformClick} className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2 w-full text-left">
+              <Link href="/ai-assistant" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                  🧠
+                  🤖
                 </div>
                 <div>
-                  <div className="font-semibold dr-ui dr-text-pearl mb-1">AI Security Assessment</div>
-                  <div className="dr-ui text-gray-400 leading-tight">Professional security analysis with AI</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">AI Assistant Refinement</div>
+                  <div className="dr-ui text-gray-400 leading-tight">Enhance any assessment with AI • 5-10 min</div>
                 </div>
-              </button>
+              </Link>
 
 
               <Link href="/integrations/system-surveyor" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
@@ -428,24 +428,16 @@ export default function UnifiedNavigation() {
             {/* Platform Section */}
             <div>
               <div className="text-gray-400 dr-ui uppercase tracking-wider mb-2">Platform</div>
-              <button
-                onClick={handleTryPlatformClick}
-                className="block text-white/80 hover:dr-text-pearl py-2 pl-4 text-left w-full touch-manipulation active:bg-violet-600/10 transition-colors"
-                type="button"
-              >
-                📊 Security Estimate
-              </button>
+              <Link href="/security-estimate" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">
+                📊 Quick Security Estimate
+              </Link>
               <Link href="/ai-discovery" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🚀 AI Discovery Assistant</Link>
+              <Link href="/ai-assistant" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">
+                🤖 AI Assistant Refinement
+              </Link>
               <Link href="/integrations/system-surveyor" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">
                 📋 System Surveyor
               </Link>
-              <button
-                onClick={handleTryPlatformClick}
-                className="block text-white/80 hover:dr-text-pearl py-2 pl-4 text-left w-full touch-manipulation active:bg-violet-600/10 transition-colors"
-                type="button"
-              >
-                🧠 AI Security Assessment
-              </button>
               <Link href="/compliance-analyst" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">✅ Compliance Tools</Link>
               <Link href="/professional-proposals" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">📋 Proposal Generator</Link>
               <Link href="/pricing-intelligence" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">💰 Pricing Intelligence</Link>
