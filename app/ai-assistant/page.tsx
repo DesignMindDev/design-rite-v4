@@ -1,1376 +1,266 @@
-'use client'
+"use client"
 
-import { useState, useEffect, useRef } from 'react'
-import Link from 'next/link'
-import { Bot, Upload, MessageSquare, Zap, RefreshCw, Download, ArrowLeft, Sparkles, FileText, Database, Settings, ChevronDown, LogOut } from 'lucide-react'
-import { sessionManager } from '../../lib/sessionManager'
-import { useSupabaseAuth } from '@/app/hooks/useSupabaseAuth'
+import { useRouter } from 'next/navigation'
+import UnifiedNavigation from '@/app/components/UnifiedNavigation'
+import Footer from '@/app/components/Footer'
+import { Bot, MessageSquare, Sparkles, RefreshCw, Upload, CheckCircle, Zap, FileText } from 'lucide-react'
 
-interface Message {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  timestamp: Date
-}
+export default function AIAssistantMarketingPage() {
+  const router = useRouter()
 
-interface AssessmentData {
-  projectType?: string
-  facilitySize?: string
-  budget?: string
-  securityNeeds?: string[]
-  currentSystems?: string
-  [key: string]: any
-}
-
-interface AIProvider {
-  id: string
-  name: string
-  description: string
-  endpoint?: string
-  model?: string
-  available: boolean
-}
-
-export default function AIAssistantPage() {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [inputValue, setInputValue] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [assessmentData, setAssessmentData] = useState<AssessmentData | null>(null)
-  const [hasUploadedFile, setHasUploadedFile] = useState(false)
-  const [showSessions, setShowSessions] = useState(false)
-  const [userHash, setUserHash] = useState('')
-  const [sessionId, setSessionId] = useState('')
-  const [sessionName, setSessionName] = useState('')
-  const [previousSessions, setPreviousSessions] = useState<any[]>([])
-  const [showPrintPreview, setShowPrintPreview] = useState(false)
-  const [previewContent, setPreviewContent] = useState({ title: '', content: '', filename: '' })
-  const [showAssumptions, setShowAssumptions] = useState(false)
-  const [showCustomCategory, setShowCustomCategory] = useState(false)
-  const [customCategoryTitle, setCustomCategoryTitle] = useState('')
-  const [customCategoryDetails, setCustomCategoryDetails] = useState('')
-  const [selectedProvider, setSelectedProvider] = useState<string>('assessment-assistant')
-  const { isAuthenticated, signOut } = useSupabaseAuth()
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const [aiProviders, setAiProviders] = useState<AIProvider[]>([
-    {
-      id: 'assessment-assistant',
-      name: 'Assessment Assistant',
-      description: 'Specialized security assessment and discovery assistant',
-      endpoint: '/api/ai/assistant',
-      model: 'gpt-4',
-      available: true
-    },
-    {
-      id: 'simulated',
-      name: 'Simulated Responses',
-      description: 'Pre-programmed responses for demo purposes',
-      available: true
-    },
-    {
-      id: 'existing-endpoint',
-      name: 'Existing AI Assessment',
-      description: 'Your current /api/ai-assessment endpoint',
-      endpoint: '/api/ai-assessment',
-      available: true
-    }
-  ])
-
-  useEffect(() => {
-    // Check for existing assessment data from previous tools FIRST
-    // This prevents race conditions with session initialization
-    const systemSurveyorImport = sessionStorage.getItem('systemSurveyorImport')
-    const quickEstimateData = sessionStorage.getItem('quickEstimateData')
-    const aiDiscoveryData = sessionStorage.getItem('aiDiscoveryData')
-
-    let hasImportedData = false
-
-    // Priority: System Surveyor Import > AI Discovery > Quick Estimate
-    if (systemSurveyorImport) {
-      console.log('🎬 System Surveyor Import detected, loading data...')
-      const data = JSON.parse(systemSurveyorImport)
-      setAssessmentData(data)
-      setHasUploadedFile(true) // Mark as having imported data
-      addWelcomeMessage('System Surveyor Import', data)
-      sessionStorage.removeItem('systemSurveyorImport') // Clear after loading
-      hasImportedData = true
-      console.log('✅ System Surveyor data loaded successfully')
-    } else if (aiDiscoveryData) {
-      const data = JSON.parse(aiDiscoveryData)
-      setAssessmentData(data)
-      addWelcomeMessage('AI Discovery', data)
-      hasImportedData = true
-
-      // Initialize session tracking from AI Discovery data
-      if (data.userId && data.projectId) {
-        console.log('🎯 Continuing session from AI Discovery:', data.userId, data.projectId)
-      }
-    } else if (quickEstimateData) {
-      const data = JSON.parse(quickEstimateData)
-      setAssessmentData(data)
-      addWelcomeMessage('Quick Estimate', data)
-      hasImportedData = true
-
-      // Initialize session tracking from Quick Estimate data
-      if (data.userId && data.projectId) {
-        console.log('🎯 Continuing session from Quick Estimate:', data.userId, data.projectId)
-
-        // Track AI assistant usage
-        sessionManager.trackActivity({
-          action: 'ai_assistant_started',
-          tool: 'ai-assistant',
-          data: {
-            source: 'quick-estimate',
-            estimatedCost: data.estimate?.totalCost,
-            systems: data.selectedSystems
-          }
-        });
-
-        // Log AI session continuation
-        sessionManager.logAISession({
-          tool: 'ai-assistant',
-          sessionId: sessionId,
-          userId: data.userId,
-          projectId: data.projectId,
-          data: { source: 'quick_estimate_handoff', assessment_data: data }
-        });
-      }
-    } else {
-      addInitialMessage()
-
-      // Initialize fresh session for direct AI assistant access
-      const user = sessionManager.getOrCreateUser()
-      const project = sessionManager.createOrUpdateProject({
-        projectName: `AI Assistant Session ${new Date().toLocaleDateString()}`,
-        facilityType: 'Unknown',
-        phase: {
-          tool: 'ai-assistant',
-          data: { direct_access: true }
-        }
-      });
-
-      console.log('🎯 Started fresh AI Assistant session:', user.userId, project.projectId)
-    }
-
-    // Initialize user hash and session AFTER data is loaded
-    // Skip session restore if we have freshly imported data (prevents overwriting welcome message)
-    initializeSession(hasImportedData)
-
-    // Load AI providers from the AI Providers system
-    loadAIProviders()
-  }, [])
-
-  const loadAIProviders = async () => {
-    try {
-      const response = await fetch('/api/admin/ai-providers')
-      if (response.ok) {
-        const data = await response.json()
-        const assessmentProviders = data.providers.filter((p: any) =>
-          p.use_case === 'assessment' && p.enabled
-        ).map((p: any) => ({
-          id: p.id,
-          name: p.name,
-          description: p.description || `${p.provider_type} provider for security assessments`,
-          endpoint: '/api/ai/assistant',
-          model: p.model,
-          available: true
-        }))
-
-        // Update the providers list with real ones
-        setAiProviders(prev => [
-          ...assessmentProviders,
-          ...prev.filter(p => p.id === 'simulated' || p.id === 'existing-endpoint')
-        ])
-
-        // If assessment providers are available, set the first one as default
-        if (assessmentProviders.length > 0) {
-          setSelectedProvider(assessmentProviders[0].id)
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load AI providers:', error)
-    }
-  }
-
-  const generateUserHash = () => {
-    // Create a persistent user hash based on browser fingerprint
-    const fingerprint = [
-      navigator.userAgent,
-      navigator.language,
-      screen.width + 'x' + screen.height,
-      new Date().getTimezoneOffset(),
-      navigator.platform
-    ].join('|')
-
-    // Simple hash function
-    let hash = 0
-    for (let i = 0; i < fingerprint.length; i++) {
-      const char = fingerprint.charCodeAt(i)
-      hash = ((hash << 5) - hash) + char
-      hash = hash & hash // Convert to 32-bit integer
-    }
-    return Math.abs(hash).toString(36)
-  }
-
-  const generateSessionId = () => {
-    return `ai_session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-  }
-
-  const initializeSession = async (skipSessionRestore = false) => {
-    // Get or create user hash
-    let hash = localStorage.getItem('ai_user_hash')
-    if (!hash) {
-      hash = generateUserHash()
-      localStorage.setItem('ai_user_hash', hash)
-    }
-    setUserHash(hash)
-
-    // Check for existing session or create new one
-    // Skip session restore if we have fresh imported data
-    const existingSessionId = sessionStorage.getItem('ai_current_session')
-    if (existingSessionId && !skipSessionRestore) {
-      setSessionId(existingSessionId)
-      await loadSession(existingSessionId, hash)
-    } else {
-      await createNewSession(hash)
-    }
-
-    // Load previous sessions
-    await loadPreviousSessions(hash)
-  }
-
-  const createNewSession = async (hash: string) => {
-    const newSessionId = generateSessionId()
-    const newSessionName = `Session ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`
-
-    setSessionId(newSessionId)
-    setSessionName(newSessionName)
-    sessionStorage.setItem('ai_current_session', newSessionId)
-
-    // Create assessment session in database (for assessment data only)
-    try {
-      await fetch('/api/ai/logging', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'create_session',
-          data: {
-            sessionId: newSessionId,
-            userHash: hash,
-            sessionName: newSessionName,
-            aiProvider: selectedProvider,
-            assessmentData // Only assessment data goes here
-          }
-        })
-      })
-
-      // Create separate chat session (for chat messages only)
-      await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'create_chat_session',
-          data: {
-            sessionId: `chat_${newSessionId}`,
-            userHash: hash,
-            sessionName: `Chat - ${newSessionName}`,
-            aiProvider: selectedProvider,
-            assessmentReference: newSessionId // Link to assessment session
-          }
-        })
-      })
-    } catch (error) {
-      console.error('Failed to create session:', error)
-    }
-  }
-
-  const loadSession = async (sessionId: string, hash: string) => {
-    try {
-      const response = await fetch('/api/ai/logging', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'get_session',
-          data: { sessionId, userHash: hash }
-        })
-      })
-
-      if (response.ok) {
-        const { session, conversations } = await response.json()
-        setSessionName(session.session_name)
-        setSelectedProvider(session.ai_provider)
-
-        if (session.assessment_data) {
-          setAssessmentData(session.assessment_data)
-        }
-
-        // Restore conversation history
-        const restoredMessages = conversations.map((conv: any) => [
-          {
-            id: `${conv.id}_user`,
-            role: 'user' as const,
-            content: conv.user_message,
-            timestamp: new Date(conv.timestamp)
-          },
-          {
-            id: `${conv.id}_assistant`,
-            role: 'assistant' as const,
-            content: conv.ai_response,
-            timestamp: new Date(conv.timestamp)
-          }
-        ]).flat()
-
-        setMessages(restoredMessages)
-      }
-    } catch (error) {
-      console.error('Failed to load session:', error)
-    }
-  }
-
-  const loadPreviousSessions = async (hash: string) => {
-    try {
-      const response = await fetch('/api/ai/logging', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'get_sessions',
-          data: { userHash: hash, limit: 10 }
-        })
-      })
-
-      if (response.ok) {
-        const { sessions } = await response.json()
-        setPreviousSessions(sessions || [])
-      }
-    } catch (error) {
-      console.error('Failed to load previous sessions:', error)
-    }
-  }
-
-  const logConversation = async (userMessage: string, aiResponse: string) => {
-    try {
-      // Save chat message separately (without assessment data)
-      await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'save_chat_message',
-          data: {
-            sessionId: `chat_${sessionId}`, // Use separate chat session ID
-            userHash,
-            userMessage,
-            aiResponse,
-            aiProvider: selectedProvider,
-            threadId: null, // Will be set when using OpenAI threads
-            assistantId: null, // Will be set when using OpenAI assistants
-            timestamp: new Date().toISOString(),
-            metadata: { hasUploadedFile }
-          }
-        })
-      })
-    } catch (error) {
-      console.error('Failed to log conversation:', error)
-    }
-  }
-
-  const switchToSession = async (targetSessionId: string) => {
-    setSessionId(targetSessionId)
-    sessionStorage.setItem('ai_current_session', targetSessionId)
-    setMessages([])
-    await loadSession(targetSessionId, userHash)
-    setShowSessions(false)
-  }
-
-  const startNewSession = async () => {
-    await createNewSession(userHash)
-    setMessages([])
-    setAssessmentData(null)
-    setHasUploadedFile(false)
-    addInitialMessage()
-    await loadPreviousSessions(userHash)
-    setShowSessions(false)
-  }
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages])
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  const addInitialMessage = () => {
-    const initialMessage: Message = {
-      id: '1',
-      role: 'assistant',
-      content: `👋 Welcome to AI Assistant Refinement!
-
-I'm here to help you perfect your security assessment through natural conversation. You can:
-
-🔄 **Refine existing assessments** - Upload a previous estimate or continue from AI Discovery
-💬 **Chat to improve** - Tell me what you'd like to change or add
-⚡ **Real-time updates** - See pricing and recommendations update as we chat
-📊 **Export results** - Generate updated proposals and BOMs
-
-What would you like to work on today?`,
-      timestamp: new Date()
-    }
-    setMessages([initialMessage])
-  }
-
-  const addWelcomeMessage = (source: string, data: AssessmentData) => {
-    // Handle different data structures based on source
-    let overview = ''
-
-    if (source === 'System Surveyor Import') {
-      // System Surveyor Excel import data structure
-      const siteInfo = data.siteInfo || {}
-      const equipment = data.equipment || {}
-      const totals = data.totals || {}
-
-      const cameraCount = equipment.cameras?.length || 0
-      const networkCount = equipment.network?.length || 0
-      const totalHours = totals.totalInstallHours || 0
-      const estimatedCost = totals.estimatedLaborCost || 0
-
-      overview = `**System Surveyor Field Survey Import:**
-• Site: ${siteInfo.siteName || 'Unknown'}
-• Address: ${siteInfo.address || 'N/A'}
-• Survey: ${siteInfo.surveyName || 'N/A'}
-• Equipment Surveyed: ${cameraCount} cameras, ${networkCount} network devices
-• Installation Labor: ${totalHours} hours estimated
-• Labor Cost: ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(estimatedCost)}
-
-**🎬 Field-Verified Data Loaded!**
-Your System Surveyor field survey is now integrated with ${cameraCount} camera locations and complete installation data.`
-    } else if (source === 'Quick Estimate') {
-      // Security estimate data structure
-      const facilitySize = data.facilitySize ? `${data.facilitySize} sq ft` : ''
-      const selectedSystems = data.selectedSystems || []
-      const estimate = data.estimate
-      const contactInfo = data.contactInfo
-
-      overview = `**Current Assessment Overview:**
-${facilitySize ? `• Facility Size: ${facilitySize}` : ''}
-${contactInfo?.company ? `• Company: ${contactInfo.company}` : ''}
-${selectedSystems.length ? `• Selected Systems: ${selectedSystems.join(', ').replace(/([A-Z])/g, ' $1').trim()}` : ''}
-${estimate?.totalCost ? `• Estimated Cost: ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(estimate.totalCost)}` : ''}`
-    } else {
-      // AI Discovery data structure
-      const facilityInfo = data.squareFootage ? `${data.squareFootage} sq ft` : (data.facilitySize || '')
-      const facilityType = data.facilityType || data.projectType || ''
-      const budget = data.budgetRange || data.budget || ''
-      const securityConcerns = data.securityConcerns || data.securityNeeds || []
-
-      overview = `**Current Assessment Overview:**
-${facilityType ? `• Facility Type: ${facilityType}` : ''}
-${facilityInfo ? `• Facility Size: ${facilityInfo}` : ''}
-${budget ? `• Budget Range: ${budget.replace(/-/g, ' - ').replace(/k/g, 'K').replace(/m/g, 'M')}` : ''}
-${securityConcerns.length ? `• Security Concerns: ${securityConcerns.join(', ')}` : ''}`
-    }
-
-    const welcomeMessage: Message = {
-      id: '1',
-      role: 'assistant',
-      content: `🎉 Perfect! I've loaded your ${source} data and I'm ready to help refine it.
-
-${overview}
-
-What would you like to refine or improve? For example:
-- "Add more cameras to the parking area"
-- "Include access control for the server room"
-- "Reduce the budget by 15%"
-- "Add compliance requirements for HIPAA"`,
-      timestamp: new Date()
-    }
-    setMessages([welcomeMessage])
-  }
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      setHasUploadedFile(true)
-      const uploadMessage: Message = {
-        id: Date.now().toString(),
-        role: 'user',
-        content: `Uploaded file: ${file.name}`,
-        timestamp: new Date()
-      }
-
-      const responseMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `📄 I've analyzed your uploaded assessment. I can see the existing security recommendations and pricing. What would you like to refine or improve?
-
-Some suggestions:
-- Adjust equipment quantities or specifications
-- Add new security zones or areas
-- Modify budget constraints
-- Include additional compliance requirements
-- Update implementation timeline`,
-        timestamp: new Date()
-      }
-
-      setMessages(prev => [...prev, uploadMessage, responseMessage])
-    }
-  }
-
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || isLoading) return
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: inputValue,
-      timestamp: new Date()
-    }
-
-    setMessages(prev => [...prev, userMessage])
-    const currentInput = inputValue
-    setInputValue('')
-    setIsLoading(true)
-
-    try {
-      let aiResponse: Message
-
-      if (selectedProvider === 'simulated') {
-        // Simulate AI response with real-world refinement scenarios
-        setTimeout(() => {
-          const response: Message = {
-            id: (Date.now() + 1).toString(),
-            role: 'assistant',
-            content: generateAIResponse(currentInput),
-            timestamp: new Date()
-          }
-          setMessages(prev => [...prev, response])
-          setIsLoading(false)
-        }, 1500)
-        return
-      }
-
-      // Use real AI provider
-      const selectedProviderConfig = aiProviders.find(p => p.id === selectedProvider)
-      if (!selectedProviderConfig?.endpoint) {
-        throw new Error('Provider configuration not found')
-      }
-
-      const response = await fetch(selectedProviderConfig.endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: currentInput,
-          context: {
-            assessmentData,
-            conversationHistory: messages.slice(-5), // Last 5 messages for context
-            provider: selectedProvider
-          }
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status} ${response.statusText}`)
-      }
-
-      const data = await response.json()
-
-      if (!data.success && data.error) {
-        throw new Error(data.error)
-      }
-
-      aiResponse = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: data.message || data.content || 'I apologize, but I encountered an issue processing your request.',
-        timestamp: new Date()
-      }
-
-      setMessages(prev => [...prev, aiResponse])
-
-      // Log the conversation
-      await logConversation(currentInput, aiResponse.content)
-    } catch (error) {
-      console.error('AI Provider Error:', error)
-
-      const errorResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `⚠️ AI Provider Error: ${error instanceof Error ? error.message : 'Unknown error'}\n\nFalling back to simulated response:\n\n${generateAIResponse(currentInput)}`,
-        timestamp: new Date()
-      }
-
-      setMessages(prev => [...prev, errorResponse])
-
-      // Log the error response
-      await logConversation(currentInput, errorResponse.content)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const generateAIResponse = (userInput: string): string => {
-    const input = userInput.toLowerCase()
-
-    if (input.includes('camera') || input.includes('surveillance')) {
-      return `🎥 Great! I've updated your surveillance system recommendations:
-
-**Added to Assessment:**
-• 4x Additional IP cameras (2MP/4MP options) for enhanced coverage
-• Upgraded storage to accommodate extra streams
-• Enhanced analytics package for motion detection
-
-**Updated Pricing:**
-• Previous estimate: $28,500
-• **New total: $31,200** (+$2,700)
-
-The additional cameras will provide 95% coverage versus the original 80%. Would you like me to adjust the camera specifications or add any other features?`
-    }
-
-    if (input.includes('budget') || input.includes('cost') || input.includes('price')) {
-      return `💰 I'll help optimize your budget!
-
-**Cost Optimization Options:**
-• Switch to 1080p cameras in low-priority areas (-$3,200)
-• Use hybrid wired/wireless access points (-$1,800)
-• Standard analytics vs. premium package (-$2,400)
-• Phased implementation over 6 months (30% upfront)
-
-**Current Total:** $31,200
-**Optimized Total:** $23,800 (-24% savings)
-
-Which budget adjustments interest you most?`
-    }
-
-    if (input.includes('access control') || input.includes('door') || input.includes('entry')) {
-      return `🚪 Perfect! Let me enhance your access control system:
-
-**Recommended Additions:**
-• Card reader system for main entrances
-• Biometric scanner for secure areas
-• Integration with existing surveillance
-• Mobile app for remote management
-
-**Security Enhancement:**
-• Multi-factor authentication
-• Time-based access restrictions
-• Audit trail logging
-• Emergency lockdown capability
-
-**Investment:** +$8,400 for comprehensive access control
-**Total Updated Estimate:** $39,600
-
-This creates a fully integrated security ecosystem. Shall I detail the implementation plan?`
-    }
-
-    return `✨ I understand you'd like to refine that aspect of your security assessment.
-
-Based on your input, I'm analyzing the best approach to incorporate these changes while maintaining system integration and budget considerations.
-
-**What I'm considering:**
-• Impact on existing recommendations
-• Budget implications
-• Installation timeline adjustments
-• Compliance requirements
-
-Could you provide a bit more detail about your specific goals? This will help me give you the most accurate refinement.`
-  }
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSendMessage()
-    }
-  }
-
-  const handleExportProposal = () => {
-    // Create a mock updated proposal
-    const proposalContent = `# Updated Security Assessment Proposal
-
-## Project Summary
-${assessmentData?.projectType || 'Security Assessment'}
-${assessmentData?.facilitySize ? `Facility Size: ${assessmentData.facilitySize}` : ''}
-${assessmentData?.budget ? `Budget Range: ${assessmentData.budget}` : ''}
-
-## AI-Enhanced Recommendations
-Based on our conversation, the following refinements have been made:
-
-${messages.filter(m => m.role === 'user').map((msg, i) => `${i + 1}. ${msg.content}`).join('\n')}
-
-## Updated Pricing
-- Real-time pricing integration maintained
-- Recommendations optimized based on conversation
-- Professional-grade specifications
-
-## Next Steps
-1. Review updated specifications
-2. Schedule installation consultation
-3. Finalize contract and timeline
-
-Generated with AI Assistant Refinement
-Date: ${new Date().toLocaleDateString()}
-`
-
-    // Show preview instead of direct download
-    setPreviewContent({
-      title: 'Updated Security Assessment Proposal',
-      content: proposalContent,
-      filename: `Updated_Security_Proposal_${new Date().toISOString().split('T')[0]}.md`
-    })
-    setShowPrintPreview(true)
-  }
-
-  const handleExportBOM = () => {
-    // Create a mock BOM
-    const bomContent = `# Detailed Bill of Materials (BOM)
-
-## Security System Components
-
-### Surveillance System
-- IP Security Cameras (8x) - $800-$1,200 each (NDAA Compliant)
-- Network Video Recorder - $800
-- Storage Array (8TB) - $600
-- Network Infrastructure - $1,500
-
-### Access Control
-- Card Readers (4x) - $400 each
-- Access Control Panel - $1,200
-- Key Cards (50x) - $5 each
-
-### Installation & Configuration
-- Professional Installation - $3,500
-- System Configuration - $1,200
-- Training & Documentation - $800
-
-Total Investment: $15,400
-
-Generated with AI Assistant Refinement
-Date: ${new Date().toLocaleDateString()}
-`
-
-    // Show preview instead of direct download
-    setPreviewContent({
-      title: 'Detailed Bill of Materials (BOM)',
-      content: bomContent,
-      filename: `Security_BOM_${new Date().toISOString().split('T')[0]}.md`
-    })
-    setShowPrintPreview(true)
-  }
-
-  const handleExportImplementation = () => {
-    // Create a mock implementation plan
-    const implementationContent = `# Implementation Plan
-
-## Phase 1: Site Survey & Planning (Week 1)
-- Conduct detailed site assessment
-- Finalize equipment specifications
-- Create installation timeline
-- Obtain necessary permits
-
-## Phase 2: Equipment Procurement (Week 2-3)
-- Order security equipment
-- Coordinate delivery scheduling
-- Prepare installation materials
-- Schedule contractor resources
-
-## Phase 3: Installation (Week 4-5)
-- Install surveillance cameras
-- Configure network infrastructure
-- Set up access control system
-- Test all components
-
-## Phase 4: Configuration & Testing (Week 6)
-- System configuration and optimization
-- User training and documentation
-- Final testing and sign-off
-- Warranty and support activation
-
-Total Timeline: 6 weeks
-Project Manager: Assigned upon contract signing
-
-Generated with AI Assistant Refinement
-Date: ${new Date().toLocaleDateString()}
-`
-
-    // Show preview instead of direct download
-    setPreviewContent({
-      title: 'Implementation Plan',
-      content: implementationContent,
-      filename: `Implementation_Plan_${new Date().toISOString().split('T')[0]}.md`
-    })
-    setShowPrintPreview(true)
-  }
-
-  const handleDownloadFromPreview = () => {
-    const blob = new Blob([previewContent.content], { type: 'text/markdown' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = previewContent.filename
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-    setShowPrintPreview(false)
-  }
-
-  const handleLogout = async () => {
-    await signOut()
-    window.location.href = '/'
-  }
-
-  const handlePrint = () => {
-    const printWindow = window.open('', '_blank')
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>${previewContent.title}</title>
-            <style>
-              body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                line-height: 1.6;
-                max-width: 800px;
-                margin: 0 auto;
-                padding: 20px;
-              }
-              h1, h2, h3 { color: #333; }
-              pre { background: #f5f5f5; padding: 15px; border-radius: 5px; }
-              table { border-collapse: collapse; width: 100%; }
-              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-              th { background-color: #f2f2f2; }
-            </style>
-          </head>
-          <body>
-            <pre style="white-space: pre-wrap; font-family: inherit;">${previewContent.content}</pre>
-          </body>
-        </html>
-      `)
-      printWindow.document.close()
-      printWindow.print()
-      printWindow.close()
-    }
-  }
-
-  const handleAddCustomCategory = () => {
-    if (!customCategoryTitle.trim()) {
-      alert('Please enter a category title')
-      return
-    }
-
-    // Create a message requesting the custom category addition
-    const customCategoryMessage = `Add custom category: "${customCategoryTitle}"${customCategoryDetails ? `\n\nDetails: ${customCategoryDetails}` : ''}`
-    setInputValue(customCategoryMessage)
-
-    // Reset the form
-    setCustomCategoryTitle('')
-    setCustomCategoryDetails('')
-    setShowCustomCategory(false)
+  const handleTryPlatform = () => {
+    router.push('/pricing')
   }
 
   return (
-    <div className="min-h-screen dr-bg-charcoal dr-text-pearl">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 text-center">
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <Link href="/estimate-options" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <ArrowLeft className="w-5 h-5" />
-            <span className="font-medium">Back to Options</span>
-          </Link>
-          <div className="flex-1 text-center">
-            <span className="font-bold text-lg">🤖 AI ASSISTANT REFINEMENT</span>
-            <span className="ml-2">★★★ Intelligent Conversation-Driven Improvements</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/admin/ai-providers" className="text-sm hover:opacity-80 transition-opacity" title="AI Provider Settings">
-              <Settings className="w-5 h-5" />
-            </Link>
-            {isAuthenticated && (
-              <button onClick={handleLogout} className="text-sm hover:opacity-80 transition-opacity flex items-center gap-1" title="Logout">
-                <LogOut className="w-5 h-5" />
-              </button>
-            )}
+    <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
+      <UnifiedNavigation />
+
+      {/* Hero Section */}
+      <section className="max-w-6xl mx-auto px-8 pt-20 pb-16 text-center">
+        <div className="inline-flex items-center gap-3 mb-6">
+          <div className="w-16 h-16 bg-gradient-to-br from-violet-600 to-purple-600 rounded-xl flex items-center justify-center">
+            <Bot className="w-8 h-8 text-white" />
           </div>
         </div>
-      </div>
+        <h1 className="text-5xl lg:text-6xl font-bold mb-8 leading-tight">
+          Refine Any Assessment with <span className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">AI Conversation</span>
+        </h1>
+        <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+          Natural language refinement for security proposals. Upload existing estimates or start from scratch.
+          Just chat to improve.
+        </p>
+        <button
+          onClick={handleTryPlatform}
+          className="bg-gradient-to-r from-violet-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold hover:from-violet-700 hover:to-purple-800 transition-all transform hover:scale-[1.02] shadow-lg text-lg"
+        >
+          🚀 Start 14-Day Free Trial
+        </button>
+      </section>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid lg:grid-cols-12 gap-8">
-          {/* Chat Interface */}
-          <div className="lg:col-span-8">
-            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl border shadow-2xl flex flex-col h-[600px]">
-              {/* Chat Header */}
-              <div className="p-6 border-b border-gray-700/50 bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-t-2xl">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 dr-bg-violet rounded-lg">
-                      <MessageSquare className="w-5 h-5 dr-text-pearl" />
-                    </div>
-                    <div>
-                      <h2 className="font-semibold dr-text-pearl">AI Refinement Assistant</h2>
-                      <p className="text-sm text-gray-300">Natural language security system optimization</p>
-                    </div>
-                  </div>
-
-                  {/* Upload Button */}
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-2 px-4 py-2 dr-bg-violet hover:bg-purple-700 dr-text-pearl rounded-lg transition-colors"
-                  >
-                    <Upload className="w-4 h-4" />
-                    Upload Assessment
-                  </button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    onChange={handleFileUpload}
-                    accept=".pdf,.doc,.docx,.txt"
-                    className="hidden"
-                  />
-                </div>
-                <p className="text-xs text-gray-400 mt-2 italic">
-                  *Accepts: PDF, DOC, DOCX, TXT files up to 10MB
-                </p>
-              </div>
-
-              {/* Messages */}
-              <div className="flex-1 p-6 overflow-y-auto bg-gray-900/20">
-                <div className="space-y-4">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-3xl rounded-lg p-4 ${
-                          message.role === 'user'
-                            ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
-                            : 'bg-gray-800/80 border border-gray-700/50 text-gray-100'
-                        }`}
-                      >
-                        <div className="whitespace-pre-wrap">{message.content}</div>
-                        <div className={`text-xs mt-2 ${
-                          message.role === 'user' ? 'text-purple-200' : 'text-gray-400'
-                        }`}>
-                          {message.timestamp.toLocaleTimeString()}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  {isLoading && (
-                    <div className="flex justify-start">
-                      <div className="bg-gray-800/80 border border-gray-700/50 rounded-lg p-4">
-                        <div className="flex items-center gap-2 text-gray-300">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 dr-border-violet"></div>
-                          AI is analyzing your request...
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* Input */}
-              <div className="p-6 border-t border-gray-700/50 bg-gray-900/20 rounded-b-2xl">
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Describe what you'd like to refine... (e.g., 'Add more cameras to parking area')"
-                    className="flex-1 px-4 py-3 bg-gray-800/60 border border-gray-600/50 rounded-lg dr-text-pearl placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    disabled={isLoading}
-                  />
-                  <button
-                    onClick={handleSendMessage}
-                    disabled={!inputValue.trim() || isLoading}
-                    className="px-6 py-3 dr-bg-violet hover:bg-purple-700 dr-text-pearl rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Send
-                  </button>
-                </div>
-              </div>
-            </div>
+      {/* How It Works */}
+      <section className="max-w-6xl mx-auto px-8 py-16">
+        <h2 className="text-3xl font-bold text-center mb-12">Simple Conversation-Driven Refinement</h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+            <div className="text-4xl mb-4">📤</div>
+            <h3 className="text-xl font-bold mb-3">Upload or Start Fresh</h3>
+            <ul className="text-gray-300 space-y-2 text-sm">
+              <li>• Upload existing proposals (PDF, DOC, TXT)</li>
+              <li>• Continue from Quick Estimate or AI Discovery</li>
+              <li>• Start from scratch with natural language</li>
+              <li>• Up to 10MB file uploads supported</li>
+            </ul>
           </div>
 
-          {/* Side Panel */}
-          <div className="lg:col-span-4 space-y-6">
-            {/* Current Assessment Summary */}
-            {assessmentData && (
-              <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl border p-6">
-                <h3 className="font-semibold dr-text-pearl mb-4 flex items-center gap-2">
-                  <Database className="w-5 h-5 dr-text-violet" />
-                  Current Assessment
-                </h3>
-                <div className="space-y-3 text-sm">
-                  {assessmentData.projectType && (
-                    <div>
-                      <span className="font-medium text-gray-300">Project:</span>
-                      <span className="ml-2 text-gray-400">{assessmentData.projectType}</span>
-                    </div>
-                  )}
-                  {assessmentData.facilitySize && (
-                    <div>
-                      <span className="font-medium text-gray-300">Size:</span>
-                      <span className="ml-2 text-gray-400">{assessmentData.facilitySize}</span>
-                    </div>
-                  )}
-                  {assessmentData.budget && (
-                    <div>
-                      <span className="font-medium text-gray-300">Budget:</span>
-                      <span className="ml-2 text-gray-400">{assessmentData.budget}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+            <div className="text-4xl mb-4">💬</div>
+            <h3 className="text-xl font-bold mb-3">Chat to Refine</h3>
+            <ul className="text-gray-300 space-y-2 text-sm">
+              <li>• "Add more cameras to parking area"</li>
+              <li>• "Reduce budget by 20%"</li>
+              <li>• "Include HIPAA compliance"</li>
+              <li>• "Switch to premium access control"</li>
+            </ul>
+          </div>
 
-            {/* Quick Actions */}
-            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl border p-6">
-              <h3 className="font-semibold dr-text-pearl mb-4">Quick Refinements</h3>
-              <div className="space-y-2">
-                <button
-                  onClick={() => setInputValue("Add more security cameras")}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
-                >
-                  🎥 Add more cameras
-                </button>
-                <button
-                  onClick={() => setInputValue("Reduce budget by 20%")}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
-                >
-                  💰 Optimize budget
-                </button>
-                <button
-                  onClick={() => setInputValue("Add access control system")}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
-                >
-                  🚪 Access control
-                </button>
-                <button
-                  onClick={() => setInputValue("Include HIPAA compliance")}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
-                >
-                  🔒 Add compliance
-                </button>
-                <button
-                  onClick={() => setShowAssumptions(true)}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
-                >
-                  📋 Review assumptions
-                </button>
-                <button
-                  onClick={() => setShowCustomCategory(true)}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
-                >
-                  ➕ Add custom category
-                </button>
-              </div>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+            <div className="text-4xl mb-4">⚡</div>
+            <h3 className="text-xl font-bold mb-3">Instant Updates</h3>
+            <ul className="text-gray-300 space-y-2 text-sm">
+              <li>• Real-time pricing updates</li>
+              <li>• Equipment recommendations adjusted</li>
+              <li>• Professional proposal regenerated</li>
+              <li>• Download updated PDF/BOM instantly</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Perfect For */}
+      <section className="max-w-6xl mx-auto px-8 py-16 bg-white/5 rounded-3xl my-16">
+        <h2 className="text-3xl font-bold text-center mb-12">Perfect For</h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="flex items-start gap-4">
+            <Sparkles className="w-6 h-6 text-violet-400 flex-shrink-0 mt-1" />
+            <div>
+              <h3 className="font-bold mb-2">Refining Existing Proposals</h3>
+              <p className="text-gray-400 text-sm">Upload previous estimates and enhance them with AI-powered conversation. Perfect for iterative improvements.</p>
             </div>
-
-            {/* Export Options */}
-            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl border p-6">
-              <h3 className="font-semibold dr-text-pearl mb-4 flex items-center gap-2">
-                <Download className="w-5 h-5 dr-text-violet" />
-                Export Results
-              </h3>
-              <div className="space-y-3">
-                <button
-                  onClick={handleExportProposal}
-                  className="w-full px-4 py-2 dr-bg-violet hover:bg-purple-700 dr-text-pearl rounded-lg transition-colors"
-                >
-                  📄 Preview Proposal
-                </button>
-                <button
-                  onClick={handleExportBOM}
-                  className="w-full px-4 py-2 border border-gray-600/50 text-gray-300 rounded-lg hover:bg-gray-700/50 transition-colors"
-                >
-                  📊 Preview BOM
-                </button>
-                <button
-                  onClick={handleExportImplementation}
-                  className="w-full px-4 py-2 border border-gray-600/50 text-gray-300 rounded-lg hover:bg-gray-700/50 transition-colors"
-                >
-                  📋 Preview Implementation Plan
-                </button>
-              </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <RefreshCw className="w-6 h-6 text-green-400 flex-shrink-0 mt-1" />
+            <div>
+              <h3 className="font-bold mb-2">Client-Requested Changes</h3>
+              <p className="text-gray-400 text-sm">"Can you add access control?" or "Budget needs to be lower" - just tell the AI what changed.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <MessageSquare className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" />
+            <div>
+              <h3 className="font-bold mb-2">Natural Language Improvements</h3>
+              <p className="text-gray-400 text-sm">No forms to fill out. Just describe what you want in plain English and watch the proposal update.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <Upload className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" />
+            <div>
+              <h3 className="font-bold mb-2">Upgrading Quick Estimates</h3>
+              <p className="text-gray-400 text-sm">Start with 5-minute estimate, then refine with AI conversation to add detail and customization.</p>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Print Preview Modal */}
-      {showPrintPreview && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">{previewContent.title}</h2>
-              <button
-                onClick={() => setShowPrintPreview(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 overflow-auto p-6 bg-gray-50">
-              <div className="bg-white shadow-sm rounded-lg p-8 mx-auto max-w-3xl" style={{ minHeight: '11in' }}>
-                <pre className="whitespace-pre-wrap text-sm text-gray-800 leading-relaxed font-mono">
-                  {previewContent.content}
-                </pre>
+      {/* Real Conversation Examples */}
+      <section className="max-w-6xl mx-auto px-8 py-16">
+        <h2 className="text-3xl font-bold text-center mb-12">Real Conversation Examples</h2>
+        <div className="space-y-6">
+          {/* Example 1 */}
+          <div className="bg-gradient-to-r from-violet-900/30 to-purple-900/30 rounded-2xl p-6 border border-violet-500/30">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="bg-violet-600 rounded-lg p-2">
+                <MessageSquare className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <p className="text-gray-300 italic">"Add 4 more cameras to the parking lot area"</p>
               </div>
             </div>
-
-            {/* Footer Actions */}
-            <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
-              <div className="text-sm text-gray-500">
-                File: {previewContent.filename}
+            <div className="flex items-start gap-4 ml-12">
+              <div className="bg-gray-700 rounded-lg p-2">
+                <Bot className="w-5 h-5" />
               </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setShowPrintPreview(false)}
-                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handlePrint}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                  </svg>
-                  Print
-                </button>
-                <button
-                  onClick={handleDownloadFromPreview}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  Download
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Assumptions Checklist Modal */}
-      {showAssumptions && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col border border-purple-500/30">
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-700">
-              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                <span>📋</span> Standard Assumptions Checklist
-              </h2>
-              <button
-                onClick={() => setShowAssumptions(false)}
-                className="text-gray-400 hover:text-gray-200 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 overflow-auto p-6">
-              <div className="space-y-6">
-                <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-4">
-                  <h3 className="text-purple-300 font-medium mb-3">Surveillance System</h3>
-                  <ul className="space-y-2 text-gray-300 text-sm">
-                    <li className="flex items-start gap-2">
-                      <input type="checkbox" className="mt-1" defaultChecked />
-                      <span>NDAA-compliant IP cameras (2MP-4MP resolution)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <input type="checkbox" className="mt-1" defaultChecked />
-                      <span>30-day video retention on local NVR</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <input type="checkbox" className="mt-1" defaultChecked />
-                      <span>Motion detection and analytics included</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <input type="checkbox" className="mt-1" defaultChecked />
-                      <span>Standard coverage: 80-90% of facility area</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
-                  <h3 className="text-blue-300 font-medium mb-3">Access Control</h3>
-                  <ul className="space-y-2 text-gray-300 text-sm">
-                    <li className="flex items-start gap-2">
-                      <input type="checkbox" className="mt-1" defaultChecked />
-                      <span>Card reader system (125kHz or 13.56MHz)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <input type="checkbox" className="mt-1" defaultChecked />
-                      <span>Cloud or on-premise management options</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <input type="checkbox" className="mt-1" defaultChecked />
-                      <span>Integration with existing HR/AD systems</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
-                  <h3 className="text-green-300 font-medium mb-3">Installation & Labor</h3>
-                  <ul className="space-y-2 text-gray-300 text-sm">
-                    <li className="flex items-start gap-2">
-                      <input type="checkbox" className="mt-1" defaultChecked />
-                      <span>Professional installation by certified technicians</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <input type="checkbox" className="mt-1" defaultChecked />
-                      <span>Standard business hours installation (M-F, 8am-5pm)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <input type="checkbox" className="mt-1" defaultChecked />
-                      <span>2-hour end-user training session included</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <input type="checkbox" className="mt-1" defaultChecked />
-                      <span>90-day warranty on labor, manufacturer warranty on equipment</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-4">
-                  <h3 className="text-orange-300 font-medium mb-3">Exclusions & Caveats</h3>
-                  <ul className="space-y-2 text-gray-300 text-sm">
-                    <li className="flex items-start gap-2">
-                      <span className="text-orange-400 font-bold">⚠️</span>
-                      <span>Pricing assumes existing network infrastructure is adequate</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-orange-400 font-bold">⚠️</span>
-                      <span>Permits, electrical work, and structural modifications not included</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-orange-400 font-bold">⚠️</span>
-                      <span>Assumes clear mounting surfaces and standard ceiling heights</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-orange-400 font-bold">⚠️</span>
-                      <span>Site survey required for final pricing validation</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-700">
-              <button
-                onClick={() => setShowAssumptions(false)}
-                className="px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-700/50 transition-colors"
-              >
-                Close
-              </button>
-              <button
-                onClick={() => {
-                  setInputValue("Please provide a detailed quote based on the standard assumptions checklist")
-                  setShowAssumptions(false)
-                }}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-              >
-                Apply to Quote
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Custom Category Modal */}
-      {showCustomCategory && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-gray-800 rounded-lg shadow-xl max-w-xl w-full border border-purple-500/30">
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-700">
-              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                <span>➕</span> Add Custom Category
-              </h2>
-              <button
-                onClick={() => setShowCustomCategory(false)}
-                className="text-gray-400 hover:text-gray-200 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Content */}
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Category Title *
-                </label>
-                <input
-                  type="text"
-                  value={customCategoryTitle}
-                  onChange={(e) => setCustomCategoryTitle(e.target.value)}
-                  placeholder="e.g., Exclusions, Special Requirements, Caveats"
-                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Details (Optional)
-                </label>
-                <textarea
-                  value={customCategoryDetails}
-                  onChange={(e) => setCustomCategoryDetails(e.target.value)}
-                  placeholder="Enter specific details, exclusions, or requirements..."
-                  rows={6}
-                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                />
-              </div>
-
-              <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
-                <h4 className="text-blue-300 font-medium text-sm mb-2">Examples:</h4>
-                <ul className="text-gray-400 text-xs space-y-1">
-                  <li>• <strong>Exclusions:</strong> "Network infrastructure upgrades not included"</li>
-                  <li>• <strong>Special Requirements:</strong> "After-hours installation required"</li>
-                  <li>• <strong>Caveats:</strong> "Pricing subject to site survey confirmation"</li>
-                  <li>• <strong>Additional Costs:</strong> "Permit fees and electrical work separate"</li>
+              <div className="flex-1">
+                <p className="text-gray-200">Great! I've updated your surveillance system recommendations:</p>
+                <ul className="mt-2 space-y-1 text-sm text-gray-300">
+                  <li>• Added 4x outdoor bullet cameras (2MP/4MP options)</li>
+                  <li>• Upgraded storage to accommodate extra streams</li>
+                  <li>• Enhanced analytics package for motion detection</li>
+                  <li>• <strong className="text-violet-400">Previous: $28,500 → New: $31,200</strong> (+$2,700)</li>
                 </ul>
               </div>
             </div>
+          </div>
 
-            {/* Footer */}
-            <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-700">
-              <button
-                onClick={() => setShowCustomCategory(false)}
-                className="px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-700/50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddCustomCategory}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-              >
-                Add to Quote
-              </button>
+          {/* Example 2 */}
+          <div className="bg-gradient-to-r from-blue-900/30 to-cyan-900/30 rounded-2xl p-6 border border-blue-500/30">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="bg-blue-600 rounded-lg p-2">
+                <MessageSquare className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <p className="text-gray-300 italic">"Budget needs to be under $25K - what can we optimize?"</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4 ml-12">
+              <div className="bg-gray-700 rounded-lg p-2">
+                <Bot className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <p className="text-gray-200">I'll help optimize your budget!</p>
+                <ul className="mt-2 space-y-1 text-sm text-gray-300">
+                  <li>• Switch to 1080p cameras in low-priority areas (-$3,200)</li>
+                  <li>• Use hybrid wired/wireless access points (-$1,800)</li>
+                  <li>• Standard analytics vs. premium package (-$2,400)</li>
+                  <li>• <strong className="text-green-400">Current: $31,200 → Optimized: $23,800</strong> (-24% savings)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Example 3 */}
+          <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 rounded-2xl p-6 border border-green-500/30">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="bg-green-600 rounded-lg p-2">
+                <MessageSquare className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <p className="text-gray-300 italic">"We need this to be HIPAA compliant for the medical office"</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4 ml-12">
+              <div className="bg-gray-700 rounded-lg p-2">
+                <Bot className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <p className="text-gray-200">Perfect! I've added HIPAA compliance requirements:</p>
+                <ul className="mt-2 space-y-1 text-sm text-gray-300">
+                  <li>• Encrypted video storage and transmission</li>
+                  <li>• Access control with audit trail logging</li>
+                  <li>• NDAA-compliant camera equipment</li>
+                  <li>• Business Associate Agreement (BAA) coverage</li>
+                  <li>• <strong className="text-green-400">Compliance cost: +$4,200</strong></li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
-      )}
+      </section>
+
+      {/* What You Get */}
+      <section className="max-w-6xl mx-auto px-8 py-16">
+        <h2 className="text-3xl font-bold text-center mb-12">What You'll Export</h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center">
+            <FileText className="w-12 h-12 text-violet-400 mx-auto mb-4" />
+            <h3 className="text-xl font-bold mb-3">Updated Proposal</h3>
+            <p className="text-gray-300">Professional proposal documents with all your conversational refinements applied</p>
+          </div>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center">
+            <Zap className="w-12 h-12 text-green-400 mx-auto mb-4" />
+            <h3 className="text-xl font-bold mb-3">Detailed BOM</h3>
+            <p className="text-gray-300">Complete bill of materials with real pricing updated in real-time</p>
+          </div>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center">
+            <CheckCircle className="w-12 h-12 text-blue-400 mx-auto mb-4" />
+            <h3 className="text-xl font-bold mb-3">Implementation Plan</h3>
+            <p className="text-gray-300">Timeline and phasing recommendations based on conversation context</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits */}
+      <section className="max-w-6xl mx-auto px-8 py-16 bg-white/5 rounded-3xl my-16">
+        <h2 className="text-3xl font-bold text-center mb-12">Why Sales Engineers Love It</h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center">
+            <div className="text-4xl mb-4">⚡</div>
+            <h3 className="text-xl font-bold mb-3">10x Faster Revisions</h3>
+            <p className="text-gray-300">Client change requests that used to take hours now take minutes with natural language</p>
+          </div>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center">
+            <div className="text-4xl mb-4">🎯</div>
+            <h3 className="text-xl font-bold mb-3">No Learning Curve</h3>
+            <p className="text-gray-300">Just describe what you want - no forms, dropdowns, or complicated UI to learn</p>
+          </div>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center">
+            <div className="text-4xl mb-4">🔄</div>
+            <h3 className="text-xl font-bold mb-3">Iterative Improvement</h3>
+            <p className="text-gray-300">Keep refining until perfect - every conversation makes the proposal better</p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="text-center max-w-4xl mx-auto px-8 py-16">
+        <h2 className="text-4xl font-bold text-white mb-6">
+          Ready to Refine with AI?
+        </h2>
+        <p className="text-xl text-gray-400 mb-8">
+          Join sales engineers using natural language to perfect security proposals in minutes, not hours.
+        </p>
+        <button
+          onClick={handleTryPlatform}
+          className="bg-white text-violet-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg"
+        >
+          Start 14-Day Free Trial
+        </button>
+        <p className="text-sm text-gray-400 mt-4">
+          No credit card required • Full access to all features • Upload existing proposals instantly
+        </p>
+      </section>
+
+      <Footer redirectToApp={handleTryPlatform} />
     </div>
   )
 }
