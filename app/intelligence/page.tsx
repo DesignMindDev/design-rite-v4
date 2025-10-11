@@ -39,16 +39,10 @@ export default function IntelligencePage() {
               Every product recommendation backed by real-time market data, competitor analysis, and installer sentiment from 14 manufacturers, 271 YouTube videos, and 1.6M views.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <Link
-                href="/estimate-options"
-                className="dr-bg-violet dr-text-pearl px-10 py-5 rounded-xl text-lg dr-ui font-bold hover:shadow-2xl transition-all inline-block text-center"
-              >
-                Try Intelligence-Powered Estimates
-              </Link>
+            <div className="flex justify-center mb-16">
               <Link
                 href="/contact"
-                className="bg-white/10 dr-text-pearl px-10 py-5 rounded-xl text-lg dr-ui font-semibold border-2 border-white/30 hover:bg-white/20 transition-all"
+                className="dr-bg-violet dr-text-pearl px-10 py-5 rounded-xl text-lg dr-ui font-bold hover:shadow-2xl transition-all inline-block text-center"
               >
                 Schedule Demo
               </Link>
@@ -572,16 +566,10 @@ export default function IntelligencePage() {
               Join the sales engineers who are closing 25% more deals with intelligence-powered recommendations.
               Every quote backed by data. Every objection pre-answered. Every customer confident.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/estimate-options"
-                className="dr-bg-violet dr-text-pearl px-10 py-5 rounded-xl text-lg dr-ui font-bold hover:shadow-2xl transition-all inline-block text-center"
-              >
-                Try Intelligence Platform Free
-              </Link>
+            <div className="flex justify-center">
               <Link
                 href="/contact"
-                className="border-2 border-white text-white px-10 py-5 rounded-xl text-lg dr-ui font-bold hover:bg-white/10 transition-all"
+                className="dr-bg-violet dr-text-pearl px-10 py-5 rounded-xl text-lg dr-ui font-bold hover:shadow-2xl transition-all inline-block text-center"
               >
                 Schedule Demo
               </Link>
