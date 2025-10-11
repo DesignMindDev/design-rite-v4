@@ -2,9 +2,12 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import UnifiedNavigation from '../components/UnifiedNavigation';
+import Footer from '../components/Footer';
 
 export default function DocsPage() {
+  const router = useRouter();
   const [activeSection, setActiveSection] = useState('getting-started');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -586,6 +589,9 @@ Access: /white-label
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <Footer redirectToApp={() => router.push('/estimate-options')} />
     </div>
   );
 }
