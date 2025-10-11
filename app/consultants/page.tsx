@@ -8,10 +8,6 @@ import Footer from '../components/Footer';
 export default function ConsultantsPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const redirectToWaitlist = () => {
-    window.location.href = '/waitlist'
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
       {/* Main Navigation Header */}
@@ -31,16 +27,10 @@ export default function ConsultantsPage() {
             Empower your consulting practice with AI-driven security assessments, compliance tools, 
             and white-label solutions that position you as the industry expert.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/waitlist"
-              className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg inline-block text-center"
-            >
-              🤝 Partner With Design-Rite
-            </Link>
+          <div className="flex justify-center">
             <Link
               href="/contact"
-              className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block text-center"
+              className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg inline-block text-center"
             >
               📅 Schedule Consultation
             </Link>
@@ -133,15 +123,9 @@ export default function ConsultantsPage() {
             </div>
           </div>
           <div className="text-center mt-8">
-            <p className="text-gray-300 mb-6">
+            <p className="text-gray-300">
               Join our exclusive consultant partner program and transform your practice
             </p>
-            <Link
-              href="/waitlist"
-              className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl font-bold transition-all inline-block"
-            >
-              Apply for Partnership
-            </Link>
           </div>
         </section>
 
@@ -205,16 +189,10 @@ export default function ConsultantsPage() {
           <p className="text-xl text-gray-300 mb-8">
             Join leading security consultants who deliver exceptional value with Design-Rite.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/waitlist"
-              className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg inline-block text-center"
-            >
-              🤝 Apply for Partnership
-            </Link>
+          <div className="flex justify-center">
             <Link
               href="/contact"
-              className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block text-center"
+              className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg inline-block text-center"
             >
               📅 Schedule Consultation
             </Link>
@@ -223,7 +201,7 @@ export default function ConsultantsPage() {
       </main>
 
       {/* Footer */}
-      <Footer redirectToApp={redirectToWaitlist} />
+      <Footer />
     </div>
   )
 }
