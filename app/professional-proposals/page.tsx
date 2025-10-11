@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import UnifiedNavigation from '../components/UnifiedNavigation'
+import Footer from '../components/Footer'
 import EmailGate from '../components/EmailGate'
 import { useAuthCache } from '../hooks/useAuthCache'
 
@@ -318,46 +319,7 @@ export default function ProfessionalProposalsPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
-        <div className="max-w-6xl mx-auto px-8 py-12">
-          <div className="grid lg:grid-cols-4 gap-8 mb-12">
-            <div className="lg:col-span-2">
-              <Link href="/" className="flex items-center gap-3 text-white font-bold text-2xl mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-black text-sm">
-                  DR
-                </div>
-                Design-Rite
-              </Link>
-              <p className="text-white/70 text-lg leading-relaxed max-w-md">
-                Revolutionary AI-powered platform transforming security system design through intelligent automation and expert-level analysis.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold text-lg mb-4">AI Solutions</h4>
-              <ul className="space-y-3">
-                <li><Link href="/ai-powered-analyst" className="text-white/70 hover:text-white transition-colors">AI Security Analyst</Link></li>
-                <li><Link href="/compliance-analyst" className="text-white/70 hover:text-white transition-colors">Compliance Analyst</Link></li>
-                <li><Link href="/project-management" className="text-white/70 hover:text-white transition-colors">Project Management</Link></li>
-                <li><Link href="/professional-proposals" className="text-purple-400 hover:text-purple-300 transition-colors">Professional Proposals</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold text-lg mb-4">Company</h4>
-              <ul className="space-y-3">
-                <li><Link href="/about" className="text-white/70 hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="/contact" className="text-white/70 hover:text-white transition-colors">Contact</Link></li>
-                <li><Link href="/privacy" className="text-white/70 hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="text-white/70 hover:text-white transition-colors">Terms of Service</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-white/10 pt-8 text-center">
-            <p className="text-white/60">
-              © 2025 Design-Rite™. All rights reserved. | Revolutionary AI-Powered Security Solutions
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer redirectToApp={handleEmailGateSuccess} />
 
       <EmailGate
         isOpen={showEmailGate}

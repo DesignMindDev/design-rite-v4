@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import UnifiedNavigation from '../components/UnifiedNavigation';
+import Footer from '../components/Footer';
 
 export default function EnterpriseSecurityPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -172,17 +173,7 @@ export default function EnterpriseSecurityPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#0A0A0A] border-t border-purple-600/20 py-12 mt-20">
-        <div className="max-w-6xl mx-auto px-8 text-center">
-          <p className="text-white/70">© 2025 Design-Rite. All rights reserved.</p>
-          <div className="flex justify-center gap-6 mt-4">
-            <Link href="/" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Home</Link>
-            <Link href="/about" className="text-white/70 hover:text-purple-600 text-sm transition-colors">About</Link>
-            <Link href="/careers" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Careers</Link>
-            <Link href="/contact" className="text-white/70 hover:text-purple-600 text-sm transition-colors">Contact</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer redirectToApp={redirectToApp} />
     </div>
   )
 }
