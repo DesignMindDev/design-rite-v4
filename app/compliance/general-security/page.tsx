@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import UnifiedNavigation from '../../components/UnifiedNavigation';
 import EmailGate from '../../components/EmailGate';
+import Footer from '../../components/Footer';
 import { useAuthCache } from '../../hooks/useAuthCache';
 
 export default function GeneralSecurityCompliance() {
@@ -32,7 +33,7 @@ export default function GeneralSecurityCompliance() {
               onClick={() => {
                 if (isAuthenticated) {
                   extendSession();
-                  window.location.href = '/ai-assessment';
+                  window.location.href = '/ai-discovery';
                 } else {
                   setShowEmailGate(true);
                 }
@@ -657,19 +658,12 @@ For detailed implementation support and customized roadmaps, consult with qualif
               Our security experts help organizations navigate complex compliance requirements and implement robust security frameworks tailored to your industry and risk profile.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => {
-                  if (isAuthenticated) {
-                    extendSession();
-                    window.location.href = '/contact';
-                  } else {
-                    setShowEmailGate(true);
-                  }
-                }}
-                className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-xl transition-all"
+              <Link
+                href="/contact"
+                className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-xl transition-all inline-block text-center"
               >
                 Schedule Security Consultation
-              </button>
+              </Link>
               <button
                 onClick={() => {
                   const complianceMatrixContent = `SECURITY COMPLIANCE MATRIX
@@ -845,6 +839,8 @@ For customized compliance matrices and implementation roadmaps, contact our secu
           </div>
         </section>
       </main>
+
+      <Footer />
 
       {/* Email Gate Modal */}
       {showEmailGate && (
