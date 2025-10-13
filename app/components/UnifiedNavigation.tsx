@@ -376,7 +376,7 @@ export default function UnifiedNavigation() {
               onClick={handleSignInClick}
               className="dr-bg-violet dr-text-pearl px-6 py-2.5 rounded-lg font-semibold dr-ui hover:bg-purple-700 transition-all hover:scale-105 shadow-lg hover:shadow-purple-600/25"
             >
-              Sign In
+              Sign In / Try for Free
             </button>
           )}
         </div>
