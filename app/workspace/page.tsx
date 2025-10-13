@@ -347,7 +347,7 @@ export default function DashboardPage() {
                 Comprehensive AI-guided assessment with detailed proposals and compliance mapping.
               </p>
               <button
-                onClick={(e) => handleToolAccess('/ai-discovery', e)}
+                onClick={(e) => handleToolAccess('/ai-assessment', e)}
                 className="w-full flex items-center justify-center dr-bg-violet hover:bg-purple-700 dr-text-pearl font-bold py-3 px-4 rounded-xl transition-all group-hover:scale-105"
               >
                 Start AI Discovery
