@@ -36,7 +36,7 @@ export default function UnifiedNavigation() {
     e.preventDefault();
     // Redirect directly to portal auth
     const portalUrl = process.env.NODE_ENV === 'development'
-      ? 'http://localhost:3040/auth'
+      ? 'http://localhost:3001/auth'
       : 'https://portal.design-rite.com/auth';
     window.location.href = portalUrl;
   };
@@ -45,7 +45,7 @@ export default function UnifiedNavigation() {
     e.preventDefault();
     // Redirect to portal auth for authentication/signup
     const portalUrl = process.env.NODE_ENV === 'development'
-      ? 'http://localhost:3040/auth'
+      ? 'http://localhost:3001/auth'
       : 'https://portal.design-rite.com/auth';
     window.location.href = portalUrl;
   };
