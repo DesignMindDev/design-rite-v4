@@ -380,20 +380,13 @@ export default function DashboardPage() {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <a
-                href={process.env.NODE_ENV === 'development' ? 'http://localhost:3001/dashboard' : 'https://portal.design-rite.com/dashboard'}
+              <Link
+                href="/"
                 className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/50 text-purple-300 hover:text-white rounded-lg transition-colors"
               >
                 <ArrowRight className="w-5 h-5 rotate-180" />
-                <span>Back to Portal Dashboard</span>
-              </a>
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-2 text-gray-300 hover:text-red-400 transition-colors"
-              >
-                <LogOut className="w-5 h-5" />
-                <span>Sign Out</span>
-              </button>
+                <span>Back to Homepage</span>
+              </Link>
             </div>
           </div>
 
@@ -839,13 +832,13 @@ export default function DashboardPage() {
                 {stats.plan === 'trial' ? 'Upgrade Now' : 'View Pricing & Upgrade'}
                 <ArrowRight className="w-5 h-5" />
               </a>
-              <a
-                href={process.env.NODE_ENV === 'development' ? 'http://localhost:3001/dashboard' : 'https://portal.design-rite.com/dashboard'}
+              <Link
+                href="/"
                 className="inline-flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl font-semibold text-lg transition-all"
               >
-                Back to Portal Dashboard
+                Back to Homepage
                 <ArrowRight className="w-5 h-5" />
-              </a>
+              </Link>
             </div>
 
             {/* Trust Badge */}
