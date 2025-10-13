@@ -196,10 +196,13 @@ export default function AdminPage() {
       return
     }
 
-    // Redirect if not authenticated
+    // Redirect if not authenticated (but NOT if we have an auth hash - let session sync handle it)
     if (!auth.isAuthenticated) {
-      router.push('/login?callbackUrl=/admin')
-      return
+      const hasAuthHash = window.location.hash.startsWith('#auth=')
+      if (!hasAuthHash) {
+        router.push('/login?callbackUrl=/admin')
+        return
+      }
     }
 
     // Check if user has permission to access admin content management
