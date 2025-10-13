@@ -29,6 +29,15 @@ export default function UnifiedNavigation() {
     }
   }
 
+  const handleSignInClick = () => {
+    // Redirect to portal auth page
+    const portalUrl = process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3001/auth?redirect=welcome'
+      : 'https://portal.design-rite.com/auth?redirect=welcome';
+
+    window.location.href = portalUrl;
+  }
+
   return (
     <React.Fragment>
       {/* Main Navigation Header */}
@@ -322,6 +331,17 @@ export default function UnifiedNavigation() {
           </li>
         </ul>
 
+        {/* Sign In / Try Free Button - Desktop */}
+        <div className="hidden lg:block">
+          <button
+            onClick={handleSignInClick}
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          >
+            <span>Sign In / Try Free</span>
+            <span className="text-xl">→</span>
+          </button>
+        </div>
+
         {/* Mobile Menu Button */}
         <div className="lg:hidden flex items-center gap-2">
           <button
@@ -393,6 +413,17 @@ export default function UnifiedNavigation() {
               <Link href="/careers" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">💼 Careers</Link>
               <Link href="/support" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">❓ Support</Link>
               <Link href="/contact" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">📧 Contact</Link>
+            </div>
+
+            {/* Sign In / Try Free Button - Mobile */}
+            <div className="border-t border-white/10 pt-4 mt-4">
+              <button
+                onClick={handleSignInClick}
+                className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all shadow-lg"
+              >
+                <span>Sign In / Try Free</span>
+                <span className="text-xl">→</span>
+              </button>
             </div>
 
           </div>

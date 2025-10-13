@@ -295,8 +295,12 @@ export default function DashboardPage() {
   }, [user, supabase]);
 
   const handleSignOut = async () => {
-    // For now, just reload the page (no auth redirect for development)
-    window.location.reload();
+    // Sign out and redirect to portal dashboard
+    await authHelpers.signOut();
+    const portalUrl = process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3001/dashboard'
+      : 'https://portal.design-rite.com/dashboard';
+    window.location.href = portalUrl;
   };
 
   const handleToolAccess = async (toolUrl: string, e: React.MouseEvent) => {
@@ -380,13 +384,22 @@ export default function DashboardPage() {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <Link
-                href="/"
+              <a
+                href={process.env.NODE_ENV === 'development' ? 'http://localhost:3001/dashboard' : 'https://portal.design-rite.com/dashboard'}
                 className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/50 text-purple-300 hover:text-white rounded-lg transition-colors"
               >
                 <ArrowRight className="w-5 h-5 rotate-180" />
-                <span>Back to Homepage</span>
-              </Link>
+                <span>Back to Portal Dashboard</span>
+              </a>
+              {user && (
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/30 border border-red-500/50 text-red-300 hover:text-white rounded-lg transition-colors"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span>Sign Out</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -832,13 +845,13 @@ export default function DashboardPage() {
                 {stats.plan === 'trial' ? 'Upgrade Now' : 'View Pricing & Upgrade'}
                 <ArrowRight className="w-5 h-5" />
               </a>
-              <Link
-                href="/"
+              <a
+                href={process.env.NODE_ENV === 'development' ? 'http://localhost:3001/dashboard' : 'https://portal.design-rite.com/dashboard'}
                 className="inline-flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl font-semibold text-lg transition-all"
               >
-                Back to Homepage
+                Back to Portal Dashboard
                 <ArrowRight className="w-5 h-5" />
-              </Link>
+              </a>
             </div>
 
             {/* Trust Badge */}
