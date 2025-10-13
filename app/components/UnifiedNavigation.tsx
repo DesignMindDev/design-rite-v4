@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSupabaseAuth } from '@/app/hooks/useSupabaseAuth';
 
 interface SiteSettings {
   logoPath: string
@@ -13,8 +12,6 @@ interface SiteSettings {
 export default function UnifiedNavigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [settings, setSettings] = useState<SiteSettings>({ logoPath: '', footerLogoPath: '' });
-  const { isAuthenticated, signOut } = useSupabaseAuth();
-
   useEffect(() => {
     loadSettings()
   }, [])
@@ -31,29 +28,6 @@ export default function UnifiedNavigation() {
       console.error('Failed to load settings:', error)
     }
   }
-
-  const handleSignInClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // Redirect directly to portal auth
-    const portalUrl = process.env.NODE_ENV === 'development'
-      ? 'http://localhost:3001/auth'
-      : 'https://portal.design-rite.com/auth';
-    window.location.href = portalUrl;
-  };
-
-  const handleTryPlatformClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // Redirect to portal auth for authentication/signup
-    const portalUrl = process.env.NODE_ENV === 'development'
-      ? 'http://localhost:3001/auth'
-      : 'https://portal.design-rite.com/auth';
-    window.location.href = portalUrl;
-  };
-
-  const handleLogout = async () => {
-    await signOut();
-    window.location.href = '/';
-  };
 
   return (
     <React.Fragment>
@@ -348,51 +322,8 @@ export default function UnifiedNavigation() {
           </li>
         </ul>
 
-        {/* Utility Menu */}
-        <div className="hidden lg:flex items-center gap-4">
-          <Link
-            href="/pricing"
-            className="text-gray-300 hover:dr-text-violet font-medium transition-all dr-ui text-sm"
-          >
-            Subscribe
-          </Link>
-          {isAuthenticated ? (
-            <>
-              <a
-                href={process.env.NODE_ENV === 'development' ? 'http://localhost:3040/profile' : 'https://portal.design-rite.com/profile'}
-                className="text-gray-300 hover:dr-text-violet font-medium transition-all dr-ui text-sm"
-              >
-                👤 Account
-              </a>
-              <button
-                onClick={handleLogout}
-                className="dr-bg-violet dr-text-pearl px-6 py-2.5 rounded-lg font-semibold dr-ui hover:bg-purple-700 transition-all hover:scale-105 shadow-lg hover:shadow-purple-600/25"
-              >
-                🚪 Logout
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={handleSignInClick}
-              className="dr-bg-violet dr-text-pearl px-6 py-2.5 rounded-lg font-semibold dr-ui hover:bg-purple-700 transition-all hover:scale-105 shadow-lg hover:shadow-purple-600/25"
-            >
-              Sign In / Try for Free
-            </button>
-          )}
-        </div>
-
-        {/* Mobile Menu Buttons */}
+        {/* Mobile Menu Button */}
         <div className="lg:hidden flex items-center gap-2">
-          {isAuthenticated && (
-            <button
-              onClick={handleLogout}
-              className="dr-bg-violet dr-text-pearl px-4 py-2 rounded-lg font-semibold dr-ui hover:bg-purple-700 transition-all shadow-lg text-sm"
-              type="button"
-              aria-label="Logout"
-            >
-              🚪 Logout
-            </button>
-          )}
           <button
             className="dr-text-pearl text-2xl p-2 touch-manipulation active:bg-white/10 rounded transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -464,49 +395,6 @@ export default function UnifiedNavigation() {
               <Link href="/contact" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">📧 Contact</Link>
             </div>
 
-            {/* Utility Menu */}
-            <div className="pt-4 border-t border-white/10">
-              <div className="text-gray-400 dr-ui uppercase tracking-wider mb-2">Quick Links</div>
-              <Link href="/pricing" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">💳 Subscribe</Link>
-            </div>
-
-            {/* Sign In and CTA */}
-            <div className="pt-4 border-t border-white/10">
-              {isAuthenticated ? (
-                <>
-                  <a
-                    href={process.env.NODE_ENV === 'development' ? 'http://localhost:3040/profile' : 'https://portal.design-rite.com/profile'}
-                    className="block w-full text-left text-white/80 hover:dr-text-pearl py-2 pl-4 transition-colors"
-                  >
-                    👤 Manage Account
-                  </a>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left dr-bg-violet dr-text-pearl px-4 py-2 rounded-lg mt-2 touch-manipulation active:bg-purple-800 transition-colors"
-                    type="button"
-                  >
-                    🚪 Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={handleSignInClick}
-                    className="block w-full text-left text-white/80 hover:dr-text-pearl py-2 transition-colors"
-                    type="button"
-                  >
-                    👤 Sign In
-                  </button>
-                  <button
-                    onClick={handleSignInClick}
-                    className="block w-full text-left dr-bg-violet dr-text-pearl px-4 py-2 rounded-lg mt-2 touch-manipulation active:bg-purple-800 transition-colors"
-                    type="button"
-                  >
-                    👤 Sign In / Try Free
-                  </button>
-                </>
-              )}
-            </div>
           </div>
         </div>
       )}
