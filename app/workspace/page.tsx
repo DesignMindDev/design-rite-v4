@@ -55,42 +55,46 @@ export default function DashboardPage() {
           console.log('[Workspace] Session established from portal');
         }
 
-        // Now check if we have a valid session
+        // Check if we have a valid session (optional - workspace works without auth)
         const session = await authHelpers.getCurrentSession();
 
-        if (!session) {
-          // No session - redirect to portal for authentication
-          const portalUrl = process.env.NODE_ENV === 'development'
-            ? 'http://localhost:3001/auth'
-            : 'https://portal.design-rite.com/auth';
-          window.location.href = `${portalUrl}?redirect=workspace`;
-          return;
+        if (session) {
+          // User is authenticated - load their data
+          setUser(session.user);
+        } else {
+          // No session - that's OK! Workspace is accessible without auth
+          console.log('[Workspace] No session found - using guest access');
+          setUser(null);
         }
 
-        setUser(session.user);
-
-        // Fetch user stats and subscription
-        const { data: subscription } = await supabase
-          .from('subscriptions')
-          .select('tier, status')
-          .eq('user_id', session.user.id)
-          .in('status', ['active', 'trialing'])
-          .single();
-
-        // Set stats based on subscription
-        let plan = 'trial';
+        // Fetch user stats and subscription (only if user is authenticated)
+        let plan = 'guest';
         let assessmentLimit = 3;
 
-        if (subscription) {
-          plan = subscription.tier;
-          switch (subscription.tier) {
-            case 'starter':
-              assessmentLimit = 25;
-              break;
-            case 'professional':
-            case 'enterprise':
-              assessmentLimit = -1; // Unlimited
-              break;
+        if (session && session.user) {
+          const { data: subscription } = await supabase
+            .from('subscriptions')
+            .select('tier, status')
+            .eq('user_id', session.user.id)
+            .in('status', ['active', 'trialing'])
+            .single();
+
+          if (subscription) {
+            plan = subscription.tier;
+            switch (subscription.tier) {
+              case 'starter':
+                assessmentLimit = 25;
+                break;
+              case 'professional':
+              case 'enterprise':
+                assessmentLimit = -1; // Unlimited
+                break;
+              default:
+                plan = 'free';
+                assessmentLimit = 3;
+            }
+          } else {
+            plan = 'free';
           }
         }
 
@@ -189,34 +193,46 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center mb-4">
             <div>
               <h1 className="text-2xl font-bold text-white">
-                Welcome back, {user?.user_metadata?.name || user?.email}! 👋
+                {user ? `Welcome back, ${user.user_metadata?.full_name || user.email}!` : 'Welcome to Design-Rite Workspace!'} 👋
               </h1>
               <p className="text-gray-400 text-sm mt-1">
-                Your Security Design Workspace
+                {user ? 'Your Security Design Workspace' : 'Professional Security System Estimation Tools'}
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <a
-                href={process.env.NODE_ENV === 'development' ? 'http://localhost:3001/dashboard' : 'https://portal.design-rite.com/dashboard'}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/50 text-purple-300 hover:text-white rounded-lg transition-colors"
-              >
-                <ArrowRight className="w-5 h-5 rotate-180" />
-                <span>Portal Dashboard</span>
-              </a>
-              <Link
-                href="/account"
-                className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
-              >
-                <Settings className="w-5 h-5" />
-                <span>Account</span>
-              </Link>
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-2 text-gray-300 hover:text-red-400 transition-colors"
-              >
-                <LogOut className="w-5 h-5" />
-                <span>Sign Out</span>
-              </button>
+              {user ? (
+                <>
+                  <a
+                    href={process.env.NODE_ENV === 'development' ? 'http://localhost:3001/dashboard' : 'https://portal.design-rite.com/dashboard'}
+                    className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/50 text-purple-300 hover:text-white rounded-lg transition-colors"
+                  >
+                    <ArrowRight className="w-5 h-5 rotate-180" />
+                    <span>Portal Dashboard</span>
+                  </a>
+                  <Link
+                    href="/account"
+                    className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
+                  >
+                    <Settings className="w-5 h-5" />
+                    <span>Account</span>
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-2 text-gray-300 hover:text-red-400 transition-colors"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    <span>Sign Out</span>
+                  </button>
+                </>
+              ) : (
+                <a
+                  href={process.env.NODE_ENV === 'development' ? 'http://localhost:3001/auth' : 'https://portal.design-rite.com/auth'}
+                  className="flex items-center gap-2 px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-semibold"
+                >
+                  Sign In / Try for Free
+                  <ArrowRight className="w-5 h-5" />
+                </a>
+              )}
             </div>
           </div>
 
