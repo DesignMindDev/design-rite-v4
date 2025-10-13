@@ -9,6 +9,7 @@ import {
   BarChart3, Download, Eye
 } from 'lucide-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { authHelpers } from '@/lib/supabase';
 import UpgradeModal from '../components/UpgradeModal';
 
 interface UserStats {
@@ -47,28 +48,22 @@ export default function DashboardPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Check if session tokens are in URL hash (from portal redirect)
-        const hash = window.location.hash;
-        if (hash.startsWith('#auth=')) {
-          const authDataEncoded = hash.substring(6); // Remove '#auth='
-          try {
-            const authData = JSON.parse(decodeURIComponent(authDataEncoded));
-            // Set the session from portal tokens
-            await supabase.auth.setSession({
-              access_token: authData.access_token,
-              refresh_token: authData.refresh_token
-            });
-            // Clean up URL
-            window.history.replaceState(null, '', window.location.pathname);
-          } catch (e) {
-            console.error('Failed to parse auth data from hash:', e);
-          }
+        // Try to set session from hash first (if coming from portal)
+        const hasSessionFromHash = await authHelpers.setSessionFromHash();
+
+        if (hasSessionFromHash) {
+          console.log('[Workspace] Session established from portal');
         }
 
-        const { data: { session } } = await supabase.auth.getSession();
+        // Now check if we have a valid session
+        const session = await authHelpers.getCurrentSession();
 
         if (!session) {
-          router.push('/login?redirect=/workspace');
+          // No session - redirect to portal for authentication
+          const portalUrl = process.env.NODE_ENV === 'development'
+            ? 'http://localhost:3001/auth'
+            : 'https://portal.design-rite.com/auth';
+          window.location.href = `${portalUrl}?redirect=workspace`;
           return;
         }
 
@@ -140,7 +135,11 @@ export default function DashboardPage() {
         }
       } catch (error) {
         console.error('Dashboard auth error:', error);
-        router.push('/login?redirect=/workspace');
+        // Redirect to portal on error
+        const portalUrl = process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3001/auth'
+          : 'https://portal.design-rite.com/auth';
+        window.location.href = `${portalUrl}?redirect=workspace`;
       }
     };
 
@@ -148,8 +147,8 @@ export default function DashboardPage() {
   }, []);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push('/');
+    // Use authHelpers.signOut which redirects to portal
+    await authHelpers.signOut();
   };
 
   const handleToolAccess = async (toolUrl: string, e: React.MouseEvent) => {

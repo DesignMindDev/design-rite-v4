@@ -11,12 +11,12 @@ function LoginRedirect() {
   useEffect(() => {
     // Redirect to subscriber portal for authentication
     const portalUrl = process.env.NODE_ENV === 'development'
-      ? 'http://localhost:3040/auth'
+      ? 'http://localhost:3001/auth'
       : 'https://portal.design-rite.com/auth';
 
     // Pass callback URL to portal so it knows where to redirect after auth
     const redirectUrl = callbackUrl
-      ? `${portalUrl}?callbackUrl=${encodeURIComponent(callbackUrl)}`
+      ? `${portalUrl}?redirect=${encodeURIComponent(callbackUrl)}`
       : portalUrl;
 
     console.log('[Login Redirect] Redirecting to portal:', redirectUrl);
