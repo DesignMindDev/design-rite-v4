@@ -96,6 +96,7 @@ export default function AdminPage() {
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null)
   const [newPost, setNewPost] = useState<Partial<BlogPost>>({})
   const [uploadingBlogImage, setUploadingBlogImage] = useState(false)
+  const [isRestoringSession, setIsRestoringSession] = useState(false)
 
   // Easter egg: 5-click logo for super admin access
   const [logoClickCount, setLogoClickCount] = useState(0)
@@ -123,6 +124,7 @@ export default function AdminPage() {
       if (hash.startsWith('#auth=')) {
         try {
           console.log('[Admin Session Sync] Found auth hash in URL')
+          setIsRestoringSession(true)
 
           // Import supabase client
           const { supabase } = await import('@/lib/supabase')
@@ -139,6 +141,7 @@ export default function AdminPage() {
 
             // Just clean up the hash and continue - no reload needed!
             window.location.hash = ''
+            setIsRestoringSession(false)
 
             console.log('[Admin Session Sync] Continuing with existing session')
             return false // Don't reload, session already active
@@ -157,6 +160,7 @@ export default function AdminPage() {
 
           if (error) {
             console.error('[Admin Session Sync] Error setting session:', error)
+            setIsRestoringSession(false)
             throw error
           }
 
@@ -174,23 +178,21 @@ export default function AdminPage() {
             return true
           } else {
             console.warn('[Admin Session Sync] Session was set but data.session is null')
+            setIsRestoringSession(false)
           }
         } catch (error) {
           console.error('[Admin Session Sync] Error:', error)
+          setIsRestoringSession(false)
         }
       }
       return false
     }
 
     // Try session sync first
-    handleSessionSync().then(synced => {
-      if (synced) return // Will reload, don't continue
+    handleSessionSync()
 
-      // Normal auth flow continues below
-    })
-
-    // Wait for auth to finish loading
-    if (auth.isLoading) {
+    // Wait for auth to finish loading OR while restoring session
+    if (auth.isLoading || isRestoringSession) {
       return
     }
 
