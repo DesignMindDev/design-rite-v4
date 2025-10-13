@@ -426,9 +426,11 @@ export default function AdminPage() {
     }
   }
 
-  if (!isMounted || auth.isLoading) {
+  if (!isMounted || auth.isLoading || isRestoringSession) {
     return <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] flex items-center justify-center">
-      <div className="text-white">Loading...</div>
+      <div className="text-white">
+        {isRestoringSession ? 'Restoring session...' : 'Loading...'}
+      </div>
     </div>
   }
 
