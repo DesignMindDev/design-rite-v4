@@ -122,26 +122,59 @@ export default function AdminPage() {
       const hash = window.location.hash
       if (hash.startsWith('#auth=')) {
         try {
-          const authDataString = decodeURIComponent(hash.slice(6))
-          const authData = JSON.parse(authDataString)
+          console.log('[Admin Session Sync] Found auth hash in URL')
 
           // Import supabase client
           const { supabase } = await import('@/lib/supabase')
 
-          // Set session from portal
-          await supabase.auth.setSession({
+          // IMPORTANT: Check if we already have an active session
+          // This prevents trying to restore tokens that are already in use
+          const { data: { session: existingSession } } = await supabase.auth.getSession()
+
+          if (existingSession) {
+            console.log('[Admin Session Sync] Active session already exists, no restoration needed', {
+              userId: existingSession.user.id,
+              email: existingSession.user.email
+            })
+
+            // Just clean up the hash and continue - no reload needed!
+            window.location.hash = ''
+
+            console.log('[Admin Session Sync] Continuing with existing session')
+            return false // Don't reload, session already active
+          }
+
+          console.log('[Admin Session Sync] No existing session, attempting to restore from hash...')
+
+          const authDataString = decodeURIComponent(hash.slice(6))
+          const authData = JSON.parse(authDataString)
+
+          // Set session from portal only if no session exists
+          const { data, error } = await supabase.auth.setSession({
             access_token: authData.access_token,
             refresh_token: authData.refresh_token
           })
 
-          console.log('[Admin Session Sync] Session transferred from portal')
+          if (error) {
+            console.error('[Admin Session Sync] Error setting session:', error)
+            throw error
+          }
 
-          // Clean up URL
-          window.location.hash = ''
+          if (data.session) {
+            console.log('[Admin Session Sync] Session restored successfully!', {
+              userId: data.session.user.id,
+              email: data.session.user.email
+            })
 
-          // Reload to re-run auth check with new session
-          window.location.reload()
-          return true
+            // Clean up URL
+            window.location.hash = ''
+
+            // Reload to re-run auth check with new session
+            window.location.reload()
+            return true
+          } else {
+            console.warn('[Admin Session Sync] Session was set but data.session is null')
+          }
         } catch (error) {
           console.error('[Admin Session Sync] Error:', error)
         }
