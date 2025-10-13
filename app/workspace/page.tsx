@@ -294,6 +294,49 @@ export default function DashboardPage() {
     return () => clearInterval(intervalId);
   }, [user, supabase]);
 
+  const handleBackToPortal = async () => {
+    try {
+      console.log('[Workspace] Returning to portal dashboard...');
+
+      // Get current session to transfer back to portal
+      const session = await authHelpers.getCurrentSession();
+
+      if (session) {
+        console.log('[Workspace] Session found, encoding tokens...');
+
+        // Encode session tokens in URL hash (same pattern as portal → workspace)
+        const authData = {
+          access_token: session.access_token,
+          refresh_token: session.refresh_token
+        };
+        const encodedAuth = encodeURIComponent(JSON.stringify(authData));
+
+        const portalUrl = process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3001/dashboard'
+          : 'https://portal.design-rite.com/dashboard';
+
+        const dashboardUrl = `${portalUrl}#auth=${encodedAuth}`;
+
+        console.log('[Workspace] Redirecting to portal with session');
+        window.location.href = dashboardUrl;
+      } else {
+        // No session - just go to portal (will redirect to auth)
+        console.log('[Workspace] No session, redirecting to portal');
+        const portalUrl = process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3001/dashboard'
+          : 'https://portal.design-rite.com/dashboard';
+        window.location.href = portalUrl;
+      }
+    } catch (error) {
+      console.error('[Workspace] Error returning to portal:', error);
+      // Fallback: redirect without session
+      const portalUrl = process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3001/dashboard'
+        : 'https://portal.design-rite.com/dashboard';
+      window.location.href = portalUrl;
+    }
+  };
+
   const handleSignOut = async () => {
     // Sign out and redirect to portal dashboard
     await authHelpers.signOut();
@@ -384,13 +427,13 @@ export default function DashboardPage() {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <a
-                href={process.env.NODE_ENV === 'development' ? 'http://localhost:3001/dashboard' : 'https://portal.design-rite.com/dashboard'}
+              <button
+                onClick={handleBackToPortal}
                 className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/50 text-purple-300 hover:text-white rounded-lg transition-colors"
               >
                 <ArrowRight className="w-5 h-5 rotate-180" />
                 <span>Back to Portal Dashboard</span>
-              </a>
+              </button>
               {user && (
                 <button
                   onClick={handleSignOut}
@@ -845,13 +888,13 @@ export default function DashboardPage() {
                 {stats.plan === 'trial' ? 'Upgrade Now' : 'View Pricing & Upgrade'}
                 <ArrowRight className="w-5 h-5" />
               </a>
-              <a
-                href={process.env.NODE_ENV === 'development' ? 'http://localhost:3001/dashboard' : 'https://portal.design-rite.com/dashboard'}
+              <button
+                onClick={handleBackToPortal}
                 className="inline-flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 rounded-xl font-semibold text-lg transition-all"
               >
                 Back to Portal Dashboard
                 <ArrowRight className="w-5 h-5" />
-              </a>
+              </button>
             </div>
 
             {/* Trust Badge */}
