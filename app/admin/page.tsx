@@ -218,7 +218,7 @@ export default function AdminPage() {
       loadSiteSettings()
       loadBlogPosts()
     }
-  }, [auth.isAuthenticated, auth.isLoading, auth.user, router])
+  }, [auth.isAuthenticated, auth.isLoading, auth.user, router, isRestoringSession])
 
   // Load Spatial Studio metrics when Analytics tab is active
   useEffect(() => {
