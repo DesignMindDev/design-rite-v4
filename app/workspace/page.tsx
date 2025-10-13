@@ -298,35 +298,14 @@ export default function DashboardPage() {
     try {
       console.log('[Workspace] Returning to portal dashboard...');
 
-      // Get current session to transfer back to portal
-      const session = await authHelpers.getCurrentSession();
+      // Portal already has a valid session - just redirect without transferring tokens
+      // The portal and v4 share the same Supabase project, so the session is already valid
+      const portalUrl = process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3001/dashboard'
+        : 'https://portal.design-rite.com/dashboard';
 
-      if (session) {
-        console.log('[Workspace] Session found, encoding tokens...');
-
-        // Encode session tokens in URL hash (same pattern as portal → workspace)
-        const authData = {
-          access_token: session.access_token,
-          refresh_token: session.refresh_token
-        };
-        const encodedAuth = encodeURIComponent(JSON.stringify(authData));
-
-        const portalUrl = process.env.NODE_ENV === 'development'
-          ? 'http://localhost:3001/dashboard'
-          : 'https://portal.design-rite.com/dashboard';
-
-        const dashboardUrl = `${portalUrl}#auth=${encodedAuth}`;
-
-        console.log('[Workspace] Redirecting to portal with session');
-        window.location.href = dashboardUrl;
-      } else {
-        // No session - just go to portal (will redirect to auth)
-        console.log('[Workspace] No session, redirecting to portal');
-        const portalUrl = process.env.NODE_ENV === 'development'
-          ? 'http://localhost:3001/dashboard'
-          : 'https://portal.design-rite.com/dashboard';
-        window.location.href = portalUrl;
-      }
+      console.log('[Workspace] Redirecting to portal (session already valid)');
+      window.location.href = portalUrl;
     } catch (error) {
       console.error('[Workspace] Error returning to portal:', error);
       // Fallback: redirect without session
