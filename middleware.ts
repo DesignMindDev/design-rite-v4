@@ -24,22 +24,23 @@ export async function middleware(req: NextRequest) {
 
   // Protect all /admin routes
   if (path.startsWith('/admin')) {
-    // CRITICAL: Allow admin page to load if there's an auth hash in the URL
-    // This enables portal → V4 session transfer to complete
-    const hasAuthHash = req.nextUrl.hash?.startsWith('#auth=') || false;
+    // CRITICAL: Check for session transfer flag in query params
+    // Portal adds ?transfer=true when sending session via URL hash
+    const isSessionTransfer = req.nextUrl.searchParams.get('transfer') === 'true';
+
+    // If session transfer in progress, skip auth check and let page handle it
+    if (isSessionTransfer) {
+      console.log('[Middleware] Session transfer detected, allowing page load');
+      return res;
+    }
 
     const { data: { session } } = await supabase.auth.getSession();
 
-    if (!session && !hasAuthHash) {
-      // Redirect to login if not authenticated AND no auth hash present
+    if (!session) {
+      // Redirect to login if not authenticated
       const loginUrl = new URL('/login', req.url);
       loginUrl.searchParams.set('callbackUrl', path);
       return NextResponse.redirect(loginUrl);
-    }
-
-    // If auth hash is present, let the page component handle session sync
-    if (hasAuthHash) {
-      return res;
     }
 
     // Get user email
