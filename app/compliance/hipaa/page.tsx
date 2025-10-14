@@ -4,12 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import UnifiedNavigation from '../../components/UnifiedNavigation';
-import EmailGate from '../../components/EmailGate';
 import { useAuthCache } from '../../hooks/useAuthCache';
 
 export default function HIPAACompliance() {
   const [activeTab, setActiveTab] = useState('overview');
-  const [showEmailGate, setShowEmailGate] = useState(false);
   const router = useRouter();
   const { isAuthenticated, extendSession } = useAuthCache();
 
@@ -36,7 +34,10 @@ export default function HIPAACompliance() {
                   extendSession();
                   router.push('/ai-assessment');
                 } else {
-                  setShowEmailGate(true);
+                  // Redirect to portal for authentication
+                  window.location.href = process.env.NODE_ENV === 'development'
+                    ? 'http://localhost:3001/auth'
+                    : 'https://portal.design-rite.com/auth';
                 }
               }}
               className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-xl transition-all hover:scale-105"
@@ -536,7 +537,10 @@ For detailed implementation guidance, consult with qualified HIPAA compliance ex
                     extendSession();
                     router.push('/contact');
                   } else {
-                    setShowEmailGate(true);
+                    // Redirect to portal for authentication
+                    window.location.href = process.env.NODE_ENV === 'development'
+                      ? 'http://localhost:3001/auth'
+                      : 'https://portal.design-rite.com/auth';
                   }
                 }}
                 className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-xl transition-all"
@@ -671,16 +675,6 @@ For customized implementation support, contact our HIPAA compliance experts.
         </section>
       </main>
 
-      {/* Email Gate Modal */}
-      {showEmailGate && (
-        <EmailGate
-          onClose={() => setShowEmailGate(false)}
-          onSuccess={() => {
-            setShowEmailGate(false);
-            router.push('/ai-assessment');
-          }}
-        />
-      )}
     </div>
   );
 }

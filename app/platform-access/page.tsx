@@ -4,12 +4,10 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, User, Sparkles, Shield, Zap, Clock, CheckCircle } from 'lucide-react';
-import EmailGate from '../components/EmailGate';
 import { authHelpers } from '@/lib/supabase';
 import { sessionManager } from '../../lib/sessionManager';
 
 export default function PlatformAccessPage() {
-  const [showEmailGate, setShowEmailGate] = useState(false);
   const [isReturningUser, setIsReturningUser] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
@@ -46,18 +44,18 @@ export default function PlatformAccessPage() {
 
   const handleReturningUser = () => {
     setIsReturningUser(true);
-    setShowEmailGate(true);
+    // Redirect to portal for authentication
+    window.location.href = process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3001/auth'
+      : 'https://portal.design-rite.com/auth';
   };
 
   const handleNewUser = () => {
     setIsReturningUser(false);
-    setShowEmailGate(true);
-  };
-
-  const handleEmailGateSuccess = () => {
-    setShowEmailGate(false);
-    // Magic link will handle redirect or guest session will be created
-    window.location.href = '/estimate-options';
+    // Redirect to portal for authentication
+    window.location.href = process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3001/auth'
+      : 'https://portal.design-rite.com/auth';
   };
 
   // Show loading while checking auth
@@ -245,12 +243,6 @@ export default function PlatformAccessPage() {
         </div>
       </div>
 
-      {/* Email Gate Modal */}
-      <EmailGate
-        isOpen={showEmailGate}
-        onClose={() => setShowEmailGate(false)}
-        onSuccess={handleEmailGateSuccess}
-      />
     </div>
   );
 }

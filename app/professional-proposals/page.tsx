@@ -5,12 +5,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import UnifiedNavigation from '../components/UnifiedNavigation'
 import Footer from '../components/Footer'
-import EmailGate from '../components/EmailGate'
 import { useAuthCache } from '../hooks/useAuthCache'
 
 export default function ProfessionalProposalsPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [showEmailGate, setShowEmailGate] = useState(false)
   const router = useRouter()
   const { isAuthenticated, extendSession } = useAuthCache()
 
@@ -24,18 +22,24 @@ export default function ProfessionalProposalsPage() {
       extendSession();
       router.push('/ai-assessment');
     } else {
-      setShowEmailGate(true);
+      // Redirect to portal for authentication
+      window.location.href = process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3001/auth'
+        : 'https://portal.design-rite.com/auth';
     }
   }
 
   const handleGenerateProposalClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    setShowEmailGate(true);
-  };
-
-  const handleEmailGateSuccess = () => {
-    setShowEmailGate(false);
-    router.push('/ai-assessment');
+    if (isAuthenticated) {
+      extendSession();
+      router.push('/ai-assessment');
+    } else {
+      // Redirect to portal for authentication
+      window.location.href = process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3001/auth'
+        : 'https://portal.design-rite.com/auth';
+    }
   };
 
   return (
@@ -319,13 +323,7 @@ export default function ProfessionalProposalsPage() {
       </main>
 
       {/* Footer */}
-      <Footer redirectToApp={handleEmailGateSuccess} />
-
-      <EmailGate
-        isOpen={showEmailGate}
-        onClose={() => setShowEmailGate(false)}
-        onSuccess={handleEmailGateSuccess}
-      />
+      <Footer />
     </div>
   )
 }

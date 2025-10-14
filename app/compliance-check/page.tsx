@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import EmailGate from '../components/EmailGate'
 import { useAuthCache } from '../hooks/useAuthCache'
 
 interface ComplianceFormData {
@@ -22,22 +21,19 @@ export default function ComplianceCheckPage() {
     concerns: []
   })
   const [showResults, setShowResults] = useState(false)
-  const [showEmailGate, setShowEmailGate] = useState(false)
   const { isAuthenticated } = useAuthCache()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!isAuthenticated) {
-      setShowEmailGate(true)
+      // Redirect to portal for authentication
+      window.location.href = process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3001/auth'
+        : 'https://portal.design-rite.com/auth';
       return
     }
 
-    setShowResults(true)
-  }
-
-  const handleEmailGateSuccess = () => {
-    setShowEmailGate(false)
     setShowResults(true)
   }
 
@@ -358,12 +354,6 @@ export default function ComplianceCheckPage() {
         </div>
       </div>
 
-      {/* Email Gate Modal */}
-      <EmailGate
-        isOpen={showEmailGate}
-        onClose={() => setShowEmailGate(false)}
-        onSuccess={handleEmailGateSuccess}
-      />
     </div>
   )
 }

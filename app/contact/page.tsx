@@ -2,12 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import EmailGate from '../components/EmailGate'
 import Footer from '../components/Footer'
 import UnifiedNavigation from '../components/UnifiedNavigation'
 
 export default function ContactPage() {
-  const [showEmailGate, setShowEmailGate] = useState(false)
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -70,15 +68,6 @@ Sent from Design-Rite Contact Form
     alert('📅 Demo scheduling would open here. For now, please use the contact form or email info@design-rite.com')
   }
 
-  const handleTryItFreeClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setShowEmailGate(true);
-  };
-
-  const handleEmailGateSuccess = () => {
-    setShowEmailGate(false);
-    window.location.href = '/estimate-options';
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
@@ -329,13 +318,7 @@ Sent from Design-Rite Contact Form
       </main>
 
       {/* Footer */}
-      <Footer redirectToApp={handleEmailGateSuccess} />
-
-      <EmailGate
-        isOpen={showEmailGate}
-        onClose={() => setShowEmailGate(false)}
-        onSuccess={handleEmailGateSuccess}
-      />
+      <Footer />
     </div>
   )
 }

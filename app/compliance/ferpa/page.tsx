@@ -3,12 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import UnifiedNavigation from '../../components/UnifiedNavigation';
-import EmailGate from '../../components/EmailGate';
 import { useAuthCache } from '../../hooks/useAuthCache';
 
 export default function FERPACompliance() {
   const [activeTab, setActiveTab] = useState('overview');
-  const [showEmailGate, setShowEmailGate] = useState(false);
   const { isAuthenticated, extendSession } = useAuthCache();
 
   const handleStartAssessment = () => {
@@ -16,13 +14,11 @@ export default function FERPACompliance() {
       extendSession();
       window.location.href = '/ai-assessment';
     } else {
-      setShowEmailGate(true);
+      // Redirect to portal for authentication
+      window.location.href = process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3001/auth'
+        : 'https://portal.design-rite.com/auth';
     }
-  };
-
-  const handleEmailGateSuccess = () => {
-    setShowEmailGate(false);
-    window.location.href = '/ai-assessment';
   };
 
   const handleDownloadChecklist = () => {
@@ -588,11 +584,6 @@ Design-Rite AI Assessment Platform
         </section>
       </main>
 
-      <EmailGate
-        isOpen={showEmailGate}
-        onClose={() => setShowEmailGate(false)}
-        onSuccess={handleEmailGateSuccess}
-      />
     </div>
   );
 }

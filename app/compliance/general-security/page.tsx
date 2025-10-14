@@ -3,13 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import UnifiedNavigation from '../../components/UnifiedNavigation';
-import EmailGate from '../../components/EmailGate';
 import Footer from '../../components/Footer';
 import { useAuthCache } from '../../hooks/useAuthCache';
 
 export default function GeneralSecurityCompliance() {
   const [activeTab, setActiveTab] = useState('overview');
-  const [showEmailGate, setShowEmailGate] = useState(false);
   const { isAuthenticated, extendSession } = useAuthCache();
 
   return (
@@ -35,7 +33,10 @@ export default function GeneralSecurityCompliance() {
                   extendSession();
                   window.location.href = '/ai-discovery';
                 } else {
-                  setShowEmailGate(true);
+                  // Redirect to portal for authentication
+                  window.location.href = process.env.NODE_ENV === 'development'
+                    ? 'http://localhost:3001/auth'
+                    : 'https://portal.design-rite.com/auth';
                 }
               }}
               className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-xl transition-all hover:scale-105"
@@ -841,17 +842,6 @@ For customized compliance matrices and implementation roadmaps, contact our secu
       </main>
 
       <Footer />
-
-      {/* Email Gate Modal */}
-      {showEmailGate && (
-        <EmailGate
-          onClose={() => setShowEmailGate(false)}
-          onSuccess={() => {
-            setShowEmailGate(false);
-            // The useAuthCache hook will handle the authentication state
-          }}
-        />
-      )}
     </div>
   );
 }

@@ -13,7 +13,8 @@ const AUTH_CACHE_KEY = 'design_rite_auth';
 const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
 export const useAuthCache = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Initialize to null to indicate "not yet checked" vs false for "definitely not authenticated"
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [authData, setAuthData] = useState<AuthData | null>(null);
 
   // Check if user is authenticated on mount

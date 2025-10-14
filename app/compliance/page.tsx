@@ -4,13 +4,11 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import UnifiedNavigation from '../components/UnifiedNavigation';
-import EmailGate from '../components/EmailGate';
 import Footer from '../components/Footer';
 import { useAuthCache } from '../hooks/useAuthCache';
 
 export default function CompliancePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [showEmailGate, setShowEmailGate] = useState(false)
   const router = useRouter()
   const { isAuthenticated, extendSession } = useAuthCache()
 
@@ -19,13 +17,11 @@ export default function CompliancePage() {
       extendSession()
       router.push('/ai-assessment')
     } else {
-      setShowEmailGate(true)
+      // Redirect to portal for authentication
+      window.location.href = process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3001/auth'
+        : 'https://portal.design-rite.com/auth';
     }
-  }
-
-  const handleEmailGateSuccess = () => {
-    setShowEmailGate(false)
-    router.push('/ai-assessment')
   }
 
   return (
@@ -306,13 +302,7 @@ export default function CompliancePage() {
       </main>
 
       {/* Footer */}
-      <Footer redirectToApp={handleStartAssessment} />
-
-      <EmailGate
-        isOpen={showEmailGate}
-        onClose={() => setShowEmailGate(false)}
-        onSuccess={handleEmailGateSuccess}
-      />
+      <Footer />
     </div>
   )
 }

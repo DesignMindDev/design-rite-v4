@@ -3,29 +3,31 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import UnifiedNavigation from '../components/UnifiedNavigation';
-import EmailGate from '../components/EmailGate';
 import { useAuthCache } from '../hooks/useAuthCache';
 
 export default function AISecurityAssessmentPage() {
   const [showDocument, setShowDocument] = useState('');
-  const [showEmailGate, setShowEmailGate] = useState(false);
   const { isAuthenticated, extendSession } = useAuthCache();
 
   const handleTryDemoClick = (e: React.MouseEvent) => {
     e.preventDefault();
+
+    // Wait for auth check to complete before redirect
+    if (isAuthenticated === null) {
+      // Still checking auth, wait a moment
+      return;
+    }
 
     // Check if user is already authenticated
     if (isAuthenticated) {
       extendSession();
       window.location.href = '/ai-assessment';
     } else {
-      setShowEmailGate(true);
+      // Redirect to portal for authentication
+      window.location.href = process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3001/auth'
+        : 'https://portal.design-rite.com/auth';
     }
-  };
-
-  const handleEmailGateSuccess = () => {
-    setShowEmailGate(false);
-    window.location.href = '/ai-assessment';
   };
 
   const documents = {
@@ -281,11 +283,6 @@ Target: Large facilities, maximum security`
         </div>
       </section>
 
-      <EmailGate
-        isOpen={showEmailGate}
-        onClose={() => setShowEmailGate(false)}
-        onSuccess={handleEmailGateSuccess}
-      />
     </div>
   );
 }
