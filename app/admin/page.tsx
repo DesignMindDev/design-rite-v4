@@ -157,16 +157,14 @@ export default function AdminPage() {
             if (data.session) {
               console.log('[Admin] Session synced successfully!')
 
-              // Update auth context
-              await auth.refreshAuth()
-
               // Clean URL
               window.history.replaceState(null, '', '/admin')
 
               // Update state
               setIsRestoringSession(false)
 
-              // Don't reload - just let the auth context update trigger re-render
+              // Auth context will update automatically via onAuthStateChange listener
+              // No need to manually refresh - just let the automatic update trigger re-render
               return
             }
           }
