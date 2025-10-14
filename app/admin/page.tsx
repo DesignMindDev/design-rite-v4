@@ -186,18 +186,18 @@ export default function AdminPage() {
       // Check if user has permission to access admin content management
       if (auth.user && auth.isAuthenticated) {
         const role = auth.user.role
-        if (!['super_admin', 'admin'].includes(role || '')) {
-          router.push('/unauthorized?reason=insufficient_permissions')
-          return
+
+        // Role check happens in render section now (lines 257-272)
+        // Only load data if user has proper role
+        if (['super_admin', 'admin'].includes(role || '')) {
+          // Fetch user's module permissions
+          fetchModulePermissions()
+
+          // Load content management data
+          loadTeamMembers()
+          loadSiteSettings()
+          loadBlogPosts()
         }
-
-        // Fetch user's module permissions
-        fetchModulePermissions()
-
-        // Load content management data
-        loadTeamMembers()
-        loadSiteSettings()
-        loadBlogPosts()
       }
     }
 
@@ -415,15 +415,25 @@ export default function AdminPage() {
     }
   }
 
+  // Show loading screen while checking auth or restoring session
   if (!isMounted || auth.isLoading || isRestoringSession) {
     return <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] flex items-center justify-center">
-      <div className="text-white">
-        {isRestoringSession ? 'Restoring session...' : 'Loading...'}
+      <div className="text-white text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+        <div>{isRestoringSession ? 'Restoring session...' : 'Loading...'}</div>
       </div>
     </div>
   }
 
-  if (!auth.isAuthenticated || !['super_admin', 'admin'].includes(auth.user?.role || '')) {
+  // Only show access denied AFTER we've confirmed they're authenticated but lack permission
+  // This prevents the blip during session restoration
+  if (!auth.isAuthenticated) {
+    // Not authenticated at all - redirect will happen in useEffect
+    return null
+  }
+
+  // Authenticated but wrong role
+  if (!['super_admin', 'admin'].includes(auth.user?.role || '')) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] flex items-center justify-center">
         <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-8 max-w-md w-full mx-4 text-center">

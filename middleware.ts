@@ -1,10 +1,10 @@
 /**
  * Next.js Middleware for route protection and authentication
  * Protects admin routes and enforces role-based access control
- * BUSINESS AUTH SYSTEM - 2025-10-05
- * - Enforces @design-rite.com domain restriction
- * - Super admin can override domain restriction
- * - Supports developer/contractor access with override
+ * ROLE-BASED AUTH SYSTEM - Updated 2025-10-14
+ * - Pure role-based access (no domain restrictions)
+ * - Super admin controls all access via Supabase user_roles
+ * - Supports employees, contractors, and partners
  */
 
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
@@ -43,41 +43,20 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    // Get user email
-    const userEmail = session.user.email || '';
-
-    // Get user role and domain override
+    // Get user role from Supabase
     const { data: roleData } = await supabase
       .from('user_roles')
-      .select('role, domain_override')
+      .select('role')
       .eq('user_id', session.user.id)
       .single();
 
     const role = roleData?.role || 'guest';
-    const domainOverride = roleData?.domain_override || false;
-
-    // =========================================
-    // BUSINESS ACCESS CONTROL
-    // =========================================
-    // Rule 1: Super admins always have access
-    // Rule 2: Users with domain_override = true have access
-    // Rule 3: @design-rite.com emails have access
-    // Rule 4: All others denied
-
-    const isSuperAdmin = role === 'super_admin';
-    const hasOverride = domainOverride === true;
-    const isDesignRiteEmail = userEmail.endsWith('@design-rite.com');
-
-    if (!isSuperAdmin && !hasOverride && !isDesignRiteEmail) {
-      // Access denied - redirect to error page
-      const errorUrl = new URL('/unauthorized', req.url);
-      errorUrl.searchParams.set('reason', 'domain_restricted');
-      return NextResponse.redirect(errorUrl);
-    }
 
     // =========================================
     // ROLE-BASED ACCESS CONTROL
     // =========================================
+    // Access granted based on role assigned by super admin
+    // No domain restrictions - super admin controls all access
 
     // Super admin routes (only super_admin)
     if (path.startsWith('/admin/super') && role !== 'super_admin') {
