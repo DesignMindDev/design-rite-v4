@@ -116,112 +116,98 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    setIsMounted(true)
+    const initializeAuth = async () => {
+      console.log('[Admin] Initializing auth check...')
 
-    // Session sync from portal admin
-    const handleSessionSync = async () => {
-      const hash = window.location.hash
-      if (hash.startsWith('#auth=')) {
+      // Check for auth hash FIRST
+      const hasAuthHash = window.location.hash.startsWith('#auth=')
+
+      // If we have a hash, handle session sync first
+      if (hasAuthHash) {
+        console.log('[Admin] Found auth hash, syncing session...')
+        setIsRestoringSession(true)
+
         try {
-          console.log('[Admin Session Sync] Found auth hash in URL')
-          setIsRestoringSession(true)
+          const hash = window.location.hash
+          const authMatch = hash.match(/auth=([^&]+)/)
 
-          // Import supabase client
-          const { supabase } = await import('@/lib/supabase')
+          if (authMatch) {
+            const encodedAuth = authMatch[1]
+            const authDataString = decodeURIComponent(encodedAuth)
+            const authData = JSON.parse(authDataString)
 
-          // IMPORTANT: Check if we already have an active session
-          // This prevents trying to restore tokens that are already in use
-          const { data: { session: existingSession } } = await supabase.auth.getSession()
+            console.log('[Admin] Decoded auth data, setting session...')
 
-          if (existingSession) {
-            console.log('[Admin Session Sync] Active session already exists, no restoration needed', {
-              userId: existingSession.user.id,
-              email: existingSession.user.email
+            // Import supabase client
+            const { supabase } = await import('@/lib/supabase')
+
+            // Set session in Supabase
+            const { data, error } = await supabase.auth.setSession({
+              access_token: authData.access_token,
+              refresh_token: authData.refresh_token
             })
 
-            // Just clean up the hash and continue - no reload needed!
-            window.location.hash = ''
-            setIsRestoringSession(false)
+            if (error) {
+              console.error('[Admin] Error setting session:', error)
+              setIsRestoringSession(false)
+              router.push('/login?callbackUrl=/admin')
+              return
+            }
 
-            console.log('[Admin Session Sync] Continuing with existing session')
-            return false // Don't reload, session already active
-          }
+            if (data.session) {
+              console.log('[Admin] Session synced successfully!')
 
-          console.log('[Admin Session Sync] No existing session, attempting to restore from hash...')
+              // Update auth context
+              await auth.refreshAuth()
 
-          const authDataString = decodeURIComponent(hash.slice(6))
-          const authData = JSON.parse(authDataString)
+              // Clean URL
+              window.history.replaceState(null, '', '/admin')
 
-          // Set session from portal only if no session exists
-          const { data, error } = await supabase.auth.setSession({
-            access_token: authData.access_token,
-            refresh_token: authData.refresh_token
-          })
+              // Update state
+              setIsRestoringSession(false)
 
-          if (error) {
-            console.error('[Admin Session Sync] Error setting session:', error)
-            setIsRestoringSession(false)
-            throw error
-          }
-
-          if (data.session) {
-            console.log('[Admin Session Sync] Session restored successfully!', {
-              userId: data.session.user.id,
-              email: data.session.user.email
-            })
-
-            // Clean up URL
-            window.location.hash = ''
-
-            // Reload to re-run auth check with new session
-            window.location.reload()
-            return true
-          } else {
-            console.warn('[Admin Session Sync] Session was set but data.session is null')
-            setIsRestoringSession(false)
+              // Don't reload - just let the auth context update trigger re-render
+              return
+            }
           }
         } catch (error) {
-          console.error('[Admin Session Sync] Error:', error)
+          console.error('[Admin] Session sync error:', error)
           setIsRestoringSession(false)
         }
       }
-      return false
-    }
 
-    // Try session sync first
-    handleSessionSync()
-
-    // Wait for auth to finish loading OR while restoring session
-    if (auth.isLoading || isRestoringSession) {
-      return
-    }
-
-    // Redirect if not authenticated (but NOT if we have an auth hash - let session sync handle it)
-    if (!auth.isAuthenticated) {
-      const hasAuthHash = window.location.hash.startsWith('#auth=')
-      if (!hasAuthHash) {
+      // Only redirect if no auth and no hash
+      if (!auth.isAuthenticated && !hasAuthHash && !auth.isLoading) {
+        console.log('[Admin] No authentication found, redirecting...')
         router.push('/login?callbackUrl=/admin')
         return
       }
-    }
 
-    // Check if user has permission to access admin content management
-    if (auth.user) {
-      const role = auth.user.role
-      if (!['super_admin', 'admin'].includes(role || '')) {
-        router.push('/unauthorized?reason=insufficient_permissions')
-        return
+      // Check if user has permission to access admin content management
+      if (auth.user && auth.isAuthenticated) {
+        const role = auth.user.role
+        if (!['super_admin', 'admin'].includes(role || '')) {
+          router.push('/unauthorized?reason=insufficient_permissions')
+          return
+        }
+
+        // Fetch user's module permissions
+        fetchModulePermissions()
+
+        // Load content management data
+        loadTeamMembers()
+        loadSiteSettings()
+        loadBlogPosts()
       }
-
-      // Fetch user's module permissions
-      fetchModulePermissions()
-
-      // Load content management data
-      loadTeamMembers()
-      loadSiteSettings()
-      loadBlogPosts()
     }
-  }, [auth.isAuthenticated, auth.isLoading, auth.user, router, isRestoringSession])
+
+    setIsMounted(true)
+
+    // Only run if not already restoring
+    if (!isRestoringSession) {
+      initializeAuth()
+    }
+  }, [auth.isAuthenticated, auth.isLoading, router, isRestoringSession])
 
   // Load Spatial Studio metrics when Analytics tab is active
   useEffect(() => {

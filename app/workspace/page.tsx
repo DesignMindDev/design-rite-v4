@@ -295,24 +295,48 @@ export default function DashboardPage() {
   }, [user, supabase]);
 
   const handleBackToPortal = async () => {
+    console.log('[Workspace] Navigating back to portal...')
+
     try {
-      console.log('[Workspace] Returning to portal dashboard...');
+      // Get current session
+      const { data: { session } } = await supabase.auth.getSession()
 
-      // Portal already has a valid session - just redirect without transferring tokens
-      // The portal and v4 share the same Supabase project, so the session is already valid
-      const portalUrl = process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3001/dashboard'
-        : 'https://portal.design-rite.com/dashboard';
+      if (session) {
+        // Encode the session for portal
+        const authData = {
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+          user_email: session.user.email
+        }
 
-      console.log('[Workspace] Redirecting to portal (session already valid)');
-      window.location.href = portalUrl;
+        const encodedAuth = encodeURIComponent(JSON.stringify(authData))
+
+        // Determine portal URL
+        const portalUrl = process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3001'
+          : 'https://portal.design-rite.com'
+
+        // Navigate with auth hash
+        const targetUrl = `${portalUrl}/dashboard#auth=${encodedAuth}`
+
+        console.log('[Workspace] Redirecting to portal with session...')
+        window.location.href = targetUrl
+      } else {
+        // No session, just navigate
+        const portalUrl = process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3001'
+          : 'https://portal.design-rite.com'
+
+        window.location.href = `${portalUrl}/auth`
+      }
     } catch (error) {
-      console.error('[Workspace] Error returning to portal:', error);
-      // Fallback: redirect without session
+      console.error('[Workspace] Error preparing portal navigation:', error)
+      // Fallback
       const portalUrl = process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3001/dashboard'
-        : 'https://portal.design-rite.com/dashboard';
-      window.location.href = portalUrl;
+        ? 'http://localhost:3001'
+        : 'https://portal.design-rite.com'
+
+      window.location.href = `${portalUrl}/dashboard`
     }
   };
 
