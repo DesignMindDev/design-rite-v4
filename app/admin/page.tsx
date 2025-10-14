@@ -174,10 +174,16 @@ export default function AdminPage() {
         }
       }
 
-      // Only redirect if no auth and no hash
-      if (!auth.isAuthenticated && !hasAuthHash && !auth.isLoading) {
-        console.log('[Admin] No authentication found, redirecting...')
-        router.push('/login?callbackUrl=/admin')
+      // Only redirect if no auth, no hash, AND not currently restoring session
+      if (!auth.isAuthenticated && !hasAuthHash && !auth.isLoading && !isRestoringSession) {
+        console.log('[Admin] No authentication found, redirecting to portal...')
+
+        // Redirect to portal login with callback
+        const portalUrl = process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3001/auth'
+          : 'https://portal.design-rite.com/auth'
+
+        window.location.href = portalUrl
         return
       }
 
