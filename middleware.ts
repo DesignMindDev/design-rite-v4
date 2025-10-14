@@ -24,13 +24,22 @@ export async function middleware(req: NextRequest) {
 
   // Protect all /admin routes
   if (path.startsWith('/admin')) {
+    // CRITICAL: Allow admin page to load if there's an auth hash in the URL
+    // This enables portal → V4 session transfer to complete
+    const hasAuthHash = req.nextUrl.hash?.startsWith('#auth=') || false;
+
     const { data: { session } } = await supabase.auth.getSession();
 
-    if (!session) {
-      // Redirect to login if not authenticated
+    if (!session && !hasAuthHash) {
+      // Redirect to login if not authenticated AND no auth hash present
       const loginUrl = new URL('/login', req.url);
       loginUrl.searchParams.set('callbackUrl', path);
       return NextResponse.redirect(loginUrl);
+    }
+
+    // If auth hash is present, let the page component handle session sync
+    if (hasAuthHash) {
+      return res;
     }
 
     // Get user email
