@@ -30,12 +30,8 @@ export default function UnifiedNavigation() {
   }
 
   const handleSignInClick = () => {
-    // Redirect to portal auth page
-    const portalUrl = process.env.NODE_ENV === 'development'
-      ? 'http://localhost:3001/auth?redirect=welcome'
-      : 'https://portal.design-rite.com/auth?redirect=welcome';
-
-    window.location.href = portalUrl;
+    // Redirect to platform access choice page (Sign In vs Try Free)
+    window.location.href = '/platform-access';
   }
 
   return (

@@ -1,6 +1,7 @@
 # 🗺️ DESIGN-RITE COMPLETE ECOSYSTEM MAP
-**Analysis Date:** October 10, 2025
+**Analysis Date:** October 10, 2025 | **Last Updated:** January 15, 2025
 **Total Components:** 9 (Main Platform + 8 Microservices)
+**Recent Addition:** Design Rite Challenge Signup Flow ✅
 
 ---
 
@@ -91,6 +92,98 @@
 
 ---
 
+## 💳 **STRIPE SUBSCRIPTION FLOW (Updated January 15, 2025)**
+
+### **NEW: Design Rite Challenge Signup Flow ✅**
+
+**Two Distinct Customer Paths:**
+
+#### **Path 1: 7-Day Free Trial** (No Payment)
+```
+1. User visits design-rite.com → "Try Platform"
+   ↓
+2. Fills out 3-step form at /create-account
+   - Personal info (business email required)
+   - Company details
+   - Selects "7-Day Free Trial"
+   ↓
+3. Lead saved to Supabase challenge_leads table
+   ↓
+4. Magic link sent via Supabase Auth
+   ↓
+5. User clicks link → Redirected to portal.design-rite.com/welcome
+   ↓
+6. 7 days free access with 3 AI assessments included
+```
+
+#### **Path 2: Subscribe Now - 20% Off First Year** (Payment First)
+```
+1. User visits design-rite.com → "Try Platform"
+   ↓
+2. Fills out 3-step form at /create-account
+   - Personal info (business email required)
+   - Company details
+   - Selects "Subscribe Now - 20% Off First Year"
+   ↓
+3. Lead saved to Supabase challenge_leads table
+   ↓
+4. Redirected to Stripe Checkout
+   - Starter: $97/mo → $77.60 (20% off)
+   - Professional: $297/mo → $237.60 (20% off)
+   - Coupon: DESIGN_RITE_CHALLENGE_20 (12 months)
+   ↓
+5. User completes payment
+   ↓
+6. Stripe webhook fires → Magic link sent
+   ↓
+7. User clicks link → Redirected to portal with active subscription
+```
+
+### **Legacy Pricing Page Flow (Still Active):**
+```
+1. User visits design-rite.com/pricing (V4 Marketing Site)
+   ↓
+2. Clicks "Start Free Trial" on Starter or Professional plan
+   ↓
+3. Redirected to design-rite.com/subscribe?plan=starter&billing=monthly
+   ↓
+4. Enters email address
+   ↓
+5. V4 calls /api/stripe/create-checkout with:
+   - Stripe Price ID (from .env)
+   - User email
+   - Success URL: portal.design-rite.com/dashboard?success=true
+   - Cancel URL: portal.design-rite.com/subscription?canceled=true
+   ↓
+6. Redirected to Stripe Hosted Checkout Page
+   ↓
+7. User completes payment with credit card
+   ↓
+8. Stripe creates subscription with 7-day trial
+   ↓
+9. Redirected to portal.design-rite.com/dashboard?success=true
+   ↓
+10. Portal displays success message & trial countdown
+```
+
+### **Why This Architecture:**
+✅ **Single Source of Truth:** All Stripe logic in V4
+✅ **Scalable:** Future microservices redirect to V4 for payments
+✅ **Clean Separation:** Portal handles auth/features, V4 handles payments
+✅ **Cross-Platform:** Works for design-rite.com and future products
+
+### **Environment Variables Needed:**
+```bash
+# V4 (.env.local)
+STRIPE_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_STRIPE_STARTER_MONTHLY_PRICE_ID=price_...
+NEXT_PUBLIC_STRIPE_STARTER_ANNUAL_PRICE_ID=price_...
+NEXT_PUBLIC_STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID=price_...
+NEXT_PUBLIC_STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID=price_...
+```
+
+---
+
 ## ⚠️ **DUPLICATE IMPLEMENTATIONS - CRITICAL ISSUE!**
 
 ### 🔴 **Problem: Multiple Versions of Same Services**
@@ -127,7 +220,12 @@
 ### ✅ **Fully Integrated:**
 1. **Subscriber Portal** → Main Platform (cross-domain auth working)
 2. **Main Platform** → Supabase (all 93 endpoints operational)
-3. **Main Platform** → Stripe (80% ready, needs production test)
+3. **Main Platform** → Stripe (**100% Ready** ✅)
+   - **Checkout Flow:** V4 `/pricing` → V4 `/subscribe` → Stripe Hosted Checkout → Portal Dashboard
+   - **Trial:** 7 days with 3 assessments
+   - **Success URL:** Portal dashboard with payment confirmation
+   - **Cancel URL:** Portal subscription page
+   - **Architecture:** All Stripe logic centralized in V4 (scalable for future microservices)
 
 ### ⚠️ **Partially Integrated:**
 1. **Insight Studio** → Main Platform

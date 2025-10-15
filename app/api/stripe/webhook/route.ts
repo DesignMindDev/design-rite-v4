@@ -51,6 +51,10 @@ export async function POST(request: NextRequest) {
   // Handle the event
   try {
     switch (event.type) {
+      case 'checkout.session.completed':
+        await handleCheckoutComplete(event.data.object as Stripe.Checkout.Session)
+        break
+
       case 'customer.subscription.created':
       case 'customer.subscription.updated':
         await handleSubscriptionChange(event.data.object as Stripe.Subscription)
@@ -76,6 +80,123 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Webhook processing error:', error)
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 })
+  }
+}
+
+async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
+  console.log('[Webhook] Checkout completed for session:', session.id)
+  console.log('[Webhook] Customer email:', session.customer_email)
+  console.log('[Webhook] Metadata:', session.metadata)
+
+  const { leadId, email, fullName, company } = session.metadata || {}
+
+  if (!leadId || !email) {
+    console.error('[Webhook] Missing leadId or email in metadata')
+    return
+  }
+
+  try {
+    // Import Supabase client with service key
+    const { createClient } = require('@supabase/supabase-js')
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    )
+
+    // Update lead record with payment status
+    const { error: updateError } = await supabaseAdmin
+      .from('challenge_leads')
+      .update({
+        account_created: true,
+        email_verified: true,
+        email_verified_at: new Date().toISOString()
+      })
+      .eq('id', leadId)
+
+    if (updateError) {
+      console.error('[Webhook] Error updating lead:', updateError)
+    } else {
+      console.log('[Webhook] Lead updated successfully')
+    }
+
+    // Create auth user account first (if doesn't exist)
+    console.log('[Webhook] Creating auth account for:', email)
+
+    const { data: signUpData, error: signUpError } = await supabaseAdmin.auth.admin.createUser({
+      email: email.toLowerCase(),
+      email_confirm: true, // Auto-confirm email since they paid
+      user_metadata: {
+        full_name: fullName || '',
+        company: company || '',
+        stripe_customer_id: session.customer as string,
+        stripe_subscription_id: session.subscription as string,
+        offer_choice: '20percent-discount',
+        source: 'design_rite_challenge',
+        payment_completed: true
+      }
+    })
+
+    if (signUpError) {
+      // User might already exist - that's okay
+      if (signUpError.message.includes('already registered')) {
+        console.log('[Webhook] User already exists, updating metadata')
+
+        // Update existing user's metadata
+        const { data: users } = await supabaseAdmin.auth.admin.listUsers()
+        const existingUser = users?.users.find(u => u.email?.toLowerCase() === email.toLowerCase())
+
+        if (existingUser) {
+          await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
+            user_metadata: {
+              full_name: fullName || '',
+              company: company || '',
+              stripe_customer_id: session.customer as string,
+              stripe_subscription_id: session.subscription as string,
+              offer_choice: '20percent-discount',
+              source: 'design_rite_challenge',
+              payment_completed: true
+            }
+          })
+        }
+      } else {
+        console.error('[Webhook] Error creating user:', signUpError)
+        return
+      }
+    } else {
+      console.log('[Webhook] Auth account created successfully:', signUpData.user.id)
+    }
+
+    // Now send magic link for immediate access
+    console.log('[Webhook] Sending magic link to:', email)
+
+    const { data: authData, error: authError } = await supabaseAdmin.auth.signInWithOtp({
+      email: email.toLowerCase(),
+      options: {
+        emailRedirectTo: process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3001/welcome'
+          : 'https://portal.design-rite.com/welcome'
+      }
+    })
+
+    if (authError) {
+      console.error('[Webhook] Error sending magic link:', authError)
+    } else {
+      console.log('[Webhook] Magic link sent successfully')
+
+      // Update lead with magic link sent timestamp
+      await supabaseAdmin
+        .from('challenge_leads')
+        .update({ magic_link_sent_at: new Date().toISOString() })
+        .eq('id', leadId)
+    }
+  } catch (error) {
+    console.error('[Webhook] Error in handleCheckoutComplete:', error)
   }
 }
 

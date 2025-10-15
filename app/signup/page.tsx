@@ -31,10 +31,24 @@ function SignupForm() {
     checkSession();
   }, [supabase, router, redirect]);
 
+  // Business email validation - reject common free providers
+  const isBusinessEmail = (email: string) => {
+    const freeProviders = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'live.com', 'msn.com', 'ymail.com', 'protonmail.com'];
+    const domain = email.split('@')[1]?.toLowerCase();
+    return domain && !freeProviders.includes(domain);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
+    // Business email validation
+    if (!isBusinessEmail(email)) {
+      setError('Please use a business email address. Personal emails (Gmail, Yahoo, Hotmail, etc.) are not accepted.');
+      setLoading(false);
+      return;
+    }
 
     // Validation
     if (password.length < 8) {
@@ -160,7 +174,7 @@ function SignupForm() {
           {/* Email Field */}
           <div>
             <label htmlFor="email" className="block text-gray-300 mb-2 font-medium text-sm">
-              Email Address
+              Business Email Address
             </label>
             <input
               id="email"
@@ -168,11 +182,14 @@ function SignupForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-[#0A0A0A] border border-purple-600/30 rounded px-4 py-3 text-white focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
-              placeholder="you@company.com"
+              placeholder="you@yourcompany.com"
               required
               disabled={loading}
               autoComplete="email"
             />
+            <p className="text-xs text-gray-500 mt-2">
+              ⚠️ Personal email addresses (Gmail, Yahoo, Hotmail, etc.) are not accepted
+            </p>
           </div>
 
           {/* Password Field */}

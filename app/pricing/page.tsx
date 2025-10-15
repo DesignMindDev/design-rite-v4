@@ -9,8 +9,10 @@ export default function PricingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [billingPeriod, setBillingPeriod] = useState('monthly') // 'monthly' or 'annual'
 
-  const redirectToApp = () => {
-    window.location.href = '/subscribe'
+  const handleStartTrial = (plan: string) => {
+    // Redirect to subscribe page with plan and billing period
+    const subscribeUrl = `/subscribe?plan=${plan.toLowerCase()}&billing=${billingPeriod}`;
+    window.location.href = subscribeUrl;
   }
 
   const plans = {
@@ -20,13 +22,13 @@ export default function PricingPage() {
       monthlyPrice: 49,
       annualPrice: 490, // 2 months free
       features: [
+        '7-day free trial (3 assessments)',
         'Up to 10 assessments per month',
         'AI-powered site analysis',
         'Basic proposal generation',
         'Standard equipment database',
         'Email support',
-        'Mobile app access',
-        '14-day free trial'
+        'Mobile app access'
       ],
       cta: 'Start Free Trial',
       popular: false
@@ -37,10 +39,11 @@ export default function PricingPage() {
       monthlyPrice: 199,
       annualPrice: 1990, // 2 months free
       features: [
-        'Unlimited assessments',
+        'Everything in Starter',
+        'Up to 40 assessments per month',
         'Advanced AI recommendations',
         'Custom proposal templates',
-        'Premium equipment database',
+        'Private secure data storage',
         'Priority phone & email support',
         'Client portal access',
         'Project management tools',
@@ -65,7 +68,7 @@ export default function PricingPage() {
         'Custom training & onboarding',
         'SLA guarantee'
       ],
-      cta: 'Contact Sales',
+      cta: 'Explore Enterprise',
       popular: false
     }
   }
@@ -174,10 +177,10 @@ export default function PricingPage() {
 
                 <div className="text-center">
                   {plan.name === 'Enterprise' ? (
-                    <Link 
-                      href="/contact"
+                    <Link
+                      href="/enterprise-subscription"
                       className={`block w-full py-4 px-6 rounded-xl font-bold transition-all text-lg ${
-                        plan.popular 
+                        plan.popular
                           ? 'bg-white text-purple-600 hover:bg-gray-100'
                           : 'bg-purple-600 text-white hover:bg-purple-700'
                       }`}
@@ -185,10 +188,10 @@ export default function PricingPage() {
                       {plan.cta}
                     </Link>
                   ) : (
-                    <button 
-                      onClick={redirectToApp}
+                    <button
+                      onClick={() => handleStartTrial(plan.name)}
                       className={`w-full py-4 px-6 rounded-xl font-bold transition-all text-lg ${
-                        plan.popular 
+                        plan.popular
                           ? 'bg-white text-purple-600 hover:bg-gray-100'
                           : 'bg-purple-600 text-white hover:bg-purple-700'
                       }`}
@@ -220,8 +223,8 @@ export default function PricingPage() {
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
               <h3 className="text-xl font-bold text-white mb-3">What's included in the free trial?</h3>
               <p className="text-gray-300">
-                All plans include a 14-day free trial with full access to features. Credit card required to prevent abuse,
-                but you won't be charged until day 15. Cancel anytime before then at no cost.
+                All plans include a 7-day free trial with 3 AI assessments. Credit card required to prevent abuse,
+                but you won't be charged until day 8. Cancel anytime before then at no cost. Most integrators see value after 2 assessments.
               </p>
             </div>
 
@@ -252,11 +255,11 @@ export default function PricingPage() {
             Join thousands of security professionals who have revolutionized their workflow with Design-Rite.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
-              onClick={redirectToApp}
+            <button
+              onClick={() => handleStartTrial('Professional')}
               className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg"
             >
-              Start 14-Day Free Trial
+              Start 7-Day Free Trial
             </button>
             <Link 
               href="/contact" 
@@ -269,7 +272,7 @@ export default function PricingPage() {
       </main>
 
       {/* Footer */}
-      <Footer redirectToApp={redirectToApp} />
+      <Footer redirectToApp={() => handleStartTrial('Starter')} />
     </div>
   )
 }

@@ -37,12 +37,16 @@ export async function POST(request: Request) {
         },
       ],
       mode: 'subscription',
-      success_url: successUrl || `${process.env.NEXT_PUBLIC_APP_URL}/subscription?success=true`,
-      cancel_url: cancelUrl || `${process.env.NEXT_PUBLIC_APP_URL}/subscription?canceled=true`,
+      success_url: successUrl || (process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3001/dashboard?success=true'
+        : 'https://portal.design-rite.com/dashboard?success=true'),
+      cancel_url: cancelUrl || (process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3001/subscription?canceled=true'
+        : 'https://portal.design-rite.com/subscription?canceled=true'),
       allow_promotion_codes: true,
       billing_address_collection: 'required',
       subscription_data: {
-        trial_period_days: 14, // 14-day free trial
+        trial_period_days: 7, // 7-day free trial with 3 assessments
       },
     });
 

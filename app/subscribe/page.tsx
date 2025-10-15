@@ -1,353 +1,500 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Loader2, CreditCard, Shield, Zap, Check, ArrowLeft } from 'lucide-react'
+import { toast } from 'sonner'
 import Link from 'next/link'
-import UnifiedNavigation from '../components/UnifiedNavigation'
-import Footer from '../components/Footer'
-import { useSupabaseAuth } from '@/lib/hooks/useSupabaseAuth'
-import { Check, Loader2, CreditCard, Shield, Zap } from 'lucide-react'
 
-export default function SubscribePage() {
+function SubscribeContent() {
   const router = useRouter()
-  const { user, loading: authLoading } = useSupabaseAuth()
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly')
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
+  const [step, setStep] = useState(1)
 
-  // Don't redirect - let guests browse pricing
-  // Only require login when they click subscribe button
+  // Form data
+  const [formData, setFormData] = useState({
+    email: '',
+    fullName: '',
+    company: '',
+    phone: '',
+    consentMarketing: false,
+    consentSurveys: false
+  })
 
-  const plans = {
+  // Get plan details from URL params
+  const planName = searchParams.get('plan') || 'starter'
+  const billingPeriod = searchParams.get('billing') || 'monthly'
+
+  // Stripe Price IDs - these will be set in .env
+  const stripePriceIds = {
+    starter: {
+      monthly: process.env.NEXT_PUBLIC_STRIPE_STARTER_MONTHLY_PRICE_ID,
+      annual: process.env.NEXT_PUBLIC_STRIPE_STARTER_ANNUAL_PRICE_ID
+    },
+    professional: {
+      monthly: process.env.NEXT_PUBLIC_STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID,
+      annual: process.env.NEXT_PUBLIC_STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID
+    }
+  }
+
+  const planDetails = {
     starter: {
       name: 'Starter',
-      description: 'Perfect for small integrators getting started',
       monthlyPrice: 49,
       annualPrice: 490,
       features: [
+        '7-day free trial (3 assessments)',
         'Up to 10 assessments per month',
         'AI-powered site analysis',
         'Basic proposal generation',
         'Standard equipment database',
         'Email support',
-        'Mobile app access',
-        '14-day free trial'
-      ],
-      limits: {
-        assessments: 10,
-        projects: 50,
-        storage: '5GB'
-      },
-      popular: false
+        'Mobile app access'
+      ]
     },
     professional: {
       name: 'Professional',
-      description: 'For established integrators scaling their business',
       monthlyPrice: 199,
       annualPrice: 1990,
       features: [
-        'Unlimited assessments',
+        'Everything in Starter',
+        'Up to 40 assessments per month',
         'Advanced AI recommendations',
         'Custom proposal templates',
-        'Premium equipment database',
+        'Private secure data storage',
         'Priority phone & email support',
         'Client portal access',
-        'Project management tools',
-        'Custom pricing rules'
-      ],
-      limits: {
-        assessments: 'Unlimited',
-        projects: 'Unlimited',
-        storage: '100GB'
-      },
-      popular: true
-    },
-    enterprise: {
-      name: 'Enterprise',
-      description: 'For large organizations with multiple facilities',
-      monthlyPrice: 499,
-      annualPrice: 4990,
-      features: [
-        'Everything in Professional',
-        'Multi-site management',
-        'Vendor comparison tools',
-        'Custom compliance reporting',
-        'API access & integrations',
-        'Dedicated account manager',
-        'Advanced analytics dashboard',
-        'Custom training & onboarding',
-        'SLA guarantee',
-        'Priority feature requests'
-      ],
-      limits: {
-        assessments: 'Unlimited',
-        projects: 'Unlimited',
-        storage: 'Unlimited',
-        users: 'Unlimited'
-      },
-      popular: false
+        'Project management tools'
+      ]
     }
   }
 
-  const getPrice = (plan: typeof plans.starter) => {
-    return billingPeriod === 'monthly' ? plan.monthlyPrice : Math.floor(plan.annualPrice / 12)
-  }
+  const currentPlan = planDetails[planName as keyof typeof planDetails] || planDetails.starter
+  const price = billingPeriod === 'annual'
+    ? Math.floor(currentPlan.annualPrice / 12)
+    : currentPlan.monthlyPrice
 
-  const getSavings = (plan: typeof plans.starter) => {
-    const monthlyCost = plan.monthlyPrice * 12
-    const annualCost = plan.annualPrice
-    return monthlyCost - annualCost
-  }
+  const handleNextStep = (e: React.FormEvent) => {
+    e.preventDefault()
 
-  const handleSubscribe = async (tier: 'starter' | 'professional' | 'enterprise') => {
-    if (!user) {
-      router.push('/login?redirect=/subscribe')
+    // Step 1: Email validation
+    if (step === 1) {
+      if (!formData.email) {
+        toast.error('Please enter your email address')
+        return
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(formData.email)) {
+        toast.error('Please enter a valid email address')
+        return
+      }
+      setStep(2)
       return
     }
 
+    // Step 2: Company details validation
+    if (step === 2) {
+      if (!formData.fullName || !formData.company) {
+        toast.error('Please fill in all required fields')
+        return
+      }
+      setStep(3)
+      return
+    }
+
+    // Step 3: Phone & consent validation
+    if (step === 3) {
+      if (!formData.phone) {
+        toast.error('Please enter your phone number')
+        return
+      }
+      const phoneRegex = /^[\d\s\-\(\)\+]+$/
+      if (!phoneRegex.test(formData.phone)) {
+        toast.error('Please enter a valid phone number')
+        return
+      }
+      if (!formData.consentMarketing) {
+        toast.error('Please agree to be contacted to continue')
+        return
+      }
+      handleSubmit()
+    }
+  }
+
+  const handleSubmit = async () => {
     setLoading(true)
-    setSelectedPlan(tier)
 
     try {
-      // Call Stripe checkout API
+      console.log('[Subscribe] Saving lead data and creating checkout session...')
+
+      // Get the correct Stripe price ID
+      const priceId = stripePriceIds[planName as keyof typeof stripePriceIds]?.[billingPeriod as 'monthly' | 'annual']
+
+      if (!priceId) {
+        throw new Error('Stripe Price ID not configured. Please contact support.')
+      }
+
+      // Save lead data to Supabase (optional - you can create this endpoint)
+      try {
+        await fetch('/api/leads/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...formData,
+            plan: planName,
+            billingPeriod,
+            source: 'subscribe_page'
+          })
+        })
+      } catch (err) {
+        console.warn('[Subscribe] Failed to save lead data, continuing to checkout:', err)
+      }
+
+      // Create Stripe checkout session
       const response = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          planId: tier,
-          userEmail: user.email,
-          successUrl: `https://portal.design-rite.com/welcome?payment=success&plan=${tier}`,
-          cancelUrl: `${window.location.origin}/subscribe?payment=canceled`,
+          planId: priceId,
+          userEmail: formData.email,
         }),
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        throw new Error('Failed to create checkout session')
+        throw new Error(data.error || 'Failed to create checkout session')
       }
 
-      const { url } = await response.json()
+      console.log('[Subscribe] Checkout session created, redirecting to Stripe...')
 
       // Redirect to Stripe Checkout
-      window.location.href = url
-    } catch (error) {
-      console.error('Error creating checkout session:', error)
-      alert('Failed to start checkout. Please try again.')
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        throw new Error('No checkout URL returned from Stripe')
+      }
+
+    } catch (error: any) {
+      console.error('[Subscribe] Error:', error)
+      toast.error(error.message || 'Failed to start checkout. Please try again.')
       setLoading(false)
-      setSelectedPlan(null)
     }
   }
 
-  // Don't block guests with loading screen - show pricing immediately
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A2E] to-[#16213E] text-white overflow-x-hidden">
-      <UnifiedNavigation />
+    <div className="min-h-screen bg-gray-50">
+      {/* Header with back button */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-6 py-4">
+          <Link
+            href="/pricing"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Pricing
+          </Link>
+        </div>
+      </div>
 
       {/* Main Content */}
-      <main className="py-20 px-6">
-        {/* Hero Section */}
-        <section className="text-center mb-16 max-w-4xl mx-auto">
-          <div className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-bold text-base tracking-widest uppercase mb-4">
-            Start Your Free Trial
-          </div>
-          <h1 className="text-5xl lg:text-6xl font-black leading-tight mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-            Choose Your Plan
+      <div className="max-w-4xl mx-auto px-6 py-12">
+        {/* Page Title */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">
+            Subscribe to {currentPlan.name}
           </h1>
-          <p className="text-xl text-gray-400 leading-relaxed mb-8">
-            Start with a 14-day free trial. Your card won't be charged until day 15. Cancel anytime.
+          <p className="text-xl text-gray-600">
+            Start your 7-day free trial. No commitment required.
           </p>
+        </div>
 
-          {/* Trust Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-6 mb-8">
-            <div className="flex items-center gap-2 text-gray-300">
-              <Shield className="w-5 h-5 text-green-500" />
-              <span className="text-sm">Secure Payment</span>
+        {/* Main Card */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+          {/* Plan Summary Header */}
+          <div className="bg-gradient-to-r from-primary to-purple-600 text-white p-8 text-center">
+            <div className="text-6xl font-bold mb-2">
+              ${price}
+              <span className="text-2xl font-normal opacity-90">/month</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-300">
-              <CreditCard className="w-5 h-5 text-purple-500" />
-              <span className="text-sm">Powered by Stripe</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-300">
-              <Zap className="w-5 h-5 text-blue-500" />
-              <span className="text-sm">Instant Access</span>
+            {billingPeriod === 'annual' && (
+              <div className="text-green-300 font-semibold text-lg">
+                Save ${currentPlan.monthlyPrice * 12 - currentPlan.annualPrice}/year
+              </div>
+            )}
+            <div className="mt-4 inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+              <Zap className="w-5 h-5" />
+              <span className="font-semibold">7-Day Free Trial • 3 AI Assessments</span>
             </div>
           </div>
 
-          {/* Billing Toggle */}
-          <div className="flex items-center justify-center mb-8">
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-1 border border-white/20">
-              <button
-                onClick={() => setBillingPeriod('monthly')}
-                className={`px-6 py-2 rounded-md font-semibold transition-all ${
-                  billingPeriod === 'monthly'
-                    ? 'bg-purple-600 text-white'
-                    : 'text-gray-300 hover:text-white'
-                }`}
-              >
-                Monthly
-              </button>
-              <button
-                onClick={() => setBillingPeriod('annual')}
-                className={`px-6 py-2 rounded-md font-semibold transition-all ${
-                  billingPeriod === 'annual'
-                    ? 'bg-purple-600 text-white'
-                    : 'text-gray-300 hover:text-white'
-                }`}
-              >
-                Annual
-                <span className="ml-2 text-xs bg-green-500 text-white px-2 py-1 rounded-full">Save 20%</span>
-              </button>
+          {/* Features & Form */}
+          <div className="grid md:grid-cols-2 gap-8 p-8">
+            {/* Features List */}
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">What's included:</h3>
+              <ul className="space-y-3">
+                {currentPlan.features.map((feature, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700">{feature}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
-        </section>
 
-        {/* Pricing Cards */}
-        <section className="max-w-7xl mx-auto mb-20">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Object.entries(plans).map(([key, plan]) => (
-              <div
-                key={key}
-                className={`bg-white/10 backdrop-blur-sm rounded-3xl p-8 border transition-all hover:-translate-y-2 relative ${
-                  plan.popular
-                    ? 'border-purple-500 ring-2 ring-purple-500/20'
-                    : 'border-white/20 hover:border-purple-500/30'
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-2 rounded-full text-sm font-bold">
-                      Most Popular
-                    </span>
+            {/* Multi-Step Form */}
+            <div>
+              {/* Step Progress Indicator */}
+              <div className="flex items-center justify-center mb-8">
+                <div className="flex items-center gap-2">
+                  {/* Step 1 */}
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm transition-all ${
+                    step >= 1 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
+                  }`}>
+                    1
+                  </div>
+                  <div className={`h-1 w-16 transition-all ${step >= 2 ? 'bg-primary' : 'bg-gray-200'}`} />
+
+                  {/* Step 2 */}
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm transition-all ${
+                    step >= 2 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
+                  }`}>
+                    2
+                  </div>
+                  <div className={`h-1 w-16 transition-all ${step >= 3 ? 'bg-primary' : 'bg-gray-200'}`} />
+
+                  {/* Step 3 */}
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm transition-all ${
+                    step >= 3 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
+                  }`}>
+                    3
+                  </div>
+                </div>
+              </div>
+
+              {/* Step Labels */}
+              <div className="text-center mb-6">
+                <h3 className="text-lg font-bold text-gray-900">
+                  {step === 1 && 'Your Email Address'}
+                  {step === 2 && 'Company Information'}
+                  {step === 3 && 'Contact & Consent'}
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  {step === 1 && 'We\'ll use this to create your account'}
+                  {step === 2 && 'Tell us about your business'}
+                  {step === 3 && 'Final step before checkout'}
+                </p>
+              </div>
+
+              <form onSubmit={handleNextStep} className="space-y-4">
+                {/* Step 1: Email */}
+                {step === 1 && (
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Email Address *
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      placeholder="you@company.com"
+                      required
+                      disabled={loading}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    />
                   </div>
                 )}
 
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
-                  <p className="text-gray-400 mb-6">{plan.description}</p>
-
-                  <div className="mb-4">
-                    <span className="text-5xl font-black text-white">${getPrice(plan)}</span>
-                    <span className="text-gray-400 ml-2">/month</span>
-                  </div>
-
-                  {billingPeriod === 'annual' && (
-                    <div className="text-green-400 text-sm font-semibold mb-4">
-                      Save ${getSavings(plan)} per year
+                {/* Step 2: Company Details */}
+                {step === 2 && (
+                  <>
+                    <div>
+                      <label htmlFor="fullName" className="block text-sm font-semibold text-gray-700 mb-2">
+                        Full Name *
+                      </label>
+                      <input
+                        id="fullName"
+                        type="text"
+                        value={formData.fullName}
+                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                        placeholder="John Doe"
+                        required
+                        disabled={loading}
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      />
                     </div>
+                    <div>
+                      <label htmlFor="company" className="block text-sm font-semibold text-gray-700 mb-2">
+                        Company Name *
+                      </label>
+                      <input
+                        id="company"
+                        type="text"
+                        value={formData.company}
+                        onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                        placeholder="Acme Security Solutions"
+                        required
+                        disabled={loading}
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Step 3: Phone & Consent */}
+                {step === 3 && (
+                  <>
+                    <div>
+                      <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                        Phone Number *
+                      </label>
+                      <input
+                        id="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        placeholder="(555) 123-4567"
+                        required
+                        disabled={loading}
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      />
+                    </div>
+
+                    {/* Consent Checkboxes */}
+                    <div className="space-y-3 pt-2">
+                      <label className="flex items-start gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.consentMarketing}
+                          onChange={(e) => setFormData({ ...formData, consentMarketing: e.target.checked })}
+                          className="mt-1 w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                        />
+                        <span className="text-sm text-gray-700">
+                          I agree to be contacted by Design-Rite about my subscription and account. *
+                        </span>
+                      </label>
+
+                      <label className="flex items-start gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.consentSurveys}
+                          onChange={(e) => setFormData({ ...formData, consentSurveys: e.target.checked })}
+                          className="mt-1 w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                        />
+                        <span className="text-sm text-gray-700">
+                          I'm interested in participating in product surveys and feedback sessions (optional)
+                        </span>
+                      </label>
+                    </div>
+                  </>
+                )}
+
+                {/* Navigation Buttons */}
+                <div className="flex gap-3 pt-4">
+                  {step > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setStep(step - 1)}
+                      disabled={loading}
+                      className="px-6 py-3 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    >
+                      Back
+                    </button>
                   )}
 
-                  <div className="text-sm text-gray-400">
-                    Billed {billingPeriod === 'monthly' ? 'monthly' : 'annually'}
-                  </div>
-                </div>
-
-                <ul className="space-y-4 mb-8">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-3 text-gray-300">
-                      <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="text-center">
                   <button
-                    onClick={() => handleSubscribe(key as 'starter' | 'professional' | 'enterprise')}
-                    disabled={loading && selectedPlan === key}
-                    className={`w-full py-4 px-6 rounded-xl font-bold transition-all text-lg flex items-center justify-center gap-2 ${
-                      plan.popular
-                        ? 'bg-white text-purple-600 hover:bg-gray-100'
-                        : 'bg-purple-600 text-white hover:bg-purple-700'
-                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed px-8 py-4 rounded-lg font-bold text-lg text-white transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3"
                   >
-                    {loading && selectedPlan === key ? (
+                    {loading ? (
                       <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        Processing...
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                        Redirecting to Stripe...
                       </>
                     ) : (
-                      <>Start 14-Day Free Trial</>
+                      <>
+                        {step < 3 ? (
+                          'Continue'
+                        ) : (
+                          <>
+                            <CreditCard className="w-6 h-6" />
+                            Continue to Secure Checkout
+                          </>
+                        )}
+                      </>
                     )}
                   </button>
                 </div>
-              </div>
-            ))}
-          </div>
-        </section>
 
-        {/* FAQ Section */}
-        <section className="max-w-4xl mx-auto mb-20">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">
-            Frequently Asked Questions
-          </h2>
-
-          <div className="space-y-6">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <h3 className="text-xl font-bold text-white mb-3">Is the free trial really free?</h3>
-              <p className="text-gray-300">
-                Yes! Start with a 14-day free trial with full access to all features in your chosen plan.
-                We require a valid payment method to prevent abuse, but you won't be charged until day 15.
-                Cancel anytime before then at no cost.
-              </p>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <h3 className="text-xl font-bold text-white mb-3">Can I switch plans anytime?</h3>
-              <p className="text-gray-300">
-                Absolutely! You can upgrade or downgrade your plan at any time. Changes take effect immediately,
-                and we'll prorate the billing accordingly.
-              </p>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <h3 className="text-xl font-bold text-white mb-3">What payment methods do you accept?</h3>
-              <p className="text-gray-300">
-                We accept all major credit cards (Visa, Mastercard, American Express, Discover) via Stripe.
-                Enterprise customers can arrange ACH transfers or invoicing.
-              </p>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <h3 className="text-xl font-bold text-white mb-3">Can I cancel my subscription?</h3>
-              <p className="text-gray-300">
-                Yes, you can cancel your subscription at any time from your account dashboard.
-                You'll continue to have access until the end of your current billing period.
-              </p>
+                {/* Trust Badges */}
+                {step === 3 && (
+                  <div className="flex items-center justify-center gap-6 text-sm text-gray-500 pt-4">
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-green-600" />
+                      Secure Payment
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="w-4 h-4 text-green-600" />
+                      Cancel Anytime
+                    </div>
+                  </div>
+                )}
+              </form>
             </div>
           </div>
-        </section>
 
-        {/* CTA Section */}
-        <section className="text-center max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold text-white mb-6">
-            Ready to Transform Your Security Design Process?
-          </h2>
-          <p className="text-xl text-gray-400 mb-8">
-            Join thousands of security professionals who have revolutionized their workflow.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/pricing"
-              className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-purple-600 transition-all text-lg inline-block"
-            >
-              Compare Plans
-            </Link>
-            <Link
-              href="/contact"
-              className="border-2 border-purple-600 text-purple-400 px-8 py-4 rounded-xl font-bold hover:bg-purple-600 hover:text-white transition-all text-lg inline-block"
-            >
-              Talk to Sales
-            </Link>
+          {/* Footer Info */}
+          <div className="bg-gray-50 px-8 py-6 border-t border-gray-200">
+            <p className="text-center text-sm text-gray-600">
+              By subscribing, you'll be charged <strong>${billingPeriod === 'annual' ? currentPlan.annualPrice : currentPlan.monthlyPrice}</strong> after your 7-day free trial ends.
+              You can cancel anytime before day 8 at no cost. Most integrators see value after 2 assessments.
+            </p>
           </div>
-        </section>
-      </main>
+        </div>
 
-
-      {/* Footer */}
-      <Footer redirectToApp={() => router.push('/subscribe')} />
+        {/* Additional Trust Section */}
+        <div className="mt-12 grid md:grid-cols-3 gap-6 text-center">
+          <div className="p-6">
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Check className="w-6 h-6 text-green-600" />
+            </div>
+            <h3 className="font-semibold text-gray-900 mb-2">No Commitment</h3>
+            <p className="text-sm text-gray-600">Cancel anytime during your trial at no charge</p>
+          </div>
+          <div className="p-6">
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Shield className="w-6 h-6 text-blue-600" />
+            </div>
+            <h3 className="font-semibold text-gray-900 mb-2">Secure Billing</h3>
+            <p className="text-sm text-gray-600">Powered by Stripe - industry-leading payment security</p>
+          </div>
+          <div className="p-6">
+            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Zap className="w-6 h-6 text-purple-600" />
+            </div>
+            <h3 className="font-semibold text-gray-900 mb-2">Instant Access</h3>
+            <p className="text-sm text-gray-600">Start using Design-Rite immediately after checkout</p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
 
-
+export default function SubscribePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      </div>
+    }>
+      <SubscribeContent />
+    </Suspense>
+  )
+}

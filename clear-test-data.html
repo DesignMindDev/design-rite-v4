@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Design-Rite Test Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        button { padding: 15px 30px; font-size: 16px; margin: 10px; cursor: pointer; }
+        .danger { background: #dc3545; color: white; border: none; border-radius: 5px; }
+        .success { background: #28a745; color: white; border: none; border-radius: 5px; }
+        .result { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🧹 Clear Design-Rite Test Data</h1>
+    <p>Clear all localStorage data for testing with new emails:</p>
+    
+    <button class="danger" onclick="clearAll()">Clear All LocalStorage</button>
+    <button class="success" onclick="showData()">Show Current Data</button>
+    
+    <div class="result" id="result"></div>
+
+    <script>
+        function clearAll() {
+            const keys = [
+                'design_rite_user',
+                'design_rite_project',
+                'design_rite_projects',
+                'design_rite_user_history'
+            ];
+            
+            let cleared = [];
+            keys.forEach(key => {
+                if (localStorage.getItem(key)) {
+                    localStorage.removeItem(key);
+                    cleared.push(key);
+                }
+            });
+            
+            document.getElementById('result').innerHTML = 
+                '<h3>✅ Cleared!</h3>' +
+                '<p>Removed: ' + cleared.join(', ') + '</p>' +
+                '<p><strong>You can now test with any email again!</strong></p>';
+        }
+        
+        function showData() {
+            const keys = [
+                'design_rite_user',
+                'design_rite_project',
+                'design_rite_projects',
+                'design_rite_user_history'
+            ];
+            
+            let html = '<h3>Current LocalStorage Data:</h3>';
+            keys.forEach(key => {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        html += `<h4>${key}:</h4><pre style="overflow: auto;">${JSON.stringify(parsed, null, 2)}</pre>`;
+                    } catch {
+                        html += `<h4>${key}:</h4><p>${data}</p>`;
+                    }
+                } else {
+                    html += `<h4>${key}:</h4><p><em>No data</em></p>`;
+                }
+            });
+            
+            document.getElementById('result').innerHTML = html;
+        }
+        
+        // Show data on load
+        showData();
+    </script>
+</body>
+</html>

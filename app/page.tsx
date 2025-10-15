@@ -396,6 +396,45 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Security Pro Tip Banner */}
+      <section className="py-16 bg-gradient-to-r from-blue-900/40 to-purple-900/40 border-y border-blue-500/30">
+        <div className="max-w-5xl mx-auto px-8">
+          <div className="bg-blue-500/10 rounded-2xl p-8 md:p-12 border border-blue-500/30 backdrop-blur-sm">
+            <div className="flex items-start gap-6">
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center">
+                  <span className="text-3xl">🛡️</span>
+                </div>
+              </div>
+              <div>
+                <div className="inline-block px-3 py-1 bg-blue-500/20 rounded-full text-blue-300 text-sm font-semibold mb-4">
+                  Security Pro Tip
+                </div>
+                <p className="text-xl md:text-2xl text-blue-100 leading-relaxed font-medium">
+                  "This is the same architecture you recommend for your enterprise clients -
+                  dedicated VLANs, isolated VMS servers, and segmented access control.
+                  <span className="text-blue-300 font-bold"> We practice what you preach.</span>"
+                </p>
+                <div className="mt-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                  <Link
+                    href="/enterprise-subscription"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all"
+                  >
+                    Learn about Enterprise Data Isolation
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                  <span className="text-sm text-blue-300">
+                    Your floor. Your access card. Zero neighbors.
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-24 bg-gradient-to-r from-violet-600/10 to-violet-700/10">
         <div className="max-w-4xl mx-auto px-8 text-center">

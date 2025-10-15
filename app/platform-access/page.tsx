@@ -52,10 +52,8 @@ export default function PlatformAccessPage() {
 
   const handleNewUser = () => {
     setIsReturningUser(false);
-    // Redirect to portal for authentication
-    window.location.href = process.env.NODE_ENV === 'development'
-      ? 'http://localhost:3001/auth'
-      : 'https://portal.design-rite.com/auth';
+    // Redirect to new account creation page with lead capture
+    window.location.href = '/create-account';
   };
 
   // Show loading while checking auth

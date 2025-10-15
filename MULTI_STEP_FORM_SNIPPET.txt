@@ -1,0 +1,197 @@
+{/* Step Progress Indicator */}
+<div className="mb-8">
+  <div className="flex items-center justify-center gap-4">
+    {[1, 2, 3].map((stepNum) => (
+      <div key={stepNum} className="flex items-center">
+        <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold transition-all ${
+          step >= stepNum
+            ? 'bg-gradient-to-r from-primary to-purple-600 text-white'
+            : 'bg-gray-200 text-gray-400'
+        }`}>
+          {stepNum}
+        </div>
+        {stepNum < 3 && (
+          <div className={`w-16 h-1 mx-2 transition-all ${
+            step > stepNum ? 'bg-gradient-to-r from-primary to-purple-600' : 'bg-gray-200'
+          }`} />
+        )}
+      </div>
+    ))}
+  </div>
+  <div className="flex justify-center gap-20 mt-3">
+    <span className={`text-sm font-medium ${step >= 1 ? 'text-primary' : 'text-gray-400'}`}>
+      Email
+    </span>
+    <span className={`text-sm font-medium ${step >= 2 ? 'text-primary' : 'text-gray-400'}`}>
+      Company
+    </span>
+    <span className={`text-sm font-medium ${step >= 3 ? 'text-primary' : 'text-gray-400'}`}>
+      Verify
+    </span>
+  </div>
+</div>
+
+{/* Multi-Step Form */}
+<div>
+  <h3 className="text-lg font-bold text-gray-900 mb-4">
+    {step === 1 && "Enter your email to get started:"}
+    {step === 2 && "Tell us about your company:"}
+    {step === 3 && "Final step - verify you're legit:"}
+  </h3>
+  <form onSubmit={handleNextStep} className="space-y-4">
+    {/* Step 1: Email */}
+    {step === 1 && (
+      <div>
+        <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+          Email Address *
+        </label>
+        <input
+          id="email"
+          type="email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          placeholder="you@company.com"
+          required
+          disabled={loading}
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        />
+        <p className="text-xs text-gray-500 mt-2">
+          We'll use this to create your Design-Rite account
+        </p>
+      </div>
+    )}
+
+    {/* Step 2: Company Details */}
+    {step === 2 && (
+      <>
+        <div>
+          <label htmlFor="fullName" className="block text-sm font-semibold text-gray-700 mb-2">
+            Full Name *
+          </label>
+          <input
+            id="fullName"
+            type="text"
+            value={formData.fullName}
+            onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+            placeholder="John Doe"
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          />
+        </div>
+        <div>
+          <label htmlFor="company" className="block text-sm font-semibold text-gray-700 mb-2">
+            Company Name *
+          </label>
+          <input
+            id="company"
+            type="text"
+            value={formData.company}
+            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+            placeholder="Acme Security Inc."
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          />
+        </div>
+      </>
+    )}
+
+    {/* Step 3: Phone & Consent */}
+    {step === 3 && (
+      <>
+        <div>
+          <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
+            Phone Number *
+          </label>
+          <input
+            id="phone"
+            type="tel"
+            value={formData.phone}
+            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            placeholder="+1 (555) 123-4567"
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          />
+          <p className="text-xs text-gray-500 mt-2">
+            We'll use this to verify you're a legitimate business
+          </p>
+        </div>
+
+        <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.consentMarketing}
+              onChange={(e) => setFormData({ ...formData, consentMarketing: e.target.checked })}
+              className="mt-1 w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
+            />
+            <span className="text-sm text-gray-700">
+              <strong>I agree to be contacted</strong> by Design-Rite via email or phone for product updates, surveys, and support. *
+            </span>
+          </label>
+
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.consentSurveys}
+              onChange={(e) => setFormData({ ...formData, consentSurveys: e.target.checked })}
+              className="mt-1 w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
+            />
+            <span className="text-sm text-gray-700">
+              I'd like to participate in user surveys to help improve Design-Rite (optional)
+            </span>
+          </label>
+        </div>
+      </>
+    )}
+
+    {/* Navigation Buttons */}
+    <div className="flex gap-3">
+      {step > 1 && (
+        <button
+          type="button"
+          onClick={() => setStep(step - 1)}
+          disabled={loading}
+          className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Back
+        </button>
+      )}
+      <button
+        type="submit"
+        disabled={loading}
+        className="flex-1 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed px-8 py-4 rounded-lg font-bold text-lg text-white transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3"
+      >
+        {loading ? (
+          <>
+            <Loader2 className="w-6 h-6 animate-spin" />
+            Processing...
+          </>
+        ) : step < 3 ? (
+          <>
+            Continue
+            <ArrowLeft className="w-5 h-5 rotate-180" />
+          </>
+        ) : (
+          <>
+            <CreditCard className="w-6 h-6" />
+            Continue to Secure Checkout
+          </>
+        )}
+      </button>
+    </div>
+
+    {/* Trust Badges */}
+    {step === 3 && (
+      <div className="flex items-center justify-center gap-6 text-sm text-gray-500 pt-4">
+        <div className="flex items-center gap-2">
+          <Shield className="w-4 h-4 text-green-600" />
+          Secure Payment
+        </div>
+        <div className="flex items-center gap-2">
+          <CreditCard className="w-4 h-4 text-green-600" />
+          Cancel Anytime
+        </div>
+      </div>
+    )}
+  </form>
+</div>
