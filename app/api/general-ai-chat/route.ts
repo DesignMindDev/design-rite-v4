@@ -142,13 +142,16 @@ async function getClaudeResponse(message: string, context: any): Promise<string>
   }
 
   // Build conversation history for context
+  const pathname = context?.pathname || 'general-ai-chat';
+  const previousMessages = context?.previousMessages || [];
+
   const messages = [
     {
       role: 'user',
-      content: `Context: User is on page "${context.pathname}" in Design-Rite platform.
+      content: `Context: User is on page "${pathname}" in Design-Rite platform.
 
 Previous conversation:
-${context.previousMessages.map((msg: ChatMessage) => `${msg.role}: ${msg.content}`).join('\n')}
+${previousMessages.map((msg: ChatMessage) => `${msg.role}: ${msg.content}`).join('\n')}
 
 Current request: ${message}`
     }
@@ -184,14 +187,17 @@ async function getOpenAIResponse(message: string, context: any): Promise<string>
     throw new Error('OpenAI API key not configured');
   }
 
-  // Build conversation history
+  // Build conversation history with null safety
+  const pathname = context?.pathname || 'general-ai-chat';
+  const previousMessages = context?.previousMessages || [];
+
   const messages = [
     {
       role: 'system',
-      content: `You are a helpful AI assistant. The user is currently on page "${context.pathname}" in the Design-Rite platform. Provide direct, helpful responses without any branding constraints.`
+      content: `You are a helpful AI assistant. The user is currently on page "${pathname}" in the Design-Rite platform. Provide direct, helpful responses without any branding constraints.`
     },
     // Add previous messages for context
-    ...context.previousMessages.slice(-5).map((msg: ChatMessage) => ({
+    ...previousMessages.slice(-5).map((msg: ChatMessage) => ({
       role: msg.role,
       content: msg.content
     })),
