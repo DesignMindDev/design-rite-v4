@@ -89,12 +89,12 @@ export default function UnifiedNavigation() {
                 </div>
               </Link>
 
-              <Link href="/ai-assistant" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+              <Link href="/ai-refinement-marketing" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🤖
                 </div>
                 <div>
-                  <div className="font-semibold dr-ui dr-text-pearl mb-1">AI Assistant Refinement</div>
+                  <div className="font-semibold dr-ui dr-text-pearl mb-1">AI Refinement</div>
                   <div className="dr-ui text-gray-400 leading-tight">Enhance any assessment with AI • 5-10 min</div>
                 </div>
               </Link>
@@ -364,8 +364,8 @@ export default function UnifiedNavigation() {
                 📊 Quick Security Estimate
               </Link>
               <Link href="/ai-discovery" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🚀 AI Discovery Assistant</Link>
-              <Link href="/ai-assistant" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">
-                🤖 AI Assistant Refinement
+              <Link href="/ai-refinement-marketing" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">
+                🤖 AI Refinement
               </Link>
               <Link href="/compliance-analyst" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">✅ Compliance Tools</Link>
               <Link href="/professional-proposals" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">📋 Proposal Generator</Link>

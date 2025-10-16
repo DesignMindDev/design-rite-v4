@@ -5,7 +5,7 @@ import UnifiedNavigation from '@/app/components/UnifiedNavigation'
 import Footer from '@/app/components/Footer'
 import { Bot, MessageSquare, Sparkles, RefreshCw, Upload, CheckCircle, Zap, FileText } from 'lucide-react'
 
-export default function AIAssistantMarketingPage() {
+export default function AIRefinementMarketingPage() {
   const router = useRouter()
 
   const handleTryPlatform = () => {
