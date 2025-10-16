@@ -213,19 +213,19 @@ export default function AdminPage() {
     }
   }, [auth.isAuthenticated, auth.isLoading, router, isRestoringSession])
 
-  // Load Spatial Studio metrics when Analytics tab is active
-  useEffect(() => {
-    if (activeTab === 'analytics') {
-      fetch('/api/spatial-studio/analytics')
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            setSpatialMetrics(data.metrics)
-          }
-        })
-        .catch(err => console.error('Failed to load Spatial Studio metrics:', err))
-    }
-  }, [activeTab])
+  // Spatial Studio metrics removed - now handled by standalone microservice
+  // useEffect(() => {
+  //   if (activeTab === 'analytics') {
+  //     fetch('/api/spatial-studio/analytics')
+  //       .then(res => res.json())
+  //       .then(data => {
+  //         if (data.success) {
+  //           setSpatialMetrics(data.metrics)
+  //         }
+  //       })
+  //       .catch(err => console.error('Failed to load Spatial Studio metrics:', err))
+  //   }
+  // }, [activeTab])
 
   const fetchModulePermissions = async () => {
     try {
@@ -617,6 +617,10 @@ export default function AdminPage() {
               </button>
               <div className="absolute right-0 mt-2 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 <div className="py-2">
+                  <Link href="/admin/super-agent" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-cyan-600/20 transition-colors">
+                    <span>⚡</span>
+                    <span>Super Agent</span>
+                  </Link>
                   <Link href="/admin/harvester" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-cyan-600/20 transition-colors">
                     <span>🔍</span>
                     <span>Product Harvester</span>
@@ -644,14 +648,6 @@ export default function AdminPage() {
                       <span>Team Management</span>
                     </button>
                   )}
-                  <Link href="/admin/creative-studio" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
-                    <span>🎨</span>
-                    <span>Creative Studio</span>
-                  </Link>
-                  <Link href="/admin/spatial-studio-dev" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
-                    <span>🏗️</span>
-                    <span>Spatial Studio</span>
-                  </Link>
                   <Link href="/integrations/system-surveyor/upload" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-green-600/20 transition-colors w-full text-left">
                     <span>📋</span>
                     <span>System Surveyor</span>
@@ -1537,14 +1533,6 @@ export default function AdminPage() {
                 <p className="text-gray-400 text-sm">User flow & behavior insights</p>
               </Link>
 
-              <Link href="/admin/spatial-studio-dev" className="bg-gradient-to-br from-pink-600/20 to-pink-900/20 border border-pink-600/30 rounded-xl p-6 hover:border-pink-500/50 transition-all group">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xl font-bold text-white">Spatial Studio</span>
-                  <span className="text-3xl group-hover:scale-110 transition-transform">🏗️</span>
-                </div>
-                <p className="text-gray-400 text-sm">3D floor plan AI analysis</p>
-              </Link>
-
               <Link href="/admin/ai-analytics" className="bg-gradient-to-br from-indigo-600/20 to-indigo-900/20 border border-indigo-600/30 rounded-xl p-6 hover:border-indigo-500/50 transition-all group">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xl font-bold text-white">AI Analytics</span>
@@ -1578,54 +1566,7 @@ export default function AdminPage() {
               </Link>
             </div>
 
-            {/* Spatial Studio Analytics */}
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-600/20 rounded-2xl p-6">
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                <span>🏗️</span>
-                Spatial Studio Metrics
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-gradient-to-br from-purple-600/20 to-purple-900/20 border border-purple-600/30 rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-gray-400 text-sm">Total Projects</span>
-                    <span className="text-2xl">🏗️</span>
-                  </div>
-                  <div className="text-3xl font-bold text-white">
-                    {spatialMetrics?.totalProjects || 0}
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-green-600/20 to-green-900/20 border border-green-600/30 rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-gray-400 text-sm">Success Rate</span>
-                    <span className="text-2xl">✅</span>
-                  </div>
-                  <div className="text-3xl font-bold text-white">
-                    {spatialMetrics?.successRate || 0}%
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-blue-600/20 to-blue-900/20 border border-blue-600/30 rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-gray-400 text-sm">Avg Analysis Time</span>
-                    <span className="text-2xl">⏱️</span>
-                  </div>
-                  <div className="text-3xl font-bold text-white">
-                    {spatialMetrics?.avgAnalysisTime || 0}s
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-pink-600/20 to-pink-900/20 border border-pink-600/30 rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-gray-400 text-sm">Walls Detected</span>
-                    <span className="text-2xl">🧱</span>
-                  </div>
-                  <div className="text-3xl font-bold text-white">
-                    {spatialMetrics?.totalWalls || 0}
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Spatial Studio Analytics - Removed (now handled by standalone microservice on Port 3020) */}
           </div>
         )}
       </div>

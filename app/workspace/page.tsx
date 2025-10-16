@@ -543,8 +543,8 @@ export default function DashboardPage() {
         <div className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8">Your Security Design Tools</h2>
 
-          {/* 3-Column Tool Grid - Same as estimate-options */}
-          <div className="grid lg:grid-cols-3 gap-6">
+          {/* 4-Column Tool Grid */}
+          <div className="grid lg:grid-cols-2 xl:grid-cols-4 gap-6">
             {/* Quick Estimate */}
             <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6 border hover:shadow-2xl hover:shadow-purple-600/20 transition-all group">
               <div className="flex items-center mb-4">
@@ -612,6 +612,32 @@ export default function DashboardPage() {
                 Start AI Assistant
                 <ArrowRight className="w-4 h-4 ml-2" />
               </button>
+            </div>
+
+            {/* General AI Chat */}
+            <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6 border hover:shadow-2xl hover:shadow-purple-600/20 transition-all group relative">
+              <div className="absolute top-4 right-4">
+                <span className="bg-green-500/20 text-green-300 text-xs font-bold px-2 py-1 rounded-full border border-green-500/40">NEW</span>
+              </div>
+              <div className="flex items-center mb-4">
+                <div className="p-3 dr-bg-violet rounded-xl mr-3">
+                  <Sparkles className="w-6 h-6 dr-text-pearl" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">General AI Chat</h3>
+                  <p className="text-gray-400 text-sm">Unrestricted</p>
+                </div>
+              </div>
+              <p className="text-gray-300 mb-6 text-sm">
+                Unrestricted AI for any task. Code generation, content writing, brainstorming, and more.
+              </p>
+              <Link
+                href="/general-ai-chat"
+                className="w-full flex items-center justify-center dr-bg-violet hover:bg-purple-700 dr-text-pearl font-bold py-3 px-4 rounded-xl transition-all group-hover:scale-105"
+              >
+                Start AI Chat
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
             </div>
           </div>
         </div>
