@@ -69,7 +69,7 @@ export default function UnifiedNavigation() {
             </span>
             <div className="absolute top-full left-0 mt-4 bg-black/95 backdrop-blur-xl dr-border-violet rounded-xl p-4 min-w-[280px] opacity-0 invisible transform -translate-y-2 transition-all group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 shadow-2xl">
 
-              <Link href="/security-estimate" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+              <Link href="/security-estimate-marketing" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   📊
                 </div>
@@ -79,7 +79,7 @@ export default function UnifiedNavigation() {
                 </div>
               </Link>
 
-              <Link href="/ai-discovery" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
+              <Link href="/ai-discovery-marketing" className="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:bg-violet-600/10 hover:dr-text-pearl transition-all hover:translate-x-1 mb-2">
                 <div className="w-10 h-10 bg-violet-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
                   🚀
                 </div>
@@ -360,10 +360,10 @@ export default function UnifiedNavigation() {
             {/* Platform Section */}
             <div>
               <div className="text-gray-400 dr-ui uppercase tracking-wider mb-2">Platform</div>
-              <Link href="/security-estimate" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">
+              <Link href="/security-estimate-marketing" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">
                 📊 Quick Security Estimate
               </Link>
-              <Link href="/ai-discovery" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🚀 AI Discovery Assistant</Link>
+              <Link href="/ai-discovery-marketing" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">🚀 AI Discovery Assistant</Link>
               <Link href="/ai-refinement-marketing" className="block text-white/80 hover:dr-text-pearl py-2 pl-4">
                 🤖 AI Refinement
               </Link>
