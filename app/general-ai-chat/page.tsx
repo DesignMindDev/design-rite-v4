@@ -96,7 +96,10 @@ export default function GeneralAIChatPage() {
           body: JSON.stringify({
             message: input.trim(),
             provider: selectedProvider,
-            conversationHistory: messages.slice(-10) // Last 10 messages for context
+            context: {
+              pathname: '/general-ai-chat',
+              previousMessages: messages.slice(-10) // Last 10 messages for context
+            }
           })
         });
       }
