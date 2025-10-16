@@ -16,12 +16,17 @@
 - **Purpose:** Main application with AI estimation, quote generation, multi-AI failover
 - **Features:** 93 API endpoints, Stripe subscriptions, System Surveyor integration
 
-#### 2. **Subscriber Portal**
-- **Location:** `C:\Users\dkozi\Projects\design-rite-subscriber-portal`
+#### 2. **Subscriber Portal (design-rite-portal-v2)**
+- **Location:** `C:\Users\dkozi\Projects\design-rite-portal-v2`
 - **URL:** https://portal.design-rite.com
 - **Status:** 100% Deployed ✅
-- **Purpose:** Subscriber-only features (8 complete features)
+- **Purpose:** Subscriber-only features (8 complete features) + Marketing/Content Management
 - **Integration:** Cross-domain auth with main platform
+- **New Features (Oct 2025):**
+  - Team Management (About Us page) with photo uploads
+  - Site Logo Management (header/footer)
+  - Blog Management (full CRUD + featured images)
+  - File-based storage (JSON + uploads)
 
 ---
 
@@ -219,6 +224,9 @@ NEXT_PUBLIC_STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID=price_...
 
 ### ✅ **Fully Integrated:**
 1. **Subscriber Portal** → Main Platform (cross-domain auth working)
+   - **Recent Migration (Oct 2025):** Marketing & content management features migrated from v4 to portal
+   - **3 New Admin Pages:** Team Management, Site Logos, Blog (APIs complete)
+   - **6 New API Routes:** Team CRUD, photo uploads, logo uploads, blog CRUD, blog image uploads
 2. **Main Platform** → Supabase (all 93 endpoints operational)
 3. **Main Platform** → Stripe (**100% Ready** ✅)
    - **Checkout Flow:** V4 `/pricing` → V4 `/subscribe` → Stripe Hosted Checkout → Portal Dashboard
