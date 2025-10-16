@@ -34,7 +34,7 @@ export default function AIAssistantMarketingPage() {
           onClick={handleTryPlatform}
           className="bg-gradient-to-r from-violet-600 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold hover:from-violet-700 hover:to-purple-800 transition-all transform hover:scale-[1.02] shadow-lg text-lg"
         >
-          🚀 Start 14-Day Free Trial
+          🚀 Take the Design Rite Challenge
         </button>
       </section>
 
@@ -253,7 +253,7 @@ export default function AIAssistantMarketingPage() {
           onClick={handleTryPlatform}
           className="bg-white text-violet-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all text-lg"
         >
-          Start 14-Day Free Trial
+          Take the Challenge - 7 Days Free
         </button>
         <p className="text-sm text-gray-400 mt-4">
           No credit card required • Full access to all features • Upload existing proposals instantly

@@ -141,7 +141,7 @@ function SignupForm() {
             DR
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
-          <p className="text-gray-400">Start your 14-day free trial</p>
+          <p className="text-gray-400">Take the Design Rite Challenge - 7 Days Free</p>
         </div>
 
         {/* Signup Form */}
@@ -321,7 +321,7 @@ function SignupForm() {
             <div>
               <p className="text-xs text-gray-400">
                 <strong className="text-purple-400">Start Your Free Trial</strong><br />
-                No credit card required. 14-day trial with full access to all features.
+                No credit card required. 7-day trial with full access to all features.
               </p>
             </div>
           </div>

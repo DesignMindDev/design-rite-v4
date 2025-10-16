@@ -118,7 +118,7 @@ export default function UpgradeModal({
                   ${recommendedPlan === 'professional' ? '199' : '499'}
                   <span className="text-sm text-gray-400 ml-1">/mo</span>
                 </div>
-                <p className="text-green-400 text-sm">14-day free trial</p>
+                <p className="text-green-400 text-sm">7-day free trial</p>
               </div>
             </div>
 

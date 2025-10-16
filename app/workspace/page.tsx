@@ -369,7 +369,7 @@ export default function DashboardPage() {
   };
 
   const handleContinueProject = (project: RecentProject) => {
-    // Load project data into sessionStorage for AI Assistant to pick up
+    // Load project data into sessionStorage for AI Refinement to pick up
     const handoffKey = project.tool === 'security-estimate' ? 'quickEstimateData' :
                        project.tool === 'ai-discovery' ? 'aiDiscoveryData' :
                        'aiAssistantData';
@@ -380,8 +380,8 @@ export default function DashboardPage() {
       resumedAt: new Date().toISOString()
     }));
 
-    // Navigate to AI Assistant to continue work
-    router.push('/ai-assistant');
+    // Navigate to AI Refinement to continue work
+    router.push('/ai-refinement');
   };
 
   const getPriorityColor = (project: RecentProject) => {
@@ -591,14 +591,14 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            {/* AI Assistant */}
+            {/* AI Refinement */}
             <div className="bg-gray-800/60 backdrop-blur-xl dr-border-violet rounded-2xl p-6 border hover:shadow-2xl hover:shadow-purple-600/20 transition-all group">
               <div className="flex items-center mb-4">
                 <div className="p-3 dr-bg-violet rounded-xl mr-3">
                   <Bot className="w-6 h-6 dr-text-pearl" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">AI Assistant</h3>
+                  <h3 className="text-xl font-bold text-white">AI Refinement</h3>
                   <p className="text-gray-400 text-sm">5-10 minutes</p>
                 </div>
               </div>
@@ -606,10 +606,10 @@ export default function DashboardPage() {
                 Refine any assessment with natural language. Upload existing proposals for enhancement.
               </p>
               <button
-                onClick={(e) => handleToolAccess('/ai-assistant', e)}
+                onClick={(e) => handleToolAccess('/ai-refinement', e)}
                 className="w-full flex items-center justify-center dr-bg-violet hover:bg-purple-700 dr-text-pearl font-bold py-3 px-4 rounded-xl transition-all group-hover:scale-105"
               >
-                Start AI Assistant
+                Start AI Refinement
                 <ArrowRight className="w-4 h-4 ml-2" />
               </button>
             </div>
@@ -929,7 +929,7 @@ export default function DashboardPage() {
             {/* Trust Badge */}
             <div className="mt-8 text-center">
               <p className="text-gray-400 text-sm">
-                ✨ <span className="text-purple-300 font-semibold">14-day free trial</span> on all paid plans • Cancel anytime • No credit card required
+                ✨ <span className="text-purple-300 font-semibold">7-day free trial</span> on all paid plans • Cancel anytime • No credit card required
               </p>
             </div>
           </div>

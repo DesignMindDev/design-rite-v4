@@ -621,6 +621,10 @@ export default function AdminPage() {
                     <span>⚡</span>
                     <span>Super Agent</span>
                   </Link>
+                  <Link href="/admin/automation" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-cyan-600/20 transition-colors">
+                    <span>🤖</span>
+                    <span>Automation</span>
+                  </Link>
                   <Link href="/admin/harvester" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-cyan-600/20 transition-colors">
                     <span>🔍</span>
                     <span>Product Harvester</span>

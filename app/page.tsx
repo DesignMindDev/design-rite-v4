@@ -330,6 +330,47 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Design Rite Challenge Warning Banner */}
+      <section className="py-6 bg-gradient-to-r from-orange-900/60 via-red-900/60 to-orange-900/60 border-y-4 border-orange-500/50">
+        <div className="max-w-6xl mx-auto px-8">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-center md:text-left">
+            <div className="flex items-center gap-4">
+              <span className="text-5xl">⚠️</span>
+              <div>
+                <h3 className="text-2xl font-black text-orange-200 mb-1">
+                  WARNING: OUR FIRST FREE AUTOMATION IS ADDICTIVE
+                </h3>
+                <p className="text-orange-300 dr-ui font-medium">
+                  Just like you can't eat just one chip, you can't experience just one automation without wanting more
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleTryPlatformClick}
+              className="bg-white text-orange-600 px-8 py-4 rounded-xl dr-ui font-black hover:bg-orange-100 transition-all shadow-xl whitespace-nowrap"
+            >
+              Take the Challenge →
+            </button>
+          </div>
+          <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center items-center text-sm">
+            <div className="flex items-center gap-2 text-orange-200">
+              <span className="text-2xl">⚡</span>
+              <span className="font-semibold">Get 2+ Hours Back Daily</span>
+            </div>
+            <div className="hidden sm:block text-orange-400">•</div>
+            <div className="flex items-center gap-2 text-orange-200">
+              <span className="text-2xl">🎁</span>
+              <span className="font-semibold">Try Everything Free for 7 Days</span>
+            </div>
+            <div className="hidden sm:block text-orange-400">•</div>
+            <div className="flex items-center gap-2 text-orange-200">
+              <span className="text-2xl">🚀</span>
+              <span className="font-semibold">Watch What Happens Next</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Problem/Solution Section */}
       <section className="py-24 bg-black/50">
         <div className="max-w-4xl mx-auto px-8 text-center">
