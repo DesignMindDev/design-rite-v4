@@ -124,68 +124,148 @@ export async function POST(req: NextRequest) {
 
 /**
  * Handle checkout.session.completed
- * Creates initial subscription record
+ * Creates subscription record + sends magic link for Challenge flow
  */
 async function handleCheckoutCompleted(
   session: Stripe.Checkout.Session,
   stripe: Stripe,
   supabase: ReturnType<typeof createClient>
 ) {
-  console.log('[Stripe] Checkout completed:', session.id);
+  console.log('[Stripe Webhook] Checkout completed:', session.id);
+  console.log('[Stripe Webhook] Metadata:', session.metadata);
 
-  const userId = session.metadata?.user_id;
+  const userId = session.metadata?.userId; // Changed from user_id to userId (matches our API)
+  const leadId = session.metadata?.leadId;
+  const email = session.metadata?.email;
+  const offerChoice = session.metadata?.offerChoice;
   const subscriptionId = session.subscription as string;
 
-  if (!userId || !subscriptionId) {
-    console.error('[Stripe] Missing user_id or subscription_id in metadata');
+  if (!userId || !subscriptionId || !email) {
+    console.error('[Stripe Webhook] Missing required metadata:', { userId, subscriptionId, email });
     return;
   }
+
+  console.log('[Stripe Webhook] Processing subscription for user:', userId);
 
   // Fetch full subscription details
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-  // Determine tier from price
-  const tier = getTierFromPrice(subscription.items.data[0].price.id);
+  const isTrial = subscription.status === 'trialing';
+  const priceId = subscription.items.data[0].price.id;
+  const planId = getPlanFromPrice(priceId); // 'starter' or 'professional'
 
-  // Create subscription record
-  const { error } = await supabase.from('subscriptions').insert({
-    user_id: userId,
-    stripe_subscription_id: subscription.id,
-    stripe_customer_id: subscription.customer as string,
-    tier,
-    status: subscription.status === 'trialing' ? 'trialing' : 'active',
-    billing_period: subscription.items.data[0].price.recurring?.interval === 'year' ? 'annual' : 'monthly',
-    amount: subscription.items.data[0].price.unit_amount || 0,
-    trial_start: subscription.trial_start ? new Date(subscription.trial_start * 1000).toISOString() : null,
-    trial_end: subscription.trial_end ? new Date(subscription.trial_end * 1000).toISOString() : null,
-    current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-    current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-    next_billing_date: new Date(subscription.current_period_end * 1000).toISOString(),
+  console.log('[Stripe Webhook] Subscription details:', {
+    status: subscription.status,
+    isTrial,
+    planId,
+    priceId
   });
 
-  if (error) {
-    console.error('[Stripe] Error creating subscription:', error);
+  // ==============================================
+  // STEP 1: Create subscription record
+  // ==============================================
+  const { error: subError } = await supabase.from('subscriptions').insert({
+    user_id: userId,
+    stripe_customer_id: subscription.customer as string,
+    stripe_subscription_id: subscription.id,
+    stripe_price_id: priceId,
+    status: subscription.status, // 'trialing' or 'active'
+    plan_id: planId,
+
+    // Trial information
+    trial_started_at: subscription.trial_start ? new Date(subscription.trial_start * 1000).toISOString() : null,
+    trial_ends_at: subscription.trial_end ? new Date(subscription.trial_end * 1000).toISOString() : null,
+
+    // Billing period
+    current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+    current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+
+    // Pricing
+    amount_cents: subscription.items.data[0].price.unit_amount || 0,
+    currency: subscription.currency || 'usd',
+    interval: subscription.items.data[0].price.recurring?.interval || 'month',
+
+    // Discount/Coupon (if 20% discount was applied)
+    coupon_code: subscription.discount?.coupon.id || null,
+    discount_percent: subscription.discount?.coupon.percent_off || null,
+
+    // Metadata
+    source: 'design_rite_challenge',
+    campaign_name: session.metadata?.campaignName || 'Take the Design Rite Challenge',
+
+    // Payment method info (if available)
+    payment_method_last4: null, // Will be populated on first payment
+    payment_method_brand: null,
+  });
+
+  if (subError) {
+    console.error('[Stripe Webhook] Error creating subscription:', subError);
     return;
   }
 
-  // Update user profile
-  await supabase.from('profiles').update({
-    subscription_tier: tier,
-    subscription_status: subscription.status === 'trialing' ? 'trialing' : 'active',
-    stripe_customer_id: subscription.customer as string,
-    stripe_subscription_id: subscription.id,
-  }).eq('id', userId);
+  console.log('[Stripe Webhook] Subscription record created successfully');
 
-  // Log subscription history
-  await supabase.from('subscription_history').insert({
+  // ==============================================
+  // STEP 2: Create subscription event log
+  // ==============================================
+  await supabase.from('subscription_events').insert({
     user_id: userId,
-    action: subscription.status === 'trialing' ? 'trial_started' : 'created',
-    new_tier: tier,
+    event_type: isTrial ? 'trial_started' : 'subscription_created',
+    stripe_event_id: session.id,
     new_status: subscription.status,
-    is_automatic: true,
+    amount_cents: subscription.items.data[0].price.unit_amount || 0,
+    metadata: {
+      offer_choice: offerChoice,
+      plan_id: planId,
+      trial_days: isTrial ? 7 : 0
+    }
   });
 
-  console.log(`[Stripe] Subscription created for user ${userId}, tier: ${tier}`);
+  // ==============================================
+  // STEP 3: Update challenge_leads table
+  // ==============================================
+  if (leadId) {
+    await supabase
+      .from('challenge_leads')
+      .update({
+        account_created: true,
+        stripe_customer_id: subscription.customer as string,
+        subscription_status: subscription.status
+      })
+      .eq('id', leadId);
+
+    console.log('[Stripe Webhook] Updated challenge lead:', leadId);
+  }
+
+  // ==============================================
+  // STEP 4: Send magic link for authentication ⭐
+  // ==============================================
+  console.log('[Stripe Webhook] Sending magic link to:', email);
+
+  const { error: magicLinkError } = await supabase.auth.signInWithOtp({
+    email: email.toLowerCase(),
+    options: {
+      emailRedirectTo: process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3001/auth/callback'
+        : 'https://portal.design-rite.com/auth/callback',
+      data: {
+        from_stripe_checkout: true,
+        offer_choice: offerChoice,
+        subscription_status: subscription.status,
+        plan_id: planId
+      }
+    }
+  });
+
+  if (magicLinkError) {
+    console.error('[Stripe Webhook] Error sending magic link:', magicLinkError);
+    // Don't fail webhook - subscription is already created
+    // User can request new magic link from login page
+  } else {
+    console.log('[Stripe Webhook] Magic link sent successfully');
+  }
+
+  console.log(`[Stripe Webhook] ✅ Complete! User ${userId} can now sign in and set password`);
 }
 
 /**
@@ -466,7 +546,7 @@ async function handleTrialWillEnd(
 // ==============================================
 
 /**
- * Map Stripe price ID to subscription tier
+ * Map Stripe price ID to subscription tier (Challenge flow)
  */
 function getTierFromPrice(priceId: string): 'starter' | 'professional' | 'enterprise' {
   // Map your actual Stripe Price IDs here
@@ -481,6 +561,21 @@ function getTierFromPrice(priceId: string): 'starter' | 'professional' | 'enterp
 
   // Default to starter if unknown
   console.warn(`[Stripe] Unknown price ID: ${priceId}, defaulting to starter`);
+  return 'starter';
+}
+
+/**
+ * Get plan ID from price (simplified for Challenge)
+ */
+function getPlanFromPrice(priceId: string): string {
+  const STARTER_PRICE_ID = process.env.STRIPE_STARTER_PRICE_ID;
+  const PROFESSIONAL_PRICE_ID = process.env.STRIPE_PROFESSIONAL_PRICE_ID;
+
+  if (priceId === STARTER_PRICE_ID) return 'starter';
+  if (priceId === PROFESSIONAL_PRICE_ID) return 'professional';
+
+  // Default to starter
+  console.warn(`[Stripe Webhook] Unknown price ID: ${priceId}, defaulting to starter`);
   return 'starter';
 }
 
