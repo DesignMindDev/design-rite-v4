@@ -10,9 +10,12 @@ export default function PricingPage() {
   const [billingPeriod, setBillingPeriod] = useState('monthly') // 'monthly' or 'annual'
 
   const handleStartTrial = (plan: string) => {
-    // Redirect to subscribe page with plan and billing period
-    const subscribeUrl = `/subscribe?plan=${plan.toLowerCase()}&billing=${billingPeriod}`;
-    window.location.href = subscribeUrl;
+    // Redirect to portal trial signup page
+    const portalUrl = process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3005'
+      : 'https://portal.design-rite.com';
+
+    window.location.href = `${portalUrl}/start-trial`;
   }
 
   const plans = {

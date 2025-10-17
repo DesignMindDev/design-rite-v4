@@ -46,7 +46,7 @@ export default function PlatformAccessPage() {
     setIsReturningUser(true);
     // Redirect to portal for authentication
     window.location.href = process.env.NODE_ENV === 'development'
-      ? 'http://localhost:3001/auth'
+      ? 'http://localhost:3005/auth'
       : 'https://portal.design-rite.com/auth';
   };
 

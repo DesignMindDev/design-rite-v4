@@ -131,9 +131,11 @@ export default function CreateAccountPage() {
         return
       }
 
-      // For 7-day trial: Show success screen
-      setAccountCreated(true)
+      // For 7-day trial: Redirect to "Check Email" page
+      console.log('[Create Account] Redirecting to check-email page...')
       toast.success('Welcome to the Design Rite Challenge!')
+      window.location.href = `/challenge/check-email?email=${encodeURIComponent(formData.email)}`
+      return
 
     } catch (error: any) {
       console.error('[Create Account] Error:', error)
@@ -236,7 +238,7 @@ export default function CreateAccountPage() {
             {/* CTA Buttons */}
             <div className="flex gap-4">
               <a
-                href={process.env.NODE_ENV === 'development' ? 'http://localhost:3001/auth' : 'https://portal.design-rite.com/auth'}
+                href={process.env.NODE_ENV === 'development' ? 'http://localhost:3005/auth' : 'https://portal.design-rite.com/auth'}
                 className="flex-1 bg-gradient-to-r from-primary to-purple-600 text-white py-4 px-6 rounded-xl font-bold text-center hover:from-primary/90 hover:to-purple-600/90 transition-all shadow-lg"
               >
                 Go to Dashboard
