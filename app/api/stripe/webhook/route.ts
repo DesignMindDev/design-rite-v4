@@ -212,7 +212,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
 
       // Determine portal URL
       const portalUrl = process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3005'
+        ? 'http://localhost:3001'
         : 'https://portal.design-rite.com'
 
       // Send invite email (uses "You've been invited" template)
