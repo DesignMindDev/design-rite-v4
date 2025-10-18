@@ -46,14 +46,16 @@ export default function PlatformAccessPage() {
     setIsReturningUser(true);
     // Redirect to portal for authentication
     window.location.href = process.env.NODE_ENV === 'development'
-      ? 'http://localhost:3001/auth'
+      ? 'http://localhost:3005/auth'
       : 'https://portal.design-rite.com/auth';
   };
 
   const handleNewUser = () => {
     setIsReturningUser(false);
-    // Redirect to new account creation page with lead capture
-    window.location.href = '/create-account';
+    // Redirect to Stripe trial signup
+    window.location.href = process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3005/start-trial'
+      : 'https://portal.design-rite.com/start-trial';
   };
 
   // Show loading while checking auth

@@ -111,8 +111,8 @@ export async function POST(request: NextRequest) {
       email: email.toLowerCase(),
       options: {
         emailRedirectTo: process.env.NODE_ENV === 'development'
-          ? 'http://localhost:3001/welcome'
-          : 'https://portal.design-rite.com/welcome',
+          ? 'http://localhost:3001/auth/callback'
+          : 'https://portal.design-rite.com/auth/callback',
         data: {
           full_name: fullName,
           company,

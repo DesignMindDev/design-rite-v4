@@ -1,9 +1,16 @@
 'use client'
 
+<<<<<<< HEAD
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function CheckEmailPage() {
+=======
+import { Suspense, useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+
+function CheckEmailContent() {
+>>>>>>> 8c8f5cc3df934d6283a8675dfbaca659f6dd8559
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
   const [email, setEmail] = useState<string>('')
@@ -122,3 +129,21 @@ export default function CheckEmailPage() {
     </div>
   )
 }
+<<<<<<< HEAD
+=======
+
+export default function CheckEmailPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen dr-bg-gradient flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <CheckEmailContent />
+    </Suspense>
+  )
+}
+>>>>>>> 8c8f5cc3df934d6283a8675dfbaca659f6dd8559

@@ -18,19 +18,22 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const leadId = searchParams.get('leadId')
+    const userId = searchParams.get('userId') // NEW: Supabase user ID
     const email = searchParams.get('email')
     const fullName = searchParams.get('fullName')
     const company = searchParams.get('company')
-    const discount = searchParams.get('discount') // '20percent-first-year'
+    const offerChoice = searchParams.get('offerChoice') // '7day-trial' or '20percent-discount'
 
-    if (!leadId || !email) {
+    if (!leadId || !userId || !email || !offerChoice) {
       return NextResponse.json(
-        { error: 'Missing required parameters' },
+        { error: 'Missing required parameters: leadId, userId, email, offerChoice' },
         { status: 400 }
       )
     }
 
-    console.log('[Stripe Checkout] Creating session for:', email, 'with discount:', discount)
+    console.log('[Stripe Checkout] Creating session for:', email)
+    console.log('[Stripe Checkout] Offer choice:', offerChoice)
+    console.log('[Stripe Checkout] User ID:', userId)
 
     // Get pricing from environment variables or use defaults
     const STARTER_PRICE_ID = process.env.STRIPE_STARTER_PRICE_ID || 'price_starter'
@@ -50,12 +53,16 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Create Stripe checkout session with both plan options
+    // Determine if this is a trial or paid subscription
+    const isTrial = offerChoice === '7day-trial'
+    const is20PercentDiscount = offerChoice === '20percent-discount'
+
+    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       customer_email: email,
 
-      // Line items - both Starter and Professional options
+      // Line items - Starter plan (can upgrade later)
       line_items: [
         {
           price: STARTER_PRICE_ID,
@@ -63,19 +70,30 @@ export async function GET(request: NextRequest) {
         }
       ],
 
-      // Allow plan selection in checkout
+      // Subscription configuration
       subscription_data: {
+        // ⭐ TRIAL: 7 days with payment info collected
+        ...(isTrial ? {
+          trial_period_days: 7,
+          trial_settings: {
+            end_behavior: {
+              missing_payment_method: 'cancel' // Cancel if no payment method at trial end
+            }
+          }
+        } : {}),
+
         metadata: {
           leadId,
+          userId, // ⭐ CRITICAL: Supabase user ID for webhook
           fullName: fullName || '',
           company: company || '',
-          offerChoice: '20percent-discount',
+          offerChoice,
           source: 'design_rite_challenge'
         }
       },
 
-      // Apply 20% discount for first year (if specified)
-      ...(discount === '20percent-first-year' ? {
+      // Apply 20% discount for paid plan
+      ...(is20PercentDiscount ? {
         discounts: [
           {
             coupon: await getOrCreate20PercentCoupon()
@@ -83,20 +101,27 @@ export async function GET(request: NextRequest) {
         ]
       } : {}),
 
+      // Payment method collection
+      // Trial: Collect card but don't charge until trial ends
+      // Paid: Collect and charge immediately
+      payment_method_collection: isTrial ? 'if_required' : 'always',
+
       // Metadata for webhook processing
       metadata: {
         leadId,
+        userId, // ⭐ CRITICAL: For subscription record creation
         fullName: fullName || '',
         company: company || '',
         email,
-        offerChoice: '20percent-discount',
+        offerChoice,
         source: 'design_rite_challenge'
       },
 
       // Success/Cancel URLs
+      // ✅ NEW: Redirect to custom "Check Email" page instead of auth callback
       success_url: process.env.NODE_ENV === 'development'
-        ? `http://localhost:3001/welcome?session_id={CHECKOUT_SESSION_ID}`
-        : `https://portal.design-rite.com/welcome?session_id={CHECKOUT_SESSION_ID}`,
+        ? `http://localhost:3000/challenge/check-email?session_id={CHECKOUT_SESSION_ID}`
+        : `https://design-rite.com/challenge/check-email?session_id={CHECKOUT_SESSION_ID}`,
 
       cancel_url: process.env.NODE_ENV === 'development'
         ? `http://localhost:3000/create-account?cancelled=true`
@@ -107,6 +132,18 @@ export async function GET(request: NextRequest) {
       phone_number_collection: {
         enabled: true
       },
+
+      // Custom text for trial
+      ...(isTrial ? {
+        consent_collection: {
+          terms_of_service: 'required'
+        },
+        custom_text: {
+          submit: {
+            message: 'Start your 7-day free trial. Your card will be charged after the trial ends unless you cancel.'
+          }
+        }
+      } : {})
     })
 
     console.log('[Stripe Checkout] Session created:', session.id)
