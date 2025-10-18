@@ -53,17 +53,17 @@
 
 ---
 
-## 🔴 Issue 3: Stripe Webhooks Not Working - CRITICAL
+## 🔴 Issue 3: Stripe Webhook Secret Rotation Required - CRITICAL SECURITY
 
-**Problem:** No webhook events received today (Oct 18), last events were Oct 17
+**Problem:** Webhook secret was accidentally exposed in git commit (now removed)
+**Status:** Secret must be rotated immediately
 
-**Possible Causes:**
-1. Webhook endpoint URL changed
-2. Webhook signing secret changed/invalid
-3. Render deployment URL changed
-4. Webhook was deleted/disabled in Stripe
+**Security Incident:** GitGuardian detected exposed `STRIPE_WEBHOOK_SECRET` in commit history.
+Even though the file has been removed, the secret is considered compromised.
 
-### Diagnosis Steps:
+### Immediate Action Required:
+
+**STEP 1: Rotate Webhook Secret in Stripe** (DO THIS FIRST)
 
 1. **Check Stripe Webhook Configuration**
    - Go to: https://dashboard.stripe.com/webhooks
