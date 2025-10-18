@@ -53,6 +53,36 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    // Check if user already exists in Supabase Auth
+    console.log('[Create Account API] Checking for existing user:', email)
+    const { data: existingUsers } = await supabase.auth.admin.listUsers()
+    const existingUser = existingUsers?.users.find(u => u.email?.toLowerCase() === email.toLowerCase())
+
+    if (existingUser) {
+      console.log('[Create Account API] User already exists in auth system')
+
+      // Check if they have an active subscription
+      const { data: existingSubscription } = await supabase
+        .from('subscriptions')
+        .select('status, tier')
+        .eq('user_id', existingUser.id)
+        .single()
+
+      if (existingSubscription && existingSubscription.status === 'active') {
+        console.log('[Create Account API] User has active subscription - blocking signup')
+        return NextResponse.json(
+          {
+            error: 'You already have an active Design-Rite account! Please sign in instead.',
+            existingUser: true,
+            redirectToLogin: true
+          },
+          { status: 409 }
+        )
+      }
+
+      console.log('[Create Account API] User exists but no active subscription - allowing to continue')
+    }
+
     // Save lead data to challenge_leads table
     const { data: leadData, error: leadError } = await supabase
       .from('challenge_leads')

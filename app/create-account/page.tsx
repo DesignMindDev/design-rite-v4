@@ -108,6 +108,18 @@ export default function CreateAccountPage() {
       const data = await response.json()
 
       if (!response.ok) {
+        // Handle existing user error
+        if (response.status === 409 && data.existingUser) {
+          toast.error(data.error, { duration: 6000 })
+          setTimeout(() => {
+            const loginUrl = process.env.NODE_ENV === 'development'
+              ? 'http://localhost:3001/auth'
+              : 'https://portal.design-rite.com/auth'
+            window.location.href = loginUrl
+          }, 2000)
+          return
+        }
+
         throw new Error(data.error || 'Failed to create account')
       }
 
