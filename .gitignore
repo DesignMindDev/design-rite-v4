@@ -96,3 +96,9 @@ services/
 # Environment variable upload scripts with secrets
 upload-env-vars.bat
 upload-env.py
+
+# Diagnostic/Documentation files that may contain secrets
+*DIAGNOSTIC*.md
+*_WEBHOOK_*.md
+*SECRET*.md
+STRIPE_WEBHOOK_DIAGNOSTIC.md
