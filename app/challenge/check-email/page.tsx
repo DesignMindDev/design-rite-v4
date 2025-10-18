@@ -1,16 +1,9 @@
 'use client'
 
-<<<<<<< HEAD
-import { useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
-
-export default function CheckEmailPage() {
-=======
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 function CheckEmailContent() {
->>>>>>> 8c8f5cc3df934d6283a8675dfbaca659f6dd8559
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
   const [email, setEmail] = useState<string>('')
@@ -129,8 +122,6 @@ function CheckEmailContent() {
     </div>
   )
 }
-<<<<<<< HEAD
-=======
 
 export default function CheckEmailPage() {
   return (
@@ -146,4 +137,3 @@ export default function CheckEmailPage() {
     </Suspense>
   )
 }
->>>>>>> 8c8f5cc3df934d6283a8675dfbaca659f6dd8559
