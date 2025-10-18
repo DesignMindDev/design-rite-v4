@@ -1,8 +1,20 @@
 # Design-Rite v3 - Security Estimation System
 
+## 🚨 IMPORTANT: Deployment Policy
+
+**⚠️ READ THIS FIRST:** Before making any commits or deployments, review the **[DEPLOYMENT_POLICY.md](./DEPLOYMENT_POLICY.md)** file.
+
+**Current Phase:** Phase 1 - Pre-Production Development
+- `main` branch → Auto-deploys to production (testing environment)
+- `staging` branch → Manual deploys only (use Render API)
+- Always sync staging with main before manual deployment
+- Phase 2 workflow (staging validation required) will be enforced once V4 is production-ready
+
 ## 🗺️ Strategic Roadmap
 
 **[Spatial Studio Roadmap & Vision](./SPATIAL_STUDIO_ROADMAP.md)** - Complete product roadmap for Spatial Studio / Integrator Plus+ platform, including phasing strategy, technical architecture, and investment timeline.
+
+**[Deployment Policy](./DEPLOYMENT_POLICY.md)** - Complete deployment workflow, branch strategy, and Render API commands for both development and production phases.
 
 ---
 
