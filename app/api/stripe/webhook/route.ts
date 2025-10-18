@@ -200,35 +200,25 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       supabaseUserId = newUser.user.id
       console.log(`[Webhook] Created new user: ${supabaseUserId}`)
 
-      // Send magic link email for password setup
-      console.log(`[Webhook] Sending magic link to: ${customerEmail}`)
+      // Send password reset email for initial password setup
+      console.log(`[Webhook] Sending password setup email to: ${customerEmail}`)
 
       // Determine portal URL
       const portalUrl = process.env.NODE_ENV === 'development'
         ? 'http://localhost:3005'
         : 'https://portal.design-rite.com'
 
-      const { error: magicLinkError } = await supabaseAdmin.auth.admin.generateLink({
-        type: 'magiclink',
-        email: customerEmail,
-        options: {
-          redirectTo: `${portalUrl}/auth/callback`
-        }
+      // Send password reset email (this actually sends an email!)
+      const { data: resetData, error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(customerEmail, {
+        redirectTo: `${portalUrl}/reset-password`
       })
 
-      if (magicLinkError) {
-        console.error('[Webhook] Failed to send magic link:', magicLinkError)
-        // Try password reset as fallback
-        const { error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(customerEmail, {
-          redirectTo: `${portalUrl}/reset-password`
-        })
-        if (resetError) {
-          console.error('[Webhook] Failed to send password reset:', resetError)
-        } else {
-          console.log(`[Webhook] Sent password reset email as fallback`)
-        }
+      if (resetError) {
+        console.error('[Webhook] Failed to send password setup email:', resetError)
+        console.log('[Webhook] User created but email failed - user can request password reset manually')
       } else {
-        console.log(`[Webhook] Magic link sent successfully`)
+        console.log(`[Webhook] Password setup email sent successfully`)
+        console.log('[Webhook] Email data:', resetData)
       }
 
       // Create user profile
