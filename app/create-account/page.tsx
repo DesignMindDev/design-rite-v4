@@ -131,9 +131,11 @@ export default function CreateAccountPage() {
         return
       }
 
-      // For 7-day trial: Show success screen
-      setAccountCreated(true)
+      // For 7-day trial: Redirect to "Check Email" page
+      console.log('[Create Account] Redirecting to check-email page...')
       toast.success('Welcome to the Design Rite Challenge!')
+      window.location.href = `/challenge/check-email?email=${encodeURIComponent(formData.email)}`
+      return
 
     } catch (error: any) {
       console.error('[Create Account] Error:', error)
