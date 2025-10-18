@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-export default function ExistingUserPage() {
+function ExistingUserContent() {
   const searchParams = useSearchParams()
   const email = searchParams.get('email')
 
@@ -94,5 +94,20 @@ export default function ExistingUserPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ExistingUserPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen dr-bg-gradient flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <ExistingUserContent />
+    </Suspense>
   )
 }
