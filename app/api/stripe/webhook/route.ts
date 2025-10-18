@@ -215,6 +215,10 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
         ? 'http://localhost:3001'
         : 'https://portal.design-rite.com'
 
+      console.log('[Webhook] NODE_ENV:', process.env.NODE_ENV)
+      console.log('[Webhook] Portal URL:', portalUrl)
+      console.log('[Webhook] Redirect URL will be:', `${portalUrl}/auth/callback`)
+
       // Send invite email (uses "You've been invited" template)
       const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(customerEmail, {
         redirectTo: `${portalUrl}/auth/callback`,
