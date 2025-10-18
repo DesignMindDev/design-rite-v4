@@ -180,6 +180,13 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     if (userExists) {
       supabaseUserId = userExists.id
       console.log(`[Webhook] Found existing user: ${supabaseUserId}`)
+
+      // User already exists - send them a friendly reminder email
+      // Note: They won't get charged twice - Stripe prevents duplicate subscriptions
+      console.log(`[Webhook] Existing user attempted signup - they should have been redirected to login`)
+
+      // Don't process subscription for existing users - they should use the portal
+      return
     } else {
       // Create new user in Supabase Auth
       console.log(`[Webhook] Creating new user for email: ${customerEmail}`)

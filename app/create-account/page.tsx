@@ -121,12 +121,14 @@ export default function CreateAccountPage() {
         // Redirect to Stripe checkout with lead data
         const stripeParams = new URLSearchParams({
           leadId: data.leadId,
+          userId: data.userId || '', // Include userId for Stripe metadata
           email: formData.email,
           fullName: formData.fullName,
           company: formData.company,
-          discount: '20percent-first-year'
+          offerChoice: formData.offerChoice // Include offer choice
         })
 
+        // Redirect - the API will either redirect to Stripe or return error JSON
         window.location.href = `/api/stripe/create-checkout-session?${stripeParams.toString()}`
         return
       }

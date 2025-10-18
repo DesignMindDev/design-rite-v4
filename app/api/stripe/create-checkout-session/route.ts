@@ -1,9 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { createClient } from '@supabase/supabase-js'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-11-20.acacia',
 })
+
+// Initialize Supabase admin client
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
+)
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,6 +42,35 @@ export async function GET(request: NextRequest) {
         { error: 'Missing required parameters: leadId, userId, email, offerChoice' },
         { status: 400 }
       )
+    }
+
+    // Check if user already exists in Supabase Auth (duplicate detection)
+    console.log('[Stripe Checkout] Checking for existing user:', email)
+    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers()
+    const existingUser = existingUsers?.users.find(u => u.email?.toLowerCase() === email.toLowerCase())
+
+    if (existingUser) {
+      console.log('[Stripe Checkout] User already exists:', email)
+
+      // Check if they already have an active subscription
+      const { data: existingSubscription } = await supabaseAdmin
+        .from('subscriptions')
+        .select('status, tier')
+        .eq('user_id', existingUser.id)
+        .eq('status', 'active')
+        .single()
+
+      if (existingSubscription) {
+        console.log('[Stripe Checkout] User already has active subscription - redirecting to existing-user page')
+        const existingUserUrl = process.env.NODE_ENV === 'development'
+          ? `http://localhost:3000/create-account/existing-user?email=${encodeURIComponent(email)}`
+          : `https://design-rite.com/create-account/existing-user?email=${encodeURIComponent(email)}`
+
+        return NextResponse.redirect(existingUserUrl)
+      }
+
+      // User exists but no active subscription - allow them to proceed
+      console.log('[Stripe Checkout] User exists but no active subscription - allowing checkout')
     }
 
     console.log('[Stripe Checkout] Creating session for:', email)
