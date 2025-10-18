@@ -10,10 +10,12 @@
 
 ### Render Environment Variables (Verified)
 ```bash
-STRIPE_WEBHOOK_SECRET=whsec_Vh8ERs6CgFysvS2pkb5xvHHiKAldULIG
-STRIPE_SECRET_KEY=sk_test_51Rdsn800jf1eOeXQ... (redacted - check Render dashboard)
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_51Rdsn800jf1eOeXQ... (redacted - check Render dashboard)
+STRIPE_WEBHOOK_SECRET=whsec_... (check Render dashboard)
+STRIPE_SECRET_KEY=sk_test_... (check Render dashboard)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_... (check Render dashboard)
 ```
+
+**Note:** Never commit actual secrets to Git. Check Render dashboard for current values.
 
 ### Known Webhook Endpoints
 Your application has **TWO** webhook routes:
@@ -49,8 +51,9 @@ Your application has **TWO** webhook routes:
 4. **Check Webhook Signing Secret**
    - Click on the webhook endpoint
    - Click "Reveal" next to "Signing secret"
-   - **Does it match:** `whsec_Vh8ERs6CgFysvS2pkb5xvHHiKAldULIG`?
-   - If NOT, you need to either:
+   - Compare it with the value in Render environment variables
+   - To check Render env var: https://dashboard.render.com/web/srv-d35mk4bipnbc739je85g/env
+   - If they don't match, you need to either:
      - Update Render env var to match Stripe's secret, OR
      - Delete and recreate the webhook in Stripe
 
