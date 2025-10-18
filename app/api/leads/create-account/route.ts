@@ -134,13 +134,13 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // For 7-day trial: Send magic link for email verification
-    console.log('[Create Account API] Sending magic link to:', email)
+    // For 7-day trial: Send invite email to create account
+    console.log('[Create Account API] Sending invite email to:', email)
 
-    const { data: authData, error: authError } = await supabase.auth.signInWithOtp({
-      email: email.toLowerCase(),
-      options: {
-        emailRedirectTo: process.env.NODE_ENV === 'development'
+    const { data: inviteData, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(
+      email.toLowerCase(),
+      {
+        redirectTo: process.env.NODE_ENV === 'development'
           ? 'http://localhost:3001/auth/callback'
           : 'https://portal.design-rite.com/auth/callback',
         data: {
@@ -155,24 +155,24 @@ export async function POST(request: NextRequest) {
           campaign_name: campaignName
         }
       }
-    })
+    )
 
-    if (authError) {
-      console.error('[Create Account API] Error sending magic link:', authError)
-      // Don't fail the request if magic link fails - lead data is already saved
-      // User can request a new magic link later
+    if (inviteError) {
+      console.error('[Create Account API] Error sending invite email:', inviteError)
+      // Don't fail the request if invite fails - lead data is already saved
+      // User can request a new invite later
       return NextResponse.json({
         success: true,
-        message: 'Lead saved successfully. Please check your email for verification link.',
+        message: 'Lead saved successfully. Please check your email for your invitation link.',
         leadId: leadData.id,
-        magicLinkSent: false,
-        warning: 'Magic link could not be sent. Please contact support.'
+        inviteSent: false,
+        warning: 'Invite email could not be sent. Please contact support.'
       })
     }
 
-    console.log('[Create Account API] Magic link sent successfully')
+    console.log('[Create Account API] Invite email sent successfully')
 
-    // Update lead with magic link sent timestamp
+    // Update lead with invite sent timestamp
     await supabase
       .from('challenge_leads')
       .update({ magic_link_sent_at: new Date().toISOString() })
@@ -180,9 +180,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Account created successfully! Please check your email to verify and access your account.',
+      message: 'Account created successfully! Please check your email for your invitation to join Design-Rite.',
       leadId: leadData.id,
-      magicLinkSent: true
+      inviteSent: true
     })
 
   } catch (error: any) {

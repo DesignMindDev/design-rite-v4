@@ -207,25 +207,31 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       supabaseUserId = newUser.user.id
       console.log(`[Webhook] Created new user: ${supabaseUserId}`)
 
-      // Send password reset email for initial password setup
-      console.log(`[Webhook] Sending password setup email to: ${customerEmail}`)
+      // Send invite email for initial password setup
+      console.log(`[Webhook] Sending invite email to: ${customerEmail}`)
 
       // Determine portal URL
       const portalUrl = process.env.NODE_ENV === 'development'
         ? 'http://localhost:3005'
         : 'https://portal.design-rite.com'
 
-      // Send password reset email (this actually sends an email!)
-      const { data: resetData, error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(customerEmail, {
-        redirectTo: `${portalUrl}/reset-password`
+      // Send invite email (uses "You've been invited" template)
+      const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(customerEmail, {
+        redirectTo: `${portalUrl}/auth/callback`,
+        data: {
+          full_name: session.metadata?.fullName || session.customer_details?.name || '',
+          company: session.metadata?.company || '',
+          tier: tier || 'starter',
+          source: 'stripe_checkout'
+        }
       })
 
-      if (resetError) {
-        console.error('[Webhook] Failed to send password setup email:', resetError)
-        console.log('[Webhook] User created but email failed - user can request password reset manually')
+      if (inviteError) {
+        console.error('[Webhook] Failed to send invite email:', inviteError)
+        console.log('[Webhook] User created but email failed - user can request invite manually')
       } else {
-        console.log(`[Webhook] Password setup email sent successfully`)
-        console.log('[Webhook] Email data:', resetData)
+        console.log(`[Webhook] Invite email sent successfully`)
+        console.log('[Webhook] Email data:', inviteData)
       }
 
       // Create user profile

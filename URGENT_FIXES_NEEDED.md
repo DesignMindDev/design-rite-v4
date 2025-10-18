@@ -14,78 +14,42 @@
 
 ---
 
-## ⚠️ Issue 2: Supabase Email Template - MANUAL FIX REQUIRED
+## ✅ Issue 2: Supabase Email Template - IMPROVED WITH INVITE EMAIL
 
-**Problem:** Email says "Reset Password" instead of "Create Your Password"
+**Problem:** Email said "Reset Password" instead of welcoming new users
 
-**Solution:** You MUST update the Supabase email template in the dashboard
+**Solution:** Switched to "Invite User" email template (much better approach!)
 
-### Step-by-Step Instructions:
+### What Changed in Code:
+
+**✅ Updated Files:**
+1. `app/api/stripe/webhook/route.ts` - Now uses `inviteUserByEmail()` instead of `resetPasswordForEmail()`
+2. `app/api/leads/create-account/route.ts` - Now uses `inviteUserByEmail()` instead of `signInWithOtp()`
+
+**✅ Benefits:**
+- More welcoming messaging: "You've been invited to join Design-Rite"
+- Better user experience than "reset password" for new signups
+- Can include rich onboarding content
+- More professional and less confusing
+
+### Manual Setup Required:
 
 1. **Go to Supabase Dashboard**
    - URL: https://supabase.com/dashboard/project/aeorianxnxpxveoxzhov
    - Navigate to: **Authentication** → **Email Templates**
 
-2. **Select "Reset Password" Template**
+2. **Select "Invite User" Template** (NOT "Reset Password")
 
-3. **Update Subject Line:**
-   ```
-   Welcome to Design-Rite! Create Your Password 🚀
-   ```
+3. **Update with custom template from:**
+   - See complete template in: `SUPABASE_INVITE_EMAIL_TEMPLATE.md`
+   - Copy and paste the entire HTML template
+   - Update subject line: "Welcome to Design-Rite! You've Been Invited 🎉"
 
-4. **Replace Template Body with:**
-   ```html
-   <h2>Welcome to Design-Rite! 🎉</h2>
+4. **Click "Save"**
 
-   <p>Hi there,</p>
-
-   <p>Welcome to the Design-Rite family! We're thrilled to have you join thousands of security and low-voltage professionals who are transforming how they create proposals.</p>
-
-   <h3>Create Your Password</h3>
-
-   <p>To get started, click the button below to create your secure password:</p>
-
-   <p><a href="{{ .ConfirmationURL }}" style="display: inline-block; padding: 12px 24px; background-color: #7C3AED; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">Create My Password</a></p>
-
-   <p>Or copy and paste this link into your browser:<br/>
-   {{ .ConfirmationURL }}</p>
-
-   <h3>What's Next?</h3>
-
-   <ul>
-     <li><strong>Access Your Dashboard</strong> - View all your projects and proposals in one place</li>
-     <li><strong>Try AI Assessment</strong> - Get professional proposals in minutes, not hours</li>
-     <li><strong>Join the Community</strong> - Connect with other sales engineers and share tips</li>
-   </ul>
-
-   <h3>Need Help?</h3>
-
-   <p>Our support team is here for you:</p>
-   <ul>
-     <li>📧 Email: support@design-rite.com</li>
-     <li>📚 Help Center: https://design-rite.com/help</li>
-     <li>💬 Live Chat: Available in your dashboard</li>
-   </ul>
-
-   <p>This link expires in 24 hours for security purposes. If it expires, you can request a new one anytime.</p>
-
-   <p>Excited to see what you'll build with Design-Rite!</p>
-
-   <p>Best regards,<br/>
-   The Design-Rite Team</p>
-
-   <hr style="border: 1px solid #e5e7eb; margin: 24px 0;"/>
-
-   <p style="font-size: 12px; color: #6b7280;">
-     If you didn't sign up for Design-Rite, you can safely ignore this email. Someone may have entered your email address by mistake.
-   </p>
-   ```
-
-5. **Click "Save"**
-
-6. **Test:**
-   - Create a new test account
-   - Check email - should now say "Welcome to Design-Rite! Create Your Password"
+5. **Test:**
+   - Create a new test account (7-day trial or Stripe checkout)
+   - Check email - should say "You've been invited to join Design-Rite"
 
 ---
 
@@ -239,9 +203,12 @@ NODE_ENV=production
 
 ## 📝 Files Modified in This Fix
 
-1. `app/api/leads/create-account/route.ts` - Added duplicate user check
-2. `app/create-account/page.tsx` - Handle 409 error and redirect to login
-3. `URGENT_FIXES_NEEDED.md` - This file (instructions)
+1. `app/api/leads/create-account/route.ts` - Added duplicate user check + switched to invite email
+2. `app/api/stripe/webhook/route.ts` - Switched from resetPasswordForEmail to inviteUserByEmail
+3. `app/create-account/page.tsx` - Handle 409 error and redirect to login
+4. `URGENT_FIXES_NEEDED.md` - This file (instructions)
+5. `SUPABASE_INVITE_EMAIL_TEMPLATE.md` - New file with custom invite email template
+6. `STRIPE_WEBHOOK_DIAGNOSTIC.md` - New file with webhook troubleshooting guide
 
 ---
 
